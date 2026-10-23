@@ -34,3 +34,6 @@ deliverables/*.xlsx
 # 预览产物
 work/preview.png
 work/xlsx_prev/
+
+# 本地密钥（绝不提交）
+.secrets/
