@@ -392,10 +392,21 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-19 | v0.30 | 完整口径改名：扣掉所有费用后的净利润 → **Net Cash Profit 现金净利润（完整口径）**；总成本回报率 → **Net Cash Return on Capital 现金总成本回报率** |
 | 2026-10-19 | v0.31 | 自动格（SPA/LA 律师费、估价费、卖出中介费、卖出律师费）编辑体验重做：输入过程中不回填（可自由删改、边改边算），离开时仍为空才恢复自动值；手动改过则保持橙色覆盖 |
 | 2026-10-19 | v0.32 | RPGT 改老板口径：(卖价 − 实价 − 总购置费用 − 卖出中介费 − 卖出律师费 − 售出杂费) × 年限税率（30/20/15/0），不再用法定豁免；RPGT 行移到售出杂费下方；删「Selling related cost」标题与整个完整口径块（Net Cash Profit → XIRR）；test.js 保持 48 项 |
+| 2026-10-19 | 版本管理 | 初始化 git 仓库并推送到 GitHub 私有仓库 `jamesyew1314/Property-nvestment-calculator`；标签 v0.32 |
 
 ---
 
-## 14. 快速链接
+## 14. 版本管理（git）
+
+- **私有仓库**：`git@ssh.github.com:443/jamesyew1314/Property-nvestment-calculator.git`（GitHub 账号 `jamesyew1314`，分支 `main`）
+- **密钥**：`~/.ssh/laoyeshu_gh`（已注册到该账号，走 443 端口）；仓库内已设 `core.sshCommand`
+- **发布流程**：改 → `node web/test.js` 全过 → 浏览器 QA → 部署（scp + chmod 644 + sha256 核对）→ `git commit` → `git tag -a vX.XX` → `git push --tags`
+- **回滚**：`git checkout <tag> -- web/` 后重新部署；服务器备份在 `/opt/laoyeshu/backups/`
+- **不纳入 git**：生成物（PDF/DOCX/XLSX）、预览产物、`backups/`、`.secrets/`
+
+---
+
+## 15. 快速链接
 
 - 完整方案（Markdown）：[`deliverables/房地产投资分析系统_需求分析与开发方案_v1.1.md`](deliverables/房地产投资分析系统_需求分析与开发方案_v1.1.md)
 - 公式与对账（Markdown）：[`deliverables/投资系统_公式验证与案例对账_v1.1.md`](deliverables/投资系统_公式验证与案例对账_v1.1.md)
