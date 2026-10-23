@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>房地产投资快速计算器 v0.1</title>
+<style>
+  :root {
+    --navy:#1F3864; --blue:#2E5496; --light:#EAF0FA; --ink:#222; --grey:#68707C;
+    --input:#FFF6DD; --auto:#EAF0FA; --out:#E7F4EC; --red:#B23B3B; --green:#166E52;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+         background:#F4F6FA; color:var(--ink); font-size:15px; }
+  header { background:var(--navy); color:#fff; padding:14px 16px; }
+  .headrow { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  header h1 { margin:0; font-size:18px; font-weight:700; }
+  .logo { height:30px; width:auto; vertical-align:-7px; border-radius:6px; margin-right:8px; }
+  header p { margin:4px 0 0; font-size:12px; opacity:.8; }
+  #langBtn { flex:none; border:1px solid rgba(255,255,255,.6); background:transparent; color:#fff;
+       border-radius:9px; padding:6px 12px; font-size:14px; font-weight:600; cursor:pointer; }
+  main { max-width:640px; margin:0 auto; padding:12px 12px 48px; }
+  .part { background:#fff; border-radius:14px; padding:14px 14px 10px; margin-bottom:14px;
+          box-shadow:0 1px 4px rgba(31,56,100,.08); }
+  .part h2 { margin:0 0 4px; font-size:16px; color:var(--navy); }
+  .part .sub { font-size:12px; color:var(--grey); margin:0 0 10px; }
+  .subh { font-size:14px; color:var(--blue); margin:12px 0 2px; font-weight:600; }
+  .row { display:flex; align-items:center; margin-bottom:9px; }
+  .row label { flex:1 1 46%; font-size:13px; color:#3A4351; line-height:1.3; }
+  .row input, .row select { width:118px; padding:8px 10px; border:1px solid #C9D3E2; border-radius:9px;
+       font-size:15px; text-align:right; background:#fff; color:var(--ink); }
+  .row input.manual, .row select.manual { background:var(--input); border-color:#E4CE8B; }
+  .row input.auto { background:var(--auto); border-color:#B9CBEA; color:var(--blue); font-weight:600; }
+  .row input.override { background:#FFEED9; border-color:#E2A76F; color:#8A5A2B; font-weight:600; }
+  #loanPct { width:72px; margin-right:4px; }
+  .unitPct { width:20px; margin-left:2px; }
+  .autoVal { width:118px; text-align:right; font-size:15px; font-weight:600; color:var(--blue); }
+  .unit { width:34px; font-size:12px; color:var(--grey); margin-left:4px; }
+  .out { background:var(--out); border:1px solid #C4E0D0; border-radius:10px; padding:10px 12px; margin-top:6px; }
+  .out .line { display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:13.5px; padding:2px 0; }
+  .out .line > span:first-child { flex:1 1 auto; min-width:0; }
+  .out .line > span:last-child, .out .line > b:last-child { flex:none; white-space:nowrap; text-align:right; }
+  .hr { border-top:1px solid #BFD8C8; margin:8px 0; }
+  .out .line b { font-size:15px; color:var(--green); }
+  .big { font-size:18px !important; }
+  .lessHead span { color:var(--grey); font-size:12.5px; font-weight:600; }
+  .legend { font-size:11px; color:var(--grey); margin-top:8px; line-height:1.6; }
+  .legend span { display:inline-block; width:10px; height:10px; border-radius:3px; vertical-align:-1px; margin:0 3px 0 10px; }
+  .legend .m { background:var(--input); border:1px solid #E4CE8B; }
+  .legend .a { background:var(--auto); border:1px solid #B9CBEA; }
+  table { width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
+  th, td { border:1px solid #D9E1EC; padding:5px 4px; text-align:right; }
+  th { background:var(--light); color:var(--navy); font-weight:600; }
+  td:first-child, th:first-child { text-align:left; }
+  .btn { display:block; width:100%; padding:12px; border:0; border-radius:12px; background:var(--blue);
+         color:#fff; font-size:15px; font-weight:600; margin-top:10px; cursor:pointer; }
+  .btn2 { background:#fff; color:var(--blue); border:1.5px solid var(--blue); margin-top:8px; }
+  footer { font-size:11px; color:var(--grey); text-align:center; padding:0 20px 30px; line-height:1.7; }
+  .tag { display:inline-block; background:var(--navy); color:#fff; font-size:10px; border-radius:6px;
+         padding:1px 6px; margin-left:6px; vertical-align:2px; }
+  .neg { color:var(--red); }
+  .printhead { display:none; }
+  .shareRow { display:flex; gap:8px; margin-top:8px; }
+  .shareBtn { flex:1; padding:11px 0; border:0; border-radius:12px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; }
+  #toast { position:fixed; left:50%; bottom:90px; transform:translateX(-50%); background:rgba(31,56,100,.95);
+           color:#fff; padding:10px 18px; border-radius:22px; font-size:13px; opacity:0;
+           transition:opacity .25s; pointer-events:none; z-index:99; }
+  @media print {
+    header, .no-print, .sub, .btn, .shareRow { display:none !important; }
+    .printhead { display:flex !important; align-items:center; font-size:17px; font-weight:700; color:#1F3864;
+                 border-bottom:2px solid #1F3864; padding:8px 4px 10px; margin-bottom:10px; }
+    .printhead .printdate { margin-left:auto; font-size:12px; font-weight:400; color:#68707C; }
+    body { background:#fff; }
+    main { max-width:none; padding:0; }
+    .part { box-shadow:none; border:1px solid #C9D3E2; border-radius:0; padding:10px 12px; margin-bottom:10px;
+            break-inside:avoid; page-break-inside:avoid; }
+    #part1Sec { page-break-after:always; }
+    .row { margin-bottom:6px; }
+    .row input, .row select { border:none; background:#fff !important; padding:4px 6px; }
+    table { font-size:11px; }
+    footer { display:none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="headrow">
+    <h1><img src="logo.jpg" alt="logo" class="logo"><span data-i18n="appName">房地产投资快速计算器</span> <span class="tag" data-i18n="beta">v0.1 内测</span></h1>
+    <button id="langBtn">EN</button>
+  </div>
+  <p data-i18n="appSub">个人买入 → 持有 1–5 年 → 卖出 · 所有金额 RM</p>
+</header>
+<div class="printhead">
+  <img src="logo.jpg" alt="logo" style="height:26px;width:auto;border-radius:6px;margin-right:8px;">
+  <span data-i18n="appName">房地产投资快速计算器</span>
+  <span class="printdate"></span>
+</div>
+<main>
+
+  <!-- Part 1 -->
+  <section class="part" id="part1Sec">
+    <h2 data-i18n="p1Title">Part 1 · 买入（第一次要出的费用）</h2>
+    <p class="sub" data-i18n="legendFill">✍️ 自己填 &nbsp;·&nbsp; ⚙️ 自动算</p>
+    <div class="row"><label data-i18n="fSpa">SPA 价格</label><input class="manual money" id="spa" type="text" min="0" step="1000" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fActual">实际买价</label><input class="manual money" id="actual" type="text" min="0" step="1000" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fLoan">贷款数额</label><input class="manual" id="loanPct" type="number" min="0" max="100" step="0.5" inputmode="decimal"><span class="unit unitPct">%</span><input class="manual money" id="loan" type="text" min="0" step="1000" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fRate">年利率</label><input class="manual" id="rate" type="number" min="0" max="20" step="0.05" inputmode="decimal"><span class="unit">%</span></div>
+    <div class="row"><label data-i18n="fTenure">贷款年限</label><input class="manual" id="tenure" type="number" min="1" max="50" step="1" inputmode="decimal"><span class="unit" data-i18n="unitYears">年</span></div>
+    <div class="row"><label data-i18n="fPmt">月供（等额本息）</label><input class="auto" id="pmt" readonly><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fSpaFee">SPA 律师费（律师费 + 印花税 + 杂费 + 8% SST）</label><input class="auto money" id="spaFee" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fLaFee">Loan Agreement 律师费（律师费 + 印花税 + 杂费 + 8% SST）</label><input class="auto money" id="laFee" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fVal">Property Valuation Fee 房产估价费（SPA × 0.2% + 500 杂费）</label><input class="auto money" id="valFee" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="legend" data-i18n="lawNote">⚠️ 律师费/估价费只作估算，以律师最终报价为准。</div>
+    <div class="row"><label data-i18n="fAgent">Agent Fee 中介费</label><input class="manual money" id="agent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fConsent">Consent Fee（如有）</label><input class="manual money" id="consent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fOther">Other Expenses 其他杂费</label><input class="manual money" id="other" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="out">
+      <div class="line"><span data-i18n="lAcqTotal">Total Acquisition Costs 总购置费用</span><span id="acqTotal">—</span></div>
+      <div class="line"><span data-i18n="lDown">Down Payment 首付款（实价 − 贷款）</span><span id="down">—</span></div>
+      <div class="line"><span data-i18n="lCashback">Less: Excess Loan Proceeds / Cashback 减：超额贷款所得</span><span id="cashback">—</span></div>
+      <div class="line"><span data-i18n="lUpfront">Total Upfront Cash Required 购房所需现金总额</span><b class="big" id="initial">—</b></div>
+    </div>
+  </section>
+
+  <!-- Part 2 -->
+  <section class="part" id="part2Sec">
+    <h2 data-i18n="p2Title">Part 2 · Annual Holding Costs（每年持有费用）</h2>
+    <p class="sub" data-i18n="legendFill">✍️ 自己填 &nbsp;·&nbsp; ⚙️ 自动算</p>
+    <div class="row"><label data-i18n="fMgmt">Management Fee（每月）</label><input class="manual money" id="mgmt" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fQuit">地税 Quit Rent（每年）</label><input class="manual money" id="quit" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fAssess">门牌税 Assessment（每年）</label><input class="manual money" id="assess" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fRepair">装修费 / 维修费（每年预算）</label><input class="manual money" id="repair" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fInsur">保险（每年，可选）</label><input class="manual money" id="insur" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fRentAgent">出租中介费（每年）</label><input class="manual money" id="rentAgent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fMInt">每个月银行利息（平均，自动）</label><input class="auto" id="mInt" readonly><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fYCost">每年总费用（第 1 年，自动）</label><input class="auto" id="yCost" readonly><span class="unit">RM</span></div>
+    <div class="legend" data-i18n="p2Note">说明：每月利息会随着贷款余额递减；卖出时还会自动加上律师费与 RPGT（见 Part 3 结果）。</div>
+  </section>
+
+  <!-- Part 3 -->
+  <section class="part" id="part3Sec">
+    <h2 data-i18n="p3Title">Part 3 · Investment Returns（投资回报分析）</h2>
+    <p class="sub" data-i18n="legendFill">✍️ 自己填 &nbsp;·&nbsp; ⚙️ 自动算</p>
+
+    <h3 class="subh" data-i18n="p3aTitle">① Keep & Rent 持有出租回报</h3>
+    <div class="row"><label data-i18n="fRent">Annual Rental Income 年租金收入</label><input class="manual money" id="rent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="out">
+      <div class="line"><span data-i18n="lNetY">Annual Rental Profit 年租金净利润（租金 − 年度费用，含利息）</span><span id="netY">—</span></div>
+      <div class="line"><span data-i18n="lHoldAnnual">Annual Rental Return 年租金回报率（年租金净利润 ÷ 购房所需现金总额）</span><b class="big" id="holdAnnual">—</b></div>
+      <div class="line"><span data-i18n="lTotalRentalProfit">Total Rental Profit 总年租金净利润（年租金净利润 × 年数）</span><span id="totalRentalProfit">—</span></div>
+    </div>
+    <div class="legend" data-i18n="noteHold">↑ 不卖、持续出租的口径：租金一年扣掉 Part 2 的年度费用（含每月银行利息），剩下的就是利润。逐年数字见下面表格。</div>
+
+    <h3 class="subh" data-i18n="p3bTitle">② Sell Property 出售房产回报</h3>
+    <div class="row"><label data-i18n="fSell">Expected Selling Price 预计卖出价格</label><input class="manual money" id="sell" type="text" min="0" step="1000" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fHold">Holding Period 持有年限</label><input class="manual" id="hold" type="number" min="1" max="30" step="1" inputmode="decimal"><span class="unit" data-i18n="unitYears">年</span></div>
+    <div class="row"><label data-i18n="fSellAgent">Agent Fee 卖出中介费（默认 2% 卖价）</label><input class="auto money" id="sellAgent" type="text" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fSellLegal">Legal Fee（律师费 + 印花税 + 杂费 + 8% SST，默认 5,000）</label><input class="auto money" id="sellLegal" type="text" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fSellMisc">Selling Miscellaneous Expenses 售出杂费</label><input class="manual money" id="sellMisc" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label id="rpgtLabel">RPGT（持有 5 年 = 15%）</label><span class="autoVal" id="rpgtVal">—</span><span class="unit">RM</span></div>
+    <div class="out">
+      <div class="line"><span data-i18n="lSellPriceShow">Expected Selling Price 预计卖出价格</span><span id="sellPriceShow">—</span></div>
+      <div class="line lessHead"><span data-i18n="lLessHead">Less (扣除）：</span><span></span></div>
+      <div class="line"><span data-i18n="lLessActual">Actual Purchase Price 实际成交价</span><span id="lessActual">—</span></div>
+      <div class="line"><span data-i18n="lLessAcq">Total Acquisition Costs 总购置费用</span><span id="lessAcq">—</span></div>
+      <div class="line"><span data-i18n="lGrossGain">Gross Capital Gain 出售资本收益（扣出售相关费用前）</span><b id="gross">—</b></div>
+      <div class="line"><span data-i18n="lTotalSellCosts">Total Selling Costs 出售总费用（中介 + 律师 + 杂费 + RPGT）</span><b id="totalSellCosts">—</b></div>
+      <div class="line"><span data-i18n="lSellingProfit">Selling Profit 出售利润（出售资本收益 − 出售总费用）</span><b id="sellingProfit">—</b></div>
+      <div class="line"><span data-i18n="lSellingReturn">Selling Return 出售回报率（出售利润 ÷ 购房所需现金总额 ÷ 年数）</span><b class="big" id="sellingReturn">—</b></div>
+      <div class="hr"></div>
+      <div class="line"><span data-i18n="lNetInvProfit">Net Investment Profit 投资净利润 ① + ②（总年租金净利润 + 出售利润）</span><b id="netInvestProfit">—</b></div>
+      <div class="line"><span data-i18n="lTotalRoi">Total ROI 总投资回报率（投资净利润 ÷ 购房所需现金总额 ÷ 年数）</span><b class="big" id="totalRoi">—</b></div>
+      <div class="line"><span data-i18n="lTotalCost">Total Cost 总成本（实际成交价 + 总购置费用 + 出售总费用）</span><span id="totalCost">—</span></div>
+      <div class="line"><span data-i18n="lRotc">Return on Total Cost 总成本回报率（投资净利润 ÷ 总成本 ÷ 年数）</span><span id="rotc">—</span></div>
+
+    </div>
+    <table id="yearTable">
+      <thead><tr><th data-i18n="thYear">年</th><th data-i18n="thBal">年末余额</th><th data-i18n="thInt">当年利息</th><th data-i18n="thCost">当年费用</th><th data-i18n="thNet">当年净利润</th><th data-i18n="thRpgt">RPGT</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="btn" id="demo" data-i18n="btnDemo">填入示例（SPA 1M / 实价 800k / 贷 800k / 一年后卖 900k）</button>
+    <button class="btn btn2" id="reset" data-i18n="btnReset">清空</button>
+  </section>
+
+  <!-- 导出 / 分享 -->
+  <section class="part no-print" id="shareSec">
+    <h2 data-i18n="exportTitle">导出 / 分享</h2>
+    <button class="btn" id="printBtn" data-i18n="printBtn">🖨️ 导出 PDF / 打印（Part 1 一页 · Part 2+3 一页）</button>
+    <div class="shareRow">
+      <button class="shareBtn" id="waBtn" style="background:#25D366">WhatsApp</button>
+      <button class="shareBtn" id="wxBtn" style="background:#07C160">微信</button>
+      <button class="shareBtn" id="fbBtn" style="background:#1877F2">Facebook</button>
+    </div>
+    <div class="legend" data-i18n="shareNote">WhatsApp / Facebook 直接打开；微信没有网页分享接口，点「微信」会复制文字，粘贴到微信即可。</div>
+  </section>
+
+  <footer data-i18n="footer">
+    ⚠️ 律师费/印花税按法定费率自动估算，RPGT 为估算（30/20/15/0），银行利息为等额本息——实际金额以律师报价、银行结算单与 LHDN 为准。<br>
+    本计算器不构成法律或税务意见。
+  </footer>
+  <div id="toast"></div>
+</main>
+
+<script src="calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+
+  var I18N = {
+    zh: {
+      appName: "房地产投资快速计算器", beta: "v0.1 内测",
+      appSub: "个人买入 → 持有 1–5 年 → 卖出 · 所有金额 RM",
+      legendFill: "✍️ 自己填 · ⚙️ 自动算",
+      p1Title: "Part 1 · 买入（第一次要出的费用）",
+      fSpa: "SPA 价格", fActual: "实际买价", fLoan: "贷款数额", fRate: "年利率", fTenure: "贷款年限",
+      unitYears: "年", fPmt: "月供（等额本息）",
+      fSpaFee: "SPA 律师费（律师费 + 印花税 + 杂费 + 8% SST）", fLaFee: "Loan Agreement 律师费（律师费 + 印花税 + 杂费 + 8% SST）",
+      fVal: "Property Valuation Fee 房产估价费（SPA × 0.2% + 500 杂费）",
+      fAgent: "Agent Fee 中介费", fConsent: "Consent Fee（如有）", fOther: "Other Expenses 其他杂费",
+      lawNote: "⚠️ 律师费/估价费只作估算，以律师最终报价为准。也可直接改格子里的数字（改完变橙色），清空即恢复自动。",
+      lInitial: "Total 第一次要出的费用", lAcqTotal: "Total Acquisition Costs 总购置费用", lDown: "Down Payment 首付款（实价 − 贷款）", lCashback: "Less: Excess Loan Proceeds / Cashback 减：超额贷款所得", lUpfront: "Total Upfront Cash Required 购房所需现金总额",
+      p2Title: "Part 2 · Annual Holding Costs（每年持有费用）",
+      fMgmt: "Management Fee（每月）", fQuit: "地税 Quit Rent（每年）", fAssess: "门牌税 Assessment（每年）",
+      fRepair: "装修费 / 维修费（每年预算）", fInsur: "保险（每年，可选）", fRentAgent: "出租中介费（每年）", fSellAgent: "Agent Fee 卖出中介费（默认 2% 卖价）",
+      fSellLegal: "Legal Fee（律师费 + 印花税 + 杂费 + 8% SST，默认 5,000）", fSellMisc: "Selling Miscellaneous Expenses 售出杂费",
+      lSellCostHead: "Selling related cost 出售相关费用：", lTotalSellCosts: "Total Selling Costs 出售总费用（中介 + 律师 + 杂费 + RPGT）", lSellingProfit: "Selling Profit 出售利润（出售资本收益 − 出售总费用）", lSellingReturn: "Selling Return 出售回报率（出售利润 ÷ 购房所需现金总额 ÷ 年数）",
+      lNetInvProfit: "Net Investment Profit 投资净利润 ① + ②（总年租金净利润 + 出售利润）", lTotalRoi: "Total ROI 总投资回报率（投资净利润 ÷ 购房所需现金总额 ÷ 年数）", lTotalCost: "Total Cost 总成本（实际成交价 + 总购置费用 + 出售总费用）", lRotc: "Return on Total Cost 总成本回报率（投资净利润 ÷ 总成本 ÷ 年数）",
+      fMInt: "每个月银行利息（平均，自动）", fYCost: "每年总费用（第 1 年，自动）",
+      p2Note: "说明：利息是平均口径（贷款 × 年利率 ÷ 12）；真实等额本息每月利息会随余额略减，以银行账单为准。卖出时还会自动加上律师费与 RPGT（见 Part 3 结果）。",
+      p3Title: "Part 3 · Investment Returns（投资回报分析）", p3aTitle: "① Keep & Rent 持有出租回报", p3bTitle: "② Sell Property 出售房产回报",
+      fRent: "Annual Rental Income 年租金收入", fSell: "Expected Selling Price 预计卖出价格", fHold: "Holding Period 持有年限",
+      lSellPriceShow: "Expected Selling Price 预计卖出价格", lCashIn: "Total Upfront Cash Required 购房所需现金总额", lLessHead: "Less (扣除）：", lLessActual: "Actual Purchase Price 实际成交价", lLessAcq: "Total Acquisition Costs 总购置费用", lGrossGain: "Gross Capital Gain 出售资本收益（扣出售相关费用前）", lQuick: "年利润（净赚 ÷ 自己现金 ÷ 年数）",
+      noteQuick: "↑ 快速口径。下面的“扣掉所有费用”会再算：月供利息、卖出中介/律师费、RPGT、租金。",
+      lNetY: "Annual Rental Profit 年租金净利润（租金 − 年度费用，含利息）", lHoldAnnual: "Annual Rental Return 年租金回报率（年租金净利润 ÷ 购房所需现金总额）", lTotalRentalProfit: "Total Rental Profit 总年租金净利润（年租金净利润 × 年数）",
+      noteHold: "↑ 不卖、持续出租的口径：租金一年扣掉 Part 2 的年度费用（含每月银行利息），剩下的就是利润。逐年数字见下面表格。",
+      lProfit: "Net Cash Profit 现金净利润（完整口径）", lBal: "卖出时贷款余额",
+      lSellCosts: "卖出总费用（中介 + 律师 + RPGT）", rpgtLine: "RPGT（持有 {y} 年 = {p}%）", rpgtEmpty: "RPGT（请先选持有年限）",
+      lCoc: "现金回报率（完整口径）", lTcr: "Net Cash Return on Capital 现金总成本回报率", lXirr: "年利率（XIRR，完整口径）",
+      thYear: "年", thBal: "年末余额", thInt: "当年利息", thCost: "当年费用", thNet: "当年净利润", thRpgt: "RPGT",
+      yearRow: "第 {y} 年", xirrNA: "无法计算",
+      btnDemo: "填入示例（SPA 1M / 实价 800k / 贷 800k / 一年后卖 900k）", btnReset: "清空",
+      exportTitle: "导出 / 分享",
+      printBtn: "🖨️ 导出 PDF / 打印（Part 1 一页 · Part 2+3 一页）",
+      shareNote: "WhatsApp / Facebook 直接打开；微信没有网页分享接口，点「微信」会复制文字，粘贴到微信即可。",
+      copyOk: "已复制，去微信粘贴即可",
+      shareTpl: "房地产投资计算｜SPA {spa} · 实价 {actual} · 贷款 {loan} · 租金 {rent}/年 → 持有年利润 {hold} · 卖出年利润 {quick}（估算，以律师/银行为准）｜{url}",
+      footer: "⚠️ 律师费/印花税按法定费率自动估算，RPGT 为估算（30/20/15/0），银行利息为等额本息——实际金额以律师报价、银行结算单与 LHDN 为准。本计算器不构成法律或税务意见。"
+    },
+    en: {
+      appName: "Property Investment Calculator", beta: "v0.1 beta",
+      appSub: "Buy → Hold 1–5 yrs → Sell · All amounts in RM",
+      legendFill: "✍️ Manual · ⚙️ Auto",
+      p1Title: "Part 1 · Purchase (one-time outlay)",
+      fSpa: "SPA Price", fActual: "Actual Purchase Price", fLoan: "Loan Amount", fRate: "Interest Rate", fTenure: "Loan Tenure",
+      unitYears: "yr", fPmt: "Monthly Instalment (equal)",
+      fSpaFee: "SPA Legal Fee (legal + stamp duty + misc + 8% SST)", fLaFee: "Loan Agreement Legal Fee (legal + stamp duty + misc + 8% SST)",
+      fVal: "Property Valuation Fee (SPA × 0.2% + 500 misc)",
+      fAgent: "Agent Fee", fConsent: "Consent Fee (if any)", fOther: "Other Expenses",
+      lawNote: "⚠️ Estimate only — based on lawyer final. You may also type over any fee (turns orange); clear it to restore auto.",
+      lInitial: "Total One-time Outlay", lAcqTotal: "Total Acquisition Costs", lDown: "Down Payment (actual − loan)", lCashback: "Less: Excess Loan Proceeds / Cashback", lUpfront: "Total Upfront Cash Required",
+      p2Title: "Part 2 · Annual Holding Costs",
+      fMgmt: "Management Fee (monthly)", fQuit: "Quit Rent (yearly)", fAssess: "Assessment Tax (yearly)",
+      fRepair: "Renovation / Repair (yearly)", fInsur: "Insurance (yearly, optional)", fRentAgent: "Rental Agent Fee (yearly)", fSellAgent: "Agent Fee (default 2% of expected price)",
+      fSellLegal: "Legal Fee (legal + stamp duty + misc + 8% SST, default 5,000)", fSellMisc: "Selling Miscellaneous Expenses",
+      lSellCostHead: "Selling related cost:", lTotalSellCosts: "Total Selling Costs (agent + legal + misc + RPGT)", lSellingProfit: "Selling Profit (gross capital gain − total selling costs)", lSellingReturn: "Selling Return (selling profit ÷ upfront cash ÷ years)",
+      lNetInvProfit: "Net Investment Profit ① + ② (total rental profit + selling profit)", lTotalRoi: "Total ROI (net investment profit ÷ upfront cash ÷ years)", lTotalCost: "Total Cost (actual price + acquisition costs + selling costs)", lRotc: "Return on Total Cost (net investment profit ÷ total cost ÷ years)",
+      fMInt: "Monthly Bank Interest (average, auto)", fYCost: "Total Annual Cost (Yr 1, auto)",
+      p2Note: "Note: interest uses the average method (loan × rate ÷ 12); actual equal-instalment interest decreases slightly with balance — bank statement prevails. Selling legal fee and RPGT are added automatically at sale (see Part 3).",
+      p3Title: "Part 3 · Investment Returns", p3aTitle: "① Keep & Rent", p3bTitle: "② Sell Property",
+      fRent: "Annual Rental Income", fSell: "Expected Selling Price", fHold: "Holding Period",
+      lSellPriceShow: "Expected Selling Price", lCashIn: "Total Upfront Cash Required", lLessHead: "Less (deduct):", lLessActual: "Actual Purchase Price", lLessAcq: "Total Acquisition Costs", lGrossGain: "Gross Capital Gain (before selling costs)", lQuick: "Annual Profit (gross ÷ cash ÷ years)",
+      noteQuick: "↑ Quick method. “After all costs” below also deducts: loan interest, selling agent/legal fees, RPGT, rental.",
+      lNetY: "Annual Rental Profit (rent − annual costs, incl. interest)", lHoldAnnual: "Annual Rental Return (rental profit ÷ upfront cash)", lTotalRentalProfit: "Total Rental Profit (annual rental profit × years)",
+      noteHold: "↑ Holding-only method: yearly rent minus Part 2 annual costs (incl. monthly bank interest) = profit. Year-by-year details in the table below.",
+      lProfit: "Net Cash Profit (full basis)", lBal: "Loan Balance at Sale",
+      lSellCosts: "Total Selling Costs (agent + legal + RPGT)", rpgtLine: "RPGT (hold {y} yr = {p}%)", rpgtEmpty: "RPGT (select holding period first)",
+      lCoc: "Cash-on-Cash (full)", lTcr: "Net Cash Return on Capital", lXirr: "Annual Rate (XIRR, full)",
+      thYear: "Year", thBal: "Balance", thInt: "Interest", thCost: "Costs", thNet: "Net Profit", thRpgt: "RPGT",
+      yearRow: "Year {y}", xirrNA: "n/a",
+      btnDemo: "Fill Example (SPA 1M / actual 800k / loan 800k / sell 900k after 1 yr)", btnReset: "Clear",
+      exportTitle: "Export / Share",
+      printBtn: "🖨️ Export PDF / Print (Part 1 on page 1 · Parts 2+3 on page 2)",
+      shareNote: "WhatsApp / Facebook open directly. WeChat has no web share API — tapping WeChat copies the text; paste it in WeChat.",
+      copyOk: "Copied — paste it in WeChat",
+      shareTpl: "Property calc | SPA {spa} · Actual {actual} · Loan {loan} · Rent {rent}/yr → Holding {hold} · Sale {quick} (estimate) | {url}",
+      footer: "⚠️ Legal fees / stamp duty follow statutory rates; RPGT is an estimate (30/20/15/0); interest is equal-instalment. Actual amounts follow lawyer quotes, bank settlement and LHDN. This calculator is not legal or tax advice."
+    }
+  };
+  var LANG_KEY = "fangchan_lang";
+  var lang = "zh";
+  try { lang = localStorage.getItem(LANG_KEY) || "zh"; } catch (e) {}
+  var lastInp = null, lastRes = null;
+  function t(key) { return I18N[lang][key] || key; }
+  function fmt(key, vars) {
+    var s = t(key);
+    for (var k in vars) s = s.split("{" + k + "}").join(vars[k]);
+    return s;
+  }
+  function applyLang() {
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+    document.title = t("appName") + " v0.1";
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      el.textContent = t(el.getAttribute("data-i18n"));
+    });
+    $("langBtn").textContent = lang === "zh" ? "EN" : "中文";
+    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+    document.querySelectorAll(".printdate").forEach(function (el) {
+      el.textContent = new Date().toLocaleDateString(lang === "zh" ? "zh-CN" : "en-MY");
+    });
+    var hv = $("hold").value;
+    var hyv = parseInt(hv, 10);
+    $("rpgtLabel").textContent = hyv >= 1 ? fmt("rpgtLine", { y: hyv, p: Math.round(Calc.rpgtRate(hyv) * 100) }) : t("rpgtEmpty");
+    recalc(); // re-render dynamic strings (RPGT line / year table / xirr fallback)
+  }
+
+  var fmtRM = function (x) {
+    if (x == null || isNaN(x)) return "—";
+    var neg = x < 0;
+    var s = Math.abs(x).toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return (neg ? "−" : "") + "RM " + s;
+  };
+  var pct = function (x) {
+    if (x == null || isNaN(x)) return "—";
+    return (x * 100).toFixed(2) + "%";
+  };
+  var num = function (id) {
+    var v = parseFloat(String($(id).value).replace(/,/g, ""));
+    return isNaN(v) ? 0 : v;
+  };
+  var set = function (id, v) {
+    $(id).value = (v == null || isNaN(v)) ? "" : Number(v).toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  // 西式数字格式：500,000.00（输入时实时加千分位，失焦补 .00）
+  var moneyRaw = function (v) { return String(v).replace(/[^0-9.]/g, ""); };
+  var moneyLive = function (v) {
+    var s = moneyRaw(v);
+    if (s === "") return "";
+    if (s === ".") return "0.";
+    var parts = s.split(".");
+    var out = parts[0].replace(/^0+(?=\d)/, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    if (parts.length > 1) out += "." + parts[1].slice(0, 2);
+    return out;
+  };
+  var moneyBlur = function (v) {
+    var s = moneyRaw(v);
+    if (s === "") return "";
+    var n = parseFloat(s);
+    if (isNaN(n)) return "";
+    return n.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  function clearResults() {
+    ["initial", "acqTotal", "down", "cashback", "sellPriceShow", "lessActual", "lessAcq", "gross", "netY", "holdAnnual", "totalRentalProfit", "totalSellCosts", "sellingProfit", "sellingReturn", "netInvestProfit", "totalRoi", "totalCost", "rotc", "rpgtVal"].forEach(function (id) {
+      var el = $(id); el.textContent = "—"; el.style.color = "";
+      if (el.classList) el.className = "";
+    });
+    ["pmt", "spaFee", "laFee", "valFee", "sellAgent", "sellLegal", "mInt", "yCost"].forEach(function (id) { $(id).value = ""; });
+    Object.keys(autoManual).forEach(function (k) { autoManual[k] = false; });
+    ["sellAgent", "sellLegal"].forEach(function (id) { $(id).classList.remove("override"); });
+    ["spaFee", "laFee", "valFee"].forEach(function (id) { $(id).classList.remove("override"); });
+    $("yearTable").querySelector("tbody").innerHTML = "";
+    var hv = $("hold").value;
+    var hyv = parseInt(hv, 10);
+    $("rpgtLabel").textContent = hyv >= 1 ? fmt("rpgtLine", { y: hyv, p: Math.round(Calc.rpgtRate(hyv) * 100) }) : t("rpgtEmpty");
+  }
+
+  function recalc() {
+    if (!autoManual.sellAgent) set("sellAgent", num("sell") * 0.02);
+    if (!autoManual.sellLegal) set("sellLegal", 5000);
+    var tenureRaw = parseInt($("tenure").value, 10);
+    var holdRaw = parseInt($("hold").value, 10);
+    var inp = {
+      spa: num("spa"), actual: num("actual"), loan: num("loan"),
+      ratePct: num("rate"), yearsLoan: tenureRaw >= 1 ? tenureRaw : 30,
+      agentFee: num("agent"), consentFee: num("consent"), other: num("other"),
+      mgmtM: num("mgmt"), quitY: num("quit"), assessY: num("assess"),
+      repairY: num("repair"), insurY: num("insur"), rentAgentY: num("rentAgent"),
+      sellAgentFee: num("sellAgent"), sellLegalFee: num("sellLegal"), sellMisc: num("sellMisc"),
+      rentY: num("rent"), sellPrice: num("sell"),
+      holdYears: holdRaw >= 1 ? holdRaw : 1,
+      spaFeeOverride: autoManual.spaFee ? num("spaFee") : null,
+      laFeeOverride: autoManual.laFee ? num("laFee") : null,
+      valFeeOverride: autoManual.valFee ? num("valFee") : null
+    };
+    if (inp.spa <= 0 || inp.actual <= 0 || inp.loan <= 0 || $("rate").value.trim() === "" || !(tenureRaw >= 1)) { clearResults(); return; }
+    var r = Calc.compute(inp);
+    lastInp = inp;
+    lastRes = r;
+
+    set("pmt", r.part1.pmt);
+    if (!autoManual.spaFee) set("spaFee", r.part1.spa.total);
+    if (!autoManual.laFee) set("laFee", r.part1.la.total);
+    if (!autoManual.valFee) set("valFee", r.part1.valuation);
+    $("acqTotal").textContent = fmtRM(r.part1.purchaseCosts);
+    $("initial").textContent = fmtRM(r.part1.initial);
+    $("down").textContent = fmtRM(r.part1.downpayment);
+    $("cashback").textContent = fmtRM(-r.part1.cashback);
+
+    set("mInt", r.part2.firstYearMonthlyInterest);
+    set("yCost", r.part2.mgmtY + r.part2.fixedY + r.part2.firstYearInterest);
+
+    var last = r.years[r.years.length - 1];
+    var holdSelected = !isNaN(holdRaw) && holdRaw >= 1;
+    $("sellPriceShow").textContent = fmtRM(inp.sellPrice);
+    $("lessActual").textContent = fmtRM(inp.actual);
+    $("lessAcq").textContent = fmtRM(r.part1.purchaseCosts);
+    var gg = $("gross");
+    gg.textContent = fmtRM(r.out.grossProfit);
+    gg.style.color = r.out.grossProfit < 0 ? "var(--red)" : "var(--green)";
+    $("netY").textContent = fmtRM(r.years[0].netY);
+    $("netY").className = r.years[0].netY < 0 ? "neg" : "";
+    var ha = $("holdAnnual");
+    ha.textContent = pct(r.out.holdingAnnual);
+    ha.style.color = r.out.holdingAnnual < 0 ? "var(--red)" : "var(--green)";
+    var trp = $("totalRentalProfit");
+    trp.textContent = holdSelected ? fmtRM(r.out.totalRentalProfit) : "—";
+    trp.style.color = holdSelected && r.out.totalRentalProfit < 0 ? "var(--red)" : "";
+
+    var saleIds = ["totalSellCosts", "sellingProfit", "sellingReturn", "netInvestProfit", "totalRoi", "totalCost", "rotc", "rpgtVal"];
+    if (!holdSelected) {
+      saleIds.forEach(function (id) { var el = $(id); el.textContent = "—"; el.style.color = ""; });
+      $("rpgtLabel").textContent = t("rpgtEmpty");
+    } else {
+      var sp = $("sellingProfit");
+      sp.textContent = fmtRM(r.out.sellingProfit);
+      sp.style.color = r.out.sellingProfit < 0 ? "var(--red)" : "var(--green)";
+      var sr = $("sellingReturn");
+      sr.textContent = pct(r.out.sellingReturn);
+      sr.style.color = r.out.sellingReturn < 0 ? "var(--red)" : "var(--green)";
+      var nip = $("netInvestProfit");
+      nip.textContent = fmtRM(r.out.netInvestmentProfit);
+      nip.style.color = r.out.netInvestmentProfit < 0 ? "var(--red)" : "var(--green)";
+      var roi = $("totalRoi");
+      roi.textContent = pct(r.out.totalROI);
+      roi.style.color = r.out.totalROI < 0 ? "var(--red)" : "var(--green)";
+      $("totalCost").textContent = fmtRM(r.out.totalCost);
+      $("rotc").textContent = pct(r.out.returnOnTotalCost);
+      $("totalSellCosts").textContent = fmtRM(r.sale.sellCosts);
+      $("rpgtLabel").textContent = fmt("rpgtLine", { y: inp.holdYears, p: Math.round(r.sale.rpgt.rate * 100) });
+      $("rpgtVal").textContent = moneyBlur(String(r.sale.rpgt.tax));
+    }
+
+    var tb = $("yearTable").querySelector("tbody");
+    tb.innerHTML = "";
+    r.years.forEach(function (row) {
+      var tr = document.createElement("tr");
+      tr.innerHTML = "<td>" + fmt("yearRow", { y: row.y }) + "</td><td>" + fmtRM(row.balance) + "</td><td>" + fmtRM(row.interestYear) +
+        "</td><td>" + fmtRM(row.costY) + "</td><td>" + fmtRM(row.netY) + "</td><td>" +
+        Math.round(row.rpgtPct * 100) + "%</td>";
+      tb.appendChild(tr);
+    });
+  }
+
+  document.querySelectorAll("input, select").forEach(function (el) {
+    if (el.id === "loan" || el.id === "loanPct" || el.id === "spa" || el.id === "spaFee" || el.id === "laFee" || el.id === "valFee" || el.id === "sellAgent" || el.id === "sellLegal") return;
+    el.addEventListener("input", recalc);
+    el.addEventListener("change", recalc);
+  });
+
+  // 律师费/估价费：默认自动；手动改 = 覆盖（橙色）；清空 = 恢复自动
+  var autoManual = { spaFee: false, laFee: false, valFee: false, sellAgent: false, sellLegal: false };
+  // 自动格：编辑中不回填（可自由删改）；离开时仍为空 → 恢复自动值；有数字 → 视为手动覆盖
+  ["spaFee", "laFee", "valFee", "sellAgent", "sellLegal"].forEach(function (id) {
+    var el = $(id);
+    el.addEventListener("input", function () {
+      autoManual[id] = true;
+      el.classList.toggle("override", el.value.trim() !== "");
+      recalc();
+    });
+    el.addEventListener("blur", function () {
+      if (el.value.trim() === "") {
+        autoManual[id] = false;
+        el.classList.remove("override");
+        recalc();
+      }
+    });
+  });
+
+  // 西式数字格式输入处理（千分位 + 两位小数）
+  document.querySelectorAll("input.money").forEach(function (el) {
+    el.addEventListener("focus", function () { el.value = moneyRaw(el.value); });
+    el.addEventListener("input", function () { el.value = moneyLive(el.value); });
+    el.addEventListener("blur", function () { el.value = moneyBlur(el.value); });
+  });
+
+  // 贷款 %：% × SPA 自动算出贷款额；也可直接在贷款格手填（手填会清掉 %）
+  var autoFilling = false;
+  var loanFromPct = false;
+  $("loanPct").addEventListener("input", function () {
+    var p = num("loanPct");
+    loanFromPct = p > 0;
+    if (p > 0 && num("spa") > 0) {
+      autoFilling = true;
+      $("loan").value = moneyBlur(String(Math.round(num("spa") * p / 100)));
+      autoFilling = false;
+    }
+    recalc();
+  });
+  $("loan").addEventListener("input", function () {
+    if (!autoFilling) {
+      loanFromPct = false;
+      $("loanPct").value = "";
+    }
+    recalc();
+  });
+  $("spa").addEventListener("input", function () {
+    if (loanFromPct && num("loanPct") > 0 && num("spa") > 0) {
+      autoFilling = true;
+      $("loan").value = moneyBlur(String(Math.round(num("spa") * num("loanPct") / 100)));
+      autoFilling = false;
+    }
+    recalc();
+  });
+
+  $("langBtn").addEventListener("click", function () {
+    lang = lang === "zh" ? "en" : "zh";
+    applyLang();
+  });
+
+  $("demo").addEventListener("click", function () {
+    var v = {
+      spa: 1000000, actual: 800000, loan: 800000, loanPct: "", rate: 4.5, tenure: "30",
+      agent: 0, consent: "", other: "",
+      mgmt: 0, quit: 0, assess: 0, repair: 0, insur: 0, rentAgent: "",
+      sellMisc: "", rent: 60000, sell: 900000, hold: "1"
+    };
+    Object.keys(v).forEach(function (k) { $(k).value = v[k]; });
+    document.querySelectorAll("input.money").forEach(function (el) { el.value = moneyBlur(el.value); });
+    loanFromPct = false;
+    Object.keys(autoManual).forEach(function (k) { autoManual[k] = false; });
+    ["spaFee", "laFee", "valFee", "sellAgent", "sellLegal"].forEach(function (id) { $(id).classList.remove("override"); });
+    recalc();
+  });
+  $("reset").addEventListener("click", function () {
+    document.querySelectorAll("input").forEach(function (el) { el.value = ""; });
+    $("tenure").value = ""; $("hold").value = "";
+    loanFromPct = false;
+    Object.keys(autoManual).forEach(function (k) { autoManual[k] = false; });
+    ["spaFee", "laFee", "valFee", "sellAgent", "sellLegal"].forEach(function (id) { $(id).classList.remove("override"); });
+    lastInp = null; lastRes = null;
+    clearResults();
+  });
+
+  // ---- 导出 PDF / 分享 ----
+  $("printBtn").addEventListener("click", function () { window.print(); });
+
+  var toastTimer = null;
+  function toast(msg) {
+    var el = $("toast");
+    el.textContent = msg;
+    el.style.opacity = "1";
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.style.opacity = "0"; }, 2200);
+  }
+  function legacyCopy(txt) {
+    var ta = document.createElement("textarea");
+    ta.value = txt;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+  function shareText() {
+    var url = location.href;
+    if (!lastRes) return t("appName") + "：" + url;
+    var holdSel = $("hold").value !== "";
+    return fmt("shareTpl", {
+      spa: moneyBlur(String(lastInp.spa)),
+      actual: moneyBlur(String(lastInp.actual)),
+      loan: moneyBlur(String(lastInp.loan)),
+      rent: moneyBlur(String(lastInp.rentY)),
+      hold: pct(lastRes.out.holdingAnnual),
+      quick: holdSel ? pct(lastRes.out.sellingReturn) : "—",
+      url: url
+    });
+  }
+  $("waBtn").addEventListener("click", function () {
+    window.open("https://wa.me/?text=" + encodeURIComponent(shareText()), "_blank");
+  });
+  $("fbBtn").addEventListener("click", function () {
+    window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(location.href) + "&quote=" + encodeURIComponent(shareText()), "_blank");
+  });
+  $("wxBtn").addEventListener("click", function () {
+    var txt = shareText();
+    var ok = function () { toast(t("copyOk")); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(ok, function () { legacyCopy(txt); ok(); });
+    } else {
+      legacyCopy(txt); ok();
+    }
+  });
+
+  applyLang();
+})();
+</script>
+</body>
+</html>

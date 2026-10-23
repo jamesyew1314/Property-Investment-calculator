@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "pdfium",
+  "source": "saved",
+  "inputPath": "/Users/huangminming/Pik kwong Lau/work/validation_calc.pdf",
+  "sourceSha256": "daffdb4852e75119be0ba2f2ecc991a16596dfe442f49e4b98219be572137cd3",
+  "dpi": 144,
+  "pageCount": 23,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "/Users/huangminming/Pik kwong Lau/work/xlsx_prev3/page-0001.png",
+      "width": 1584,
+      "height": 1224,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1056,
+        "height": 816
+      },
+      "byteLength": 169187
+    },
+    {
+      "index": 2,
+      "page": 2,
+      "path": "/Users/huangminming/Pik kwong Lau/work/xlsx_prev3/page-0002.png",
+      "width": 1584,
+      "height": 1224,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1056,
+        "height": 816
+      },
+      "byteLength": 100333
+    }
+  ],
+  "missingFonts": []
+}

@@ -1,0 +1,36 @@
+# macOS
+.DS_Store
+
+# 本地/服务器快照（不进 git，另有备份）
+backups/
+
+# 与计算器无关的其它业务
+video-automation/
+房产中介视频代剪自动化方案.md
+房产视频代剪业务方案（合伙人版）.md
+模板规格书（马来西亚房产视频）.md
+高曝光房产视频行业打法分析（合伙人版）.md
+docs/
+
+# 构建产物（由 work/build_all.sh 重新生成）
+work/__pycache__/
+work/*.pdf
+work/*.docx
+work/*.xlsx
+work/*.txt
+work/check_*.json
+work/prev*/
+work/preview*/
+work/final_*/
+work/check_rebuild/
+deliverables/*.docx
+deliverables/*.pdf
+deliverables/*.xlsx
+
+# 编辑器
+.vscode/
+.idea/
+
+# 预览产物
+work/preview.png
+work/xlsx_prev/
