@@ -126,3 +126,91 @@ share(id, plan_id, token, read_only, created_at, expires_at)
 
 **迁移清单（到时照做）**
 1. 定域名方案（A 或 B）→ 2. 新机装 nginx + certbot → 3. 拷 `web/`、`chmod 644`、配 `no-cache` → 4. 用 hosts 绑域名先测通 → 5. 切 DNS（TTL 提前调小）→ 6. 旧地址 301 → 7. 更新 `PROJECT.md` 部署章节 + 打 tag `v1.0`。
+
+---
+
+## 8. 吉隆坡服务器设置方案（按 SaaS 规划）
+
+### 8.1 目标架构（单机起步，可平滑升级）
+
+```
+Internet
+   │ 443/80
+   ▼
+ nginx（TLS 终止、静态站、反代 /api）
+   ├── /                → /srv/fangchan/web        （现在的计算器，静态）
+   ├── /app             → 同一静态目录（以后登录后的应用页）
+   └── /api/*           → 127.0.0.1:3000  Node 服务（systemd 管理）
+                                 │
+                                 └── PostgreSQL 16（仅 localhost）
+```
+
+- 单台 2C4G 足够 MVP（<100 用户）；用户量上来先**纵向变配**（停机几分钟），再考虑拆库/加节点。
+- 不开宝塔等面板，减少攻击面；全部用 apt + systemd。
+- 所有服务只监听 localhost，除 80/443 外不对外。
+
+### 8.2 目录与账号
+
+```
+/srv/fangchan/
+  web/          # 静态站（nginx 直出）
+  api/          # Node 源码 + node_modules（systemd 运行）
+  backups/      # pg_dump + 站点压缩包（保留 7/30 天）
+  logs/         # nginx / api 日志（logrotate）
+/etc/nginx/sites-available/fangchan.conf
+```
+
+- 建一个普通用户 `deploy`（免 root 日常操作），SSH 只允许密钥。
+- API 进程用 `deploy` 运行，systemd unit `fangchan-api.service`，崩溃自动重启。
+
+### 8.3 安装清单（我接手后一次装完）
+
+| 组件 | 用途 | 备注 |
+| :--- | :--- | :--- |
+| nginx | 静态 + 反代 | 关 server tokens，gzip，缓存策略 |
+| certbot | 免费 HTTPS | 自动续期 |
+| Node 22 LTS + pnpm | API | NodeSource 源 |
+| PostgreSQL 16 | 账号/方案/订阅 | 只监听 127.0.0.1 |
+| ufw | 防火墙 | 只开 22(限 IP)/80/443 |
+| fail2ban（可选） | 防暴力破解 | 配合密钥登录 |
+| unattended-upgrades | 自动安全补丁 | 只装安全更新 |
+| logrotate | 日志轮转 | 防磁盘写满 |
+
+### 8.4 备份
+
+- **每日 02:00**：`pg_dump` → gzip → `/srv/fangchan/backups/`（保留 30 天）。
+- **每周**：整站 + 数据库打包，`ossutil` 上传到同地域 OSS（异地容灾，几块钱/月）。
+- 阿里云**快照策略**：每周一次系统盘快照（保留 4 周）。
+- 恢复演练：每季度做一次「从备份恢复到临时实例」。
+
+### 8.5 域名与环境
+
+- 生产：`fangchan.<你的域名>`（A 记录 → 吉隆坡 IP）
+- 预发（建议）：`staging.fangchan.<域名>`，独立数据库 `fangchan_staging`，同一台机器不同目录；上线前先在 staging 验证。
+- 同域部署 `/api`，避免跨域与 Cookie 问题。
+
+### 8.6 与 SaaS 功能的对应
+
+| 功能 | 服务器上需要 |
+| :--- | :--- |
+| 账号登录 | Node API + Postgres（users 表）+ 短信/邮箱验证码通道 |
+| 方案云存档 | plans 表（payload JSONB）+ 备份 |
+| 订阅收费 | 支付网关 webhook（Billplz / Stripe）+ HTTPS + 订阅表 |
+| 分享链接 | 短链表或 token 表；nginx 反代 /s/:token |
+| 邮件通知 | 事务邮件服务（阿里云 DirectMail / Resend） |
+| 文件/图片 | 先本地，量大后 OSS |
+
+### 8.7 安全与合规
+
+- SSH：仅密钥、禁用密码、22 端口限你的 IP；`PermitRootLogin prohibit-password`。
+- API：限流（rate limit）、输入校验、SQL 参数化；JWT/Session 用 HttpOnly Cookie。
+- 数据：只存必要字段；备份加密；PDPA 告知与隐私政策页面。
+- 马来西亚开票：后续接 LHDN e-Invoice（SaaS 收入需开电子发票），先人工开票兜底。
+
+### 8.8 上线顺序（建议）
+
+1. **Day 1**：nginx + 静态计算器 + HTTPS → 先把现有站点跑在吉隆坡。
+2. **Day 2**：Node + Postgres + systemd + `/api/health` 跑通。
+3. **Week 1**：Phase 1（存档 + 分享链接）上线。
+4. **Week 2–3**：Phase 2 正式 PDF。
+5. 之后：Phase 3 账号/订阅（此时再加邮件与支付）。
