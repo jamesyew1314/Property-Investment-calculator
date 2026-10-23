@@ -398,7 +398,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 
 ## 14. 版本管理（git）
 
-- **私有仓库**：`git@ssh.github.com:443/jamesyew1314/Property-nvestment-calculator.git`（GitHub 账号 `jamesyew1314`，分支 `main`）
+- **私有仓库**：https://github.com/jamesyew1314/Property-Investment-calculator （git 地址 `ssh://git@ssh.github.com:443/jamesyew1314/Property-Investment-calculator.git`；账号 `jamesyew1314`，分支 `main`）
 - **密钥**：`~/.ssh/laoyeshu_gh`（已注册到该账号，走 443 端口）；仓库内已设 `core.sshCommand`
 - **发布流程**：改 → `node web/test.js` 全过 → 浏览器 QA → 部署（scp + chmod 644 + sha256 核对）→ `git commit` → `git tag -a vX.XX` → `git push --tags`
 - **回滚**：`git checkout <tag> -- web/` 后重新部署；服务器备份在 `/opt/laoyeshu/backups/`
