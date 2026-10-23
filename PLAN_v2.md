@@ -103,3 +103,26 @@ share(id, plan_id, token, read_only, created_at, expires_at)
 - 每个版本：改 → `node web/test.js`（必须全过）→ 浏览器 QA（0 报错）→ 部署（scp + chmod 644 + sha256 核对）→ `PROJECT.md` 记一笔 → **git commit + tag（v0.xx）**。
 - 回滚：`git checkout <tag> -- web/` 后重新部署；服务器另有备份 `/opt/laoyeshu/backups/fangchan_*.tar.gz`。
 - 公式改动必须同时改测试与文档；UI 改动不得破坏元素 id（浏览器 QA 会抓）。
+
+---
+
+## 7. 后期迁移到阿里云吉隆坡服务器（预告）
+
+**对现在这个纯静态计算器影响很小**：只要把 `web/` 三个文件拷到新机器的 nginx 目录，配好站点与 HTTPS 即可，代码零改动。
+
+但有 4 个真实影响要先知道：
+
+1. **URL 变了 → 旧分享链接失效**：现在分享用的是 `location.href`。迁移后旧链接应保留 6–12 个月的 301 跳转。
+2. **localStorage 不跨域**：语言偏好、以及 Phase 1 的「本地存档方案」只存在原域名下，迁移后用户看不到旧存档 → Phase 1 设计时加「导出/导入 JSON」，迁移前提示用户导出。
+3. **部署流程重建**：ssh 主机、目录路径、`no-cache` 配置、备份脚本、证书（Let's Encrypt）都要在新机器重做一次；建议写成 `work/deploy.sh` 一次跑完。
+4. **域名与备案**：深圳服务器的 `laoyeshu.cn` 有点餐系统。若只想搬计算器，两个稳妥做法：
+   - **A（推荐）**：计算器用独立子域名/新域名直接指向吉隆坡（如 `fangchan.xxx.my`），与点餐系统彻底解耦；
+   - **B**：保留 `laoyeshu.cn/static/fangchan/`，在深圳 nginx 上 `proxy_pass` 到吉隆坡机器（保留现有链接与备案，但多一跳）。
+   注意：域名指向境外后，原 ICP 备案对「境外部分」不再适用；点餐系统留在深圳则备案不受影响。
+
+**对 Phase 3 的影响（更重要）**：账号、云存档、订阅支付要直接建在吉隆坡服务器上，**不要先在深圳建后端再搬**。理由：
+- 马来西亚客户访问延迟低；PDPA（个人资料保护）下数据存在本地更简单；
+- 支付网关（Billplz / Stripe Malaysia）与本地银行结算更顺；后续 LHDN 电子发票（e-Invoice）也好接。
+
+**迁移清单（到时照做）**
+1. 定域名方案（A 或 B）→ 2. 新机装 nginx + certbot → 3. 拷 `web/`、`chmod 644`、配 `no-cache` → 4. 用 hosts 绑域名先测通 → 5. 切 DNS（TTL 提前调小）→ 6. 旧地址 301 → 7. 更新 `PROJECT.md` 部署章节 + 打 tag `v1.0`。
