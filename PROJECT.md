@@ -411,6 +411,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-25 | v0.43 | Logo 白底彻底清理（重做）：用红色方块边界保护「光泰 / KWONG THYE」白字，删除屋顶内部白三角、灰边条与文字白边；深底版把低饱和深色文字转白，无白框、无灰边 |
 | 2026-10-25 | v0.44 | 创办人形象照裁紧：改为 4:5（头到胸口）800×1000，脸部占比更大，白边更少 |
 | 2026-10-25 | v0.45 | 企业站补联系方式：办公室（Skudai）、电邮 andylau.theroof@gmail.com、注册代理 THE ROOF REALTY SDN BHD E(1)1605/1、REN 32839，页脚加注册信息行与 JSON-LD address/employee；新增**第一方访问统计**（`/api/track` + `pageviews` 表 + `admin.js pageviews`，IP 仅存 sha256 前缀） |
+| 2026-10-25 | v0.45.1 | Google Search Console 验证文件上线：`/googlec72eeacfc6bd6819.html`（HTTP 200，内容校验一致）；sitemap 待提交 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 
 ---
