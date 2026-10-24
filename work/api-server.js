@@ -490,10 +490,10 @@ app.post("/api/admin/verify", rateLimit(10, 600000), async function (req, res) {
   const a = await pool.query("SELECT id,email,role FROM admins WHERE email=$1", [r.rows[0].email]);
   const admin = a.rows[0] || { id: null, email: r.rows[0].email, role: "owner" };
   const token = crypto.randomBytes(32).toString("hex");
-  await pool.query("INSERT INTO admin_sessions(token_hash,admin_id,email,role,expires_at) VALUES($1,$2,$3,$4, now() + interval '12 hours')",
+  await pool.query("INSERT INTO admin_sessions(token_hash,admin_id,email,role,expires_at) VALUES($1,$2,$3,$4, now() + interval '2 hours')",
     [sha256(token), admin.id, admin.email, admin.role]);
   if (admin.id) await pool.query("UPDATE admins SET last_login_at=now() WHERE id=$1", [admin.id]);
-  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=" + token + "; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=43200");
+  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=" + token + "; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=7200");
   await adminLog("login.ok", admin.email + " (" + admin.role + ")", req);
   res.json({ ok: true, email: admin.email, role: admin.role });
 });
