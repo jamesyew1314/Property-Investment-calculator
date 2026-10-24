@@ -70,7 +70,7 @@
                 margin:0 0 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; }
   .viewBanner button { border:1px solid #C9A227; background:#fff; color:#7A5B12; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:600; cursor:pointer; }
   .view-only main input, .view-only main select { pointer-events:none; }
-  .view-only #toolSec { display:none !important; }
+  .view-only #toolSec, .view-only #accountSec { display:none !important; }
   .view-only .only-edit { display:none !important; }
   .shareRow { display:flex; gap:8px; margin-top:8px; }
   .shareBtn { flex:1; padding:11px 0; border:0; border-radius:12px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; }
@@ -135,6 +135,27 @@
     <span data-i18n="viewBannerText">🔗 这是分享的估算（只读）</span>
     <button id="editCopy" data-i18n="btnEditCopy">在我这边继续编辑</button>
   </div>
+
+  <!-- 我的账号 -->
+  <section class="part no-print" id="accountSec">
+    <h2 data-i18n="acctTitle">我的账号</h2>
+    <div id="acctLoggedOut">
+      <div class="row"><label data-i18n="fEmail">邮箱</label><input class="manual" id="acctEmail" type="email" autocomplete="email" inputmode="email"><span class="unit"></span></div>
+      <div class="row"><label data-i18n="fPassword">密码</label><input class="manual" id="acctPassword" type="password" autocomplete="current-password"><span class="unit"></span></div>
+      <div class="btnRow">
+        <button class="btn" id="loginBtn" data-i18n="btnLogin">登录</button>
+        <button class="btn btn2" id="registerBtn" data-i18n="btnRegister">注册</button>
+      </div>
+      <div class="legend" data-i18n="acctNote">登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。</div>
+    </div>
+    <div id="acctLoggedIn" hidden>
+      <div class="out">
+        <div class="line"><span data-i18n="acctEmailLabel">邮箱</span><b id="acctWho">—</b></div>
+        <div class="line"><span data-i18n="acctPlanLabel">版本</span><span id="acctPlan">—</span></div>
+      </div>
+      <div class="btnRow"><button class="btn btn2" id="logoutBtn" data-i18n="btnLogout">退出登录</button></div>
+    </div>
+  </section>
 
   <!-- 方案存档 / 分享 / 公司抬头 -->
   <section class="part no-print" id="toolSec">
@@ -311,6 +332,13 @@
       yearRow: "第 {y} 年", xirrNA: "无法计算",
       btnDemo: "填入示例（SPA 1M / 实价 800k / 贷 800k / 一年后卖 900k）", btnReset: "清空",
       exportTitle: "导出 / 分享",
+      acctTitle: "我的账号", fEmail: "邮箱", fPassword: "密码", btnLogin: "登录", btnRegister: "注册",
+      acctNote: "登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。",
+      acctEmailLabel: "邮箱", acctPlanLabel: "版本", btnLogout: "退出登录",
+      planFree: "免费版", planPro: "专业版", planUnlimited: "个方案（不限）",
+      errEmail: "请填正确的邮箱", errPassword: "密码至少 8 位", errExists: "这个邮箱已注册", errLogin: "邮箱或密码不对",
+      errRate: "太频繁，请稍后再试", errQuota: "免费版最多 3 个方案", errGeneric: "网络错误，请稍后再试",
+      toastLoginOk: "已登录", toastRegisterOk: "注册成功，已登录", toastLogout: "已退出登录",
       toolTitle: "方案存档 / 分享", fPlanName: "方案名称", phPlanName: "例：Bukit Jalil 公寓 A",
       btnSavePlan: "💾 保存方案", btnShareLink: "🔗 复制分享链接",
       fPlanList: "已存方案", optPick: "（选择已存方案）", optNone: "（还没有存档）",
@@ -361,6 +389,13 @@
       yearRow: "Year {y}", xirrNA: "n/a",
       btnDemo: "Fill Example (SPA 1M / actual 800k / loan 800k / sell 900k after 1 yr)", btnReset: "Clear",
       exportTitle: "Export / Share",
+      acctTitle: "My Account", fEmail: "Email", fPassword: "Password", btnLogin: "Log In", btnRegister: "Sign Up",
+      acctNote: "Log in to save plans to the cloud (3 free); local saving still works without an account.",
+      acctEmailLabel: "Email", acctPlanLabel: "Plan", btnLogout: "Log Out",
+      planFree: "Free", planPro: "Pro", planUnlimited: "plans (unlimited)",
+      errEmail: "Please enter a valid email", errPassword: "Password must be at least 8 characters", errExists: "This email is already registered", errLogin: "Wrong email or password",
+      errRate: "Too many attempts, try again later", errQuota: "Free plan allows 3 saved plans", errGeneric: "Network error, please retry",
+      toastLoginOk: "Logged in", toastRegisterOk: "Account created", toastLogout: "Logged out",
       toolTitle: "Saved Plans / Share", fPlanName: "Plan Name", phPlanName: "e.g. Bukit Jalil Condo A",
       btnSavePlan: "💾 Save Plan", btnShareLink: "🔗 Copy Share Link",
       fPlanList: "Saved Plans", optPick: "(select a saved plan)", optNone: "(no saved plans yet)",
@@ -870,6 +905,54 @@
     if (st0 && applyState(st0)) setViewOnly(true);
   }
   updatePrintHeader();
+
+  // ================= 账号（Phase 3） =================
+  function api(path, opts) {
+    opts = opts || {};
+    opts.credentials = "same-origin";
+    opts.headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
+    if (opts.body && typeof opts.body !== "string") opts.body = JSON.stringify(opts.body);
+    return fetch("/api" + path, opts).then(function (r) {
+      return r.json().then(function (j) { j.httpStatus = r.status; return j; },
+        function () { return { ok: false, httpStatus: r.status }; });
+    });
+  }
+  function errMsg(code) {
+    var map = { bad_email: "errEmail", weak_password: "errPassword", email_exists: "errExists", bad_credentials: "errLogin", rate_limited: "errRate", quota_exceeded: "errQuota" };
+    return t(map[code] || "errGeneric");
+  }
+  function setAccount(me) {
+    var logged = !!(me && me.ok && me.user);
+    $("acctLoggedOut").hidden = logged;
+    $("acctLoggedIn").hidden = !logged;
+    if (logged) {
+      $("acctWho").textContent = me.user.email;
+      var planName = me.user.plan === "pro" ? t("planPro") : t("planFree");
+      var used = (me.quota === null) ? (me.plans + " " + t("planUnlimited")) : (me.plans + " / " + me.quota);
+      $("acctPlan").textContent = planName + " · " + used;
+    }
+  }
+  function refreshMe() {
+    return api("/me").then(function (j) { setAccount(j); }).catch(function () { setAccount(null); });
+  }
+  function authAction(path) {
+    var email = $("acctEmail").value.trim();
+    var password = $("acctPassword").value;
+    if (!email || !password) { toast(t("errEmail")); return; }
+    api(path, { method: "POST", body: { email: email, password: password } }).then(function (j) {
+      if (j.ok) {
+        $("acctPassword").value = "";
+        toast(t(path.indexOf("register") >= 0 ? "toastRegisterOk" : "toastLoginOk"));
+        refreshMe();
+      } else { toast(errMsg(j.error)); }
+    }).catch(function () { toast(t("errGeneric")); });
+  }
+  $("loginBtn").addEventListener("click", function () { authAction("/auth/login"); });
+  $("registerBtn").addEventListener("click", function () { authAction("/auth/register"); });
+  $("logoutBtn").addEventListener("click", function () {
+    api("/auth/logout", { method: "POST" }).then(function () { setAccount(null); toast(t("toastLogout")); });
+  });
+  refreshMe();
 
   applyLang();
 })();

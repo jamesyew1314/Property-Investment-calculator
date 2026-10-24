@@ -397,6 +397,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-24 | 域名计划 | 计算器暂放主域名 kwongthye.com；开发完成后迁到 **calc.kwongthye.com**，主域名留作公司主页（迁移步骤见 PLAN_v2 §8.5；注意 localStorage 不跨子域，Phase 1 需带导出/导入） |
 | 2026-10-24 | v0.34 | **Phase 1 上线**：方案存档（命名保存/加载/删除/覆盖同名）、导出/导入 JSON、分享链接（`?d=` base64 全参数，只读模式可转编辑，localStorage 持久化）；**Phase 2 上线**：公司抬头（公司名/电话/微信/地址/客户项目 → 打印页头）、分享链接二维码（qrcode.js 本地化）、打印排版压到 2 页（Part 1 一页 / Part 2+3 一页）；test.js 扩到 53 项 |
 | 2026-10-24 | v0.35 | **后端地基上线**：Node 22 + PostgreSQL 16 + `fangchan-api.service`（systemd，127.0.0.1:3000）+ nginx `/api/` 反代；数据库 `fangchan` 建好 users/plans/sessions/subscriptions 四表；线上 `https://kwongthye.com/api/health` → ok/db true |
+| 2026-10-24 | v0.36 | **账号系统上线**：邮箱+密码注册/登录/注销、scrypt 密码哈希、会话 Cookie（HttpOnly+Secure+SameSite，30 天）、登录限流 5 次/分、Origin 校验；`/api/me` 返回用户+方案数+额度（免费 3 个）；前端「我的账号」卡片；curl 与真实浏览器均验证通过 |
 
 ---
 
