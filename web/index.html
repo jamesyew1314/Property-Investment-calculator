@@ -8,8 +8,10 @@
 <meta property="og:title" content="KWONG THYE 光泰 | Real Estate Investment · Property Advisory · PropTech">
 <meta property="og:description" content="Connecting Properties, Technology & Investment Opportunities. 连接房地产、科技与投资机会。">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://kwongthye.com/icon-256.png">
 <meta property="og:url" content="https://kwongthye.com/">
-<link rel="icon" href="logo.jpg">
+<link rel="icon" type="image/png" href="icon-256.png">
+<link rel="apple-touch-icon" href="icon-256.png">
 <link rel="canonical" href="https://kwongthye.com/">
 <style>
   :root{
@@ -33,9 +35,9 @@
   /* header */
   header{position:sticky;top:0;z-index:50;background:rgba(14,36,56,.96);backdrop-filter:blur(8px);
          border-bottom:1px solid rgba(198,161,91,.22)}
-  .nav{display:flex;align-items:center;gap:26px;height:68px}
+  .nav{display:flex;align-items:center;gap:26px;height:84px}
   .brand{display:flex;align-items:center;gap:10px;flex:none}
-  .brand img{height:34px;width:auto;border-radius:6px}
+  .brand img{height:56px;width:auto}
   .brand b{color:#fff;font-family:Georgia,serif;font-size:17px;letter-spacing:.04em}
   .brand span{color:var(--gold2);font-size:12px;letter-spacing:.18em}
   .navlinks{display:flex;gap:22px;margin-left:auto;align-items:center}
@@ -132,7 +134,7 @@
     .values{grid-template-columns:repeat(2,1fr)}
     .stats{grid-template-columns:repeat(2,1fr)}
     .navlinks{display:none}
-    .navlinks.open{display:flex;position:absolute;top:68px;left:0;right:0;background:#0E2438;
+    .navlinks.open{display:flex;position:absolute;top:84px;left:0;right:0;background:#0E2438;
                    flex-direction:column;align-items:flex-start;padding:14px 6vw 18px;gap:2px;
                    border-bottom:1px solid rgba(198,161,91,.25)}
     .navlinks.open a{padding:12px 0;width:100%;border-bottom:1px solid rgba(255,255,255,.06);font-size:15px}
@@ -148,9 +150,8 @@
 <body>
 <header>
   <div class="wrap nav">
-    <a class="brand" href="#top">
-      <img src="logo.jpg" alt="KWONG THYE">
-      <span class="brandtext"><b>KWONG THYE</b><br><span>光泰</span></span>
+    <a class="brand" href="#top" aria-label="KWONG THYE 光泰">
+      <img src="logo-white.png" alt="KWONG THYE 光泰">
     </a>
     <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
     <nav class="navlinks" id="navlinks">
@@ -609,7 +610,7 @@
   "@type": "Organization",
   "name": "KWONG THYE 光泰",
   "url": "https://kwongthye.com/",
-  "logo": "https://kwongthye.com/logo.jpg",
+  "logo": "https://kwongthye.com/logo.png",
   "description": "Real estate investment, property advisory and PropTech in Johor Bahru, Malaysia.",
   "areaServed": "Johor Bahru, Johor, Malaysia",
   "telephone": "+60 16-528 0918",
