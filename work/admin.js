@@ -38,6 +38,25 @@ function newCode() {
       "UPDATE users SET plan='pro', plan_expires_at = GREATEST(COALESCE(plan_expires_at, now()), now()) + ($1 || ' days')::interval, updated_at=now() WHERE email=$2 RETURNING email, plan, plan_expires_at",
       [days, email]);
     console.log(r.rows[0] || "user not found");
+  } else if (cmd === "mail-test") {
+    const nodemailer = require("nodemailer");
+    const to = args[0];
+    if (!to) { console.log("usage: node admin.js mail-test <email>"); }
+    else {
+      const t = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || "465", 10),
+        secure: (process.env.SMTP_SECURE || "true") !== "false",
+        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+      });
+      const info = await t.sendMail({
+        from: process.env.MAIL_FROM || process.env.SMTP_USER,
+        to: to,
+        subject: "KWONG THYE 邮件测试 / Mail test",
+        text: "这是一封来自 kwongthye.com 的测试邮件。\n\nThis is a test email from kwongthye.com.\n\n如果收到，说明 SMTP 配置成功。"
+      });
+      console.log("sent", info.messageId, info.response);
+    }
   } else if (cmd === "reset-link") {
     const crypto = require("node:crypto");
     const email = args[0];

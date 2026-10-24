@@ -2,6 +2,7 @@
 const express = require("express");
 const crypto = require("node:crypto");
 const fsp = require("node:fs/promises");
+const nodemailer = require("nodemailer");
 const pathMod = require("node:path");
 const { Pool } = require("pg");
 
@@ -58,9 +59,23 @@ async function createSession(userId) {
   return token;
 }
 
+let smtpTransport = null;
+if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+  smtpTransport = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || "465", 10),
+    secure: (process.env.SMTP_SECURE || "true") !== "false",
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+  });
+}
+
 async function sendMail(to, subject, text) {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.MAIL_FROM || "KWONG THYE <noreply@kwongthye.com>";
+  const from = process.env.MAIL_FROM || (process.env.SMTP_USER ? "KWONG THYE <" + process.env.SMTP_USER + ">" : "KWONG THYE <noreply@kwongthye.com>");
+  if (smtpTransport) {
+    await smtpTransport.sendMail({ from: from, to: to, subject: subject, text: text });
+    return "sent";
+  }
   if (key) {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
