@@ -288,13 +288,16 @@
     </div>
     <details class="company">
       <summary data-i18n="companyTitle">公司抬头（打印用）</summary>
-      <div class="row"><label data-i18n="fCompany">公司名</label><input class="manual" id="coName" type="text"></div>
-      <div class="row"><label data-i18n="fPhone">电话</label><input class="manual" id="coPhone" type="text"></div>
-      <div class="row"><label data-i18n="fWechat">微信</label><input class="manual" id="coWechat" type="text"></div>
-      <div class="row"><label data-i18n="fAddress">地址</label><input class="manual" id="coAddress" type="text"></div>
-      <div class="row"><label data-i18n="fCustomer">客户 / 项目</label><input class="manual" id="coClient" type="text"></div>
+      <div class="row"><label data-i18n="fCompany">公司 / 中介公司</label><input class="manual" id="coName" type="text" placeholder="ABC Realty Sdn Bhd"></div>
+      <div class="row"><label data-i18n="fPerson">中介姓名</label><input class="manual" id="coPerson" type="text" placeholder="Your name"></div>
+      <div class="row"><label data-i18n="fRen">REN 编号（可选）</label><input class="manual" id="coRen" type="text" placeholder="REN 12345"></div>
+      <div class="row"><label data-i18n="fPhone">电话 / WhatsApp</label><input class="manual" id="coPhone" type="text" inputmode="tel" placeholder="+60 12-345 6789"></div>
+      <div class="row"><label data-i18n="fEmailCo">电邮（可选）</label><input class="manual" id="coEmail" type="email" inputmode="email" placeholder="you@example.com"></div>
+      <div class="row"><label data-i18n="fAddress">公司地址（可选）</label><input class="manual" id="coAddress" type="text" placeholder="No. 1, Jalan ..., 50000 Kuala Lumpur"></div>
+      <div class="row"><label data-i18n="fCustomer">客户姓名</label><input class="manual" id="coClient" type="text" placeholder="Mr Tan"></div>
+      <div class="row"><label data-i18n="fProject">项目 / 楼盘</label><input class="manual" id="coProject" type="text" placeholder="Bukit Jalil Condo"></div>
       <div class="btnRow"><button class="btn btn2" id="coSave" data-i18n="btnSaveCo">保存抬头</button></div>
-    </details>
+        </details>
     <div class="legend" data-i18n="planNote">💾 方案存在本机浏览器；换设备或换域名时请用「导出 / 导入 JSON」。</div>
   </div>
 </div>
@@ -374,7 +377,7 @@
       btnSavePlan: "💾 保存方案", btnShareLink: "🔗 复制分享链接",
       fPlanList: "已存方案", optPick: "（选择已存方案）", optNone: "（还没有存档）",
       btnLoad: "加载", btnDelete: "删除", btnExport: "导出 JSON", btnImport: "导入 JSON",
-      companyTitle: "公司抬头（打印用）", fCompany: "公司名", fPhone: "电话", fWechat: "微信", fAddress: "地址", fCustomer: "客户 / 项目", btnSaveCo: "保存抬头",
+      companyTitle: "公司抬头（打印用）", fCompany: "公司 / 中介公司", fPerson: "中介姓名", fRen: "REN 编号（可选）", fPhone: "电话 / WhatsApp", fEmailCo: "电邮（可选）", fAddress: "公司地址（可选）", fCustomer: "客户姓名", fProject: "项目 / 楼盘", btnSaveCo: "保存抬头",
       planNote: "💾 方案存在本机浏览器；换设备或换域名时请用「导出 / 导入 JSON」。",
       viewBannerText: "🔗 这是分享的估算（只读）", btnEditCopy: "在我这边继续编辑",
       toastSaved: "方案已保存", toastLoaded: "方案已加载", toastDeleted: "方案已删除", toastNeedName: "先给方案起个名字",
@@ -431,7 +434,7 @@
       btnSavePlan: "💾 Save Plan", btnShareLink: "🔗 Copy Share Link",
       fPlanList: "Saved Plans", optPick: "(select a saved plan)", optNone: "(no saved plans yet)",
       btnLoad: "Load", btnDelete: "Delete", btnExport: "Export JSON", btnImport: "Import JSON",
-      companyTitle: "Company Header (for print)", fCompany: "Company", fPhone: "Phone", fWechat: "WeChat", fAddress: "Address", fCustomer: "Client / Project", btnSaveCo: "Save Header",
+      companyTitle: "Company Header (for print)", fCompany: "Company / Agency", fPerson: "Negotiator", fRen: "REN No. (optional)", fPhone: "Phone / WhatsApp", fEmailCo: "Email (optional)", fAddress: "Office address (optional)", fCustomer: "Client name", fProject: "Project / Property", btnSaveCo: "Save Header",
       planNote: "💾 Plans are stored in this browser only. Use Export / Import JSON when changing device or domain.",
       viewBannerText: "🔗 Shared estimate (read-only)", btnEditCopy: "Continue editing here",
       toastSaved: "Plan saved", toastLoaded: "Plan loaded", toastDeleted: "Plan deleted", toastNeedName: "Please name the plan first",
@@ -755,7 +758,7 @@
   // ================= Phase 1/2：存档 / 分享 / 公司抬头 =================
   var PLAN_KEY = "fangchan_plans_v1";
   var CO_KEY = "fangchan_company_v1";
-  var company = { name: "", phone: "", wechat: "", address: "", client: "" };
+  var company = { name: "", person: "", ren: "", phone: "", email: "", address: "", client: "", project: "" };
   try { var coSaved = JSON.parse(localStorage.getItem(CO_KEY) || "null"); if (coSaved) Object.assign(company, coSaved); } catch (e) {}
 
   var STATE_FIELDS = ["spa", "actual", "loan", "loanPct", "rate", "tenure", "agent", "consent", "other",
@@ -892,15 +895,19 @@
 
   function fillCompanyForm() {
     $("coName").value = company.name || "";
+    $("coPerson").value = company.person || "";
+    $("coRen").value = company.ren || "";
     $("coPhone").value = company.phone || "";
-    $("coWechat").value = company.wechat || "";
+    $("coEmail").value = company.email || "";
     $("coAddress").value = company.address || "";
     $("coClient").value = company.client || "";
+    $("coProject").value = company.project || "";
   }
   $("coSave").addEventListener("click", function () {
     company = {
-      name: $("coName").value.trim(), phone: $("coPhone").value.trim(), wechat: $("coWechat").value.trim(),
-      address: $("coAddress").value.trim(), client: $("coClient").value.trim()
+      name: $("coName").value.trim(), person: $("coPerson").value.trim(), ren: $("coRen").value.trim(),
+      phone: $("coPhone").value.trim(), email: $("coEmail").value.trim(),
+      address: $("coAddress").value.trim(), client: $("coClient").value.trim(), project: $("coProject").value.trim()
     };
     try { localStorage.setItem(CO_KEY, JSON.stringify(company)); } catch (e) {}
     updatePrintHeader();
@@ -910,11 +917,12 @@
   function updatePrintHeader() {
     $("phCo").textContent = company.name || t("appName");
     var bits = [];
-    if (company.phone) bits.push("☎ " + company.phone);
-    if (company.wechat) bits.push("WeChat: " + company.wechat);
+    if (company.person) bits.push(company.person + (company.ren ? " · " + company.ren : ""));
+    if (company.phone) bits.push("WhatsApp " + company.phone);
+    if (company.email) bits.push(company.email);
     if (company.address) bits.push(company.address);
     $("phContact").textContent = bits.join(" · ");
-    $("phClient").textContent = company.client || "";
+    $("phClient").textContent = [company.client, company.project].filter(Boolean).join(" · ");
     var qr = $("phQr");
     qr.style.display = "";
     try {
