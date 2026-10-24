@@ -23,7 +23,7 @@ function newCode() {
     const days = parseInt(args[0] || "365", 10);
     const count = parseInt(args[1] || "1", 10);
     const note = args[2] || null;
-    const amount = args[3] !== undefined ? parseFloat(args[3]) : Math.round((50 * days / 365) * 100) / 100;
+    const amount = args[3] !== undefined ? parseFloat(args[3]) : (days >= 365 ? 99 : Math.round(9.9 * Math.ceil(days / 30) * 100) / 100);
     for (let i = 0; i < count; i++) {
       const c = newCode();
       await pool.query("INSERT INTO redeem_codes(code,days,note,amount) VALUES($1,$2,$3,$4)", [c, days, note, amount]);
