@@ -394,6 +394,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-19 | v0.32 | RPGT 改老板口径：(卖价 − 实价 − 总购置费用 − 卖出中介费 − 卖出律师费 − 售出杂费) × 年限税率（30/20/15/0），不再用法定豁免；RPGT 行移到售出杂费下方；删「Selling related cost」标题与整个完整口径块（Net Cash Profit → XIRR）；test.js 保持 48 项 |
 | 2026-10-19 | 版本管理 | 初始化 git 仓库并推送到 GitHub 私有仓库 `jamesyew1314/Property-nvestment-calculator`；标签 v0.32 |
 | 2026-10-24 | 部署 | 正式迁移到阿里云**吉隆坡**服务器 47.254.235.22：域名 **kwongthye.com**（+ www），Let's Encrypt HTTPS 自动续期，HTTP 301 跳 HTTPS，HSTS 已开；配置：Ubuntu 24.04 / 2C4G / ufw / fail2ban / 自动安全更新 / 2G swap；旧深圳站保留 |
+| 2026-10-24 | 域名计划 | 计算器暂放主域名 kwongthye.com；开发完成后迁到 **calc.kwongthye.com**，主域名留作公司主页（迁移步骤见 PLAN_v2 §8.5；注意 localStorage 不跨子域，Phase 1 需带导出/导入） |
 
 ---
 

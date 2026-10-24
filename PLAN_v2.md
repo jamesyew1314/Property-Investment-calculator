@@ -185,6 +185,15 @@ Internet
 
 ### 8.5 域名与环境
 
+**域名计划（10/24 定）**：现在计算器放主域名 `kwongthye.com`；开发完成后再迁到子域名 `calc.kwongthye.com`，主域名留给公司主页。
+
+迁移时的注意点：
+- 新增 DNS：`calc` → A → `47.254.235.22`（TTL 600）
+- nginx 新增 `calc.kwongthye.com` server 块 + 证书（certbot 加 `-d calc.kwongthye.com`）
+- 主域名改为公司主页；旧分享链接（`kwongthye.com/?d=...`）用 301 指到 `calc.kwongthye.com` 对应参数
+- **localStorage 不跨子域**：语言偏好与 Phase 1 本地存档会“消失”→ Phase 1 必须带「导出/导入 JSON」，迁移前让用户导出
+
+
 - 生产：`fangchan.<你的域名>`（A 记录 → 吉隆坡 IP）
 - 预发（建议）：`staging.fangchan.<域名>`，独立数据库 `fangchan_staging`，同一台机器不同目录；上线前先在 staging 验证。
 - 同域部署 `/api`，避免跨域与 Cookie 问题。
