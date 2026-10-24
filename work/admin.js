@@ -31,9 +31,10 @@ function newCode() {
     }
   } else if (cmd === "otp") {
     const crypto = require("node:crypto");
+    const email = (args[0] || process.env.ADMIN_EMAIL || "andylau.theroof@gmail.com").toLowerCase();
     const code = String(Math.floor(100000 + Math.random() * 900000));
     const hash = crypto.createHash("sha256").update(code).digest("hex");
-    await pool.query("INSERT INTO admin_otps(code_hash,expires_at) VALUES($1, now() + interval '10 minutes')", [hash]);
+    await pool.query("INSERT INTO admin_otps(code_hash,expires_at,email) VALUES($1, now() + interval '10 minutes',$2)", [hash, email]);
     console.log(code);
   } else if (cmd === "logs") {
     const r = await pool.query("SELECT created_at,action,detail FROM admin_logs ORDER BY created_at DESC LIMIT 50");

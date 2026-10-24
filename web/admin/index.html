@@ -61,6 +61,7 @@
     <b>管理后台 <span style="color:#C6A15B;font-size:12px">Admin</span></b>
     <span class="sp"></span>
     <span id="who" hidden style="color:#8FE3B0;font-size:12px;margin-right:10px">● 已登录</span>
+    <span id="roleTag" hidden class="tag" style="margin-right:8px"></span>
     <button id="logoutBtn" hidden>退出</button>
   </div>
 </header>
@@ -69,7 +70,9 @@
     <div class="login" id="loginBox">
       <h2>管理员登录</h2>
       <p>仅限内部使用。密码与用户账号无关。</p>
-      <label>管理密码</label>
+      <label>管理员邮箱（owner 留空）</label>
+      <input id="admEmail" type="email" autocomplete="username" placeholder="admin@example.com">
+      <label style="margin-top:10px">密码</label>
       <input id="pw" type="password" autocomplete="current-password" placeholder="••••••••">
       <button class="btn" id="loginBtn" style="margin-top:12px;width:100%">登录</button>
       <div id="otpWrap" hidden style="margin-top:14px">
@@ -96,6 +99,7 @@
         <button data-tab="msgs">留言</button>
         <button data-tab="views">访问量</button>
         <button data-tab="logs">操作日志</button>
+        <button data-tab="admins" id="tabBtnAdmins" hidden>管理员</button>
       </div>
 
       <section class="tab on" id="tab-codes">
@@ -145,6 +149,22 @@
       <section class="tab" id="tab-msgs">
         <div class="card" style="padding:0;overflow:auto;max-height:70vh">
           <table><thead><tr><th>时间</th><th>姓名</th><th>联系</th><th>留言</th></tr></thead><tbody id="msgBody"></tbody></table>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-admins">
+        <div class="card">
+          <h3 style="margin:0 0 10px;font-size:15px;color:var(--navy)">新增管理员</h3>
+          <div class="grid3">
+            <div><label>邮箱</label><input id="naEmail" type="email" placeholder="staff@example.com"></div>
+            <div><label>初始密码（≥8 位）</label><input id="naPw" type="password"></div>
+            <div><label>权限</label><select id="naRole"><option value="admin">管理员（可发码/改用户）</option><option value="viewer">只读（仅查看）</option></select></div>
+          </div>
+          <button class="btn gold" id="naBtn" style="margin-top:12px">添加</button>
+          <div class="msg" id="naMsg"></div>
+        </div>
+        <div class="card" style="padding:0;overflow:auto">
+          <table><thead><tr><th>邮箱</th><th>权限</th><th>状态</th><th>最近登录</th><th>操作</th></tr></thead><tbody id="admBody"></tbody></table>
         </div>
       </section>
 
@@ -276,31 +296,79 @@
     }
   });
 
-  function boot() {
+  var myRole = "owner";
+  function applyRole(role) {
+    myRole = role || "owner";
+    $("roleTag").hidden = false;
+    $("roleTag").textContent = myRole === "owner" ? "Owner" : (myRole === "admin" ? "管理员" : "只读");
+    $("tabBtnAdmins").hidden = myRole !== "owner";
+    if (myRole === "viewer") {
+      ["genBtn", "promoBtn"].forEach(function (id) { if ($(id)) $(id).disabled = true; });
+    }
+  }
+  function loadAdmins() {
+    api("/admins").then(function (j) {
+      if (!j.ok) return;
+      $("admBody").innerHTML = (j.admins || []).map(function (a) {
+        return "<tr><td>" + esc(a.email) + "</td><td>" + (a.role === "viewer" ? "只读" : "管理员") +
+          "</td><td>" + (a.active ? "启用" : "停用") + "</td><td class='muted'>" + (a.last_login_at ? String(a.last_login_at).slice(0, 16).replace("T", " ") : "—") +
+          "</td><td><button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='pwd' data-id='" + a.id + "'>重置密码</button> " +
+          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='toggle' data-id='" + a.id + "' data-active='" + a.active + "'>" + (a.active ? "停用" : "启用") + "</button> " +
+          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='del' data-id='" + a.id + "' data-email='" + esc(a.email) + "'>删除</button></td></tr>";
+      }).join("") || "<tr><td colspan=5 class='muted'>暂无管理员（owner 可直接用密码登录）</td></tr>";
+    });
+  }
+  $("naBtn").onclick = function () {
+    api("/admins", { method: "POST", body: { email: $("naEmail").value.trim(), password: $("naPw").value, role: $("naRole").value } }).then(function (j) {
+      if (j.ok) { $("naMsg").className = "msg ok"; $("naMsg").textContent = "已添加"; $("naEmail").value = ""; $("naPw").value = ""; loadAdmins(); }
+      else { $("naMsg").className = "msg err"; $("naMsg").textContent = "失败：" + (j.error || j._status); }
+    });
+  };
+  $("admBody").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-a]"); if (!b) return;
+    var id = b.getAttribute("data-id"), act = b.getAttribute("data-a");
+    if (act === "pwd") {
+      var pw = prompt("新密码（≥8 位）"); if (!pw) return;
+      api("/admins/" + id, { method: "PATCH", body: { password: pw } }).then(function (j) { alert(j.ok ? "已重置，该管理员需重新登录" : "失败：" + (j.error || j._status)); loadAdmins(); });
+    } else if (act === "toggle") {
+      var active = b.getAttribute("data-active") === "true";
+      api("/admins/" + id, { method: "PATCH", body: { active: !active } }).then(function (j) { if (!j.ok) alert("失败：" + (j.error || j._status)); loadAdmins(); });
+    } else if (act === "del") {
+      if (!confirm("删除 " + b.getAttribute("data-email") + "？")) return;
+      api("/admins/" + id, { method: "DELETE" }).then(function (j) { alert(j.ok ? "已删除" : "失败：" + (j.error || j._status)); loadAdmins(); });
+    }
+  });
+
+  function boot(me) {
     show(true);
+    applyRole(me && me.role);
     loadStats(); loadList(); loadUsers(""); loadMsgs(); loadViews(); loadLogs();
+    if (myRole === "owner") loadAdmins();
     $("logoutBtn").onclick = function () {
       api("/logout", { method: "POST" }).then(function () { show(false); });
     };
   }
 
+  var loginEmail = "";
   $("loginBtn").onclick = function () {
     var pw = $("pw").value;
     if (!pw) return;
     $("loginMsg").textContent = ""; $("loginMsg").className = "msg";
-    api("/login", { method: "POST", body: { password: pw } }).then(function (j) {
+    api("/login", { method: "POST", body: { email: $("admEmail").value.trim(), password: pw } }).then(function (j) {
       if (j.ok && j.needOtp) {
+        loginEmail = j.email || "";
         $("otpWrap").hidden = false; $("otp").focus();
-        $("loginMsg").className = "msg ok"; $("loginMsg").textContent = "验证码已发送，请查收邮箱。";
-      } else if (j.ok) { boot(); }
+        $("loginMsg").className = "msg ok";
+        $("loginMsg").textContent = "验证码已发到 " + loginEmail + "，10 分钟内有效。";
+      } else if (j.ok) { boot(j); }
       else { $("loginMsg").className = "msg err"; $("loginMsg").textContent = j.error === "bad_password" ? "密码错误" : "无法登录（" + (j.error || j._status) + "）"; }
     });
   };
   $("verifyBtn").onclick = function () {
     var code = $("otp").value.trim();
     if (!code) return;
-    api("/verify", { method: "POST", body: { code: code } }).then(function (j) {
-      if (j.ok) { $("otp").value = ""; $("otpWrap").hidden = true; boot(); }
+    api("/verify", { method: "POST", body: { code: code, email: loginEmail } }).then(function (j) {
+      if (j.ok) { $("otp").value = ""; $("otpWrap").hidden = true; boot(j); }
       else { $("loginMsg").className = "msg err"; $("loginMsg").textContent = "验证码错误或已失效"; }
     });
   };
@@ -316,6 +384,7 @@
       if (b.getAttribute("data-tab") === "msgs") loadMsgs();
       if (b.getAttribute("data-tab") === "views") loadViews();
       if (b.getAttribute("data-tab") === "logs") loadLogs();
+      if (b.getAttribute("data-tab") === "admins") loadAdmins();
     };
   });
 
@@ -348,7 +417,7 @@
 
   $("uSearch").onclick = function () { loadUsers($("uQuery").value.trim()); };
 
-  api("/me").then(function (j) { if (j.ok) boot(); else show(false); }).catch(function () { show(false); });
+  api("/me").then(function (j) { if (j.ok) boot(j); else show(false); }).catch(function () { show(false); });
 })();
 </script>
 </body>

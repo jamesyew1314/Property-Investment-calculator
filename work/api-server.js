@@ -409,13 +409,24 @@ function adminToken() {
     .update(String(process.env.ADMIN_PASSWORD || "") + "|" + String(process.env.ADMIN_SECRET || "kwthye"))
     .digest("hex");
 }
-function requireAdmin(req, res, next) {
+async function requireAdmin(req, res, next) {
   if (!process.env.ADMIN_PASSWORD) return res.status(503).json({ ok: false, error: "admin_disabled" });
-  const t = parseCookies(req)[ADMIN_COOKIE] || "";
-  const exp = adminToken();
-  if (t.length !== exp.length || !crypto.timingSafeEqual(Buffer.from(t), Buffer.from(exp))) {
-    return res.status(401).json({ ok: false, error: "admin_required" });
-  }
+  try {
+    const t = parseCookies(req)[ADMIN_COOKIE] || "";
+    if (!t) return res.status(401).json({ ok: false, error: "admin_required" });
+    const r = await pool.query(
+      "SELECT admin_id,email,role FROM admin_sessions WHERE token_hash=$1 AND expires_at > now()", [sha256(t)]);
+    if (!r.rows[0]) return res.status(401).json({ ok: false, error: "admin_required" });
+    req.admin = r.rows[0];
+    next();
+  } catch (e) { next(e); }
+}
+function requireOwner(req, res, next) {
+  if (!req.admin || req.admin.role !== "owner") return res.status(403).json({ ok: false, error: "owner_only" });
+  next();
+}
+function requireWrite(req, res, next) {
+  if (!req.admin || req.admin.role === "viewer") return res.status(403).json({ ok: false, error: "read_only" });
   next();
 }
 function adminCode() {
@@ -426,39 +437,125 @@ function adminIp(req) {
   return crypto.createHash("sha256").update((req.ip || "") + (process.env.IP_SALT || "fc")).digest("hex").slice(0, 24);
 }
 async function adminLog(action, detail, req) {
-  try { await pool.query("INSERT INTO admin_logs(action,detail,ip_hash) VALUES($1,$2,$3)", [action, detail, req ? adminIp(req) : null]); } catch (e) {}
+  try {
+    await pool.query("INSERT INTO admin_logs(action,detail,ip_hash,actor) VALUES($1,$2,$3,$4)",
+      [action, detail, req ? adminIp(req) : null, req && req.admin ? req.admin.email : "owner"]);
+  } catch (e) {}
 }
 app.post("/api/admin/login", rateLimit(5, 600000), async function (req, res) {
   if (!process.env.ADMIN_PASSWORD) return res.status(503).json({ ok: false, error: "admin_disabled" });
+  const email = String((req.body || {}).email || "").trim().toLowerCase();
   const pw = String((req.body || {}).password || "");
-  const exp = Buffer.from(String(process.env.ADMIN_PASSWORD));
-  const got = Buffer.from(pw);
-  const ok = got.length === exp.length && crypto.timingSafeEqual(got, exp);
-  if (!ok) { await adminLog("login.fail", "wrong password", req); return res.status(401).json({ ok: false, error: "bad_password" }); }
+  let role = "owner", to = process.env.ADMIN_EMAIL || "andylau.theroof@gmail.com", adminId = null;
+  if (email) {
+    const r = await pool.query("SELECT * FROM admins WHERE email=$1 AND active=true", [email]);
+    const a = r.rows[0];
+    if (!a || !scryptVerify(pw, a.password_hash)) {
+      await adminLog("login.fail", "wrong password: " + email, req);
+      return res.status(401).json({ ok: false, error: "bad_password" });
+    }
+    role = a.role; to = a.email; adminId = a.id;
+  } else {
+    const exp = Buffer.from(String(process.env.ADMIN_PASSWORD));
+    const got = Buffer.from(pw);
+    if (got.length !== exp.length || !crypto.timingSafeEqual(got, exp)) {
+      await adminLog("login.fail", "wrong owner password", req);
+      return res.status(401).json({ ok: false, error: "bad_password" });
+    }
+  }
   const code = String(Math.floor(100000 + Math.random() * 900000));
-  await pool.query("INSERT INTO admin_otps(code_hash,expires_at) VALUES($1, now() + interval '10 minutes')", [sha256(code)]);
+  await pool.query("INSERT INTO admin_otps(code_hash,expires_at,email) VALUES($1, now() + interval '10 minutes',$2)", [sha256(code), to]);
   try {
-    await sendMail(process.env.ADMIN_EMAIL || "andylau.theroof@gmail.com", "后台验证码 / Admin code — KWONG THYE",
+    await sendMail(to, "后台验证码 / Admin code — KWONG THYE",
       "您的后台登录验证码 / Your admin login code:\n\n" + code + "\n\n10 分钟内有效 / valid for 10 minutes.");
   } catch (e) { console.error("admin otp mail failed", e.message); return res.status(500).json({ ok: false, error: "mail_failed" }); }
-  res.json({ ok: true, needOtp: true });
+  res.json({ ok: true, needOtp: true, email: to, role: role, adminId: adminId });
 });
 
 app.post("/api/admin/verify", rateLimit(10, 600000), async function (req, res) {
   const code = String((req.body || {}).code || "").trim();
-  const r = await pool.query("SELECT * FROM admin_otps WHERE code_hash=$1 AND used_at IS NULL AND expires_at > now()", [sha256(code)]);
+  const email = String((req.body || {}).email || "").trim().toLowerCase();
+  const r = await pool.query(
+    "SELECT * FROM admin_otps WHERE code_hash=$1 AND used_at IS NULL AND expires_at > now()" +
+    (email ? " AND email=$2" : "") + " ORDER BY created_at DESC LIMIT 1",
+    email ? [sha256(code), email] : [sha256(code)]);
   if (!r.rows[0]) return res.status(401).json({ ok: false, error: "bad_code" });
   await pool.query("UPDATE admin_otps SET used_at=now() WHERE id=$1", [r.rows[0].id]);
   await pool.query("DELETE FROM admin_otps WHERE expires_at < now() - interval '1 day'");
-  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=" + adminToken() + "; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=43200");
-  await adminLog("login.ok", "password + email OTP", req);
-  res.json({ ok: true });
+  const a = await pool.query("SELECT id,email,role FROM admins WHERE email=$1", [r.rows[0].email]);
+  const admin = a.rows[0] || { id: null, email: r.rows[0].email, role: "owner" };
+  const token = crypto.randomBytes(32).toString("hex");
+  await pool.query("INSERT INTO admin_sessions(token_hash,admin_id,email,role,expires_at) VALUES($1,$2,$3,$4, now() + interval '12 hours')",
+    [sha256(token), admin.id, admin.email, admin.role]);
+  if (admin.id) await pool.query("UPDATE admins SET last_login_at=now() WHERE id=$1", [admin.id]);
+  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=" + token + "; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=43200");
+  await adminLog("login.ok", admin.email + " (" + admin.role + ")", req);
+  res.json({ ok: true, email: admin.email, role: admin.role });
 });
-app.post("/api/admin/logout", function (req, res) {
+app.post("/api/admin/logout", async function (req, res) {
+  const t = parseCookies(req)[ADMIN_COOKIE] || "";
+  if (t) await pool.query("DELETE FROM admin_sessions WHERE token_hash=$1", [sha256(t)]);
   res.setHeader("Set-Cookie", ADMIN_COOKIE + "=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0");
   res.json({ ok: true });
 });
-app.get("/api/admin/me", requireAdmin, function (req, res) { res.json({ ok: true }); });
+app.get("/api/admin/me", requireAdmin, function (req, res) { res.json({ ok: true, email: req.admin.email, role: req.admin.role }); });
+
+app.get("/api/admin/admins", requireAdmin, requireOwner, async function (req, res, next) {
+  try {
+    const r = await pool.query("SELECT id,email,role,active,created_at,last_login_at FROM admins ORDER BY created_at");
+    res.json({ ok: true, admins: r.rows });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/admin/admins", requireAdmin, requireOwner, async function (req, res, next) {
+  try {
+    const b = req.body || {};
+    const email = String(b.email || "").trim().toLowerCase();
+    const password = String(b.password || "");
+    const role = b.role === "viewer" ? "viewer" : "admin";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ ok: false, error: "bad_email" });
+    if (password.length < 8) return res.status(400).json({ ok: false, error: "weak_password" });
+    const r = await pool.query(
+      "INSERT INTO admins(email,password_hash,role) VALUES($1,$2,$3) RETURNING id,email,role,active",
+      [email, scryptHash(password), role]);
+    await adminLog("admin.create", email + " (" + role + ")", req);
+    res.json({ ok: true, admin: r.rows[0] });
+  } catch (e) {
+    if (e.code === "23505") return res.status(409).json({ ok: false, error: "email_exists" });
+    next(e);
+  }
+});
+
+app.patch("/api/admin/admins/:id", requireAdmin, requireOwner, async function (req, res, next) {
+  try {
+    const b = req.body || {};
+    const sets = [], vals = [];
+    if (b.role === "admin" || b.role === "viewer") { sets.push("role=$" + (vals.length + 1)); vals.push(b.role); }
+    if (typeof b.active === "boolean") { sets.push("active=$" + (vals.length + 1)); vals.push(b.active); }
+    if (b.password) {
+      if (String(b.password).length < 8) return res.status(400).json({ ok: false, error: "weak_password" });
+      sets.push("password_hash=$" + (vals.length + 1)); vals.push(scryptHash(String(b.password)));
+    }
+    if (!sets.length) return res.status(400).json({ ok: false, error: "nothing_to_update" });
+    vals.push(req.params.id);
+    const r = await pool.query("UPDATE admins SET " + sets.join(",") + " WHERE id=$" + vals.length + " RETURNING email,role,active", vals);
+    if (!r.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    if (b.active === false || b.password) {
+      await pool.query("DELETE FROM admin_sessions WHERE admin_id=$1", [req.params.id]);
+    }
+    await adminLog("admin.update", r.rows[0].email + " role=" + r.rows[0].role + " active=" + r.rows[0].active, req);
+    res.json({ ok: true, admin: r.rows[0] });
+  } catch (e) { next(e); }
+});
+
+app.delete("/api/admin/admins/:id", requireAdmin, requireOwner, async function (req, res, next) {
+  try {
+    const r = await pool.query("DELETE FROM admins WHERE id=$1 RETURNING email", [req.params.id]);
+    if (!r.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    await adminLog("admin.delete", r.rows[0].email, req);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
 
 app.get("/api/admin/logs", requireAdmin, async function (req, res, next) {
   try {
@@ -467,7 +564,7 @@ app.get("/api/admin/logs", requireAdmin, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
-app.post("/api/admin/users/:id/password", requireAdmin, async function (req, res, next) {
+app.post("/api/admin/users/:id/password", requireAdmin, requireWrite, async function (req, res, next) {
   try {
     const pw = String((req.body || {}).password || "");
     if (pw.length < 8) return res.status(400).json({ ok: false, error: "weak_password" });
@@ -480,7 +577,7 @@ app.post("/api/admin/users/:id/password", requireAdmin, async function (req, res
   } catch (e) { next(e); }
 });
 
-app.post("/api/admin/users/:id/extend", requireAdmin, async function (req, res, next) {
+app.post("/api/admin/users/:id/extend", requireAdmin, requireWrite, async function (req, res, next) {
   try {
     const days = Math.max(1, Math.min(3660, parseInt((req.body || {}).days || "30", 10)));
     const r = await pool.query(
@@ -493,7 +590,7 @@ app.post("/api/admin/users/:id/extend", requireAdmin, async function (req, res, 
   } catch (e) { next(e); }
 });
 
-app.post("/api/admin/users/:id/free", requireAdmin, async function (req, res, next) {
+app.post("/api/admin/users/:id/free", requireAdmin, requireWrite, async function (req, res, next) {
   try {
     const r = await pool.query("UPDATE users SET plan='free', plan_expires_at=NULL, updated_at=now() WHERE id=$1 RETURNING email", [req.params.id]);
     if (!r.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
@@ -517,7 +614,7 @@ app.get("/api/admin/overview", requireAdmin, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
-app.post("/api/admin/codes", requireAdmin, async function (req, res, next) {
+app.post("/api/admin/codes", requireAdmin, requireWrite, async function (req, res, next) {
   try {
     const b = req.body || {};
     const days = Math.max(1, Math.min(3660, parseInt(b.days || "30", 10)));
@@ -535,7 +632,7 @@ app.post("/api/admin/codes", requireAdmin, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
-app.post("/api/admin/promo", requireAdmin, async function (req, res, next) {
+app.post("/api/admin/promo", requireAdmin, requireWrite, async function (req, res, next) {
   try {
     const b = req.body || {};
     const code = String(b.code || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 32);
