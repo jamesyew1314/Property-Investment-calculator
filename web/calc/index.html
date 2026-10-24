@@ -109,6 +109,15 @@
   .aiRow input{flex:1;min-width:240px;padding:10px 12px;border:1px solid #D8DEE9;border-radius:9px;font:inherit;font-size:13.5px}
   .aiRow button{flex:none}
   .cmpTable{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px;background:#fff}
+  .cmpPick{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+  .cmpPick select{flex:1 1 150px;min-width:120px;padding:9px 10px;border:1px solid #D8DEE9;border-radius:9px;
+    font:inherit;font-size:13px;background:#fff;color:#1B2430}
+  .cmpVs{font-size:12px;color:#6B7787;font-weight:600}
+  .cmpGo{flex:0 0 auto;padding:10px 16px;border:0;border-radius:10px;background:#C6A15B;color:#1B2430;
+    font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+  .printOpts{display:flex;gap:10px;flex-wrap:wrap;margin:2px 0 10px}
+  .printOpts label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#4A5563}
+  .printOpts select{padding:7px 8px;border:1px solid #D8DEE9;border-radius:8px;font:inherit;font-size:12.5px;background:#fff}
   .cmpTable th,.cmpTable td{border:1px solid #E6E9F0;padding:7px 8px;text-align:right}
   .cmpTable th:first-child,.cmpTable td:first-child{text-align:left;color:#4A5563}
   .cmpTable thead th{background:#F7F9FC;color:var(--navy)}
@@ -159,6 +168,7 @@
     footer { display:block; font-size:8.5px; padding:4px 8px 0; line-height:1.4; }
   }
 </style>
+<style id="printCfg"></style>
 </head>
 <body>
 <header>
@@ -289,6 +299,22 @@
   <!-- 导出 / 分享 -->
   <section class="part no-print" id="shareSec">
     <h2 data-i18n="exportTitle">导出 / 分享</h2>
+    <div class="printOpts">
+      <label><span data-i18n="printPaperLbl">纸张</span>
+        <select id="printPaper">
+          <option value="a4" data-i18n="paperA4">A4 标准</option>
+          <option value="a4tight" data-i18n="paperA4Tight">A4 省纸（边距小）</option>
+          <option value="letter" data-i18n="paperLetter">Letter</option>
+        </select>
+      </label>
+      <label><span data-i18n="printHeadLbl">页眉</span>
+        <select id="printHead">
+          <option value="full" data-i18n="headFull">完整（Logo + 抬头 + 二维码）</option>
+          <option value="simple" data-i18n="headSimple">简洁（公司名 + 日期）</option>
+          <option value="none" data-i18n="headNone">无页眉</option>
+        </select>
+      </label>
+    </div>
     <button class="btn" id="printBtn" data-i18n="printBtn">🖨️ 导出 PDF / 打印（Part 1 一页 · Part 2+3 一页）</button>
     <div class="shareRow">
       <button class="shareBtn" id="waBtn" style="background:#25D366">WhatsApp</button>
@@ -298,11 +324,15 @@
     <div class="legend" data-i18n="shareNote">WhatsApp / Facebook 直接打开；微信没有网页分享接口，点「微信」会复制文字，粘贴到微信即可。</div>
     <div class="shareRow">
       <button class="shareBtn" id="csvBtn" style="background:#1F7A4D" data-i18n="btnCsv">📊 导出 Excel / CSV</button>
-      <button class="shareBtn" id="cmpA" style="background:#334E68" data-i18n="cmpA">＋ 对比 A</button>
-      <button class="shareBtn" id="cmpB" style="background:#334E68" data-i18n="cmpB">＋ 对比 B</button>
-      <button class="shareBtn" id="cmpView" style="background:#C6A15B;color:#1B2430" data-i18n="cmpView">查看对比</button>
+    </div>
+    <div class="cmpPick">
+      <select id="cmpSelA" aria-label="A"></select>
+      <span class="cmpVs">vs</span>
+      <select id="cmpSelB" aria-label="B"></select>
+      <button class="cmpGo" id="cmpView" data-i18n="cmpView">查看对比</button>
     </div>
     <div id="cmpBox" hidden></div>
+    <div class="legend" id="cmpHint" data-i18n="cmpHint" hidden>先保存 2 个方案（💾），再选两个对比。</div>
     <div class="legend" id="proHint" data-i18n="proHint" hidden>🔒 PDF / 分享 / 存档 / 导出为 Pro 功能。</div>
   </section>
 
@@ -368,6 +398,14 @@
       <div class="legend" data-i18n="acctNote">免费版仅提供计算。升级 Pro 后可云端存档、本机存档、PDF / 打印与分享。</div>
       <button class="linkbtn" id="forgotBtn" data-i18n="forgotBtn">忘记密码？</button>
     </div>
+    <div id="twofaBox" hidden>
+      <div class="legend" data-i18n="twofaNote">两步验证已开启。请输入我们发到您邮箱的 6 位验证码。</div>
+      <div class="row"><label data-i18n="twofaCodeLbl">验证码</label><input class="manual" id="twofaCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code"><span class="unit"></span></div>
+      <div class="btnRow">
+        <button class="btn" id="twofaGo" data-i18n="btn2faGo">验证并登录</button>
+        <button class="btn btn2" id="twofaBack" data-i18n="btnBackLogin">返回</button>
+      </div>
+    </div>
     <div id="forgotBox" hidden>
       <div class="legend" data-i18n="forgotNote">输入注册邮箱，我们会发送重置链接（1 小时内有效）。</div>
       <div class="row"><label data-i18n="fEmail">邮箱</label><input class="manual" id="forgotEmail" type="email" inputmode="email"><span class="unit"></span></div>
@@ -406,6 +444,18 @@
         <div class="row"><label data-i18n="currentPassword">当前密码</label><input class="manual" id="curPwd" type="password" autocomplete="current-password"><span class="unit"></span></div>
         <div class="row"><label data-i18n="newPassword">新密码</label><input class="manual" id="newPwd" type="password" autocomplete="new-password"><span class="unit"></span></div>
         <div class="btnRow"><button class="btn btn2" id="changePwdBtn" data-i18n="btnChangePwd">修改密码</button></div>
+        <div class="hr"></div>
+        <div class="line"><span data-i18n="twofaLabel">两步验证（邮件验证码）</span><b id="twofaState">—</b></div>
+        <div class="row"><label data-i18n="fPassword">密码</label><input class="manual" id="twofaPwd" type="password" autocomplete="current-password"><span class="unit"></span></div>
+        <div class="btnRow">
+          <button class="btn btn2" id="twofaOn" data-i18n="btn2faOn">开启</button>
+          <button class="btn btn2" id="twofaOff" data-i18n="btn2faOff">关闭</button>
+        </div>
+        <div class="legend" data-i18n="twofaHint">开启后每次登录需再输入邮箱验证码（10 分钟有效）。</div>
+        <div class="hr"></div>
+        <div class="legend" data-i18n="exportNote">下载我保存的全部资料（JSON）：账号、方案、收据、留言。依据马来西亚 PDPA 查阅权。</div>
+        <div class="btnRow"><a class="btn btn2" id="dataExport" href="/api/me/export" data-i18n="btnDataExport">下载我的资料</a></div>
+        <div class="hr"></div>
         <div class="btnRow"><button class="btn btn2 danger" id="deleteAcctBtn" data-i18n="btnDeleteAcct">删除账号</button></div>
       </details>
       <div class="btnRow"><button class="btn btn2" id="logoutBtn" data-i18n="btnLogout">退出登录</button></div>
@@ -475,12 +525,27 @@
       proMore: "查看价格 / 升级 →", freeCalcOnly: "仅计算 · 存档需 Pro",
       aiPlaceholder: "一句话填数：SPA 80万，贷 90%，租 3000，5 年后卖 100万", aiBtn: "AI 填数",
       aiDone: "已填入 {n} 个字段", aiFail: "没识别到数字，试试：SPA 80万，贷 90%，租 3000",
-      btnCsv: "📊 导出 Excel / CSV", cmpA: "＋ 对比 A", cmpB: "＋ 对比 B", cmpView: "查看对比",
-      cmpHint: "先填好一个方案，点「对比 A」，改数字后再点「对比 B」。",
-      cmpNeed: "请先保存对比 A 和 B", cmpTitle: "方案对比",
+      btnCsv: "📊 导出 Excel / CSV", cmpView: "查看对比",
+      cmpHint: "先在上面「💾」保存 2 个方案，再从下拉框选择对比。",
+      cmpPick: "选择已存方案", cmpNoPlan: "还没有已存方案", cmpNeed: "请先保存对比 A 和 B", cmpTitle: "方案对比",
+      cmpNeedSaved: "请先保存并选择两个方案", cmpSame: "A 和 B 不能是同一个方案", cmpBad: "该方案数据不完整，无法计算",
+      printPaperLbl: "纸张", paperA4: "A4 标准", paperA4Tight: "A4 省纸", paperLetter: "Letter",
+      printHeadLbl: "页眉", headFull: "完整（Logo + 抬头 + 二维码）", headSimple: "简洁（公司名 + 日期）", headNone: "无页眉",
       cmpCash: "购房现金", cmpAcq: "总购置费", cmpPmt: "月供", cmpRent: "年净租金",
       cmpSell: "出售利润", cmpNet: "投资净利润", cmpRoi: "Total ROI", cmpRotc: "总成本回报", cmpRpgt: "RPGT",
-      coNew: "另存为", coDel: "删除", coDefault: "默认抬头", proHint: "🔒 PDF / 分享 / 存档 / 导出为 Pro 功能。", proOnlyAsk: "此功能为专业版功能。查看价格并升级？", payTitle: "付款记录 / 收据", payLoading: "加载中…",
+      twofaNote: "两步验证已开启。请输入我们发到您邮箱的 6 位验证码。",
+      twofaCodeLbl: "验证码", btn2faGo: "验证并登录", twofaLabel: "两步验证（邮件验证码）",
+      btn2faOn: "开启", btn2faOff: "关闭", twofaOnState: "已开启", twofaOffState: "未开启",
+      twofaHint: "开启后每次登录需再输入邮箱验证码（10 分钟有效）。",
+      exportNote: "下载我保存的全部资料（JSON）：账号、方案、收据、留言。依据马来西亚 PDPA 查阅权。",
+      btnDataExport: "下载我的资料",
+      toast2faOn: "两步验证已开启", toast2faOff: "两步验证已关闭", toastSentCode: "验证码已发送到您的邮箱",
+      badCode: "验证码不对（6 位数字）", codeExpired: "验证码已过期，请重新登录",
+      tooManyAttempts: "尝试次数太多，请稍后重新登录", errMail: "邮件发送失败，请稍后再试",
+      errUnverified: "请先验证邮箱（账号页可重发验证邮件）",
+      coNew: "另存为", coDel: "删除", coDefault: "默认抬头",
+      ckTitle: "Cookie 使用", ckText: "必要 Cookie 用于登录与安全；分析 Cookie 帮助我们改进网站。您可以自由选择。",
+      ckMore: "了解详情", ckNec: "仅必要", ckAll: "全部接受", proHint: "🔒 PDF / 分享 / 存档 / 导出为 Pro 功能。", proOnlyAsk: "此功能为专业版功能。查看价格并升级？", payTitle: "付款记录 / 收据", payLoading: "加载中…",
       payEmpty: "还没有付款记录。兑换开通码后，收据会显示在这里。", payReceipt: "查看收据", acctVerifyLabel: "验证", emailVerified: "邮箱已验证", emailUnverified: "邮箱未验证",
       btnSendVerify: "发送验证邮件", toastVerifySent: "验证邮件已发送（请查收邮箱）", toastVerified: "邮箱验证成功",
       toastLoginOk: "已登录", toastRegisterOk: "注册成功，已登录", toastLogout: "已退出登录",
@@ -559,12 +624,27 @@
       proMore: "Pricing / upgrade →", freeCalcOnly: "Calculate only · Pro to save",
       aiPlaceholder: "One sentence: SPA 800k, loan 90%, rent 3,000, sell 1M after 5 years", aiBtn: "AI fill",
       aiDone: "Filled {n} fields", aiFail: "No numbers found. Try: SPA 800k, loan 90%, rent 3,000",
-      btnCsv: "📊 Export Excel / CSV", cmpA: "＋ Compare A", cmpB: "＋ Compare B", cmpView: "View comparison",
-      cmpHint: "Fill a scenario, click Compare A, change numbers, then Compare B.",
-      cmpNeed: "Save Compare A and B first", cmpTitle: "Scenario comparison",
+      btnCsv: "📊 Export Excel / CSV", cmpView: "View comparison",
+      cmpHint: "Save 2 scenarios with 💾 above, then pick them from the dropdowns.",
+      cmpPick: "Select a saved scenario", cmpNoPlan: "No saved scenarios yet", cmpNeed: "Save Compare A and B first", cmpTitle: "Scenario comparison",
+      cmpNeedSaved: "Save and select two scenarios first", cmpSame: "A and B must be different scenarios", cmpBad: "That scenario has incomplete data",
+      printPaperLbl: "Paper", paperA4: "A4 standard", paperA4Tight: "A4 compact", paperLetter: "Letter",
+      printHeadLbl: "Header", headFull: "Full (logo + header + QR)", headSimple: "Simple (company + date)", headNone: "No header",
       cmpCash: "Upfront cash", cmpAcq: "Acquisition costs", cmpPmt: "Monthly instalment", cmpRent: "Annual net rent",
       cmpSell: "Selling profit", cmpNet: "Net investment profit", cmpRoi: "Total ROI", cmpRotc: "Return on total cost", cmpRpgt: "RPGT",
-      coNew: "Save as", coDel: "Delete", coDefault: "Default header", proHint: "🔒 PDF / share / save / export are Pro features.", proOnlyAsk: "This is a Pro feature. View pricing and upgrade?", payTitle: "Payments / receipts", payLoading: "Loading…",
+      twofaNote: "Two-step verification is on. Enter the 6-digit code we emailed you.",
+      twofaCodeLbl: "Code", btn2faGo: "Verify & sign in", twofaLabel: "Two-step verification (email code)",
+      btn2faOn: "Turn on", btn2faOff: "Turn off", twofaOnState: "On", twofaOffState: "Off",
+      twofaHint: "When on, every sign-in also needs a 6-digit email code (valid 10 minutes).",
+      exportNote: "Download everything we store about you (JSON): account, plans, receipts, enquiries. Under Malaysia's PDPA right of access.",
+      btnDataExport: "Download my data",
+      toast2faOn: "Two-step verification turned on", toast2faOff: "Two-step verification turned off", toastSentCode: "Code sent to your email",
+      badCode: "Wrong code (6 digits)", codeExpired: "Code expired, please sign in again",
+      tooManyAttempts: "Too many attempts, please sign in again later", errMail: "Email could not be sent, please try again",
+      errUnverified: "Please verify your email first (resend from your account panel)",
+      coNew: "Save as", coDel: "Delete", coDefault: "Default header",
+      ckTitle: "Cookies", ckText: "Essential cookies keep you signed in and secure; analytics cookies help us improve the site. You choose.",
+      ckMore: "Details", ckNec: "Essential only", ckAll: "Accept all", proHint: "🔒 PDF / share / save / export are Pro features.", proOnlyAsk: "This is a Pro feature. View pricing and upgrade?", payTitle: "Payments / receipts", payLoading: "Loading…",
       payEmpty: "No payments yet. Receipts appear here after you redeem a code.", payReceipt: "Receipt", acctVerifyLabel: "Email", emailVerified: "Email verified", emailUnverified: "Email not verified",
       btnSendVerify: "Send verification email", toastVerifySent: "Verification email sent", toastVerified: "Email verified",
       toastLoginOk: "Logged in", toastRegisterOk: "Account created", toastLogout: "Logged out",
@@ -614,6 +694,7 @@
       $("planNote").textContent = logged ? t("planNoteCloud") : t("planNote");
     }
     if ($("planName")) $("planName").placeholder = lang === "zh" ? "方案名称（例：Bukit Jalil A）" : "Plan name (e.g. Bukit Jalil A)";
+    try { renderCmpSelects(); } catch (e) {}
     try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
     document.querySelectorAll(".printdate").forEach(function (el) {
       el.textContent = new Date().toLocaleDateString(lang === "zh" ? "zh-CN" : "en-MY");
@@ -685,12 +766,10 @@
     $("rpgtLabel").textContent = hyv >= 1 ? fmt("rpgtLine", { y: hyv, p: Math.round(Calc.rpgtRate(hyv) * 100) }) : t("rpgtEmpty");
   }
 
-  function recalc() {
-    if (!autoManual.sellAgent) set("sellAgent", num("sell") * 0.02);
-    if (!autoManual.sellLegal) set("sellLegal", 5000);
+  function buildInput() {
     var tenureRaw = parseInt($("tenure").value, 10);
     var holdRaw = parseInt($("hold").value, 10);
-    var inp = {
+    return {
       spa: num("spa"), actual: num("actual"), loan: num("loan"),
       ratePct: num("rate"), yearsLoan: tenureRaw >= 1 ? tenureRaw : 30,
       agentFee: num("agent"), consentFee: num("consent"), other: num("other"),
@@ -703,6 +782,15 @@
       laFeeOverride: autoManual.laFee ? num("laFee") : null,
       valFeeOverride: autoManual.valFee ? num("valFee") : null
     };
+    return inp;
+  }
+
+  function recalc() {
+    if (!autoManual.sellAgent) set("sellAgent", num("sell") * 0.02);
+    if (!autoManual.sellLegal) set("sellLegal", 5000);
+    var tenureRaw = parseInt($("tenure").value, 10);
+    var holdRaw = parseInt($("hold").value, 10);
+    var inp = buildInput();
     if (inp.spa <= 0 || inp.actual <= 0 || inp.loan <= 0 || $("rate").value.trim() === "" || !(tenureRaw >= 1)) { clearResults(); return; }
     var r = Calc.compute(inp);
     lastInp = inp;
@@ -947,6 +1035,7 @@
   }
   var cloudPlans = [];
   var resetToken = "";
+  var twofaChallenge = "";
   var logged = false;
   var me = null;
 
@@ -966,6 +1055,7 @@
     if (sel) el.value = sel;
     $("planMode").textContent = logged ? t("planModeCloud") : t("planModeLocal");
     $("planNote").textContent = logged ? t("planNoteCloud") : t("planNote");
+    try { renderCmpSelects(); } catch (e) {}
   }
 
   function renderLocalPlans(sel) {
@@ -1192,7 +1282,7 @@
 
   function updateProLocks() {
     var free = !proActive();
-    ["savePlan", "shareLink", "printBtn", "waBtn", "wxBtn", "fbBtn", "csvBtn", "cmpA", "cmpB"].forEach(function (id) {
+    ["savePlan", "shareLink", "printBtn", "waBtn", "wxBtn", "fbBtn", "csvBtn", "cmpSelA", "cmpSelB", "cmpView"].forEach(function (id) {
       var el = $(id); if (el) el.classList.toggle("locked", free);
     });
     var hint = $("proHint"); if (hint) hint.hidden = !free;
@@ -1265,34 +1355,124 @@
     recalc();
     toast(fmt("aiDone", { n: filled }));
   }
-  var cmpStore = { A: null, B: null };
-  function takeCmp(slot) {
-    if (!requirePro()) return;
-    if (!lastRes || !lastInp) { toast(t("cmpNeed")); return; }
-    cmpStore[slot] = {
-      name: $("planName").value.trim() || ("Scenario " + slot),
-      cash: lastRes.part1.initial, acq: lastRes.part1.purchaseCosts, pmt: lastRes.part1.pmt,
-      rent: lastRes.years[0].netY, sell: lastRes.out.sellingProfit, net: lastRes.out.netInvestmentProfit,
-      roi: lastRes.out.totalRoi, rotc: lastRes.out.rotc
-    };
-    toast(slot + " ✓");
+  // ---- 方案对比：从「已存方案」里选两个 ----
+  function allSavedPlans() {
+    var out = [];
+    (cloudPlans || []).forEach(function (p) {
+      if (p.payload) out.push({ key: "c:" + p.id, name: p.name, date: p.updated_at, state: p.payload });
+    });
+    loadPlans().forEach(function (p) {
+      if (p.state) out.push({ key: "l:" + p.id, name: p.name, date: p.updatedAt, state: p.state });
+    });
+    return out;
+  }
+  function planMetaOf(key) {
+    var list = allSavedPlans();
+    for (var i = 0; i < list.length; i++) if (list[i].key === key) return list[i];
+    return null;
+  }
+  function metricsFromState(st) {
+    var cur = collectState(), res = null;
+    try {
+      applyState(st);
+      var inp = buildInput();
+      if (inp.spa > 0 && inp.actual > 0 && inp.loan > 0) {
+        var r = Calc.compute(inp);
+        res = {
+          cash: r.part1.initial, acq: r.part1.purchaseCosts, pmt: r.part1.pmt,
+          rent: r.years[0].netY, sell: r.out.sellingProfit, net: r.out.netInvestmentProfit,
+          roi: r.out.totalROI, rotc: r.out.returnOnTotalCost
+        };
+      }
+    } catch (e) { res = null; }
+    try { applyState(cur); } catch (e2) {}
+    return res;
+  }
+  function renderCmpSelects() {
+    var a = $("cmpSelA"), b = $("cmpSelB");
+    if (!a || !b) return;
+    var list = allSavedPlans(), prevA = a.value, prevB = b.value;
+    var ph = '<option value="">' + t(list.length ? "cmpPick" : "cmpNoPlan") + "</option>";
+    a.innerHTML = ph; b.innerHTML = ph;
+    list.forEach(function (p, i) {
+      var lbl = (p.name || ("Plan " + (i + 1))) + " · " + String(p.date || "").slice(0, 10);
+      [a, b].forEach(function (el) {
+        var o = document.createElement("option");
+        o.value = p.key; o.textContent = lbl; el.appendChild(o);
+      });
+    });
+    var has = function (k) { return list.some(function (p) { return p.key === k; }); };
+    if (prevA && has(prevA)) a.value = prevA;
+    if (prevB && has(prevB)) b.value = prevB;
+    if (list.length >= 2) {
+      if (!a.value) a.value = list[0].key;
+      if (!b.value || b.value === a.value) {
+        var other = list.filter(function (p) { return p.key !== a.value; })[0];
+        if (other) b.value = other.key;
+      }
+    }
+    $("cmpHint").hidden = list.length >= 2;
+    if (list.length < 2) $("cmpBox").hidden = true;
   }
   function renderCmp() {
-    var box = $("cmpBox");
-    if (!cmpStore.A || !cmpStore.B) { toast(t("cmpNeed")); return; }
+    if (!requirePro()) return;
+    var ka = $("cmpSelA").value, kb = $("cmpSelB").value;
+    if (!ka || !kb) { toast(t("cmpNeedSaved")); return; }
+    if (ka === kb) { toast(t("cmpSame")); return; }
+    var A = planMetaOf(ka), B = planMetaOf(kb);
+    if (!A || !B) { renderCmpSelects(); toast(t("cmpNeedSaved")); return; }
+    var ma = metricsFromState(A.state), mb = metricsFromState(B.state);
+    if (!ma || !mb) { toast(t("cmpBad")); return; }
     var rows = [["cmpCash", "cash", "rm"], ["cmpAcq", "acq", "rm"], ["cmpPmt", "pmt", "rm"],
       ["cmpRent", "rent", "rm"], ["cmpSell", "sell", "rm"], ["cmpNet", "net", "rm"],
       ["cmpRoi", "roi", "pct"], ["cmpRotc", "rotc", "pct"]];
-    var html = '<table class="cmpTable"><thead><tr><th>' + t("cmpTitle") + '</th><th>A · ' +
-      cmpStore.A.name.replace(/</g, "&lt;") + '</th><th>B · ' + cmpStore.B.name.replace(/</g, "&lt;") + '</th></tr></thead><tbody>';
+    var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
+    var html = '<table class="cmpTable"><thead><tr><th>' + t("cmpTitle") + "</th><th>A · " +
+      esc(A.name) + "</th><th>B · " + esc(B.name) + "</th></tr></thead><tbody>";
+    var f = function (v, kind) {
+      if (v == null || isNaN(v)) return "—";
+      return kind === "pct" ? (v * 100).toFixed(2) + "%" : fmtRM(v);
+    };
     rows.forEach(function (r) {
-      var a = cmpStore.A[r[1]], b = cmpStore.B[r[1]];
-      var f = function (v) { return r[2] === "pct" ? (v * 100).toFixed(2) + "%" : fmtRM(v); };
-      html += "<tr><td>" + t(r[0]) + "</td><td>" + f(a) + "</td><td>" + f(b) + "</td></tr>";
+      var va = ma[r[1]], vb = mb[r[1]];
+      var diff = (va != null && vb != null && va !== vb) ? (vb > va ? " ▲" : " ▼") : "";
+      html += "<tr><td>" + t(r[0]) + "</td><td>" + f(va, r[2]) + "</td><td>" + f(vb, r[2]) + diff + "</td></tr>";
     });
     html += "</tbody></table>";
+    var box = $("cmpBox");
     box.innerHTML = html; box.hidden = false;
+    try { box.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e) {}
   }
+  // 打印设置：纸张 + 页眉样式
+  function applyPrintCfg() {
+    var paper = "a4", head = "full";
+    try {
+      paper = localStorage.getItem("kwthye_print_paper") || "a4";
+      head = localStorage.getItem("kwthye_print_head") || "full";
+    } catch (e) {}
+    var size = paper === "letter" ? "Letter" : "A4";
+    var margin = paper === "a4tight" ? "7mm" : "11mm";
+    var css = "@page{size:" + size + " portrait;margin:" + margin + "}";
+    if (head === "none") css += "@media print{.printhead{display:none !important}}";
+    if (head === "simple") css += "@media print{.printhead .phMeta img,#phQr,.printhead .phContact{display:none !important}}";
+    if (paper === "a4tight") css += "@media print{table{font-size:9px}.part{padding:5px 8px;margin-bottom:5px}}";
+    var el = $("printCfg");
+    if (el) el.textContent = css;
+    if ($("printPaper")) $("printPaper").value = paper;
+    if ($("printHead")) $("printHead").value = head;
+  }
+  ["printPaper", "printHead"].forEach(function (id) {
+    var el = $(id);
+    if (!el) return;
+    el.addEventListener("change", function () {
+      try {
+        localStorage.setItem("kwthye_print_paper", $("printPaper").value);
+        localStorage.setItem("kwthye_print_head", $("printHead").value);
+      } catch (e) {}
+      applyPrintCfg();
+    });
+  });
+  window.addEventListener("beforeprint", applyPrintCfg);
   function profileList() {
     var list = [];
     try { list = JSON.parse(localStorage.getItem("kwthye_co_profiles_v1") || "[]"); } catch (e) {}
@@ -1319,13 +1499,17 @@
   renderPlanList();
   fillCompanyForm();
   renderProfiles(0);
+  renderCmpSelects();
   updateProLocks();
   registerSW();
   $("aiFill").addEventListener("click", parseAi);
   $("csvBtn").addEventListener("click", exportCsv);
-  $("cmpA").addEventListener("click", function () { takeCmp("A"); });
-  $("cmpB").addEventListener("click", function () { takeCmp("B"); });
   $("cmpView").addEventListener("click", renderCmp);
+  ["cmpSelA", "cmpSelB"].forEach(function (id) {
+    var el = $(id);
+    if (el) el.addEventListener("change", function () { if (!$("cmpBox").hidden) renderCmp(); });
+  });
+  applyPrintCfg();
   var vp = new URLSearchParams(location.search).get("verify");
   if (vp) {
     api("/auth/verify-email", { method: "POST", body: { token: vp } }).then(function (j) {
@@ -1359,7 +1543,9 @@
     });
   }
   function errMsg(code) {
-    var map = { bad_email: "errEmail", weak_password: "errPassword", email_exists: "errExists", bad_credentials: "errLogin", rate_limited: "errRate", quota_exceeded: "errQuota" };
+    var map = { bad_email: "errEmail", weak_password: "errPassword", email_exists: "errExists", bad_credentials: "errLogin",
+      rate_limited: "errRate", quota_exceeded: "errQuota", email_unverified: "errUnverified", bad_code: "badCode",
+      code_expired: "codeExpired", too_many_attempts: "tooManyAttempts", mail_failed: "errMail" };
     return t(map[code] || "errGeneric");
   }
   function setAccount(data) {
@@ -1387,6 +1573,10 @@
     var used = (me.quota === null) ? (me.plans + " " + t("planUnlimited"))
       : (me.quota === 0 ? t("freeCalcOnly") : (me.plans + " / " + me.quota));
     $("acctPlan").textContent = planName + " · " + used;
+    if ($("twofaState")) {
+      $("twofaState").textContent = me.user.twofaEnabled ? t("twofaOnState") : t("twofaOffState");
+      $("twofaState").style.color = me.user.twofaEnabled ? "#166E52" : "#8A5A2B";
+    }
     var exp = me.user.planExpiresAt ? new Date(me.user.planExpiresAt) : null;
     if (exp && !isNaN(exp.getTime())) {
       var days = Math.ceil((exp.getTime() - Date.now()) / 86400000);
@@ -1401,6 +1591,15 @@
     var password = $("acctPassword").value;
     if (!email || !password) { toast(t("errEmail")); return; }
     api(path, { method: "POST", body: { email: email, password: password } }).then(function (j) {
+      if (j.ok && j.twofa_required) {
+        twofaChallenge = j.challenge;
+        $("acctPassword").value = "";
+        $("twofaCode").value = "";
+        showAcctView("2fa");
+        toast(t("toastSentCode"));
+        setTimeout(function () { try { $("twofaCode").focus(); } catch (e) {} }, 120);
+        return;
+      }
       if (j.ok) {
         $("acctPassword").value = "";
         toast(t(path.indexOf("register") >= 0 ? "toastRegisterOk" : "toastLoginOk"));
@@ -1470,7 +1669,8 @@
   }
 
   function showAcctView(which) {
-    $("acctLoggedOut").hidden = which !== "login";
+    $("twofaBox").hidden = which !== "2fa";
+    $("acctLoggedOut").hidden = which !== "login" && which !== "2fa";
     $("acctLoggedIn").hidden = which !== "me";
     $("forgotBox").hidden = which !== "forgot";
     $("resetBox").hidden = which !== "reset";
@@ -1499,6 +1699,37 @@
       } else { toast(j.error === "invalid_token" ? t("errToken") : errMsg(j.error)); }
     }).catch(function () { toast(t("errGeneric")); });
   });
+  $("twofaGo").addEventListener("click", function () {
+    var code = ($("twofaCode").value || "").replace(/\D/g, "");
+    if (code.length !== 6) { toast(t("badCode")); return; }
+    api("/auth/2fa", { method: "POST", body: { challenge: twofaChallenge, code: code } }).then(function (j) {
+      if (j.ok) {
+        $("twofaCode").value = ""; twofaChallenge = "";
+        showAcctView("me");
+        toast(t("toastLoginOk"));
+        refreshMe();
+        closeAcct();
+      } else { toast(errMsg(j.error)); }
+    }).catch(function () { toast(t("errGeneric")); });
+  });
+  $("twofaCode").addEventListener("keydown", function (e) { if (e.key === "Enter") $("twofaGo").click(); });
+  $("twofaBack").addEventListener("click", function () {
+    twofaChallenge = ""; $("twofaCode").value = ""; showAcctView("login");
+  });
+  function twofaSet(enabled) {
+    var pw = $("twofaPwd").value;
+    if (!pw) { toast(t("errPassword")); return; }
+    api("/auth/2fa/settings", { method: "POST", body: { enabled: enabled, password: pw } }).then(function (j) {
+      if (j.ok) {
+        $("twofaPwd").value = "";
+        if (me && me.user) me.user.twofaEnabled = !!j.twofaEnabled;
+        renderAcctDetails();
+        toast(t(enabled ? "toast2faOn" : "toast2faOff"));
+      } else { toast(j.error === "bad_credentials" ? t("errCurrent") : errMsg(j.error)); }
+    }).catch(function () { toast(t("errGeneric")); });
+  }
+  $("twofaOn").addEventListener("click", function () { twofaSet(true); });
+  $("twofaOff").addEventListener("click", function () { twofaSet(false); });
   $("changePwdBtn").addEventListener("click", function () {
     api("/auth/change-password", { method: "POST", body: { current: $("curPwd").value, password: $("newPwd").value } }).then(function (j) {
       if (j.ok) { $("curPwd").value = ""; $("newPwd").value = ""; toast(t("toastPwdChanged")); }
@@ -1549,6 +1780,53 @@
   try {
     if (navigator.sendBeacon) navigator.sendBeacon("/api/track", JSON.stringify({ path: location.pathname, ref: document.referrer || "" }));
   } catch (e) {}
+})();
+</script>
+<style>
+  #ckBar{position:fixed;left:12px;right:12px;bottom:12px;z-index:70;max-width:880px;margin:0 auto;
+    background:#0E2438;color:#fff;border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;
+    flex-wrap:wrap;box-shadow:0 10px 30px rgba(14,36,56,.28);font-size:12.5px;line-height:1.6;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  #ckBar[hidden]{display:none !important}
+  #ckBar b{display:block;font-size:13px;color:#E7D3A8;margin-bottom:2px}
+  #ckBar .ckTx{flex:1 1 340px;min-width:220px}
+  #ckBar .ckBtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  #ckBar .ckBtns button{border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;
+    border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff}
+  #ckBar .ckBtns button#ckAll{background:#C6A15B;border-color:#C6A15B;color:#1B2430}
+  #ckBar .ckLnk{color:#C9D6E6;font-size:12px;text-decoration:underline}
+</style>
+<div id="ckBar" hidden>
+  <div class="ckTx">
+    <b data-i18n="ckTitle">Cookie 使用 / Cookies</b>
+    <span data-i18n="ckText">必要 Cookie 用于登录与安全；分析 Cookie 帮助我们改进网站。您可以自由选择。</span>
+  </div>
+  <div class="ckBtns">
+    <a class="ckLnk" href="/privacy/" data-i18n="ckMore">了解详情</a>
+    <button id="ckNec" data-i18n="ckNec">仅必要</button>
+    <button id="ckAll" data-i18n="ckAll">全部接受</button>
+  </div>
+</div>
+<script>
+(function () {
+  var KEY = "kwthye_cookie_consent";
+  var bar = document.getElementById("ckBar");
+  if (!bar) return;
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  function loadAnalytics() {
+    if (typeof window.kwthyeLoadAnalytics === "function") { try { window.kwthyeLoadAnalytics(); } catch (e) {} }
+  }
+  if (!saved) bar.hidden = false; else if (saved === "all") loadAnalytics();
+  window.kwthyeConsent = saved || null;
+  function set(v) {
+    try { localStorage.setItem(KEY, v); } catch (e) {}
+    bar.hidden = true;
+    window.kwthyeConsent = v;
+    if (v === "all") loadAnalytics();
+  }
+  document.getElementById("ckAll").addEventListener("click", function () { set("all"); });
+  document.getElementById("ckNec").addEventListener("click", function () { set("necessary"); });
 })();
 </script>
 </body>

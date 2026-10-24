@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const { Pool } = require("pg");
 const nodemailer = require("nodemailer");
+const mailLayout = require("./mail-layout");
 
 const envFile = fs.readFileSync(path.join(__dirname, ".env"), "utf8");
 envFile.split("\n").forEach(function (l) {
@@ -55,7 +56,7 @@ const replyTo = process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
       "KWONG THYE 光泰"
     ].join("\n");
     try {
-      await transport.sendMail({ from: from, to: u.email, replyTo: replyTo, subject: subject, text: text });
+      await transport.sendMail({ from: from, to: u.email, replyTo: replyTo, subject: subject, text: text, html: mailLayout.brand(subject, text).html });
       await pool.query("UPDATE users SET plan_reminder_at=now() WHERE id=$1", [u.id]);
       console.log("sent", u.email, "days", days);
     } catch (e) {
@@ -86,7 +87,7 @@ const replyTo = process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
       "KWONG THYE 光泰"
     ].join("\n");
     try {
-      await transport.sendMail({ from: from, to: u.email, replyTo: replyTo, subject: "Pro 已到期 / Plan expired — KWONG THYE", text: text });
+      await transport.sendMail({ from: from, to: u.email, replyTo: replyTo, subject: "Pro 已到期 / Plan expired — KWONG THYE", text: text, html: mailLayout.brand("Pro 已到期 / Plan expired — KWONG THYE", text).html });
       await pool.query("UPDATE users SET expiry_notice_at=now() WHERE id=$1", [u.id]);
       console.log("expired notice sent", u.email);
     } catch (e) {

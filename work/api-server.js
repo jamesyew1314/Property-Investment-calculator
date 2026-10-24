@@ -4,6 +4,7 @@ const crypto = require("node:crypto");
 const fsp = require("node:fs/promises");
 const nodemailer = require("nodemailer");
 const { buildReceiptPdf } = require("./receipt-pdf");
+const mailLayout = require("./mail-layout");
 const pathMod = require("node:path");
 const { Pool } = require("pg");
 
@@ -40,7 +41,7 @@ function parseCookies(req) {
 }
 function publicUser(u) {
   return { id: u.id, email: u.email, displayName: u.display_name || null, plan: u.plan, planExpiresAt: u.plan_expires_at,
-           emailVerified: !!u.email_verified_at };
+           emailVerified: !!u.email_verified_at, twofaEnabled: !!u.twofa_enabled };
 }
 function quotaFor(u) {
   const paid = u.plan === "pro" && (!u.plan_expires_at || new Date(u.plan_expires_at) > new Date());
@@ -99,12 +100,14 @@ async function sendMail(to, subject, text, replyToOverride, attachments) {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.MAIL_FROM || (process.env.SMTP_USER ? "KWONG THYE <" + process.env.SMTP_USER + ">" : "KWONG THYE <noreply@kwongthye.com>");
   const replyTo = replyToOverride || process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
+  let html = null;
+  try { html = mailLayout.brand(subject, text).html; } catch (e) { html = null; }
   if (smtpTransport) {
     try {
-      await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text, attachments: attachments || [] });
+      await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text, html: html || undefined, attachments: attachments || [] });
     } catch (e1) {
       await new Promise(function (r) { setTimeout(r, 2000); });
-      await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text, attachments: attachments || [] });
+      await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text, html: html || undefined, attachments: attachments || [] });
     }
     return "sent";
   }
@@ -112,7 +115,7 @@ async function sendMail(to, subject, text, replyToOverride, attachments) {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: from, to: [to], reply_to: replyTo, subject: subject, text: text, attachments: (attachments || []).map(function (a) { return { filename: a.filename, content: Buffer.from(a.content).toString("base64") }; }) })
+      body: JSON.stringify({ from: from, to: [to], reply_to: replyTo, subject: subject, text: text, html: html || undefined, attachments: (attachments || []).map(function (a) { return { filename: a.filename, content: Buffer.from(a.content).toString("base64") }; }) })
     });
     if (!r.ok) throw new Error("mail_failed");
     return "sent";
@@ -153,7 +156,7 @@ const requireAuth = async function (req, res, next) {
     const token = parseCookies(req).fc_sid;
     if (!token) return res.status(401).json({ ok: false, error: "auth_required" });
     const r = await pool.query(
-      "SELECT u.id,u.email,u.display_name,u.plan,u.plan_expires_at,u.email_verified_at " +
+      "SELECT u.id,u.email,u.display_name,u.plan,u.plan_expires_at,u.email_verified_at,u.twofa_enabled " +
       "FROM sessions s JOIN users u ON u.id = s.user_id " +
       "WHERE s.token_hash = $1 AND s.expires_at > now()", [sha256(token)]);
     if (!r.rows[0]) return res.status(401).json({ ok: false, error: "auth_required" });
@@ -163,6 +166,12 @@ const requireAuth = async function (req, res, next) {
 };
 
 // ---------- health ----------
+// 未验证邮箱 → 不能写云端数据（仍可自由计算）
+const requireVerified = function (req, res, next) {
+  if (!req.user || !req.user.email_verified_at) return res.status(403).json({ ok: false, error: "email_unverified" });
+  next();
+};
+
 app.get("/api/health", async function (req, res) {
   try {
     const r = await pool.query("SELECT now() AS now");
@@ -203,9 +212,73 @@ app.post("/api/auth/login", rateLimit(5, 60000), async function (req, res, next)
     const r = await pool.query("SELECT * FROM users WHERE email=$1", [email]);
     const u = r.rows[0];
     if (!u || !scryptVerify(password, u.password_hash)) return res.status(401).json({ ok: false, error: "bad_credentials" });
+    if (u.twofa_enabled) {
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      const challenge = crypto.randomBytes(24).toString("hex");
+      await pool.query(
+        "INSERT INTO login_codes(user_id,code_hash,challenge_hash,expires_at) VALUES($1,$2,$3, now() + interval '10 minutes')",
+        [u.id, sha256(code), sha256(challenge)]);
+      const text = [
+        "您好 / Hello,",
+        "",
+        "您的 KWONG THYE 登录验证码（10 分钟内有效）：",
+        "Your KWONG THYE sign-in code (valid for 10 minutes):",
+        "",
+        code,
+        "",
+        "如果这不是您本人的操作，请立即修改密码。",
+        "If this was not you, please change your password immediately.",
+        "",
+        "KWONG THYE 光泰"
+      ].join("\n");
+      try { await sendMail(u.email, "登录验证码 / Sign-in code — KWONG THYE", text); }
+      catch (e) { console.error("login code mail failed", u.email, e.message); return res.status(503).json({ ok: false, error: "mail_failed" }); }
+      return res.json({ ok: true, twofa_required: true, challenge: challenge });
+    }
     const token = await createSession(u.id);
     setSessionCookie(res, token);
     res.json({ ok: true, user: publicUser(u) });
+  } catch (e) { next(e); }
+});
+
+// 第二步：验证码 → 会话
+app.post("/api/auth/2fa", rateLimit(10, 600000), async function (req, res, next) {
+  try {
+    const challenge = String((req.body || {}).challenge || "");
+    const code = String((req.body || {}).code || "").replace(/\D/g, "");
+    if (!challenge || code.length !== 6) return res.status(400).json({ ok: false, error: "bad_code" });
+    // 注意：两张表都有 id，必须显式取别名，否则 pg 会按重名列解析出错
+    const r = await pool.query(
+      "SELECT l.id AS code_id, l.user_id, l.code_hash, l.attempts, " +
+      "u.id, u.email, u.display_name, u.plan, u.plan_expires_at, u.email_verified_at, u.twofa_enabled " +
+      "FROM login_codes l JOIN users u ON u.id = l.user_id " +
+      "WHERE l.challenge_hash=$1 AND l.used_at IS NULL AND l.expires_at > now() ORDER BY l.id DESC LIMIT 1",
+      [sha256(challenge)]);
+    const row = r.rows[0];
+    if (!row) return res.status(401).json({ ok: false, error: "code_expired" });
+    if (row.attempts >= 5) return res.status(429).json({ ok: false, error: "too_many_attempts" });
+    if (row.code_hash !== sha256(code)) {
+      await pool.query("UPDATE login_codes SET attempts=attempts+1 WHERE id=$1", [row.code_id]);
+      return res.status(401).json({ ok: false, error: "bad_code" });
+    }
+    await pool.query("UPDATE login_codes SET used_at=now() WHERE id=$1", [row.code_id]);
+    const token = await createSession(row.user_id);
+    setSessionCookie(res, token);
+    res.json({ ok: true, user: publicUser(row) });
+  } catch (e) { next(e); }
+});
+
+// 开关两步验证（需要当前密码确认）/ Toggle 2FA (password required)
+app.post("/api/auth/2fa/settings", requireAuth, rateLimit(10, 600000), async function (req, res, next) {
+  try {
+    const enabled = !!(req.body || {}).enabled;
+    const password = String((req.body || {}).password || "");
+    const r = await pool.query("SELECT password_hash FROM users WHERE id=$1", [req.user.id]);
+    if (!r.rows[0] || !scryptVerify(password, r.rows[0].password_hash)) return res.status(401).json({ ok: false, error: "bad_credentials" });
+    await pool.query("UPDATE users SET twofa_enabled=$2 WHERE id=$1", [req.user.id, enabled]);
+    // 关闭时清掉还没用的验证码
+    if (!enabled) await pool.query("UPDATE login_codes SET used_at=now() WHERE user_id=$1 AND used_at IS NULL", [req.user.id]);
+    res.json({ ok: true, twofaEnabled: enabled });
   } catch (e) { next(e); }
 });
 
@@ -222,6 +295,32 @@ app.get("/api/me", requireAuth, async function (req, res, next) {
   try {
     const c = await pool.query("SELECT count(*)::int AS n FROM plans WHERE user_id=$1", [req.user.id]);
     res.json({ ok: true, user: publicUser(req.user), plans: c.rows[0].n, quota: quotaFor(req.user) });
+  } catch (e) { next(e); }
+});
+
+// PDPA：下载我自己的全部资料 / Download all of my own data
+app.get("/api/me/export", requireAuth, async function (req, res, next) {
+  try {
+    const u = await pool.query(
+      "SELECT id,email,display_name,plan,plan_expires_at,email_verified_at,twofa_enabled,created_at FROM users WHERE id=$1",
+      [req.user.id]);
+    const plans = await pool.query("SELECT id,name,payload,created_at,updated_at FROM plans WHERE user_id=$1 ORDER BY created_at", [req.user.id]);
+    const pays = await pool.query(
+      "SELECT id,receipt_no,amount,days,expires_after,created_at FROM payments WHERE user_id=$1 ORDER BY created_at", [req.user.id]);
+    const msgs = await pool.query(
+      "SELECT name,phone,message,created_at FROM contact_messages WHERE lower(email)=lower($1) ORDER BY created_at", [req.user.email]);
+    const data = {
+      exported_at: new Date().toISOString(),
+      about: "此文件由 kwongthye.com 导出，包含您在该网站保存的个人资料（PDPA 2010 查阅权）。",
+      note: "密码只以不可逆哈希保存，无法导出；会话令牌同样不可导出。",
+      account: u.rows[0] || null,
+      plans: plans.rows,
+      payments: pays.rows,
+      enquiries: msgs.rows
+    };
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="kwongthye-my-data-' + new Date().toISOString().slice(0, 10) + '.json"');
+    res.send(JSON.stringify(data, null, 2));
   } catch (e) { next(e); }
 });
 
@@ -352,7 +451,7 @@ app.get("/api/plans", requireAuth, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
-app.post("/api/plans", requireAuth, async function (req, res, next) {
+app.post("/api/plans", requireAuth, requireVerified, async function (req, res, next) {
   try {
     const name = String((req.body || {}).name || "").trim().slice(0, 80) || "Untitled";
     const payload = (req.body || {}).payload;
@@ -367,7 +466,7 @@ app.post("/api/plans", requireAuth, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
-app.put("/api/plans/:id", requireAuth, async function (req, res, next) {
+app.put("/api/plans/:id", requireAuth, requireVerified, async function (req, res, next) {
   try {
     const name = String((req.body || {}).name || "").trim().slice(0, 80);
     const payload = (req.body || {}).payload;
@@ -381,7 +480,7 @@ app.put("/api/plans/:id", requireAuth, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
-app.delete("/api/plans/:id", requireAuth, async function (req, res, next) {
+app.delete("/api/plans/:id", requireAuth, requireVerified, async function (req, res, next) {
   try {
     const r = await pool.query("DELETE FROM plans WHERE id=$1 AND user_id=$2 RETURNING id", [req.params.id, req.user.id]);
     if (!r.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
@@ -389,7 +488,7 @@ app.delete("/api/plans/:id", requireAuth, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
-app.post("/api/plans/import", requireAuth, async function (req, res, next) {
+app.post("/api/plans/import", requireAuth, requireVerified, async function (req, res, next) {
   try {
     const list = Array.isArray((req.body || {}).plans) ? (req.body || {}).plans : [];
     const q = quotaFor(req.user);
@@ -765,7 +864,7 @@ app.post("/api/track", rateLimit(120, 60000), async function (req, res) {
 });
 
 // ---------- subscription ----------
-app.post("/api/subscription/redeem", requireAuth, rateLimit(10, 60000), async function (req, res, next) {
+app.post("/api/subscription/redeem", requireAuth, requireVerified, rateLimit(10, 60000), async function (req, res, next) {
   const code = String((req.body || {}).code || "").trim().toUpperCase();
   if (!code) return res.status(400).json({ ok: false, error: "bad_code" });
   const client = await pool.connect();
