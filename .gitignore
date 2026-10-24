@@ -41,3 +41,6 @@ work/xlsx_prev/
 # 本地打印测试产物
 print-test.pdf
 .chrome-tmp/
+
+# QA 截图
+qa-*.png

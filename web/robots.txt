@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://kwongthye.com/sitemap.xml

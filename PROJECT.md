@@ -55,9 +55,10 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | `work/build_xlsx.py` | 生成公式工作簿 → `work/validation.xlsx` |
 | `work/build_all.sh` | **一键重建全部**（图表 → DOCX → PDF → MD → XLSX → 复制） |
 | `work/engine.py` | 计算引擎原型：法定费用、摊销、XIRR、4 案例现金流、1–5 年投影 |
-| `web/index.html` | 自动计算系统 v0.1：3 个 Part 页面（双击可开，或丢服务器即用） |
-| `web/calc.js` | 核心公式库：等额本息/法定费用/RPGT/逐年投影/XIRR |
-| `web/test.js` | 10 项回归（`node web/test.js`，必须全过） |
+| `web/index.html` | **企业官网**（v0.39，双语单页：关于/业务/科技/创办人/联系，SEO + JSON-LD） |
+| `web/calc/index.html` | 自动计算系统（3 个 Part），部署在 `/calc/` |
+| `web/calc/calc.js` | 核心公式库：等额本息/法定费用/RPGT/逐年投影/XIRR/分享编解码 |
+| `web/test.js` | 53 项回归（`node web/test.js`，必须全过） |
 | `work/make_arch2.py` / `work/make_erd.py` | 生成架构图 / ERD |
 | `work/full.docx` / `work/full.pdf` | 构建中间物 |
 | `work/validation.xlsx` / `work/validation_calc.xlsx` | 构建中间物；后者是 LibreOffice 重算后的版本 |
@@ -404,6 +405,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-24 | v0.37 | **云端存档上线**：登录后保存/加载/删除方案走 `/api/plans`（免费 3 个，超额 402）；首次登录自动提示把本机方案上传云端（`/api/plans/import`）；未登录仍是本机存档；掉网自动回退本地；弹窗显示「☁️ 云端存档 / 💾 本机存档」 |
 | 2026-10-24 | v0.37.1 | 英文版遗漏修正：右上角登录按钮「Log in」、方案名 placeholder、微信按钮「WeChat」、方案模式/说明文案随语言切换刷新 |
 | 2026-10-24 | v0.38 | **订阅上线（手动开通码）**：`redeem_codes` 表；`POST /api/subscription/redeem` 事务核销 + 顺延到期；前端账号弹窗显示「到期日期 · 剩余天数」+ 开通码输入（RM50/年，续费叠加）；`admin.js` 支持 create-code / list-codes / set-plan / stats；**每日 02:15 数据库备份**（pg_dump，保留 30 天，已实测） |
+| 2026-10-24 | v0.39 | **企业官网正式上线**：主域名 `/` = 双语企业站（关于/核心业务/科技/创办人/联系 + JSON-LD + robots/sitemap）；计算器迁移到 **`/calc/`**；旧分享链接 `/?d=` 自动 301 到 `/calc/?d=`；手机菜单、WhatsApp 浮动按钮、SEO meta 完成 |
 
 ---
 

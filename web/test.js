@@ -1,7 +1,7 @@
 // test.js — calc.js 回归测试（10 项，与《公式验证与案例对账 v1.1》一致）
 // 运行：node test.js
 "use strict";
-const C = require("./calc.js");
+const C = require("./calc/calc.js");
 let pass = 0, fail = 0;
 function eq(got, expect, name) {
   const ok = got === expect;

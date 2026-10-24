@@ -3,1123 +3,617 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>房地产投资快速计算器 v0.1</title>
+<title>KWONG THYE 光泰 | 房地产投资 · 专业顾问 · 科技创新</title>
+<meta name="description" content="KWONG THYE 光泰 — 立足马来西亚柔佛新山，专注房地产投资、房地产顾问与房地产科技（PropTech）。Connecting Properties, Technology & Investment Opportunities.">
+<meta property="og:title" content="KWONG THYE 光泰 | Real Estate Investment · Property Advisory · PropTech">
+<meta property="og:description" content="Connecting Properties, Technology & Investment Opportunities. 连接房地产、科技与投资机会。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kwongthye.com/">
+<link rel="icon" href="logo.jpg">
+<link rel="canonical" href="https://kwongthye.com/">
 <style>
-  :root {
-    --navy:#1F3864; --blue:#2E5496; --light:#EAF0FA; --ink:#222; --grey:#68707C;
-    --input:#FFF6DD; --auto:#EAF0FA; --out:#E7F4EC; --red:#B23B3B; --green:#166E52;
+  :root{
+    --navy:#0E2438; --navy2:#15344F; --ink:#1B2430; --muted:#5D6B7A;
+    --gold:#C6A15B; --gold2:#E2C88F; --cream:#F7F4EE; --line:#E4DED2; --white:#fff;
   }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-         background:#F4F6FA; color:var(--ink); font-size:15px; }
-  header { background:var(--navy); color:#fff; padding:14px 16px; }
-  .headrow { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  header h1 { margin:0; font-size:18px; font-weight:700; }
-  .logo { height:30px; width:auto; vertical-align:-7px; border-radius:6px; margin-right:8px; }
-  header p { margin:4px 0 0; font-size:12px; opacity:.8; }
-  #langBtn { flex:none; border:1px solid rgba(255,255,255,.6); background:transparent; color:#fff;
-       border-radius:9px; padding:6px 12px; font-size:14px; font-weight:600; cursor:pointer; }
-  main { max-width:640px; margin:0 auto; padding:12px 12px 48px; }
-  .part { background:#fff; border-radius:14px; padding:14px 14px 10px; margin-bottom:14px;
-          box-shadow:0 1px 4px rgba(31,56,100,.08); }
-  .part h2 { margin:0 0 4px; font-size:16px; color:var(--navy); }
-  .part .sub { font-size:12px; color:var(--grey); margin:0 0 10px; }
-  .subh { font-size:14px; color:var(--blue); margin:12px 0 2px; font-weight:600; }
-  .row { display:flex; align-items:center; margin-bottom:9px; }
-  .row label { flex:1 1 46%; font-size:13px; color:#3A4351; line-height:1.3; }
-  .row input, .row select { width:118px; padding:8px 10px; border:1px solid #C9D3E2; border-radius:9px;
-       font-size:15px; text-align:right; background:#fff; color:var(--ink); }
-  .row input.manual, .row select.manual { background:var(--input); border-color:#E4CE8B; }
-  .row input.auto { background:var(--auto); border-color:#B9CBEA; color:var(--blue); font-weight:600; }
-  .row input.override { background:#FFEED9; border-color:#E2A76F; color:#8A5A2B; font-weight:600; }
-  #loanPct { width:72px; margin-right:4px; }
-  .unitPct { width:20px; margin-left:2px; }
-  .autoVal { width:118px; text-align:right; font-size:15px; font-weight:600; color:var(--blue); }
-  .unit { width:34px; font-size:12px; color:var(--grey); margin-left:4px; }
-  .out { background:var(--out); border:1px solid #C4E0D0; border-radius:10px; padding:10px 12px; margin-top:6px; }
-  .out .line { display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:13.5px; padding:2px 0; }
-  .out .line > span:first-child { flex:1 1 auto; min-width:0; }
-  .out .line > span:last-child, .out .line > b:last-child { flex:none; white-space:nowrap; text-align:right; }
-  .hr { border-top:1px solid #BFD8C8; margin:8px 0; }
-  .out .line b { font-size:15px; color:var(--green); }
-  .big { font-size:18px !important; }
-  .lessHead span { color:var(--grey); font-size:12.5px; font-weight:600; }
-  .legend { font-size:11px; color:var(--grey); margin-top:8px; line-height:1.6; }
-  .legend span { display:inline-block; width:10px; height:10px; border-radius:3px; vertical-align:-1px; margin:0 3px 0 10px; }
-  .legend .m { background:var(--input); border:1px solid #E4CE8B; }
-  .legend .a { background:var(--auto); border:1px solid #B9CBEA; }
-  table { width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
-  th, td { border:1px solid #D9E1EC; padding:5px 4px; text-align:right; }
-  th { background:var(--light); color:var(--navy); font-weight:600; }
-  td:first-child, th:first-child { text-align:left; }
-  .btn { display:block; width:100%; padding:12px; border:0; border-radius:12px; background:var(--blue);
-         color:#fff; font-size:15px; font-weight:600; margin-top:10px; cursor:pointer; }
-  .btn2 { background:#fff; color:var(--blue); border:1.5px solid var(--blue); margin-top:8px; }
-  footer { font-size:11px; color:var(--grey); text-align:center; padding:0 20px 30px; line-height:1.7; }
-  .tag { display:inline-block; background:var(--navy); color:#fff; font-size:10px; border-radius:6px;
-         padding:1px 6px; margin-left:6px; vertical-align:2px; }
-  .neg { color:var(--red); }
-  .printhead { display:none; }
-  .btnRow { display:flex; gap:8px; flex-wrap:wrap; }
-  .btnRow .btn, .btnRow .btn2 { flex:1 1 0; min-width:120px; }
-  .company { margin-top:10px; }
-  .company summary { cursor:pointer; font-size:13px; color:var(--blue); font-weight:600; }
-  .company .row { margin-top:8px; }
-  [hidden] { display:none !important; }
-  .headbtns { display:flex; align-items:center; gap:8px; flex:none; }
-  .quickbar { display:flex; gap:8px; align-items:center; background:#fff; border-radius:12px;
-              padding:8px 10px; margin-bottom:10px; box-shadow:0 2px 10px rgba(31,56,100,.08); }
-  .quickbar input { flex:1 1 auto; min-width:0; border:1px solid #E0E5EE; border-radius:8px;
-                    padding:8px 10px; font-size:14px; background:#FFF6DD; }
-  .quickbar .btn { flex:0 0 auto; width:44px; height:38px; min-width:0; margin:0; padding:0;
-                   font-size:17px; line-height:1; border-radius:10px; }
-  .quickbar .btn2 { border:1px solid #CFDBEE; background:#F5F8FE; }
-  .hbtn { border:1px solid rgba(255,255,255,.6); background:transparent; color:#fff; border-radius:9px;
-          padding:6px 10px; font-size:13px; font-weight:600; cursor:pointer; max-width:150px;
-          overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .modalMask { position:fixed; inset:0; background:rgba(15,23,42,.45); display:flex; align-items:center;
-               justify-content:center; padding:16px; z-index:60; }
-  .modalCard { position:relative; background:#fff; border-radius:14px; width:100%; max-width:390px;
-               padding:18px; box-shadow:0 20px 50px rgba(0,0,0,.25); }
-  .modalCard h3 { margin:0 0 12px; font-size:16px; color:var(--navy); }
-  .modalClose { position:absolute; top:8px; right:10px; border:none; background:none; font-size:22px;
-                line-height:1; cursor:pointer; color:#999; }
-  .modalCard .row { margin-bottom:8px; }
-  .modalCard .legend { margin-top:8px; }
-  .viewBanner { background:#FFF3CD; border:1px solid #E4CE8B; color:#7A5B12; border-radius:10px; padding:10px 12px;
-                margin:0 0 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; }
-  .viewBanner button { border:1px solid #C9A227; background:#fff; color:#7A5B12; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:600; cursor:pointer; }
-  .view-only main input, .view-only main select { pointer-events:none; }
-  .view-only #toolSec { display:none !important; }
-  .view-only #acctBtn { display:none !important; }
-  .view-only .only-edit { display:none !important; }
-  .shareRow { display:flex; gap:8px; margin-top:8px; }
-  .shareBtn { flex:1; padding:11px 0; border:0; border-radius:12px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; }
-  #toast { position:fixed; left:50%; bottom:90px; transform:translateX(-50%); background:rgba(31,56,100,.95);
-           color:#fff; padding:10px 18px; border-radius:22px; font-size:13px; opacity:0;
-           transition:opacity .25s; pointer-events:none; z-index:99; }
-  @media print {
-    header, .no-print, .sub, .btn, .shareRow { display:none !important; }
-    .printhead { display:flex !important; align-items:flex-start; gap:10px; color:#1F3864;
-                 border-bottom:2px solid #1F3864; padding:6px 4px 8px; margin-bottom:8px; }
-    .printhead .phLogo { height:42px; width:auto; border-radius:6px; }
-    .printhead .phMain { flex:1 1 auto; }
-    .printhead .phCo { font-weight:700; font-size:16px; }
-    .printhead .phContact { font-size:10.5px; color:#555; font-weight:400; margin-top:2px; }
-    .printhead .phMeta { text-align:right; font-size:10.5px; color:#555; font-weight:400; }
-    .printhead .phMeta .printdate { font-size:11px; color:#333; font-weight:600; }
-    .printhead .phMeta img { width:62px; height:62px; display:block; margin:4px 0 0 auto; }
-    body { background:#fff; }
-    main { max-width:none; padding:0; }
-    .part { box-shadow:none; border:1px solid #C9D3E2; border-radius:0; padding:6px 10px; margin-bottom:6px;
-            break-inside:avoid; page-break-inside:avoid; }
-    .part h2 { font-size:14px; margin-bottom:2px; }
-    .subh { font-size:12.5px; margin:6px 0 0; }
-    #part1Sec { page-break-after:always; }
-    .row { margin-bottom:3px; }
-    .row label { font-size:11.5px; }
-    .row input, .row select { border:none; background:#fff !important; padding:2px 5px; font-size:12.5px; }
-    .out { padding:5px 8px; margin-top:3px; }
-    .out .line { font-size:11.5px; padding:1px 0; }
-    .out .line b { font-size:13px; }
-    .big { font-size:15px !important; }
-    .legend { display:none !important; }
-    table { font-size:9.5px; margin-top:4px; }
-    th, td { padding:2px 3px; }
-    .hr { margin:4px 0; }
-    footer { display:block; font-size:8.5px; padding:4px 8px 0; line-height:1.4; }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+       color:var(--ink);background:var(--cream);font-size:16px;line-height:1.7}
+  h1,h2,h3,h4{font-family:Georgia,"Times New Roman","Songti SC","Noto Serif SC",serif;font-weight:600;color:var(--navy);margin:0}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{width:min(1140px,92vw);margin:0 auto}
+  .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .section{padding:84px 0}
+  .section.alt{background:var(--white)}
+  .section-head{max-width:760px;margin-bottom:44px}
+  .section-head h2{font-size:clamp(26px,3.4vw,40px);line-height:1.25;margin:8px 0 10px}
+  .section-head p{color:var(--muted);margin:0;font-size:15.5px}
+  /* header */
+  header{position:sticky;top:0;z-index:50;background:rgba(14,36,56,.96);backdrop-filter:blur(8px);
+         border-bottom:1px solid rgba(198,161,91,.22)}
+  .nav{display:flex;align-items:center;gap:26px;height:68px}
+  .brand{display:flex;align-items:center;gap:10px;flex:none}
+  .brand img{height:34px;width:auto;border-radius:6px}
+  .brand b{color:#fff;font-family:Georgia,serif;font-size:17px;letter-spacing:.04em}
+  .brand span{color:var(--gold2);font-size:12px;letter-spacing:.18em}
+  .navlinks{display:flex;gap:22px;margin-left:auto;align-items:center}
+  .navlinks a{color:#D7E0EA;font-size:13.5px;letter-spacing:.03em}
+  .navlinks a:hover{color:#fff}
+  .navlinks .calc{border:1px solid var(--gold);color:var(--gold2);padding:7px 14px;border-radius:999px;font-weight:600}
+  .lang{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:999px;
+        padding:6px 12px;font-size:12.5px;cursor:pointer}
+  .menu-btn{display:none;margin-left:auto;background:none;border:1px solid rgba(255,255,255,.35);color:#fff;
+            border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer}
+  /* hero */
+  .hero{position:relative;background:linear-gradient(160deg,#0B1D2E 0%,#123049 55%,#1B3E5C 100%);
+        color:#fff;overflow:hidden}
+  .hero:after{content:"";position:absolute;inset:0;background:
+     radial-gradient(700px 320px at 85% 10%,rgba(198,161,91,.18),transparent 60%),
+     repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 120px);pointer-events:none}
+  .hero .wrap{position:relative;z-index:2;padding:96px 0 64px}
+  .hero .eyebrow{color:var(--gold2)}
+  .hero h1{color:#fff;font-size:clamp(34px,5.2vw,60px);line-height:1.12;margin:16px 0 18px;letter-spacing:.01em}
+  .hero p.lead{max-width:720px;color:#CBD7E3;font-size:17px;margin:0 0 30px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:999px;font-weight:600;font-size:14.5px}
+  .btn.gold{background:var(--gold);color:#1B2430}
+  .btn.ghost{border:1px solid rgba(255,255,255,.45);color:#fff}
+  .btn.dark{background:var(--navy);color:#fff}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.14);
+         margin-top:56px;border:1px solid rgba(255,255,255,.14);border-radius:14px;overflow:hidden}
+  .stats div{background:rgba(9,24,38,.55);padding:20px 18px}
+  .stats b{display:block;font-family:Georgia,serif;color:#fff;font-size:clamp(22px,2.6vw,30px);line-height:1.2}
+  .stats span{color:#A9B9C9;font-size:12.5px}
+  /* about */
+  .about-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:start}
+  .about-grid p{color:#38434F;margin:0 0 16px}
+  .co-card{border:1px solid var(--line);border-radius:14px;padding:22px;background:var(--white);margin-bottom:14px}
+  .co-card b{display:block;color:var(--navy);font-size:15px;margin-bottom:4px}
+  .co-card small{color:var(--muted);display:block;font-size:12.5px;letter-spacing:.06em}
+  .co-card p{font-size:13.5px;color:var(--muted);margin:10px 0 0}
+  /* cards */
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:28px;position:relative;overflow:hidden}
+  .section.alt .card{background:var(--cream)}
+  .card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+  .card .num{font-family:Georgia,serif;color:var(--gold);font-size:13px;letter-spacing:.14em}
+  .card h3{font-size:20px;margin:8px 0 6px}
+  .card .en{color:var(--muted);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+  .card p{color:#4A5563;font-size:14.5px;margin:14px 0 0}
+  .card ul{margin:14px 0 0;padding-left:18px;color:#4A5563;font-size:13.5px;columns:2;column-gap:22px}
+  .card ul li{margin-bottom:6px;break-inside:avoid}
+  /* tech */
+  .tech{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .tech .card ul{columns:1}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.08em;border-radius:999px;padding:3px 10px;margin-left:8px;
+       background:rgba(198,161,91,.14);color:#8A6A2A;vertical-align:2px}
+  .tag.live{background:rgba(22,110,82,.12);color:#166E52}
+  .calc-band{background:linear-gradient(120deg,#10293F,#1B3E5C);border-radius:18px;padding:34px;color:#fff;
+             display:flex;align-items:center;gap:26px;justify-content:space-between;margin-top:22px;flex-wrap:wrap}
+  .calc-band h3{color:#fff;font-size:22px;margin:0 0 6px}
+  .calc-band p{color:#B9C8D6;margin:0;font-size:14px;max-width:640px}
+  /* founder */
+  .founder{display:grid;grid-template-columns:280px 1fr;gap:42px;align-items:start}
+  .avatar{width:200px;height:200px;border-radius:50%;background:linear-gradient(150deg,#15344F,#0E2438);
+          color:var(--gold2);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;
+          font-size:58px;letter-spacing:.06em;border:1px solid rgba(198,161,91,.4);margin-bottom:18px}
+  .founder .who b{display:block;font-size:20px;color:var(--navy)}
+  .founder .who span{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+  .founder .bio p{color:#38434F;margin:0 0 14px;font-size:15px}
+  .ach{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
+  .ach div{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--white)}
+  .ach b{display:block;font-family:Georgia,serif;color:var(--navy);font-size:22px;line-height:1.2}
+  .ach span{font-size:12px;color:var(--muted)}
+  .rank{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .rank span{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px;color:#4A5563;background:var(--white)}
+  /* values */
+  .values{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  .value{border-top:2px solid var(--gold);padding-top:14px}
+  .value b{display:block;color:var(--navy);font-size:15px;margin-bottom:4px}
+  .value p{color:var(--muted);font-size:13px;margin:0}
+  /* contact */
+  .contact{display:grid;grid-template-columns:1fr .9fr;gap:40px;align-items:start}
+  .contact p{color:#38434F}
+  .contact .line{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+  .contact .line b{min-width:120px;color:var(--navy)}
+  .enq{margin-top:18px;padding-left:18px;color:#4A5563;font-size:14px}
+  footer{background:#0B1D2E;color:#9FB0C1;font-size:12.5px;padding:44px 0 34px}
+  footer .cols{display:flex;gap:40px;justify-content:space-between;flex-wrap:wrap;margin-bottom:26px}
+  footer b{color:#fff;font-family:Georgia,serif}
+  footer p{margin:6px 0 0;max-width:640px;line-height:1.8}
+  .wa-fab{position:fixed;right:18px;bottom:18px;z-index:60;background:#25D366;color:#fff;border-radius:999px;
+          padding:12px 18px;font-weight:700;font-size:14px;box-shadow:0 10px 24px rgba(0,0,0,.22)}
+  @media (max-width:960px){
+    .about-grid,.founder,.contact{grid-template-columns:1fr}
+    .cards,.tech{grid-template-columns:1fr}
+    .values{grid-template-columns:repeat(2,1fr)}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .navlinks{display:none}
+    .navlinks.open{display:flex;position:absolute;top:68px;left:0;right:0;background:#0E2438;
+                   flex-direction:column;align-items:flex-start;padding:14px 6vw 18px;gap:2px;
+                   border-bottom:1px solid rgba(198,161,91,.25)}
+    .navlinks.open a{padding:12px 0;width:100%;border-bottom:1px solid rgba(255,255,255,.06);font-size:15px}
+    .navlinks.open .calc{margin:12px 0 6px;width:auto;border:1px solid var(--gold)}
+    .navlinks.open .lang{margin-top:6px}
+    .menu-btn{display:block}
+    .ach{grid-template-columns:1fr}
+    .section{padding:60px 0}
   }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
 <header>
-  <div class="headrow">
-    <h1><img src="logo.jpg" alt="logo" class="logo"><span data-i18n="appName">房地产投资快速计算器</span> <span class="tag" data-i18n="beta">v0.1 内测</span></h1>
-    <div class="headbtns">
-      <button id="acctBtn" class="hbtn">👤 <span id="acctBtnTxt">登录</span></button>
-      <button id="langBtn">EN</button>
-    </div>
+  <div class="wrap nav">
+    <a class="brand" href="#top">
+      <img src="logo.jpg" alt="KWONG THYE">
+      <span class="brandtext"><b>KWONG THYE</b><br><span>光泰</span></span>
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+    <nav class="navlinks" id="navlinks">
+      <a href="#about" data-i18n="nav.about">关于我们</a>
+      <a href="#business" data-i18n="nav.biz">核心业务</a>
+      <a href="#tech" data-i18n="nav.tech">科技</a>
+      <a href="#founder" data-i18n="nav.founder">创办人</a>
+      <a href="#contact" data-i18n="nav.contact">联系</a>
+      <a class="calc" href="/calc/" data-i18n="nav.calc">投资计算器</a>
+      <button class="lang" id="langBtn">EN</button>
+    </nav>
   </div>
-  <p data-i18n="appSub">个人买入 → 持有 1–5 年 → 卖出 · 所有金额 RM</p>
 </header>
-<div class="printhead">
-  <img class="phLogo" src="logo.jpg" alt="logo">
-  <div class="phMain">
-    <div class="phCo" id="phCo">房地产投资快速计算器</div>
-    <div class="phContact" id="phContact"></div>
-  </div>
-  <div class="phMeta">
-    <div id="phClient"></div>
-    <div class="printdate"></div>
-    <img id="phQr" alt="QR">
-  </div>
-</div>
-<main>
-  <div class="viewBanner no-print" id="viewBanner" hidden>
-    <span data-i18n="viewBannerText">🔗 这是分享的估算（只读）</span>
-    <button id="editCopy" data-i18n="btnEditCopy">在我这边继续编辑</button>
-  </div>
 
-  <!-- 方案存档 / 分享 / 公司抬头 -->
-  <div class="quickbar no-print" id="toolSec">
-    <input class="manual" id="planName" type="text" placeholder="方案名称 Plan name">
-    <button class="btn" id="savePlan" title="保存方案 Save">💾</button>
-    <button class="btn btn2" id="shareLink" title="复制分享链接 Share">🔗</button>
-    <button class="btn btn2" id="planMore" title="方案列表 / 导出">⋯</button>
-  </div>
-
-  <!-- Part 1 -->
-  <section class="part" id="part1Sec">
-    <h2 data-i18n="p1Title">Part 1 · 买入（第一次要出的费用）</h2>
-    <p class="sub" data-i18n="legendFill">✍️ 自己填 &nbsp;·&nbsp; ⚙️ 自动算</p>
-    <div class="row"><label data-i18n="fSpa">SPA 价格</label><input class="manual money" id="spa" type="text" min="0" step="1000" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fActual">实际买价</label><input class="manual money" id="actual" type="text" min="0" step="1000" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fLoan">贷款数额</label><input class="manual" id="loanPct" type="number" min="0" max="100" step="0.5" inputmode="decimal"><span class="unit unitPct">%</span><input class="manual money" id="loan" type="text" min="0" step="1000" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fRate">年利率</label><input class="manual" id="rate" type="number" min="0" max="20" step="0.05" inputmode="decimal"><span class="unit">%</span></div>
-    <div class="row"><label data-i18n="fTenure">贷款年限</label><input class="manual" id="tenure" type="number" min="1" max="50" step="1" inputmode="decimal"><span class="unit" data-i18n="unitYears">年</span></div>
-    <div class="row"><label data-i18n="fPmt">月供（等额本息）</label><input class="auto" id="pmt" readonly><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fSpaFee">SPA 律师费（律师费 + 印花税 + 杂费 + 8% SST）</label><input class="auto money" id="spaFee" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fLaFee">Loan Agreement 律师费（律师费 + 印花税 + 杂费 + 8% SST）</label><input class="auto money" id="laFee" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fVal">Property Valuation Fee 房产估价费（SPA × 0.2% + 500 杂费）</label><input class="auto money" id="valFee" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="legend" data-i18n="lawNote">⚠️ 律师费/估价费只作估算，以律师最终报价为准。</div>
-    <div class="row"><label data-i18n="fAgent">Agent Fee 中介费</label><input class="manual money" id="agent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fConsent">Consent Fee（如有）</label><input class="manual money" id="consent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fOther">Other Expenses 其他杂费</label><input class="manual money" id="other" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="out">
-      <div class="line"><span data-i18n="lAcqTotal">Total Acquisition Costs 总购置费用</span><span id="acqTotal">—</span></div>
-      <div class="line"><span data-i18n="lDown">Down Payment 首付款（实价 − 贷款）</span><span id="down">—</span></div>
-      <div class="line"><span data-i18n="lCashback">Less: Excess Loan Proceeds / Cashback 减：超额贷款所得</span><span id="cashback">—</span></div>
-      <div class="line"><span data-i18n="lUpfront">Total Upfront Cash Required 购房所需现金总额</span><b class="big" id="initial">—</b></div>
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow" data-i18n="hero.kicker">马来西亚 · 柔佛新山 · 房地产投资与科技</div>
+      <h1 data-i18n="hero.title">连接房地产、科技<br>与投资机会</h1>
+      <p class="lead" data-i18n="hero.lead">光泰（KWONG THYE）立足柔佛新山，专注房地产投资、专业顾问与科技创新，为买家、业主与投资伙伴创造长期价值。</p>
+      <div class="cta">
+        <a class="btn gold" href="https://wa.me/60165280918" target="_blank" rel="noopener" data-i18n="hero.cta1">WhatsApp 咨询</a>
+        <a class="btn ghost" href="#business" data-i18n="hero.cta2">了解核心业务</a>
+      </div>
+      <div class="stats">
+        <div><b>2021</b><span data-i18n="stat.1">光泰地产成立</span></div>
+        <div><b>2</b><span data-i18n="stat.2">旗下公司</span></div>
+        <div><b>RM1.71M+</b><span data-i18n="stat.3">累计销售佣金</span></div>
+        <div><b>88.10%</b><span data-i18n="stat.4">已完成项目平均 ROI</span></div>
+      </div>
     </div>
   </section>
 
-  <!-- Part 2 -->
-  <section class="part" id="part2Sec">
-    <h2 data-i18n="p2Title">Part 2 · Annual Holding Costs（每年持有费用）</h2>
-    <p class="sub" data-i18n="legendFill">✍️ 自己填 &nbsp;·&nbsp; ⚙️ 自动算</p>
-    <div class="row"><label data-i18n="fMgmt">Management Fee（每月）</label><input class="manual money" id="mgmt" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fQuit">地税 Quit Rent（每年）</label><input class="manual money" id="quit" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fAssess">门牌税 Assessment（每年）</label><input class="manual money" id="assess" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fRepair">装修费 / 维修费（每年预算）</label><input class="manual money" id="repair" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fInsur">保险（每年，可选）</label><input class="manual money" id="insur" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fRentAgent">出租中介费（每年）</label><input class="manual money" id="rentAgent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fMInt">每个月银行利息（平均，自动）</label><input class="auto" id="mInt" readonly><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fYCost">每年总费用（第 1 年，自动）</label><input class="auto" id="yCost" readonly><span class="unit">RM</span></div>
-    <div class="legend" data-i18n="p2Note">说明：每月利息会随着贷款余额递减；卖出时还会自动加上律师费与 RPGT（见 Part 3 结果）。</div>
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="about.kicker">关于光泰</div>
+        <h2 data-i18n="about.title">以专业与研究，发掘柔佛房地产的长期价值</h2>
+        <p data-i18n="about.sub">Real Estate Investment · Property Advisory · Technology Innovation</p>
+      </div>
+      <div class="about-grid">
+        <div>
+          <p data-i18n="about.p1">光泰（Kwong Thye）是一家立足马来西亚柔佛新山，专注于房地产投资、房地产顾问服务及科技创新的综合房地产企业。</p>
+          <p data-i18n="about.p2">光泰地产（Kwong Thye Realty Consultancy Sdn Bhd）成立于 2021 年，业务涵盖住宅、商业及工业房地产销售、市场分析与投资咨询。2025 年成立 Kwong Thye Development Sdn Bhd，拓展房地产收购、资产增值、翻新转售及投资合作业务。</p>
+          <p data-i18n="about.p3">凭借多年柔佛房地产市场经验，我们持续发掘具投资潜力的项目，通过市场研究、资金规划及项目执行，为客户与投资伙伴创造长期价值。同时积极发展房地产科技（PropTech），以投资分析工具、AI 广告制作、房源配对及资料管理平台提升行业效率。</p>
+          <p data-i18n="about.p4">我们的长期目标，是打造一个结合房地产投资、科技工具及市场资源的综合生态平台，连接代理、买家、卖家与投资者。</p>
+        </div>
+        <div>
+          <div class="co-card">
+            <small>EST. 2021</small>
+            <b>KWONG THYE REALTY CONSULTANCY SDN BHD</b>
+            <p data-i18n="about.co1">房地产销售 · 市场分析 · 投资顾问</p>
+          </div>
+          <div class="co-card">
+            <small>EST. 2025</small>
+            <b>KWONG THYE DEVELOPMENT SDN BHD</b>
+            <p data-i18n="about.co2">房地产收购 · 资产增值 · 翻新转售 · 投资合作</p>
+          </div>
+          <div class="co-card">
+            <small>BRAND POSITIONING</small>
+            <b data-i18n="about.pos">房地产投资 · 专业顾问 · 科技创新</b>
+            <p data-i18n="about.tagline">Connecting Properties, Technology &amp; Investment Opportunities.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- Part 3 -->
-  <section class="part" id="part3Sec">
-    <h2 data-i18n="p3Title">Part 3 · Investment Returns（投资回报分析）</h2>
-    <p class="sub" data-i18n="legendFill">✍️ 自己填 &nbsp;·&nbsp; ⚙️ 自动算</p>
-
-    <h3 class="subh" data-i18n="p3aTitle">① Keep & Rent 持有出租回报</h3>
-    <div class="row"><label data-i18n="fRent">Annual Rental Income 年租金收入</label><input class="manual money" id="rent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="out">
-      <div class="line"><span data-i18n="lNetY">Annual Rental Profit 年租金净利润（租金 − 年度费用，含利息）</span><span id="netY">—</span></div>
-      <div class="line"><span data-i18n="lHoldAnnual">Annual Rental Return 年租金回报率（年租金净利润 ÷ 购房所需现金总额）</span><b class="big" id="holdAnnual">—</b></div>
-      <div class="line"><span data-i18n="lTotalRentalProfit">Total Rental Profit 总年租金净利润（年租金净利润 × 年数）</span><span id="totalRentalProfit">—</span></div>
+  <!-- BUSINESS -->
+  <section class="section alt" id="business">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="biz.kicker">核心业务</div>
+        <h2 data-i18n="biz.title">四项核心业务，覆盖房地产全周期</h2>
+        <p data-i18n="biz.sub">从销售顾问、投资开发、投资合作到科技平台，形成完整的房地产生态。</p>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <div class="num">01</div>
+          <h3 data-i18n="biz.1.title">房地产销售与顾问</h3>
+          <div class="en">Property Sales &amp; Advisory</div>
+          <p data-i18n="biz.1.p">专注柔佛房地产市场，为个人买家、业主及投资者提供销售与咨询服务，结合市场趋势、物业价值与客户需求，寻找合适的房地产机会。</p>
+          <ul>
+            <li data-i18n="biz.1.a">住宅房地产</li>
+            <li data-i18n="biz.1.b">商业房地产</li>
+            <li data-i18n="biz.1.c">工业房地产</li>
+            <li data-i18n="biz.1.d">销售与营销</li>
+            <li data-i18n="biz.1.e">市场分析</li>
+            <li data-i18n="biz.1.f">投资咨询</li>
+            <li data-i18n="biz.1.g">买卖策略顾问</li>
+          </ul>
+        </article>
+        <article class="card">
+          <div class="num">02</div>
+          <h3 data-i18n="biz.2.title">房地产投资与开发</h3>
+          <div class="en">Property Investment &amp; Development</div>
+          <p data-i18n="biz.2.p">通过 Kwong Thye Development Sdn Bhd，专注物业收购、资产增值及项目开发，以策略性收购、翻新改善、出租管理及适时出售实现资产增值。</p>
+          <ul>
+            <li data-i18n="biz.2.a">短期转售</li>
+            <li data-i18n="biz.2.b">翻新转售</li>
+            <li data-i18n="biz.2.c">持有及出售</li>
+            <li data-i18n="biz.2.d">长期出租投资</li>
+            <li data-i18n="biz.2.e">房地产开发</li>
+          </ul>
+        </article>
+        <article class="card">
+          <div class="num">03</div>
+          <h3 data-i18n="biz.3.title">房地产投资合作</h3>
+          <div class="en">Property Investment Partnerships</div>
+          <p data-i18n="biz.3.p">结合市场经验、项目资源与投资伙伴的资金优势，共同探索具潜力的投资机会，并以透明机制与审慎风险评估建立长期合作。</p>
+          <ul>
+            <li data-i18n="biz.3.a">投资机会发掘</li>
+            <li data-i18n="biz.3.b">可行性分析</li>
+            <li data-i18n="biz.3.c">投资结构规划</li>
+            <li data-i18n="biz.3.d">收购协调</li>
+            <li data-i18n="biz.3.e">项目执行与增值</li>
+            <li data-i18n="biz.3.f">表现跟进</li>
+            <li data-i18n="biz.3.g">退出策略</li>
+          </ul>
+        </article>
+        <article class="card">
+          <div class="num">04</div>
+          <h3 data-i18n="biz.4.title">房地产科技</h3>
+          <div class="en">Property Technology (PropTech)</div>
+          <p data-i18n="biz.4.p">面向代理、买家与投资者的数字化工具，简化工作流程、提高信息透明度，让客户、房源与交易机会管理更高效。</p>
+          <ul>
+            <li data-i18n="biz.4.a">投资分析计算器</li>
+            <li data-i18n="biz.4.b">AI 广告视频</li>
+            <li data-i18n="biz.4.c">智能房源配对</li>
+            <li data-i18n="biz.4.d">房地产资料库</li>
+          </ul>
+        </article>
+      </div>
     </div>
-    <div class="legend" data-i18n="noteHold">↑ 不卖、持续出租的口径：租金一年扣掉 Part 2 的年度费用（含每月银行利息），剩下的就是利润。逐年数字见下面表格。</div>
-
-    <h3 class="subh" data-i18n="p3bTitle">② Sell Property 出售房产回报</h3>
-    <div class="row"><label data-i18n="fSell">Expected Selling Price 预计卖出价格</label><input class="manual money" id="sell" type="text" min="0" step="1000" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fHold">Holding Period 持有年限</label><input class="manual" id="hold" type="number" min="1" max="30" step="1" inputmode="decimal"><span class="unit" data-i18n="unitYears">年</span></div>
-    <div class="row"><label data-i18n="fSellAgent">Agent Fee 卖出中介费（默认 2% 卖价）</label><input class="auto money" id="sellAgent" type="text" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fSellLegal">Legal Fee（律师费 + 印花税 + 杂费 + 8% SST，默认 5,000）</label><input class="auto money" id="sellLegal" type="text" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fSellMisc">Selling Miscellaneous Expenses 售出杂费</label><input class="manual money" id="sellMisc" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label id="rpgtLabel">RPGT（持有 5 年 = 15%）</label><span class="autoVal" id="rpgtVal">—</span><span class="unit">RM</span></div>
-    <div class="out">
-      <div class="line"><span data-i18n="lSellPriceShow">Expected Selling Price 预计卖出价格</span><span id="sellPriceShow">—</span></div>
-      <div class="line lessHead"><span data-i18n="lLessHead">Less (扣除）：</span><span></span></div>
-      <div class="line"><span data-i18n="lLessActual">Actual Purchase Price 实际成交价</span><span id="lessActual">—</span></div>
-      <div class="line"><span data-i18n="lLessAcq">Total Acquisition Costs 总购置费用</span><span id="lessAcq">—</span></div>
-      <div class="line"><span data-i18n="lGrossGain">Gross Capital Gain 出售资本收益（扣出售相关费用前）</span><b id="gross">—</b></div>
-      <div class="line"><span data-i18n="lTotalSellCosts">Total Selling Costs 出售总费用（中介 + 律师 + 杂费 + RPGT）</span><b id="totalSellCosts">—</b></div>
-      <div class="line"><span data-i18n="lSellingProfit">Selling Profit 出售利润（出售资本收益 − 出售总费用）</span><b id="sellingProfit">—</b></div>
-      <div class="line"><span data-i18n="lSellingReturn">Selling Return 出售回报率（出售利润 ÷ 购房所需现金总额 ÷ 年数）</span><b class="big" id="sellingReturn">—</b></div>
-      <div class="hr"></div>
-      <div class="line"><span data-i18n="lNetInvProfit">Net Investment Profit 投资净利润 ① + ②（总年租金净利润 + 出售利润）</span><b id="netInvestProfit">—</b></div>
-      <div class="line"><span data-i18n="lTotalRoi">Total ROI 总投资回报率（投资净利润 ÷ 购房所需现金总额 ÷ 年数）</span><b class="big" id="totalRoi">—</b></div>
-      <div class="line"><span data-i18n="lTotalCost">Total Cost 总成本（实际成交价 + 总购置费用 + 出售总费用）</span><span id="totalCost">—</span></div>
-      <div class="line"><span data-i18n="lRotc">Return on Total Cost 总成本回报率（投资净利润 ÷ 总成本 ÷ 年数）</span><span id="rotc">—</span></div>
-
-    </div>
-    <table id="yearTable">
-      <thead><tr><th data-i18n="thYear">年</th><th data-i18n="thBal">年末余额</th><th data-i18n="thInt">当年利息</th><th data-i18n="thCost">当年费用</th><th data-i18n="thNet">当年净利润</th><th data-i18n="thRpgt">RPGT</th></tr></thead>
-      <tbody></tbody>
-    </table>
-    <button class="btn" id="demo" data-i18n="btnDemo">填入示例（SPA 1M / 实价 800k / 贷 800k / 一年后卖 900k）</button>
-    <button class="btn btn2" id="reset" data-i18n="btnReset">清空</button>
   </section>
 
-  <!-- 导出 / 分享 -->
-  <section class="part no-print" id="shareSec">
-    <h2 data-i18n="exportTitle">导出 / 分享</h2>
-    <button class="btn" id="printBtn" data-i18n="printBtn">🖨️ 导出 PDF / 打印（Part 1 一页 · Part 2+3 一页）</button>
-    <div class="shareRow">
-      <button class="shareBtn" id="waBtn" style="background:#25D366">WhatsApp</button>
-      <button class="shareBtn" id="wxBtn" style="background:#07C160" data-i18n="shareWx">微信</button>
-      <button class="shareBtn" id="fbBtn" style="background:#1877F2">Facebook</button>
+  <!-- TECH -->
+  <section class="section" id="tech">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="tech.kicker">房地产科技</div>
+        <h2 data-i18n="tech.title">用科技，让房地产交易与投资分析更透明</h2>
+        <p data-i18n="tech.sub">以更智能的工具、更清晰的数据及更高效的流程，赋能房地产从业者。</p>
+      </div>
+      <div class="tech">
+        <article class="card">
+          <h3 data-i18n="tech.1.title">房地产投资分析计算器 <span class="tag live" data-i18n="tech.live">已上线</span></h3>
+          <div class="en">Property Investment Calculator</div>
+          <p data-i18n="tech.1.p">简洁实用的投资分析工具，协助评估购房成本、贷款融资、租金收入与费用、现金流、投资回报率、出售收益及持有年限。</p>
+        </article>
+        <article class="card">
+          <h3 data-i18n="tech.2.title">AI 房地产广告视频 <span class="tag" data-i18n="tech.soon">规划中</span></h3>
+          <div class="en">AI Property Video Generator</div>
+          <p data-i18n="tech.2.p">利用人工智能快速制作房源推广视频与营销内容，降低传统广告制作的时间与成本。</p>
+        </article>
+        <article class="card">
+          <h3 data-i18n="tech.3.title">智能房源配对 <span class="tag" data-i18n="tech.soon2">规划中</span></h3>
+          <div class="en">Smart Property Matching</div>
+          <p data-i18n="tech.3.p">建立房源与客户需求的配对系统，协助代理更有效连接潜在买家、卖家与合适物业。</p>
+        </article>
+        <article class="card">
+          <h3 data-i18n="tech.4.title">房地产资料库与管理 <span class="tag" data-i18n="tech.soon3">规划中</span></h3>
+          <div class="en">Property Database &amp; Management</div>
+          <p data-i18n="tech.4.p">集中式房地产资料管理，整理房源、客户需求与市场信息，提高查找与协作效率。</p>
+        </article>
+      </div>
+      <div class="calc-band">
+        <div>
+          <h3 data-i18n="band.title">3 分钟，算清一套房子的买入、持有与卖出回报</h3>
+          <p data-i18n="band.sub">含律师费、印花税、估价费、贷款月供、年度费用、租金回报、RPGT 与出售利润，支持中英文与 PDF 报价单。</p>
+        </div>
+        <a class="btn gold" href="/calc/" data-i18n="band.cta">立即计算 →</a>
+      </div>
     </div>
-    <div class="legend" data-i18n="shareNote">WhatsApp / Facebook 直接打开；微信没有网页分享接口，点「微信」会复制文字，粘贴到微信即可。</div>
   </section>
 
-  <footer data-i18n="footer">
-    ⚠️ 律师费/印花税按法定费率自动估算，RPGT 为估算（30/20/15/0），银行利息为等额本息——实际金额以律师报价、银行结算单与 LHDN 为准。<br>
-    本计算器不构成法律或税务意见。
-  </footer>
-  <div id="toast"></div>
+  <!-- FOUNDER -->
+  <section class="section alt" id="founder">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="founder.kicker">创办人</div>
+        <h2 data-i18n="founder.title">Andy Lau 刘泌光</h2>
+        <p data-i18n="founder.sub">Founder — Kwong Thye Realty Consultancy · Kwong Thye Development</p>
+      </div>
+      <div class="founder">
+        <div>
+          <div class="avatar">AL</div>
+          <div class="who">
+            <b>Andy Lau Pik Kwong</b>
+            <span data-i18n="founder.role1">创办人 — 光泰地产</span>
+            <span data-i18n="founder.role2">创办人 — 光泰发展</span>
+            <span data-i18n="founder.role3">Group Leader — EAG Team, The Roof Properties &amp; Development</span>
+          </div>
+        </div>
+        <div class="bio">
+          <p data-i18n="founder.p1">Andy Lau 刘泌光是一位专注马来西亚柔佛房地产市场的房地产顾问及投资者，拥有超过五年销售与投资实战经验。</p>
+          <p data-i18n="founder.p2">2021 年创立 Kwong Thye Realty Consultancy Sdn Bhd，专注房地产销售与投资顾问业务；2025 年进一步成立 Kwong Thye Development Sdn Bhd，拓展投资、收购、翻新转售及开发项目。</p>
+          <p data-i18n="founder.p3">他相信，成功的房地产投资必须建立在专业判断、市场研究、合理风险管理及长期信任之上。</p>
+          <div class="ach">
+            <div><b>RM1,718,177.68</b><span data-i18n="founder.a1">累计个人销售佣金</span></div>
+            <div><b>6</b><span data-i18n="founder.a2">已完成投资项目</span></div>
+            <div><b>RM212,671</b><span data-i18n="founder.a3">已完成项目累计净利润</span></div>
+            <div><b>88.10%</b><span data-i18n="founder.a4">已完成项目平均 ROI</span></div>
+            <div><b>11</b><span data-i18n="founder.a5">进行中投资项目</span></div>
+            <div><b>RM501,087</b><span data-i18n="founder.a6">进行中项目预计净利润</span></div>
+          </div>
+          <div class="rank">
+            <span data-i18n="founder.r1">2022 The Roof Realty 全国排名第 68</span>
+            <span data-i18n="founder.r2">2023 The Roof Realty 全国排名第 49</span>
+            <span data-i18n="founder.r3">2024 The MMA Million-Dollar Club</span>
+            <span data-i18n="founder.r4">《南洋商报》房地产专题分享</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="values.kicker">愿景 · 使命 · 价值</div>
+        <h2 data-i18n="values.title">打造连接房地产投资、科技与市场资源的生态平台</h2>
+        <p data-i18n="values.sub">以专业市场研究、审慎投资策略与持续科技创新，为客户、从业者及合作伙伴创造长期价值。</p>
+      </div>
+      <div class="values">
+        <div class="value"><b data-i18n="values.1">专业</b><p data-i18n="values.1p">以市场研究、数据分析及实际经验作为决策基础。</p></div>
+        <div class="value"><b data-i18n="values.2">诚信</b><p data-i18n="values.2p">重视透明沟通、专业操守及长期合作关系。</p></div>
+        <div class="value"><b data-i18n="values.3">创新</b><p data-i18n="values.3p">持续探索科技与房地产行业的结合。</p></div>
+        <div class="value"><b data-i18n="values.4">合作</b><p data-i18n="values.4p">连接不同参与者，促进资源整合与合作机会。</p></div>
+        <div class="value"><b data-i18n="values.5">长期价值</b><p data-i18n="values.5p">重视可持续发展与审慎投资管理。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section alt" id="contact">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="contact.kicker">联系我们</div>
+        <h2 data-i18n="contact.title">欢迎洽谈房地产销售、投资合作与科技平台</h2>
+      </div>
+      <div class="contact">
+        <div>
+          <div class="line"><b data-i18n="contact.market">主要市场</b><span data-i18n="contact.marketv">马来西亚 · 柔佛新山</span></div>
+          <div class="line"><b data-i18n="contact.phone">电话 / WhatsApp</b><span><a href="https://wa.me/60165280918">+60 16-528 0918</a></span></div>
+          <div class="line"><b data-i18n="contact.web">网站</b><span><a href="https://kwongthye.com/">www.kwongthye.com</a></span></div>
+          <div class="line"><b data-i18n="contact.calc">投资计算器</b><span><a href="/calc/">kwongthye.com/calc</a></span></div>
+          <ul class="enq">
+            <li data-i18n="contact.e1">房地产销售与顾问</li>
+            <li data-i18n="contact.e2">房地产投资机会</li>
+            <li data-i18n="contact.e3">房地产投资合作</li>
+            <li data-i18n="contact.e4">房地产科技方案与合作</li>
+          </ul>
+        </div>
+        <div>
+          <div class="co-card"><b>KWONG THYE REALTY CONSULTANCY SDN BHD</b><p data-i18n="contact.co1">房地产销售 · 市场分析 · 投资顾问</p></div>
+          <div class="co-card"><b>KWONG THYE DEVELOPMENT SDN BHD</b><p data-i18n="contact.co2">房地产收购 · 资产增值 · 翻新转售</p></div>
+          <a class="btn dark" style="margin-top:6px" href="https://wa.me/60165280918" target="_blank" rel="noopener" data-i18n="contact.cta">WhatsApp 直接联系</a>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
-<div class="modalMask no-print" id="planModal" hidden>
-  <div class="modalCard" role="dialog" aria-modal="true">
-    <button class="modalClose" id="planClose" aria-label="Close">×</button>
-    <h3 data-i18n="toolTitle">方案存档 / 分享</h3>
-    <div class="row"><label data-i18n="fPlanList">已存方案</label><select class="manual" id="planList"></select></div>
-    <div class="legend" id="planMode"></div>
-    <div class="btnRow">
-      <button class="btn btn2" id="loadPlan" data-i18n="btnLoad">加载</button>
-      <button class="btn btn2" id="delPlan" data-i18n="btnDelete">删除</button>
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <b>KWONG THYE 光泰</b>
+        <p data-i18n="footer.addr">马来西亚柔佛新山 · 房地产投资 · 专业顾问 · 科技创新</p>
+      </div>
+      <div>
+        <p data-i18n="footer.tag">Connecting Properties, Technology &amp; Investment Opportunities.</p>
+      </div>
     </div>
-    <div class="btnRow">
-      <button class="btn btn2" id="exportJson" data-i18n="btnExport">导出 JSON</button>
-      <button class="btn btn2" id="importJson" data-i18n="btnImport">导入 JSON</button>
-      <input type="file" id="importFile" accept="application/json,.json" hidden>
-    </div>
-    <details class="company">
-      <summary data-i18n="companyTitle">公司抬头（打印用）</summary>
-      <div class="row"><label data-i18n="fCompany">公司 / 中介公司</label><input class="manual" id="coName" type="text" placeholder="ABC Realty Sdn Bhd"></div>
-      <div class="row"><label data-i18n="fPerson">中介姓名</label><input class="manual" id="coPerson" type="text" placeholder="Your name"></div>
-      <div class="row"><label data-i18n="fRen">REN 编号（可选）</label><input class="manual" id="coRen" type="text" placeholder="REN 12345"></div>
-      <div class="row"><label data-i18n="fPhone">电话 / WhatsApp</label><input class="manual" id="coPhone" type="text" inputmode="tel" placeholder="+60 12-345 6789"></div>
-      <div class="row"><label data-i18n="fEmailCo">电邮（可选）</label><input class="manual" id="coEmail" type="email" inputmode="email" placeholder="you@example.com"></div>
-      <div class="row"><label data-i18n="fAddress">公司地址（可选）</label><input class="manual" id="coAddress" type="text" placeholder="No. 1, Jalan ..., 50000 Kuala Lumpur"></div>
-      <div class="row"><label data-i18n="fCustomer">客户姓名</label><input class="manual" id="coClient" type="text" placeholder="Mr Tan"></div>
-      <div class="row"><label data-i18n="fProject">项目 / 楼盘</label><input class="manual" id="coProject" type="text" placeholder="Bukit Jalil Condo"></div>
-      <div class="btnRow"><button class="btn btn2" id="coSave" data-i18n="btnSaveCo">保存抬头</button></div>
-        </details>
-    <div class="legend" id="planNote" data-i18n="planNote">💾 方案存在本机浏览器；换设备或换域名时请用「导出 / 导入 JSON」。</div>
+    <p data-i18n="footer.disclaimer">Kwong Thye 通过旗下各公司经营相关房地产业务。房地产投资涉及财务、市场、融资及流动性风险；历史投资成果不代表未来表现。所有投资机会、项目预测及合作安排均须经独立评估，并受适用监管要求及正式协议约束。开发中的房地产科技产品将分阶段推出，实际可用性以平台公布为准。</p>
+    <p style="margin-top:18px">© 2026 Kwong Thye. All Rights Reserved.</p>
   </div>
-</div>
+</footer>
 
-<div class="modalMask no-print" id="acctModal" hidden>
-  <div class="modalCard" role="dialog" aria-modal="true">
-    <button class="modalClose" id="acctClose" aria-label="Close">×</button>
-    <h3 data-i18n="acctTitle">我的账号</h3>
-    <div id="acctLoggedOut">
-      <div class="row"><label data-i18n="fEmail">邮箱</label><input class="manual" id="acctEmail" type="email" autocomplete="email" inputmode="email"><span class="unit"></span></div>
-      <div class="row"><label data-i18n="fPassword">密码</label><input class="manual" id="acctPassword" type="password" autocomplete="current-password"><span class="unit"></span></div>
-      <div class="btnRow">
-        <button class="btn" id="loginBtn" data-i18n="btnLogin">登录</button>
-        <button class="btn btn2" id="registerBtn" data-i18n="btnRegister">注册</button>
-      </div>
-      <div class="legend" data-i18n="acctNote">登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。</div>
-    </div>
-    <div id="acctLoggedIn" hidden>
-      <div class="out">
-        <div class="line"><span data-i18n="acctEmailLabel">邮箱</span><b id="acctWho">—</b></div>
-        <div class="line"><span data-i18n="acctPlanLabel">版本</span><span id="acctPlan">—</span></div>
-        <div class="line"><span data-i18n="acctExpiry">到期</span><span id="acctExpiry">—</span></div>
-      </div>
-      <div id="proBox">
-        <div class="legend" data-i18n="proNote">专业版 RM 50/年：方案不限个数。付款后输入开通码即可开通或续费。</div>
-        <div class="row"><label data-i18n="fCode">开通码</label><input class="manual" id="proCode" type="text" placeholder="XXXX-XXXX-XXXX"><span class="unit"></span></div>
-        <div class="btnRow"><button class="btn" id="redeemBtn" data-i18n="btnRedeem">开通 / 续费</button></div>
-      </div>
-      <div class="btnRow"><button class="btn btn2" id="logoutBtn" data-i18n="btnLogout">退出登录</button></div>
-    </div>
-  </div>
-</div>
+<a class="wa-fab" href="https://wa.me/60165280918" target="_blank" rel="noopener">WhatsApp</a>
 
-<script src="qrcode.js"></script>
-<script src="calc.js"></script>
 <script>
 (function () {
-  "use strict";
-  var $ = function (id) { return document.getElementById(id); };
-
   var I18N = {
     zh: {
-      appName: "房地产投资快速计算器", beta: "v0.1 内测",
-      appSub: "个人买入 → 持有 1–5 年 → 卖出 · 所有金额 RM",
-      legendFill: "✍️ 自己填 · ⚙️ 自动算",
-      p1Title: "Part 1 · 买入（第一次要出的费用）",
-      fSpa: "SPA 价格", fActual: "实际买价", fLoan: "贷款数额", fRate: "年利率", fTenure: "贷款年限",
-      unitYears: "年", fPmt: "月供（等额本息）",
-      fSpaFee: "SPA 律师费（律师费 + 印花税 + 杂费 + 8% SST）", fLaFee: "Loan Agreement 律师费（律师费 + 印花税 + 杂费 + 8% SST）",
-      fVal: "Property Valuation Fee 房产估价费（SPA × 0.2% + 500 杂费）",
-      fAgent: "Agent Fee 中介费", fConsent: "Consent Fee（如有）", fOther: "Other Expenses 其他杂费",
-      lawNote: "⚠️ 律师费/估价费只作估算，以律师最终报价为准。也可直接改格子里的数字（改完变橙色），清空即恢复自动。",
-      lInitial: "Total 第一次要出的费用", lAcqTotal: "Total Acquisition Costs 总购置费用", lDown: "Down Payment 首付款（实价 − 贷款）", lCashback: "Less: Excess Loan Proceeds / Cashback 减：超额贷款所得", lUpfront: "Total Upfront Cash Required 购房所需现金总额",
-      p2Title: "Part 2 · Annual Holding Costs（每年持有费用）",
-      fMgmt: "Management Fee（每月）", fQuit: "地税 Quit Rent（每年）", fAssess: "门牌税 Assessment（每年）",
-      fRepair: "装修费 / 维修费（每年预算）", fInsur: "保险（每年，可选）", fRentAgent: "出租中介费（每年）", fSellAgent: "Agent Fee 卖出中介费（默认 2% 卖价）",
-      fSellLegal: "Legal Fee（律师费 + 印花税 + 杂费 + 8% SST，默认 5,000）", fSellMisc: "Selling Miscellaneous Expenses 售出杂费",
-      lSellCostHead: "Selling related cost 出售相关费用：", lTotalSellCosts: "Total Selling Costs 出售总费用（中介 + 律师 + 杂费 + RPGT）", lSellingProfit: "Selling Profit 出售利润（出售资本收益 − 出售总费用）", lSellingReturn: "Selling Return 出售回报率（出售利润 ÷ 购房所需现金总额 ÷ 年数）",
-      lNetInvProfit: "Net Investment Profit 投资净利润 ① + ②（总年租金净利润 + 出售利润）", lTotalRoi: "Total ROI 总投资回报率（投资净利润 ÷ 购房所需现金总额 ÷ 年数）", lTotalCost: "Total Cost 总成本（实际成交价 + 总购置费用 + 出售总费用）", lRotc: "Return on Total Cost 总成本回报率（投资净利润 ÷ 总成本 ÷ 年数）",
-      fMInt: "每个月银行利息（平均，自动）", fYCost: "每年总费用（第 1 年，自动）",
-      p2Note: "说明：利息是平均口径（贷款 × 年利率 ÷ 12）；真实等额本息每月利息会随余额略减，以银行账单为准。卖出时还会自动加上律师费与 RPGT（见 Part 3 结果）。",
-      p3Title: "Part 3 · Investment Returns（投资回报分析）", p3aTitle: "① Keep & Rent 持有出租回报", p3bTitle: "② Sell Property 出售房产回报",
-      fRent: "Annual Rental Income 年租金收入", fSell: "Expected Selling Price 预计卖出价格", fHold: "Holding Period 持有年限",
-      lSellPriceShow: "Expected Selling Price 预计卖出价格", lCashIn: "Total Upfront Cash Required 购房所需现金总额", lLessHead: "Less (扣除）：", lLessActual: "Actual Purchase Price 实际成交价", lLessAcq: "Total Acquisition Costs 总购置费用", lGrossGain: "Gross Capital Gain 出售资本收益（扣出售相关费用前）", lQuick: "年利润（净赚 ÷ 自己现金 ÷ 年数）",
-      noteQuick: "↑ 快速口径。下面的“扣掉所有费用”会再算：月供利息、卖出中介/律师费、RPGT、租金。",
-      lNetY: "Annual Rental Profit 年租金净利润（租金 − 年度费用，含利息）", lHoldAnnual: "Annual Rental Return 年租金回报率（年租金净利润 ÷ 购房所需现金总额）", lTotalRentalProfit: "Total Rental Profit 总年租金净利润（年租金净利润 × 年数）",
-      noteHold: "↑ 不卖、持续出租的口径：租金一年扣掉 Part 2 的年度费用（含每月银行利息），剩下的就是利润。逐年数字见下面表格。",
-      lProfit: "Net Cash Profit 现金净利润（完整口径）", lBal: "卖出时贷款余额",
-      lSellCosts: "卖出总费用（中介 + 律师 + RPGT）", rpgtLine: "RPGT（持有 {y} 年 = {p}%）", rpgtEmpty: "RPGT（请先选持有年限）",
-      lCoc: "现金回报率（完整口径）", lTcr: "Net Cash Return on Capital 现金总成本回报率", lXirr: "年利率（XIRR，完整口径）",
-      thYear: "年", thBal: "年末余额", thInt: "当年利息", thCost: "当年费用", thNet: "当年净利润", thRpgt: "RPGT",
-      yearRow: "第 {y} 年", xirrNA: "无法计算",
-      btnDemo: "填入示例（SPA 1M / 实价 800k / 贷 800k / 一年后卖 900k）", btnReset: "清空",
-      exportTitle: "导出 / 分享",
-      acctTitle: "我的账号", fEmail: "邮箱", fPassword: "密码", btnLogin: "登录", btnRegister: "注册", btnLoginShort: "登录",
-      acctNote: "登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。",
-      acctEmailLabel: "邮箱", acctPlanLabel: "版本", acctExpiry: "到期", btnLogout: "退出登录",
-      fCode: "开通码", btnRedeem: "开通 / 续费", proNote: "专业版 RM 50/年：方案不限个数。付款后输入开通码即可开通或续费。",
-      toastRedeemed: "已开通 {n} 天专业版", errCode: "开通码无效或已被使用",
-      planFree: "免费版", planPro: "专业版", planUnlimited: "个方案（不限）",
-      errEmail: "请填正确的邮箱", errPassword: "密码至少 8 位", errExists: "这个邮箱已注册", errLogin: "邮箱或密码不对",
-      errRate: "太频繁，请稍后再试", errQuota: "免费版最多 3 个方案", errGeneric: "网络错误，请稍后再试",
-      toastLoginOk: "已登录", toastRegisterOk: "注册成功，已登录", toastLogout: "已退出登录",
-      toolTitle: "方案存档 / 分享", fPlanName: "方案名称", phPlanName: "例：Bukit Jalil 公寓 A",
-      btnSavePlan: "💾 保存方案", btnShareLink: "🔗 复制分享链接",
-      fPlanList: "已存方案", optPick: "（选择已存方案）", optNone: "（还没有存档）",
-      btnLoad: "加载", btnDelete: "删除", btnExport: "导出 JSON", btnImport: "导入 JSON",
-      companyTitle: "公司抬头（打印用）", fCompany: "公司 / 中介公司", fPerson: "中介姓名", fRen: "REN 编号（可选）", fPhone: "电话 / WhatsApp", fEmailCo: "电邮（可选）", fAddress: "公司地址（可选）", fCustomer: "客户姓名", fProject: "项目 / 楼盘", btnSaveCo: "保存抬头",
-      planNote: "💾 方案存在本机浏览器；换设备或换域名时请用「导出 / 导入 JSON」。",
-      planModeLocal: "💾 本机存档（未登录）", planModeCloud: "☁️ 云端存档（已登录，自动同步）",
-      planNoteCloud: "☁️ 已登录：方案存在云端，换设备登录就能看到；也可以导出 JSON 做备份。",
-      confirmUpload: "检测到本机有 {n} 个方案，要上传到云端吗？", toastUploaded: "已上传 {n} 个方案到云端",
-      toastCloudSaved: "已保存到云端", toastCloudDeleted: "已从云端删除", errCloud: "云端操作失败，已保留本机数据",
-      viewBannerText: "🔗 这是分享的估算（只读）", btnEditCopy: "在我这边继续编辑", shareWx: "微信",
-      toastSaved: "方案已保存", toastLoaded: "方案已加载", toastDeleted: "方案已删除", toastNeedName: "先给方案起个名字",
-      toastExported: "已导出 JSON 文件", toastImported: "已导入", toastImportBad: "文件格式不对，导入失败",
-      toastLinkCopied: "分享链接已复制", toastCoSaved: "公司抬头已保存", toastEditable: "已切换为可编辑",
-      confirmDelete: "确定删除这个方案？", toastStorageFull: "浏览器存储已满，建议先导出再删旧方案",
-      printBtn: "🖨️ 导出 PDF / 打印（Part 1 一页 · Part 2+3 一页）",
-      shareNote: "WhatsApp / Facebook 直接打开；微信没有网页分享接口，点「微信」会复制文字，粘贴到微信即可。",
-      copyOk: "已复制，去微信粘贴即可",
-      shareTpl: "房地产投资计算｜SPA {spa} · 实价 {actual} · 贷款 {loan} · 租金 {rent}/年 → 持有年利润 {hold} · 卖出年利润 {quick}（估算，以律师/银行为准）｜{url}",
-      footer: "⚠️ 律师费/印花税按法定费率自动估算，RPGT 为估算（30/20/15/0），银行利息为等额本息——实际金额以律师报价、银行结算单与 LHDN 为准。本计算器不构成法律或税务意见。"
+      "nav.about":"关于我们","nav.biz":"核心业务","nav.tech":"科技","nav.founder":"创办人","nav.contact":"联系","nav.calc":"投资计算器",
+      "hero.kicker":"马来西亚 · 柔佛新山 · 房地产投资与科技",
+      "hero.title":"连接房地产、科技<br>与投资机会",
+      "hero.lead":"光泰（KWONG THYE）立足柔佛新山，专注房地产投资、专业顾问与科技创新，为买家、业主与投资伙伴创造长期价值。",
+      "hero.cta1":"WhatsApp 咨询","hero.cta2":"了解核心业务",
+      "stat.1":"光泰地产成立","stat.2":"旗下公司","stat.3":"累计销售佣金","stat.4":"已完成项目平均 ROI",
+      "about.kicker":"关于光泰","about.title":"以专业与研究，发掘柔佛房地产的长期价值",
+      "about.sub":"Real Estate Investment · Property Advisory · Technology Innovation",
+      "about.p1":"光泰（Kwong Thye）是一家立足马来西亚柔佛新山，专注于房地产投资、房地产顾问服务及科技创新的综合房地产企业。",
+      "about.p2":"光泰地产（Kwong Thye Realty Consultancy Sdn Bhd）成立于 2021 年，业务涵盖住宅、商业及工业房地产销售、市场分析与投资咨询。2025 年成立 Kwong Thye Development Sdn Bhd，拓展房地产收购、资产增值、翻新转售及投资合作业务。",
+      "about.p3":"凭借多年柔佛房地产市场经验，我们持续发掘具投资潜力的项目，通过市场研究、资金规划及项目执行，为客户与投资伙伴创造长期价值。同时积极发展房地产科技（PropTech），以投资分析工具、AI 广告制作、房源配对及资料管理平台提升行业效率。",
+      "about.p4":"我们的长期目标，是打造一个结合房地产投资、科技工具及市场资源的综合生态平台，连接代理、买家、卖家与投资者。",
+      "about.co1":"房地产销售 · 市场分析 · 投资顾问","about.co2":"房地产收购 · 资产增值 · 翻新转售 · 投资合作",
+      "about.pos":"房地产投资 · 专业顾问 · 科技创新",
+      "about.tagline":"Connecting Properties, Technology & Investment Opportunities.",
+      "biz.kicker":"核心业务","biz.title":"四项核心业务，覆盖房地产全周期",
+      "biz.sub":"从销售顾问、投资开发、投资合作到科技平台，形成完整的房地产生态。",
+      "biz.1.title":"房地产销售与顾问","biz.1.p":"专注柔佛房地产市场，为个人买家、业主及投资者提供销售与咨询服务，结合市场趋势、物业价值与客户需求，寻找合适的房地产机会。",
+      "biz.1.a":"住宅房地产","biz.1.b":"商业房地产","biz.1.c":"工业房地产","biz.1.d":"销售与营销","biz.1.e":"市场分析","biz.1.f":"投资咨询","biz.1.g":"买卖策略顾问",
+      "biz.2.title":"房地产投资与开发","biz.2.p":"通过 Kwong Thye Development Sdn Bhd，专注物业收购、资产增值及项目开发，以策略性收购、翻新改善、出租管理及适时出售实现资产增值。",
+      "biz.2.a":"短期转售","biz.2.b":"翻新转售","biz.2.c":"持有及出售","biz.2.d":"长期出租投资","biz.2.e":"房地产开发",
+      "biz.3.title":"房地产投资合作","biz.3.p":"结合市场经验、项目资源与投资伙伴的资金优势，共同探索具潜力的投资机会，并以透明机制与审慎风险评估建立长期合作。",
+      "biz.3.a":"投资机会发掘","biz.3.b":"可行性分析","biz.3.c":"投资结构规划","biz.3.d":"收购协调","biz.3.e":"项目执行与增值","biz.3.f":"表现跟进","biz.3.g":"退出策略",
+      "biz.4.title":"房地产科技","biz.4.p":"面向代理、买家与投资者的数字化工具，简化工作流程、提高信息透明度，让客户、房源与交易机会管理更高效。",
+      "biz.4.a":"投资分析计算器","biz.4.b":"AI 广告视频","biz.4.c":"智能房源配对","biz.4.d":"房地产资料库",
+      "tech.kicker":"房地产科技","tech.title":"用科技，让房地产交易与投资分析更透明",
+      "tech.sub":"以更智能的工具、更清晰的数据及更高效的流程，赋能房地产从业者。",
+      "tech.1.title":"房地产投资分析计算器","tech.live":"已上线",
+      "tech.1.p":"简洁实用的投资分析工具，协助评估购房成本、贷款融资、租金收入与费用、现金流、投资回报率、出售收益及持有年限。",
+      "tech.2.title":"AI 房地产广告视频","tech.soon":"规划中",
+      "tech.2.p":"利用人工智能快速制作房源推广视频与营销内容，降低传统广告制作的时间与成本。",
+      "tech.3.title":"智能房源配对","tech.soon2":"规划中",
+      "tech.3.p":"建立房源与客户需求的配对系统，协助代理更有效连接潜在买家、卖家与合适物业。",
+      "tech.4.title":"房地产资料库与管理","tech.soon3":"规划中",
+      "tech.4.p":"集中式房地产资料管理，整理房源、客户需求与市场信息，提高查找与协作效率。",
+      "band.title":"3 分钟，算清一套房子的买入、持有与卖出回报",
+      "band.sub":"含律师费、印花税、估价费、贷款月供、年度费用、租金回报、RPGT 与出售利润，支持中英文与 PDF 报价单。",
+      "band.cta":"立即计算 →",
+      "founder.kicker":"创办人","founder.title":"Andy Lau 刘泌光",
+      "founder.sub":"Founder — Kwong Thye Realty Consultancy · Kwong Thye Development",
+      "founder.role1":"创办人 — 光泰地产","founder.role2":"创办人 — 光泰发展",
+      "founder.role3":"Group Leader — EAG Team, The Roof Properties & Development",
+      "founder.p1":"Andy Lau 刘泌光是一位专注马来西亚柔佛房地产市场的房地产顾问及投资者，拥有超过五年销售与投资实战经验。",
+      "founder.p2":"2021 年创立 Kwong Thye Realty Consultancy Sdn Bhd，专注房地产销售与投资顾问业务；2025 年进一步成立 Kwong Thye Development Sdn Bhd，拓展投资、收购、翻新转售及开发项目。",
+      "founder.p3":"他相信，成功的房地产投资必须建立在专业判断、市场研究、合理风险管理及长期信任之上。",
+      "founder.a1":"累计个人销售佣金","founder.a2":"已完成投资项目","founder.a3":"已完成项目累计净利润","founder.a4":"已完成项目平均 ROI","founder.a5":"进行中投资项目","founder.a6":"进行中项目预计净利润",
+      "founder.r1":"2022 The Roof Realty 全国排名第 68","founder.r2":"2023 The Roof Realty 全国排名第 49","founder.r3":"2024 The MMA Million-Dollar Club","founder.r4":"《南洋商报》房地产专题分享",
+      "values.kicker":"愿景 · 使命 · 价值","values.title":"打造连接房地产投资、科技与市场资源的生态平台",
+      "values.sub":"以专业市场研究、审慎投资策略与持续科技创新，为客户、从业者及合作伙伴创造长期价值。",
+      "values.1":"专业","values.1p":"以市场研究、数据分析及实际经验作为决策基础。",
+      "values.2":"诚信","values.2p":"重视透明沟通、专业操守及长期合作关系。",
+      "values.3":"创新","values.3p":"持续探索科技与房地产行业的结合。",
+      "values.4":"合作","values.4p":"连接不同参与者，促进资源整合与合作机会。",
+      "values.5":"长期价值","values.5p":"重视可持续发展与审慎投资管理。",
+      "contact.kicker":"联系我们","contact.title":"欢迎洽谈房地产销售、投资合作与科技平台",
+      "contact.market":"主要市场","contact.marketv":"马来西亚 · 柔佛新山","contact.phone":"电话 / WhatsApp",
+      "contact.web":"网站","contact.calc":"投资计算器",
+      "contact.e1":"房地产销售与顾问","contact.e2":"房地产投资机会","contact.e3":"房地产投资合作","contact.e4":"房地产科技方案与合作",
+      "contact.co1":"房地产销售 · 市场分析 · 投资顾问","contact.co2":"房地产收购 · 资产增值 · 翻新转售",
+      "contact.cta":"WhatsApp 直接联系",
+      "footer.addr":"马来西亚柔佛新山 · 房地产投资 · 专业顾问 · 科技创新",
+      "footer.tag":"Connecting Properties, Technology & Investment Opportunities.",
+      "footer.disclaimer":"Kwong Thye 通过旗下各公司经营相关房地产业务。房地产投资涉及财务、市场、融资及流动性风险；历史投资成果不代表未来表现。所有投资机会、项目预测及合作安排均须经独立评估，并受适用监管要求及正式协议约束。开发中的房地产科技产品将分阶段推出，实际可用性以平台公布为准。"
     },
     en: {
-      appName: "Property Investment Calculator", beta: "v0.1 beta",
-      appSub: "Buy → Hold 1–5 yrs → Sell · All amounts in RM",
-      legendFill: "✍️ Manual · ⚙️ Auto",
-      p1Title: "Part 1 · Purchase (one-time outlay)",
-      fSpa: "SPA Price", fActual: "Actual Purchase Price", fLoan: "Loan Amount", fRate: "Interest Rate", fTenure: "Loan Tenure",
-      unitYears: "yr", fPmt: "Monthly Instalment (equal)",
-      fSpaFee: "SPA Legal Fee (legal + stamp duty + misc + 8% SST)", fLaFee: "Loan Agreement Legal Fee (legal + stamp duty + misc + 8% SST)",
-      fVal: "Property Valuation Fee (SPA × 0.2% + 500 misc)",
-      fAgent: "Agent Fee", fConsent: "Consent Fee (if any)", fOther: "Other Expenses",
-      lawNote: "⚠️ Estimate only — based on lawyer final. You may also type over any fee (turns orange); clear it to restore auto.",
-      lInitial: "Total One-time Outlay", lAcqTotal: "Total Acquisition Costs", lDown: "Down Payment (actual − loan)", lCashback: "Less: Excess Loan Proceeds / Cashback", lUpfront: "Total Upfront Cash Required",
-      p2Title: "Part 2 · Annual Holding Costs",
-      fMgmt: "Management Fee (monthly)", fQuit: "Quit Rent (yearly)", fAssess: "Assessment Tax (yearly)",
-      fRepair: "Renovation / Repair (yearly)", fInsur: "Insurance (yearly, optional)", fRentAgent: "Rental Agent Fee (yearly)", fSellAgent: "Agent Fee (default 2% of expected price)",
-      fSellLegal: "Legal Fee (legal + stamp duty + misc + 8% SST, default 5,000)", fSellMisc: "Selling Miscellaneous Expenses",
-      lSellCostHead: "Selling related cost:", lTotalSellCosts: "Total Selling Costs (agent + legal + misc + RPGT)", lSellingProfit: "Selling Profit (gross capital gain − total selling costs)", lSellingReturn: "Selling Return (selling profit ÷ upfront cash ÷ years)",
-      lNetInvProfit: "Net Investment Profit ① + ② (total rental profit + selling profit)", lTotalRoi: "Total ROI (net investment profit ÷ upfront cash ÷ years)", lTotalCost: "Total Cost (actual price + acquisition costs + selling costs)", lRotc: "Return on Total Cost (net investment profit ÷ total cost ÷ years)",
-      fMInt: "Monthly Bank Interest (average, auto)", fYCost: "Total Annual Cost (Yr 1, auto)",
-      p2Note: "Note: interest uses the average method (loan × rate ÷ 12); actual equal-instalment interest decreases slightly with balance — bank statement prevails. Selling legal fee and RPGT are added automatically at sale (see Part 3).",
-      p3Title: "Part 3 · Investment Returns", p3aTitle: "① Keep & Rent", p3bTitle: "② Sell Property",
-      fRent: "Annual Rental Income", fSell: "Expected Selling Price", fHold: "Holding Period",
-      lSellPriceShow: "Expected Selling Price", lCashIn: "Total Upfront Cash Required", lLessHead: "Less (deduct):", lLessActual: "Actual Purchase Price", lLessAcq: "Total Acquisition Costs", lGrossGain: "Gross Capital Gain (before selling costs)", lQuick: "Annual Profit (gross ÷ cash ÷ years)",
-      noteQuick: "↑ Quick method. “After all costs” below also deducts: loan interest, selling agent/legal fees, RPGT, rental.",
-      lNetY: "Annual Rental Profit (rent − annual costs, incl. interest)", lHoldAnnual: "Annual Rental Return (rental profit ÷ upfront cash)", lTotalRentalProfit: "Total Rental Profit (annual rental profit × years)",
-      noteHold: "↑ Holding-only method: yearly rent minus Part 2 annual costs (incl. monthly bank interest) = profit. Year-by-year details in the table below.",
-      lProfit: "Net Cash Profit (full basis)", lBal: "Loan Balance at Sale",
-      lSellCosts: "Total Selling Costs (agent + legal + RPGT)", rpgtLine: "RPGT (hold {y} yr = {p}%)", rpgtEmpty: "RPGT (select holding period first)",
-      lCoc: "Cash-on-Cash (full)", lTcr: "Net Cash Return on Capital", lXirr: "Annual Rate (XIRR, full)",
-      thYear: "Year", thBal: "Balance", thInt: "Interest", thCost: "Costs", thNet: "Net Profit", thRpgt: "RPGT",
-      yearRow: "Year {y}", xirrNA: "n/a",
-      btnDemo: "Fill Example (SPA 1M / actual 800k / loan 800k / sell 900k after 1 yr)", btnReset: "Clear",
-      exportTitle: "Export / Share",
-      acctTitle: "My Account", fEmail: "Email", fPassword: "Password", btnLogin: "Log In", btnRegister: "Sign Up", btnLoginShort: "Log in",
-      acctNote: "Log in to save plans to the cloud (3 free); local saving still works without an account.",
-      acctEmailLabel: "Email", acctPlanLabel: "Plan", acctExpiry: "Expires", btnLogout: "Log Out",
-      fCode: "Activation code", btnRedeem: "Activate / Renew", proNote: "Pro RM 50/year: unlimited saved plans. Enter your activation code after payment to activate or renew.",
-      toastRedeemed: "{n} days of Pro activated", errCode: "Invalid or already-used code",
-      planFree: "Free", planPro: "Pro", planUnlimited: "plans (unlimited)",
-      errEmail: "Please enter a valid email", errPassword: "Password must be at least 8 characters", errExists: "This email is already registered", errLogin: "Wrong email or password",
-      errRate: "Too many attempts, try again later", errQuota: "Free plan allows 3 saved plans", errGeneric: "Network error, please retry",
-      toastLoginOk: "Logged in", toastRegisterOk: "Account created", toastLogout: "Logged out",
-      toolTitle: "Saved Plans / Share", fPlanName: "Plan Name", phPlanName: "e.g. Bukit Jalil Condo A",
-      btnSavePlan: "💾 Save Plan", btnShareLink: "🔗 Copy Share Link",
-      fPlanList: "Saved Plans", optPick: "(select a saved plan)", optNone: "(no saved plans yet)",
-      btnLoad: "Load", btnDelete: "Delete", btnExport: "Export JSON", btnImport: "Import JSON",
-      companyTitle: "Company Header (for print)", fCompany: "Company / Agency", fPerson: "Negotiator", fRen: "REN No. (optional)", fPhone: "Phone / WhatsApp", fEmailCo: "Email (optional)", fAddress: "Office address (optional)", fCustomer: "Client name", fProject: "Project / Property", btnSaveCo: "Save Header",
-      planNote: "💾 Plans are stored in this browser only. Use Export / Import JSON when changing device or domain.",
-      planModeLocal: "💾 Local storage (not logged in)", planModeCloud: "☁️ Cloud storage (logged in, synced)",
-      planNoteCloud: "☁️ Logged in: plans are in the cloud — log in on any device. You can still export JSON as backup.",
-      confirmUpload: "Found {n} local plan(s). Upload them to the cloud?", toastUploaded: "{n} plan(s) uploaded to cloud",
-      toastCloudSaved: "Saved to cloud", toastCloudDeleted: "Deleted from cloud", errCloud: "Cloud failed — local data kept",
-      viewBannerText: "🔗 Shared estimate (read-only)", btnEditCopy: "Continue editing here", shareWx: "WeChat",
-      toastSaved: "Plan saved", toastLoaded: "Plan loaded", toastDeleted: "Plan deleted", toastNeedName: "Please name the plan first",
-      toastExported: "JSON exported", toastImported: "Imported", toastImportBad: "Invalid file — import failed",
-      toastLinkCopied: "Share link copied", toastCoSaved: "Company header saved", toastEditable: "Editable mode",
-      confirmDelete: "Delete this plan?", toastStorageFull: "Browser storage full — export and remove old plans",
-      printBtn: "🖨️ Export PDF / Print (Part 1 on page 1 · Parts 2+3 on page 2)",
-      shareNote: "WhatsApp / Facebook open directly. WeChat has no web share API — tapping WeChat copies the text; paste it in WeChat.",
-      copyOk: "Copied — paste it in WeChat",
-      shareTpl: "Property calc | SPA {spa} · Actual {actual} · Loan {loan} · Rent {rent}/yr → Holding {hold} · Sale {quick} (estimate) | {url}",
-      footer: "⚠️ Legal fees / stamp duty follow statutory rates; RPGT is an estimate (30/20/15/0); interest is equal-instalment. Actual amounts follow lawyer quotes, bank settlement and LHDN. This calculator is not legal or tax advice."
+      "nav.about":"About","nav.biz":"Business","nav.tech":"Technology","nav.founder":"Founder","nav.contact":"Contact","nav.calc":"Calculator",
+      "hero.kicker":"Johor Bahru, Malaysia · Real Estate Investment & Technology",
+      "hero.title":"Connecting Properties, Technology<br>& Investment Opportunities",
+      "hero.lead":"KWONG THYE is a Johor Bahru–based real estate group focused on property investment, professional advisory and technology — creating long-term value for buyers, owners and investment partners.",
+      "hero.cta1":"WhatsApp Us","hero.cta2":"Explore Our Business",
+      "stat.1":"Realty founded","stat.2":"Group companies","stat.3":"Cumulative sales commission","stat.4":"Average ROI, completed projects",
+      "about.kicker":"About KWONG THYE","about.title":"Long-term value in Johor real estate, built on research and discipline",
+      "about.sub":"Real Estate Investment · Property Advisory · Technology Innovation",
+      "about.p1":"KWONG THYE is an integrated real estate company based in Johor Bahru, Malaysia, focused on property investment, real estate advisory and technology innovation.",
+      "about.p2":"Kwong Thye Realty Consultancy Sdn Bhd was established in 2021, covering residential, commercial and industrial property sales, market analysis and investment advisory. In 2025, Kwong Thye Development Sdn Bhd was formed to expand into acquisitions, asset enhancement, renovation-resale and investment partnerships.",
+      "about.p3":"With years of Johor market experience, we identify properties with investment potential and create long-term value through market research, funding planning and project execution. We are also developing PropTech tools — investment analytics, AI marketing videos, property matching and data management — to raise industry efficiency.",
+      "about.p4":"Our long-term goal is an integrated ecosystem connecting property investment, technology and market resources — linking agents, buyers, sellers and investors.",
+      "about.co1":"Property sales · Market analysis · Investment advisory","about.co2":"Acquisition · Asset enhancement · Renovation-resale · Partnerships",
+      "about.pos":"Real Estate Investment · Property Advisory · Technology Innovation",
+      "about.tagline":"Connecting Properties, Technology & Investment Opportunities.",
+      "biz.kicker":"Our Core Businesses","biz.title":"Four core businesses across the property lifecycle",
+      "biz.sub":"From sales advisory and investment development to partnerships and technology — a complete real estate ecosystem.",
+      "biz.1.title":"Property Sales & Advisory","biz.1.p":"Focused on the Johor market, we advise individual buyers, owners and investors — combining market trends, property value and client needs to identify the right opportunities.",
+      "biz.1.a":"Residential","biz.1.b":"Commercial","biz.1.c":"Industrial","biz.1.d":"Sales & marketing","biz.1.e":"Market analysis","biz.1.f":"Investment advisory","biz.1.g":"Acquisition & disposal advisory",
+      "biz.2.title":"Property Investment & Development","biz.2.p":"Through Kwong Thye Development Sdn Bhd, we focus on acquisitions, asset enhancement and development — creating value through strategic purchase, renovation, rental management and timely exit.",
+      "biz.2.a":"Property flipping","biz.2.b":"Renovation & resale","biz.2.c":"Buy, hold & sell","biz.2.d":"Buy-to-let","biz.2.e":"Property development",
+      "biz.3.title":"Property Investment Partnerships","biz.3.p":"We combine market experience and project resources with partners' capital to pursue promising opportunities — built on transparency, prudent risk assessment and long-term relationships.",
+      "biz.3.a":"Opportunity identification","biz.3.b":"Feasibility analysis","biz.3.c":"Investment structuring","biz.3.d":"Acquisition coordination","biz.3.e":"Execution & asset enhancement","biz.3.f":"Performance monitoring","biz.3.g":"Exit strategy",
+      "biz.4.title":"Property Technology","biz.4.p":"Digital tools for agents, buyers and investors — simplifying workflows, improving transparency and making clients, listings and deals easier to manage.",
+      "biz.4.a":"Investment calculator","biz.4.b":"AI video","biz.4.c":"Smart matching","biz.4.d":"Property database",
+      "tech.kicker":"PropTech","tech.title":"Technology that makes property deals and investment analysis clearer",
+      "tech.sub":"Empowering real estate professionals with smarter tools, better data and more efficient workflows.",
+      "tech.1.title":"Property Investment Calculator","tech.live":"Live",
+      "tech.1.p":"A practical tool to assess acquisition costs, financing, rental income and expenses, cash flow, ROI, selling profit and holding period.",
+      "tech.2.title":"AI Property Video Generator","tech.soon":"In planning",
+      "tech.2.p":"AI-assisted listing videos and marketing content — reducing the time and cost of traditional production.",
+      "tech.3.title":"Smart Property Matching","tech.soon2":"In planning",
+      "tech.3.p":"A matching system connecting listings with buyer requirements, helping agents link buyers, sellers and the right properties.",
+      "tech.4.title":"Property Database & Management","tech.soon3":"In planning",
+      "tech.4.p":"Centralised property data management — listings, client needs and market information, for faster search and collaboration.",
+      "band.title":"In 3 minutes, understand the buy, hold and sell returns of a property",
+      "band.sub":"Legal fees, stamp duty, valuation, loan instalments, annual costs, rental yield, RPGT and selling profit — bilingual, with PDF quotation.",
+      "band.cta":"Start calculating →",
+      "founder.kicker":"Founder","founder.title":"Andy Lau Pik Kwong",
+      "founder.sub":"Founder — Kwong Thye Realty Consultancy · Kwong Thye Development",
+      "founder.role1":"Founder — Kwong Thye Realty","founder.role2":"Founder — Kwong Thye Development",
+      "founder.role3":"Group Leader — EAG Team, The Roof Properties & Development",
+      "founder.p1":"Andy Lau is a real estate adviser and investor focused on the Johor Bahru market, with over five years of sales and investment experience.",
+      "founder.p2":"He founded Kwong Thye Realty Consultancy Sdn Bhd in 2021 and Kwong Thye Development Sdn Bhd in 2025, expanding into investment, acquisition, renovation-resale and development.",
+      "founder.p3":"He believes successful property investment rests on professional judgement, market research, prudent risk management and long-term trust.",
+      "founder.a1":"Cumulative sales commission","founder.a2":"Completed investment projects","founder.a3":"Total net profit, completed projects","founder.a4":"Average ROI, completed projects","founder.a5":"Ongoing investment projects","founder.a6":"Projected net profit, ongoing projects",
+      "founder.r1":"2022 The Roof Realty — National No. 68","founder.r2":"2023 The Roof Realty — National No. 49","founder.r3":"2024 The MMA Million-Dollar Club","founder.r4":"Featured in Nanyang Siang Pau",
+      "values.kicker":"Vision · Mission · Values","values.title":"An ecosystem connecting property investment, technology and market resources",
+      "values.sub":"Creating long-term value for clients, professionals and partners through market insight, prudent strategy and continuous innovation.",
+      "values.1":"Professionalism","values.1p":"Decisions grounded in market research, data and hands-on experience.",
+      "values.2":"Integrity","values.2p":"Transparent communication, professional conduct and long-term relationships.",
+      "values.3":"Innovation","values.3p":"Continuously exploring the intersection of technology and real estate.",
+      "values.4":"Collaboration","values.4p":"Connecting market participants and integrating resources.",
+      "values.5":"Long-Term Value","values.5p":"Sustainable growth and prudent investment management.",
+      "contact.kicker":"Contact Us","contact.title":"Let's talk about property sales, investment partnerships and PropTech",
+      "contact.market":"Primary market","contact.marketv":"Johor Bahru, Johor, Malaysia","contact.phone":"Phone / WhatsApp",
+      "contact.web":"Website","contact.calc":"Calculator",
+      "contact.e1":"Property sales & advisory","contact.e2":"Property investment opportunities","contact.e3":"Property investment partnerships","contact.e4":"PropTech solutions & collaboration",
+      "contact.co1":"Property sales · Market analysis · Investment advisory","contact.co2":"Acquisition · Asset enhancement · Renovation-resale",
+      "contact.cta":"Chat on WhatsApp",
+      "footer.addr":"Johor Bahru, Malaysia · Real Estate Investment · Advisory · Technology",
+      "footer.tag":"Connecting Properties, Technology & Investment Opportunities.",
+      "footer.disclaimer":"Kwong Thye operates across property-related business activities through its respective companies. Property investment involves financial, market, financing and liquidity risks; historical results do not guarantee future performance. All investment opportunities, projections and partnership arrangements are subject to independent assessment, applicable regulatory requirements and formal agreements. PropTech products under development may be introduced progressively and are subject to availability."
     }
   };
-  var LANG_KEY = "fangchan_lang";
   var lang = "zh";
-  try { lang = localStorage.getItem(LANG_KEY) || "zh"; } catch (e) {}
-  var lastInp = null, lastRes = null;
-  function t(key) { return I18N[lang][key] || key; }
-  function fmt(key, vars) {
-    var s = t(key);
-    for (var k in vars) s = s.split("{" + k + "}").join(vars[k]);
-    return s;
-  }
-  function applyLang() {
+  try { lang = localStorage.getItem("kwongthye_lang") || "zh"; } catch (e) {}
+  function apply() {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-    document.title = t("appName") + " v0.1";
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
-      el.textContent = t(el.getAttribute("data-i18n"));
+      var k = el.getAttribute("data-i18n");
+      var v = I18N[lang][k];
+      if (v == null) return;
+      if (v.indexOf("<br>") >= 0) el.innerHTML = v; else el.textContent = v;
     });
-    $("langBtn").textContent = lang === "zh" ? "EN" : "中文";
-    if ($("planName")) $("planName").placeholder = lang === "zh" ? "方案名称（例：Bukit Jalil A）" : "Plan name (e.g. Bukit Jalil A)";
-    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
-    document.querySelectorAll(".printdate").forEach(function (el) {
-      el.textContent = new Date().toLocaleDateString(lang === "zh" ? "zh-CN" : "en-MY");
-    });
-    var hv = $("hold").value;
-    var hyv = parseInt(hv, 10);
-    $("rpgtLabel").textContent = hyv >= 1 ? fmt("rpgtLine", { y: hyv, p: Math.round(Calc.rpgtRate(hyv) * 100) }) : t("rpgtEmpty");
-    // 动态文案（由 JS 写入、没有 data-i18n 的元素）
-    if ($("acctBtnTxt") && !logged) {
-      $("acctBtnTxt").textContent = t("btnLoginShort");
-      $("acctBtn").title = t("acctTitle");
-    }
-    if ($("planMode")) {
-      $("planMode").textContent = logged ? t("planModeCloud") : t("planModeLocal");
-      $("planNote").textContent = logged ? t("planNoteCloud") : t("planNote");
-    }
-    recalc(); // re-render dynamic strings (RPGT line / year table / xirr fallback)
+    document.getElementById("langBtn").textContent = lang === "zh" ? "EN" : "中文";
+    document.title = lang === "zh"
+      ? "KWONG THYE 光泰 | 房地产投资 · 专业顾问 · 科技创新"
+      : "KWONG THYE | Real Estate Investment · Property Advisory · PropTech";
+    try { localStorage.setItem("kwongthye_lang", lang); } catch (e) {}
   }
-
-  var fmtRM = function (x) {
-    if (x == null || isNaN(x)) return "—";
-    var neg = x < 0;
-    var s = Math.abs(x).toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return (neg ? "−" : "") + "RM " + s;
-  };
-  var pct = function (x) {
-    if (x == null || isNaN(x)) return "—";
-    return (x * 100).toFixed(2) + "%";
-  };
-  var num = function (id) {
-    var v = parseFloat(String($(id).value).replace(/,/g, ""));
-    return isNaN(v) ? 0 : v;
-  };
-  var set = function (id, v) {
-    $(id).value = (v == null || isNaN(v)) ? "" : Number(v).toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
-  // 西式数字格式：500,000.00（输入时实时加千分位，失焦补 .00）
-  var moneyRaw = function (v) { return String(v).replace(/[^0-9.]/g, ""); };
-  var moneyLive = function (v) {
-    var s = moneyRaw(v);
-    if (s === "") return "";
-    if (s === ".") return "0.";
-    var parts = s.split(".");
-    var out = parts[0].replace(/^0+(?=\d)/, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    if (parts.length > 1) out += "." + parts[1].slice(0, 2);
-    return out;
-  };
-  var moneyBlur = function (v) {
-    var s = moneyRaw(v);
-    if (s === "") return "";
-    var n = parseFloat(s);
-    if (isNaN(n)) return "";
-    return n.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
-  function clearResults() {
-    ["initial", "acqTotal", "down", "cashback", "sellPriceShow", "lessActual", "lessAcq", "gross", "netY", "holdAnnual", "totalRentalProfit", "totalSellCosts", "sellingProfit", "sellingReturn", "netInvestProfit", "totalRoi", "totalCost", "rotc", "rpgtVal"].forEach(function (id) {
-      var el = $(id); el.textContent = "—"; el.style.color = "";
-      if (el.classList) el.className = "";
-    });
-    ["pmt", "spaFee", "laFee", "valFee", "sellAgent", "sellLegal", "mInt", "yCost"].forEach(function (id) { $(id).value = ""; });
-    Object.keys(autoManual).forEach(function (k) { autoManual[k] = false; });
-    ["sellAgent", "sellLegal"].forEach(function (id) { $(id).classList.remove("override"); });
-    ["spaFee", "laFee", "valFee"].forEach(function (id) { $(id).classList.remove("override"); });
-    $("yearTable").querySelector("tbody").innerHTML = "";
-    var hv = $("hold").value;
-    var hyv = parseInt(hv, 10);
-    $("rpgtLabel").textContent = hyv >= 1 ? fmt("rpgtLine", { y: hyv, p: Math.round(Calc.rpgtRate(hyv) * 100) }) : t("rpgtEmpty");
-  }
-
-  function recalc() {
-    if (!autoManual.sellAgent) set("sellAgent", num("sell") * 0.02);
-    if (!autoManual.sellLegal) set("sellLegal", 5000);
-    var tenureRaw = parseInt($("tenure").value, 10);
-    var holdRaw = parseInt($("hold").value, 10);
-    var inp = {
-      spa: num("spa"), actual: num("actual"), loan: num("loan"),
-      ratePct: num("rate"), yearsLoan: tenureRaw >= 1 ? tenureRaw : 30,
-      agentFee: num("agent"), consentFee: num("consent"), other: num("other"),
-      mgmtM: num("mgmt"), quitY: num("quit"), assessY: num("assess"),
-      repairY: num("repair"), insurY: num("insur"), rentAgentY: num("rentAgent"),
-      sellAgentFee: num("sellAgent"), sellLegalFee: num("sellLegal"), sellMisc: num("sellMisc"),
-      rentY: num("rent"), sellPrice: num("sell"),
-      holdYears: holdRaw >= 1 ? holdRaw : 1,
-      spaFeeOverride: autoManual.spaFee ? num("spaFee") : null,
-      laFeeOverride: autoManual.laFee ? num("laFee") : null,
-      valFeeOverride: autoManual.valFee ? num("valFee") : null
-    };
-    if (inp.spa <= 0 || inp.actual <= 0 || inp.loan <= 0 || $("rate").value.trim() === "" || !(tenureRaw >= 1)) { clearResults(); return; }
-    var r = Calc.compute(inp);
-    lastInp = inp;
-    lastRes = r;
-
-    set("pmt", r.part1.pmt);
-    if (!autoManual.spaFee) set("spaFee", r.part1.spa.total);
-    if (!autoManual.laFee) set("laFee", r.part1.la.total);
-    if (!autoManual.valFee) set("valFee", r.part1.valuation);
-    $("acqTotal").textContent = fmtRM(r.part1.purchaseCosts);
-    $("initial").textContent = fmtRM(r.part1.initial);
-    $("down").textContent = fmtRM(r.part1.downpayment);
-    $("cashback").textContent = fmtRM(-r.part1.cashback);
-
-    set("mInt", r.part2.firstYearMonthlyInterest);
-    set("yCost", r.part2.mgmtY + r.part2.fixedY + r.part2.firstYearInterest);
-
-    var last = r.years[r.years.length - 1];
-    var holdSelected = !isNaN(holdRaw) && holdRaw >= 1;
-    $("sellPriceShow").textContent = fmtRM(inp.sellPrice);
-    $("lessActual").textContent = fmtRM(inp.actual);
-    $("lessAcq").textContent = fmtRM(r.part1.purchaseCosts);
-    var gg = $("gross");
-    gg.textContent = fmtRM(r.out.grossProfit);
-    gg.style.color = r.out.grossProfit < 0 ? "var(--red)" : "var(--green)";
-    $("netY").textContent = fmtRM(r.years[0].netY);
-    $("netY").className = r.years[0].netY < 0 ? "neg" : "";
-    var ha = $("holdAnnual");
-    ha.textContent = pct(r.out.holdingAnnual);
-    ha.style.color = r.out.holdingAnnual < 0 ? "var(--red)" : "var(--green)";
-    var trp = $("totalRentalProfit");
-    trp.textContent = holdSelected ? fmtRM(r.out.totalRentalProfit) : "—";
-    trp.style.color = holdSelected && r.out.totalRentalProfit < 0 ? "var(--red)" : "";
-
-    var saleIds = ["totalSellCosts", "sellingProfit", "sellingReturn", "netInvestProfit", "totalRoi", "totalCost", "rotc", "rpgtVal"];
-    if (!holdSelected) {
-      saleIds.forEach(function (id) { var el = $(id); el.textContent = "—"; el.style.color = ""; });
-      $("rpgtLabel").textContent = t("rpgtEmpty");
-    } else {
-      var sp = $("sellingProfit");
-      sp.textContent = fmtRM(r.out.sellingProfit);
-      sp.style.color = r.out.sellingProfit < 0 ? "var(--red)" : "var(--green)";
-      var sr = $("sellingReturn");
-      sr.textContent = pct(r.out.sellingReturn);
-      sr.style.color = r.out.sellingReturn < 0 ? "var(--red)" : "var(--green)";
-      var nip = $("netInvestProfit");
-      nip.textContent = fmtRM(r.out.netInvestmentProfit);
-      nip.style.color = r.out.netInvestmentProfit < 0 ? "var(--red)" : "var(--green)";
-      var roi = $("totalRoi");
-      roi.textContent = pct(r.out.totalROI);
-      roi.style.color = r.out.totalROI < 0 ? "var(--red)" : "var(--green)";
-      $("totalCost").textContent = fmtRM(r.out.totalCost);
-      $("rotc").textContent = pct(r.out.returnOnTotalCost);
-      $("totalSellCosts").textContent = fmtRM(r.sale.sellCosts);
-      $("rpgtLabel").textContent = fmt("rpgtLine", { y: inp.holdYears, p: Math.round(r.sale.rpgt.rate * 100) });
-      $("rpgtVal").textContent = moneyBlur(String(r.sale.rpgt.tax));
-    }
-
-    var tb = $("yearTable").querySelector("tbody");
-    tb.innerHTML = "";
-    r.years.forEach(function (row) {
-      var tr = document.createElement("tr");
-      tr.innerHTML = "<td>" + fmt("yearRow", { y: row.y }) + "</td><td>" + fmtRM(row.balance) + "</td><td>" + fmtRM(row.interestYear) +
-        "</td><td>" + fmtRM(row.costY) + "</td><td>" + fmtRM(row.netY) + "</td><td>" +
-        Math.round(row.rpgtPct * 100) + "%</td>";
-      tb.appendChild(tr);
-    });
-  }
-
-  document.querySelectorAll("input, select").forEach(function (el) {
-    if (el.id === "loan" || el.id === "loanPct" || el.id === "spa" || el.id === "spaFee" || el.id === "laFee" || el.id === "valFee" || el.id === "sellAgent" || el.id === "sellLegal") return;
-    el.addEventListener("input", recalc);
-    el.addEventListener("change", recalc);
-  });
-
-  // 律师费/估价费：默认自动；手动改 = 覆盖（橙色）；清空 = 恢复自动
-  var autoManual = { spaFee: false, laFee: false, valFee: false, sellAgent: false, sellLegal: false };
-  // 自动格：编辑中不回填（可自由删改）；离开时仍为空 → 恢复自动值；有数字 → 视为手动覆盖
-  ["spaFee", "laFee", "valFee", "sellAgent", "sellLegal"].forEach(function (id) {
-    var el = $(id);
-    el.addEventListener("input", function () {
-      autoManual[id] = true;
-      el.classList.toggle("override", el.value.trim() !== "");
-      recalc();
-    });
-    el.addEventListener("blur", function () {
-      if (el.value.trim() === "") {
-        autoManual[id] = false;
-        el.classList.remove("override");
-        recalc();
-      }
-    });
-  });
-
-  // 西式数字格式输入处理（千分位 + 两位小数）
-  document.querySelectorAll("input.money").forEach(function (el) {
-    el.addEventListener("focus", function () { el.value = moneyRaw(el.value); });
-    el.addEventListener("input", function () { el.value = moneyLive(el.value); });
-    el.addEventListener("blur", function () { el.value = moneyBlur(el.value); });
-  });
-
-  // 贷款 %：% × SPA 自动算出贷款额；也可直接在贷款格手填（手填会清掉 %）
-  var autoFilling = false;
-  var loanFromPct = false;
-  $("loanPct").addEventListener("input", function () {
-    var p = num("loanPct");
-    loanFromPct = p > 0;
-    if (p > 0 && num("spa") > 0) {
-      autoFilling = true;
-      $("loan").value = moneyBlur(String(Math.round(num("spa") * p / 100)));
-      autoFilling = false;
-    }
-    recalc();
-  });
-  $("loan").addEventListener("input", function () {
-    if (!autoFilling) {
-      loanFromPct = false;
-      $("loanPct").value = "";
-    }
-    recalc();
-  });
-  $("spa").addEventListener("input", function () {
-    if (loanFromPct && num("loanPct") > 0 && num("spa") > 0) {
-      autoFilling = true;
-      $("loan").value = moneyBlur(String(Math.round(num("spa") * num("loanPct") / 100)));
-      autoFilling = false;
-    }
-    recalc();
-  });
-
-  $("langBtn").addEventListener("click", function () {
+  document.getElementById("langBtn").addEventListener("click", function () {
     lang = lang === "zh" ? "en" : "zh";
-    applyLang();
+    apply();
   });
+  var menu = document.getElementById("menuBtn");
+  var links = document.getElementById("navlinks");
+  menu.addEventListener("click", function () { links.classList.toggle("open"); });
+  links.addEventListener("click", function (e) { if (e.target.tagName === "A") links.classList.remove("open"); });
+  apply();
 
-  $("demo").addEventListener("click", function () {
-    var v = {
-      spa: 1000000, actual: 800000, loan: 800000, loanPct: "", rate: 4.5, tenure: "30",
-      agent: 0, consent: "", other: "",
-      mgmt: 0, quit: 0, assess: 0, repair: 0, insur: 0, rentAgent: "",
-      sellMisc: "", rent: 60000, sell: 900000, hold: "1"
-    };
-    Object.keys(v).forEach(function (k) { $(k).value = v[k]; });
-    document.querySelectorAll("input.money").forEach(function (el) { el.value = moneyBlur(el.value); });
-    loanFromPct = false;
-    Object.keys(autoManual).forEach(function (k) { autoManual[k] = false; });
-    ["spaFee", "laFee", "valFee", "sellAgent", "sellLegal"].forEach(function (id) { $(id).classList.remove("override"); });
-    recalc();
-  });
-  $("reset").addEventListener("click", function () {
-    document.querySelectorAll("input").forEach(function (el) { el.value = ""; });
-    $("tenure").value = ""; $("hold").value = "";
-    loanFromPct = false;
-    Object.keys(autoManual).forEach(function (k) { autoManual[k] = false; });
-    ["spaFee", "laFee", "valFee", "sellAgent", "sellLegal"].forEach(function (id) { $(id).classList.remove("override"); });
-    lastInp = null; lastRes = null;
-    clearResults();
-  });
-
-  // ---- 导出 PDF / 分享 ----
-  $("printBtn").addEventListener("click", function () { window.print(); });
-
-  var toastTimer = null;
-  function toast(msg) {
-    var el = $("toast");
-    el.textContent = msg;
-    el.style.opacity = "1";
-    if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { el.style.opacity = "0"; }, 2200);
+  // 旧分享链接兼容：/?d=... → /calc/?d=...
+  if (location.search.indexOf("d=") >= 0) {
+    location.replace("/calc/" + location.search);
   }
-  function legacyCopy(txt) {
-    var ta = document.createElement("textarea");
-    ta.value = txt;
-    ta.style.position = "fixed";
-    ta.style.opacity = "0";
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand("copy"); } catch (e) {}
-    document.body.removeChild(ta);
-  }
-  function shareText() {
-    var url = location.href;
-    if (!lastRes) return t("appName") + "：" + url;
-    var holdSel = $("hold").value !== "";
-    return fmt("shareTpl", {
-      spa: moneyBlur(String(lastInp.spa)),
-      actual: moneyBlur(String(lastInp.actual)),
-      loan: moneyBlur(String(lastInp.loan)),
-      rent: moneyBlur(String(lastInp.rentY)),
-      hold: pct(lastRes.out.holdingAnnual),
-      quick: holdSel ? pct(lastRes.out.sellingReturn) : "—",
-      url: url
-    });
-  }
-  $("waBtn").addEventListener("click", function () {
-    window.open("https://wa.me/?text=" + encodeURIComponent(shareText()), "_blank");
-  });
-  $("fbBtn").addEventListener("click", function () {
-    window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(location.href) + "&quote=" + encodeURIComponent(shareText()), "_blank");
-  });
-  $("wxBtn").addEventListener("click", function () {
-    var txt = shareText();
-    var ok = function () { toast(t("copyOk")); };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(txt).then(ok, function () { legacyCopy(txt); ok(); });
-    } else {
-      legacyCopy(txt); ok();
-    }
-  });
-
-  // ================= Phase 1/2：存档 / 分享 / 公司抬头 =================
-  var PLAN_KEY = "fangchan_plans_v1";
-  var CO_KEY = "fangchan_company_v1";
-  var company = { name: "", person: "", ren: "", phone: "", email: "", address: "", client: "", project: "" };
-  try { var coSaved = JSON.parse(localStorage.getItem(CO_KEY) || "null"); if (coSaved) Object.assign(company, coSaved); } catch (e) {}
-
-  var STATE_FIELDS = ["spa", "actual", "loan", "loanPct", "rate", "tenure", "agent", "consent", "other",
-    "mgmt", "quit", "assess", "repair", "insur", "rentAgent", "sell", "hold", "rent", "sellAgent", "sellLegal", "sellMisc"];
-
-  function collectState() {
-    var d = {};
-    STATE_FIELDS.forEach(function (id) { if ($(id)) d[id] = $(id).value; });
-    return { v: 1, d: d, o: { spaFee: !!autoManual.spaFee, laFee: !!autoManual.laFee, valFee: !!autoManual.valFee, sellAgent: !!autoManual.sellAgent, sellLegal: !!autoManual.sellLegal } };
-  }
-  function applyState(st) {
-    if (!st || !st.d) return false;
-    STATE_FIELDS.forEach(function (id) { if ($(id) && st.d[id] != null) $(id).value = st.d[id]; });
-    Object.keys(autoManual).forEach(function (id) { autoManual[id] = !!(st.o && st.o[id]); });
-    ["spaFee", "laFee", "valFee", "sellAgent", "sellLegal"].forEach(function (id) { $(id).classList.toggle("override", !!autoManual[id]); });
-    document.querySelectorAll("input.money").forEach(function (el) { if (el.value.trim() !== "") el.value = moneyBlur(el.value); });
-    loanFromPct = false;
-    recalc();
-    return true;
-  }
-
-  function loadPlans() {
-    try { var v = JSON.parse(localStorage.getItem(PLAN_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; }
-  }
-  function persistPlans(list) {
-    try { localStorage.setItem(PLAN_KEY, JSON.stringify(list)); } catch (e) { toast(t("toastStorageFull")); }
-    renderPlanList();
-  }
-  var cloudPlans = [];
-  var logged = false;
-
-  function fillPlanSelect(items, sel) {
-    var el = $("planList");
-    el.innerHTML = "";
-    var o0 = document.createElement("option");
-    o0.value = "";
-    o0.textContent = items.length ? t("optPick") : t("optNone");
-    el.appendChild(o0);
-    items.forEach(function (p) {
-      var o = document.createElement("option");
-      o.value = p.value;
-      o.textContent = p.name + " · " + String(p.date || "").slice(0, 10);
-      el.appendChild(o);
-    });
-    if (sel) el.value = sel;
-    $("planMode").textContent = logged ? t("planModeCloud") : t("planModeLocal");
-    $("planNote").textContent = logged ? t("planNoteCloud") : t("planNote");
-  }
-
-  function renderLocalPlans(sel) {
-    fillPlanSelect(loadPlans().map(function (p) {
-      return { value: "l:" + p.id, name: p.name, date: p.updatedAt };
-    }), sel);
-  }
-
-  function renderCloudPlans(sel) {
-    fillPlanSelect(cloudPlans.map(function (p) {
-      return { value: "c:" + p.id, name: p.name, date: p.updated_at };
-    }), sel);
-  }
-
-  function refreshPlans(sel) {
-    if (!logged) { renderLocalPlans(sel); return Promise.resolve(); }
-    return api("/plans").then(function (j) {
-      if (j.ok) { cloudPlans = j.plans || []; renderCloudPlans(sel); }
-      else { renderLocalPlans(sel); }
-    }).catch(function () { renderLocalPlans(sel); });
-  }
-
-  function renderPlanList(sel) { refreshPlans(sel); }
-
-  function syncLocalToCloud() {
-    var local = loadPlans();
-    if (!local.length) return;
-    api("/plans").then(function (j) {
-      if (!j.ok || (j.plans && j.plans.length)) return;
-      if (!confirm(fmt("confirmUpload", { n: local.length }))) return;
-      api("/plans/import", { method: "POST", body: { plans: local.map(function (p) { return { name: p.name, payload: p.state }; }) } })
-        .then(function (r) {
-          if (r.ok) { toast(fmt("toastUploaded", { n: r.imported })); refreshPlans(); refreshMe(); }
-        });
-    }).catch(function () {});
-  }
-
-  $("savePlan").addEventListener("click", function () {
-    var name = $("planName").value.trim();
-    if (!name) { $("planName").focus(); toast(t("toastNeedName")); return; }
-    var st = collectState();
-    if (logged) {
-      api("/plans", { method: "POST", body: { name: name, payload: st } }).then(function (j) {
-        if (j.ok) { toast(t("toastCloudSaved")); refreshMe(); refreshPlans("c:" + j.plan.id); }
-        else if (j.error === "quota_exceeded") { toast(t("errQuota")); }
-        else { toast(errMsg(j.error)); }
-      }).catch(function () { toast(t("errCloud")); });
-      return;
-    }
-    var list = loadPlans(), now = new Date().toISOString();
-    var found = false;
-    list.forEach(function (p) { if (p.name === name) { p.state = st; p.updatedAt = now; found = true; } });
-    if (!found) list.push({ id: "p" + Date.now(), name: name, createdAt: now, updatedAt: now, state: st });
-    persistPlans(list);
-    renderPlanList("l:" + list[list.length - 1].id);
-    toast(t("toastSaved"));
-  });
-
-  $("loadPlan").addEventListener("click", function () {
-    var v = $("planList").value;
-    if (!v) return;
-    if (v.indexOf("c:") === 0) {
-      var p = cloudPlans.filter(function (x) { return "c:" + x.id === v; })[0];
-      if (!p) return;
-      if (applyState(p.payload)) { $("planName").value = p.name; toast(t("toastLoaded")); }
-      return;
-    }
-    var id = v.slice(2);
-    var lp = loadPlans().filter(function (x) { return x.id === id; })[0];
-    if (!lp) return;
-    if (applyState(lp.state)) { $("planName").value = lp.name; toast(t("toastLoaded")); }
-  });
-
-  $("delPlan").addEventListener("click", function () {
-    var v = $("planList").value;
-    if (!v) return;
-    if (!confirm(t("confirmDelete"))) return;
-    if (v.indexOf("c:") === 0) {
-      api("/plans/" + v.slice(2), { method: "DELETE" }).then(function (j) {
-        if (j.ok) { toast(t("toastCloudDeleted")); refreshMe(); refreshPlans(); }
-        else { toast(errMsg(j.error)); }
-      }).catch(function () { toast(t("errCloud")); });
-      return;
-    }
-    persistPlans(loadPlans().filter(function (x) { return x.id !== v.slice(2); }));
-    toast(t("toastDeleted"));
-  });
-
-  $("exportJson").addEventListener("click", function () {
-    var name = $("planName").value.trim() || "plan";
-    var payload = { name: name, exportedAt: new Date().toISOString(), state: collectState() };
-    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "fangchan-" + name.replace(/[^\w\u4e00-\u9fa5-]+/g, "_") + ".json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    toast(t("toastExported"));
-  });
-
-  $("importJson").addEventListener("click", function () { $("importFile").click(); });
-  $("importFile").addEventListener("change", function () {
-    var f = this.files && this.files[0];
-    if (!f) return;
-    var reader = new FileReader();
-    var self = this;
-    reader.onload = function () {
-      try {
-        var obj = JSON.parse(reader.result);
-        var st = (obj && obj.state) ? obj.state : obj;
-        if (st && st.d && applyState(st)) {
-          if (obj && obj.name) $("planName").value = obj.name;
-          toast(t("toastImported"));
-        } else { toast(t("toastImportBad")); }
-      } catch (e) { toast(t("toastImportBad")); }
-    };
-    reader.readAsText(f);
-    self.value = "";
-  });
-
-  function shareUrl() {
-    var base = location.origin + location.pathname.replace(/index\.html$/, "");
-    return base + "?d=" + Calc.encodeState(collectState());
-  }
-  $("shareLink").addEventListener("click", function () {
-    var url = shareUrl();
-    var ok = function () { toast(t("toastLinkCopied")); };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(ok, function () { legacyCopy(url); ok(); });
-    } else { legacyCopy(url); ok(); }
-    updatePrintHeader();
-  });
-
-  function setViewOnly(on) {
-    document.body.classList.toggle("view-only", !!on);
-    $("viewBanner").hidden = !on;
-    document.querySelectorAll("main input, main select, main button").forEach(function (el) {
-      if (el.id === "shareLink" || el.id === "editCopy" || el.id === "printBtn" || el.id === "waBtn" || el.id === "wxBtn" || el.id === "fbBtn") return;
-      el.disabled = !!on;
-    });
-  }
-  $("editCopy").addEventListener("click", function () {
-    history.replaceState(null, "", location.pathname);
-    setViewOnly(false);
-    recalc();
-    toast(t("toastEditable"));
-  });
-
-  function fillCompanyForm() {
-    $("coName").value = company.name || "";
-    $("coPerson").value = company.person || "";
-    $("coRen").value = company.ren || "";
-    $("coPhone").value = company.phone || "";
-    $("coEmail").value = company.email || "";
-    $("coAddress").value = company.address || "";
-    $("coClient").value = company.client || "";
-    $("coProject").value = company.project || "";
-  }
-  $("coSave").addEventListener("click", function () {
-    company = {
-      name: $("coName").value.trim(), person: $("coPerson").value.trim(), ren: $("coRen").value.trim(),
-      phone: $("coPhone").value.trim(), email: $("coEmail").value.trim(),
-      address: $("coAddress").value.trim(), client: $("coClient").value.trim(), project: $("coProject").value.trim()
-    };
-    try { localStorage.setItem(CO_KEY, JSON.stringify(company)); } catch (e) {}
-    updatePrintHeader();
-    toast(t("toastCoSaved"));
-  });
-
-  function updatePrintHeader() {
-    $("phCo").textContent = company.name || t("appName");
-    var bits = [];
-    if (company.person) bits.push(company.person + (company.ren ? " · " + company.ren : ""));
-    if (company.phone) bits.push("WhatsApp " + company.phone);
-    if (company.email) bits.push(company.email);
-    if (company.address) bits.push(company.address);
-    $("phContact").textContent = bits.join(" · ");
-    $("phClient").textContent = [company.client, company.project].filter(Boolean).join(" · ");
-    var qr = $("phQr");
-    qr.style.display = "";
-    try {
-      if (typeof qrcode === "function") {
-        var q = qrcode(0, "M");
-        q.addData(shareUrl());
-        q.make();
-        qr.src = q.createDataURL(4, 6);
-      } else { qr.style.display = "none"; }
-    } catch (e) { qr.style.display = "none"; }
-  }
-  window.addEventListener("beforeprint", updatePrintHeader);
-
-  renderPlanList();
-  fillCompanyForm();
-  var qd = new URLSearchParams(location.search).get("d");
-  if (qd) {
-    var st0 = Calc.decodeState(qd);
-    if (st0 && applyState(st0)) setViewOnly(true);
-  }
-  updatePrintHeader();
-
-  // ================= 账号（Phase 3） =================
-  function api(path, opts) {
-    opts = opts || {};
-    opts.credentials = "same-origin";
-    opts.headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
-    if (opts.body && typeof opts.body !== "string") opts.body = JSON.stringify(opts.body);
-    return fetch("/api" + path, opts).then(function (r) {
-      return r.json().then(function (j) { j.httpStatus = r.status; return j; },
-        function () { return { ok: false, httpStatus: r.status }; });
-    });
-  }
-  function errMsg(code) {
-    var map = { bad_email: "errEmail", weak_password: "errPassword", email_exists: "errExists", bad_credentials: "errLogin", rate_limited: "errRate", quota_exceeded: "errQuota" };
-    return t(map[code] || "errGeneric");
-  }
-  function setAccount(me) {
-    var wasLogged = logged;
-    logged = !!(me && me.ok && me.user);
-    $("acctLoggedOut").hidden = logged;
-    $("acctLoggedIn").hidden = !logged;
-    if (logged && !wasLogged) { refreshPlans(); syncLocalToCloud(); }
-    if (!logged && wasLogged) { cloudPlans = []; refreshPlans(); }
-    $("acctBtnTxt").textContent = logged ? me.user.email.split("@")[0] : t("btnLoginShort");
-    $("acctBtn").title = logged ? me.user.email : t("acctTitle");
-    if (logged) {
-      $("acctWho").textContent = me.user.email;
-      var planName = me.user.plan === "pro" ? t("planPro") : t("planFree");
-      var used = (me.quota === null) ? (me.plans + " " + t("planUnlimited")) : (me.plans + " / " + me.quota);
-      $("acctPlan").textContent = planName + " · " + used;
-      var exp = me.user.planExpiresAt ? new Date(me.user.planExpiresAt) : null;
-      if (exp && !isNaN(exp.getTime())) {
-        var days = Math.ceil((exp.getTime() - Date.now()) / 86400000);
-        $("acctExpiry").textContent = exp.toLocaleDateString(lang === "zh" ? "zh-CN" : "en-MY") + " · " + days + (lang === "zh" ? " 天" : " d");
-      } else { $("acctExpiry").textContent = "—"; }
-    }
-  }
-  function refreshMe() {
-    return api("/me").then(function (j) { setAccount(j); }).catch(function () { setAccount(null); });
-  }
-  function authAction(path) {
-    var email = $("acctEmail").value.trim();
-    var password = $("acctPassword").value;
-    if (!email || !password) { toast(t("errEmail")); return; }
-    api(path, { method: "POST", body: { email: email, password: password } }).then(function (j) {
-      if (j.ok) {
-        $("acctPassword").value = "";
-        toast(t(path.indexOf("register") >= 0 ? "toastRegisterOk" : "toastLoginOk"));
-        refreshMe();
-        closeAcct();
-      } else { toast(errMsg(j.error)); }
-    }).catch(function () { toast(t("errGeneric")); });
-  }
-  $("loginBtn").addEventListener("click", function () { authAction("/auth/login"); });
-  $("registerBtn").addEventListener("click", function () { authAction("/auth/register"); });
-  $("logoutBtn").addEventListener("click", function () {
-    api("/auth/logout", { method: "POST" }).then(function () { setAccount(null); closeAcct(); toast(t("toastLogout")); });
-  });
-  $("redeemBtn").addEventListener("click", function () {
-    var code = $("proCode").value.trim();
-    if (!code) { toast(t("errCode")); return; }
-    api("/subscription/redeem", { method: "POST", body: { code: code } }).then(function (j) {
-      if (j.ok) { $("proCode").value = ""; toast(fmt("toastRedeemed", { n: j.days })); refreshMe(); }
-      else { toast(j.error === "invalid_code" ? t("errCode") : errMsg(j.error)); }
-    }).catch(function () { toast(t("errGeneric")); });
-  });
-
-  function openPlan() { renderPlanList(); $("planModal").hidden = false; }
-  function closePlan() { $("planModal").hidden = true; }
-  $("planMore").addEventListener("click", openPlan);
-  $("planClose").addEventListener("click", closePlan);
-  $("planModal").addEventListener("click", function (e) { if (e.target === this) closePlan(); });
-
-  function openAcct() { $("acctModal").hidden = false; }
-  function closeAcct() { $("acctModal").hidden = true; }
-  $("acctBtn").addEventListener("click", openAcct);
-  $("acctClose").addEventListener("click", closeAcct);
-  $("acctModal").addEventListener("click", function (e) { if (e.target === this) closeAcct(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { closeAcct(); closePlan(); } });
-
-  refreshMe();
-
-  applyLang();
 })();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "KWONG THYE 光泰",
+  "url": "https://kwongthye.com/",
+  "logo": "https://kwongthye.com/logo.jpg",
+  "description": "Real estate investment, property advisory and PropTech in Johor Bahru, Malaysia.",
+  "areaServed": "Johor Bahru, Johor, Malaysia",
+  "telephone": "+60 16-528 0918",
+  "sameAs": ["https://kwongthye.com/"]
+}
 </script>
 </body>
 </html>
