@@ -310,7 +310,11 @@
     api("/admins").then(function (j) {
       if (!j.ok) return;
       $("admBody").innerHTML = (j.admins || []).map(function (a) {
-        return "<tr><td>" + esc(a.email) + "</td><td>" + (a.role === "viewer" ? "只读" : "管理员") +
+        var sel = "<select data-a='role' data-id='" + a.id + "' style='padding:4px;font-size:11px'>" +
+          "<option value='admin'" + (a.role === "admin" ? " selected" : "") + ">管理员</option>" +
+          "<option value='viewer'" + (a.role === "viewer" ? " selected" : "") + ">只读</option>" +
+          "<option value='owner'" + (a.role === "owner" ? " selected" : "") + ">Owner</option></select>";
+        return "<tr><td>" + esc(a.email) + "</td><td>" + sel +
           "</td><td>" + (a.active ? "启用" : "停用") + "</td><td class='muted'>" + (a.last_login_at ? String(a.last_login_at).slice(0, 16).replace("T", " ") : "—") +
           "</td><td><button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='pwd' data-id='" + a.id + "'>重置密码</button> " +
           "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='toggle' data-id='" + a.id + "' data-active='" + a.active + "'>" + (a.active ? "停用" : "启用") + "</button> " +
@@ -324,6 +328,13 @@
       else { $("naMsg").className = "msg err"; $("naMsg").textContent = "失败：" + (j.error || j._status); }
     });
   };
+  $("admBody").addEventListener("change", function (e) {
+    var sel = e.target.closest("select[data-a='role']"); if (!sel) return;
+    api("/admins/" + sel.getAttribute("data-id"), { method: "PATCH", body: { role: sel.value } }).then(function (j) {
+      if (!j.ok) alert("失败：" + (j.error || j._status));
+      loadAdmins(); loadLogs();
+    });
+  });
   $("admBody").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-a]"); if (!b) return;
     var id = b.getAttribute("data-id"), act = b.getAttribute("data-a");

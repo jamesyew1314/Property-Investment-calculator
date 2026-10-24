@@ -530,7 +530,7 @@ app.patch("/api/admin/admins/:id", requireAdmin, requireOwner, async function (r
   try {
     const b = req.body || {};
     const sets = [], vals = [];
-    if (b.role === "admin" || b.role === "viewer") { sets.push("role=$" + (vals.length + 1)); vals.push(b.role); }
+    if (b.role === "admin" || b.role === "viewer" || b.role === "owner") { sets.push("role=$" + (vals.length + 1)); vals.push(b.role); }
     if (typeof b.active === "boolean") { sets.push("active=$" + (vals.length + 1)); vals.push(b.active); }
     if (b.password) {
       if (String(b.password).length < 8) return res.status(400).json({ ok: false, error: "weak_password" });
