@@ -60,6 +60,7 @@
     <a href="/"><img src="/logo-white.png" alt="KWONG THYE"></a>
     <b>管理后台 <span style="color:#C6A15B;font-size:12px">Admin</span></b>
     <span class="sp"></span>
+    <span id="who" hidden style="color:#8FE3B0;font-size:12px;margin-right:10px">● 已登录</span>
     <button id="logoutBtn" hidden>退出</button>
   </div>
 </header>
@@ -81,6 +82,10 @@
     </div>
 
     <div id="app" hidden>
+      <div style="display:flex;align-items:baseline;gap:10px;margin:0 0 14px">
+        <h1 style="margin:0">后台概览</h1>
+        <span class="muted" id="whoLine"></span>
+      </div>
       <div class="stats" id="stats"></div>
 
       <div class="tabs">
@@ -173,7 +178,15 @@
     });
   }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  function show(v) { $("app").hidden = !v; $("loginBox").hidden = v; $("logoutBtn").hidden = !v; }
+  function show(v) {
+    $("app").hidden = !v; $("loginBox").hidden = v;
+    $("logoutBtn").hidden = !v; $("who").hidden = !v;
+    if (v) {
+      var d = new Date();
+      $("whoLine").textContent = "已登录 · " + d.toLocaleDateString("en-MY") + " " + d.toLocaleTimeString("en-MY", { hour: "2-digit", minute: "2-digit" });
+      window.scrollTo(0, 0);
+    }
+  }
 
   function loadStats() {
     api("/overview").then(function (j) {
