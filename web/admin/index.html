@@ -71,6 +71,12 @@
       <label>管理密码</label>
       <input id="pw" type="password" autocomplete="current-password" placeholder="••••••••">
       <button class="btn" id="loginBtn" style="margin-top:12px;width:100%">登录</button>
+      <div id="otpWrap" hidden style="margin-top:14px">
+        <label>邮箱验证码（6 位）</label>
+        <input id="otp" class="mono" inputmode="numeric" maxlength="6" placeholder="123456">
+        <button class="btn gold" id="verifyBtn" style="margin-top:10px;width:100%">验证并进入</button>
+        <p class="muted" style="margin:8px 0 0">验证码已发到管理员邮箱，10 分钟内有效。</p>
+      </div>
       <div class="msg" id="loginMsg"></div>
     </div>
 
@@ -84,6 +90,7 @@
         <button data-tab="users">用户</button>
         <button data-tab="msgs">留言</button>
         <button data-tab="views">访问量</button>
+        <button data-tab="logs">操作日志</button>
       </div>
 
       <section class="tab on" id="tab-codes">
@@ -126,13 +133,19 @@
           <div style="display:flex;gap:8px"><input id="uQuery" placeholder="搜索邮箱"><button class="btn ghost" id="uSearch">搜索</button></div>
         </div>
         <div class="card" style="padding:0;overflow:auto;max-height:70vh">
-          <table><thead><tr><th>邮箱</th><th>版本</th><th>到期</th><th>验证</th><th>注册</th></tr></thead><tbody id="userBody"></tbody></table>
+          <table><thead><tr><th>邮箱</th><th>版本</th><th>到期</th><th>验证</th><th>操作</th></tr></thead><tbody id="userBody"></tbody></table>
         </div>
       </section>
 
       <section class="tab" id="tab-msgs">
         <div class="card" style="padding:0;overflow:auto;max-height:70vh">
           <table><thead><tr><th>时间</th><th>姓名</th><th>联系</th><th>留言</th></tr></thead><tbody id="msgBody"></tbody></table>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-logs">
+        <div class="card" style="padding:0;overflow:auto;max-height:70vh">
+          <table><thead><tr><th>时间</th><th>动作</th><th>详情</th></tr></thead><tbody id="logBody"></tbody></table>
         </div>
       </section>
 
@@ -188,7 +201,10 @@
         var pro = u.plan === "pro" && (!u.plan_expires_at || new Date(u.plan_expires_at) > new Date());
         return "<tr><td>" + esc(u.email) + "</td><td><span class='tag " + (pro ? "pro" : "") + "'>" + (pro ? "Pro" : "免费") +
           "</span></td><td>" + (u.plan_expires_at ? String(u.plan_expires_at).slice(0, 10) : "—") +
-          "</td><td>" + (u.email_verified_at ? "✓" : "—") + "</td><td class='muted'>" + String(u.created_at).slice(0, 10) + "</td></tr>";
+          "</td><td>" + (u.email_verified_at ? "✓" : "—") +
+          "</td><td><button class='btn ghost' style='padding:4px 8px;font-size:11px' data-act='pwd' data-id='" + u.id + "'>改密码</button> " +
+          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-act='ext' data-id='" + u.id + "' data-email='" + esc(u.email) + "'>延期</button> " +
+          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-act='free' data-id='" + u.id + "' data-email='" + esc(u.email) + "'>免费</button></td></tr>";
       }).join("") || "<tr><td colspan=5 class='muted'>暂无</td></tr>";
     });
   }
@@ -211,9 +227,45 @@
     });
   }
 
+  function loadLogs() {
+    api("/logs").then(function (j) {
+      if (!j.ok) return;
+      $("logBody").innerHTML = (j.logs || []).map(function (l) {
+        return "<tr><td class='muted'>" + String(l.created_at).slice(0, 16).replace("T", " ") + "</td><td class='mono'>" + esc(l.action) + "</td><td>" + esc(l.detail || "") + "</td></tr>";
+      }).join("") || "<tr><td colspan=3 class='muted'>暂无</td></tr>";
+    });
+  }
+
+  document.querySelector("#userBody").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-act]");
+    if (!b) return;
+    var id = b.getAttribute("data-id"), act = b.getAttribute("data-act"), email = b.getAttribute("data-email") || "";
+    if (act === "pwd") {
+      var pw = prompt("给 " + email + " 设置新密码（至少 8 位）");
+      if (!pw) return;
+      api("/users/" + id + "/password", { method: "POST", body: { password: pw } }).then(function (j) {
+        alert(j.ok ? "已修改，用户需重新登录" : "失败：" + (j.error || j._status));
+        if (j.ok) loadLogs();
+      });
+    } else if (act === "ext") {
+      var days = prompt("给 " + email + " 延长 Pro（天数）", "30");
+      if (!days) return;
+      api("/users/" + id + "/extend", { method: "POST", body: { days: days } }).then(function (j) {
+        alert(j.ok ? "已延期至 " + String(j.planExpiresAt).slice(0, 10) : "失败：" + (j.error || j._status));
+        loadUsers($("uQuery").value.trim()); loadLogs(); loadStats();
+      });
+    } else if (act === "free") {
+      if (!confirm("把 " + email + " 设为免费版？")) return;
+      api("/users/" + id + "/free", { method: "POST" }).then(function (j) {
+        alert(j.ok ? "已设为免费版" : "失败：" + (j.error || j._status));
+        loadUsers($("uQuery").value.trim()); loadLogs(); loadStats();
+      });
+    }
+  });
+
   function boot() {
     show(true);
-    loadStats(); loadList(); loadUsers(""); loadMsgs(); loadViews();
+    loadStats(); loadList(); loadUsers(""); loadMsgs(); loadViews(); loadLogs();
     $("logoutBtn").onclick = function () {
       api("/logout", { method: "POST" }).then(function () { show(false); });
     };
@@ -224,11 +276,23 @@
     if (!pw) return;
     $("loginMsg").textContent = ""; $("loginMsg").className = "msg";
     api("/login", { method: "POST", body: { password: pw } }).then(function (j) {
-      if (j.ok) { $("pw").value = ""; boot(); }
+      if (j.ok && j.needOtp) {
+        $("otpWrap").hidden = false; $("otp").focus();
+        $("loginMsg").className = "msg ok"; $("loginMsg").textContent = "验证码已发送，请查收邮箱。";
+      } else if (j.ok) { boot(); }
       else { $("loginMsg").className = "msg err"; $("loginMsg").textContent = j.error === "bad_password" ? "密码错误" : "无法登录（" + (j.error || j._status) + "）"; }
     });
   };
+  $("verifyBtn").onclick = function () {
+    var code = $("otp").value.trim();
+    if (!code) return;
+    api("/verify", { method: "POST", body: { code: code } }).then(function (j) {
+      if (j.ok) { $("otp").value = ""; $("otpWrap").hidden = true; boot(); }
+      else { $("loginMsg").className = "msg err"; $("loginMsg").textContent = "验证码错误或已失效"; }
+    });
+  };
   $("pw").addEventListener("keydown", function (e) { if (e.key === "Enter") $("loginBtn").click(); });
+  $("otp").addEventListener("keydown", function (e) { if (e.key === "Enter") $("verifyBtn").click(); });
 
   document.querySelectorAll(".tabs button").forEach(function (b) {
     b.onclick = function () {
@@ -238,6 +302,7 @@
       if (b.getAttribute("data-tab") === "list") loadList();
       if (b.getAttribute("data-tab") === "msgs") loadMsgs();
       if (b.getAttribute("data-tab") === "views") loadViews();
+      if (b.getAttribute("data-tab") === "logs") loadLogs();
     };
   });
 

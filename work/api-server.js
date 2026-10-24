@@ -422,14 +422,36 @@ function adminCode() {
   return Array.from({ length: 3 }, function () { return Math.random().toString(36).slice(2, 6).toUpperCase(); }).join("-");
 }
 
-app.post("/api/admin/login", rateLimit(5, 600000), function (req, res) {
+function adminIp(req) {
+  return crypto.createHash("sha256").update((req.ip || "") + (process.env.IP_SALT || "fc")).digest("hex").slice(0, 24);
+}
+async function adminLog(action, detail, req) {
+  try { await pool.query("INSERT INTO admin_logs(action,detail,ip_hash) VALUES($1,$2,$3)", [action, detail, req ? adminIp(req) : null]); } catch (e) {}
+}
+app.post("/api/admin/login", rateLimit(5, 600000), async function (req, res) {
   if (!process.env.ADMIN_PASSWORD) return res.status(503).json({ ok: false, error: "admin_disabled" });
   const pw = String((req.body || {}).password || "");
   const exp = Buffer.from(String(process.env.ADMIN_PASSWORD));
   const got = Buffer.from(pw);
   const ok = got.length === exp.length && crypto.timingSafeEqual(got, exp);
-  if (!ok) return res.status(401).json({ ok: false, error: "bad_password" });
+  if (!ok) { await adminLog("login.fail", "wrong password", req); return res.status(401).json({ ok: false, error: "bad_password" }); }
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  await pool.query("INSERT INTO admin_otps(code_hash,expires_at) VALUES($1, now() + interval '10 minutes')", [sha256(code)]);
+  try {
+    await sendMail(process.env.ADMIN_EMAIL || "andylau.theroof@gmail.com", "后台验证码 / Admin code — KWONG THYE",
+      "您的后台登录验证码 / Your admin login code:\n\n" + code + "\n\n10 分钟内有效 / valid for 10 minutes.");
+  } catch (e) { console.error("admin otp mail failed", e.message); return res.status(500).json({ ok: false, error: "mail_failed" }); }
+  res.json({ ok: true, needOtp: true });
+});
+
+app.post("/api/admin/verify", rateLimit(10, 600000), async function (req, res) {
+  const code = String((req.body || {}).code || "").trim();
+  const r = await pool.query("SELECT * FROM admin_otps WHERE code_hash=$1 AND used_at IS NULL AND expires_at > now()", [sha256(code)]);
+  if (!r.rows[0]) return res.status(401).json({ ok: false, error: "bad_code" });
+  await pool.query("UPDATE admin_otps SET used_at=now() WHERE id=$1", [r.rows[0].id]);
+  await pool.query("DELETE FROM admin_otps WHERE expires_at < now() - interval '1 day'");
   res.setHeader("Set-Cookie", ADMIN_COOKIE + "=" + adminToken() + "; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=43200");
+  await adminLog("login.ok", "password + email OTP", req);
   res.json({ ok: true });
 });
 app.post("/api/admin/logout", function (req, res) {
@@ -437,6 +459,48 @@ app.post("/api/admin/logout", function (req, res) {
   res.json({ ok: true });
 });
 app.get("/api/admin/me", requireAdmin, function (req, res) { res.json({ ok: true }); });
+
+app.get("/api/admin/logs", requireAdmin, async function (req, res, next) {
+  try {
+    const r = await pool.query("SELECT action,detail,created_at FROM admin_logs ORDER BY created_at DESC LIMIT 100");
+    res.json({ ok: true, logs: r.rows });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/admin/users/:id/password", requireAdmin, async function (req, res, next) {
+  try {
+    const pw = String((req.body || {}).password || "");
+    if (pw.length < 8) return res.status(400).json({ ok: false, error: "weak_password" });
+    const r = await pool.query("SELECT email FROM users WHERE id=$1", [req.params.id]);
+    if (!r.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    await pool.query("UPDATE users SET password_hash=$1, updated_at=now() WHERE id=$2", [scryptHash(pw), req.params.id]);
+    await pool.query("DELETE FROM sessions WHERE user_id=$1", [req.params.id]);
+    await adminLog("user.password", r.rows[0].email, req);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/admin/users/:id/extend", requireAdmin, async function (req, res, next) {
+  try {
+    const days = Math.max(1, Math.min(3660, parseInt((req.body || {}).days || "30", 10)));
+    const r = await pool.query(
+      "UPDATE users SET plan='pro', plan_expires_at = GREATEST(COALESCE(plan_expires_at, now()), now()) + ($1 || ' days')::interval, " +
+      "plan_reminder_at=NULL, expiry_notice_at=NULL, updated_at=now() WHERE id=$2 RETURNING email, plan_expires_at",
+      [days, req.params.id]);
+    if (!r.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    await adminLog("user.extend", r.rows[0].email + " +" + days + "d", req);
+    res.json({ ok: true, planExpiresAt: r.rows[0].plan_expires_at });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/admin/users/:id/free", requireAdmin, async function (req, res, next) {
+  try {
+    const r = await pool.query("UPDATE users SET plan='free', plan_expires_at=NULL, updated_at=now() WHERE id=$1 RETURNING email", [req.params.id]);
+    if (!r.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    await adminLog("user.free", r.rows[0].email, req);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
 
 app.get("/api/admin/overview", requireAdmin, async function (req, res, next) {
   try {
@@ -466,6 +530,7 @@ app.post("/api/admin/codes", requireAdmin, async function (req, res, next) {
       await pool.query("INSERT INTO redeem_codes(code,days,note,amount) VALUES($1,$2,$3,$4)", [code, days, note, amount]);
       out.push(code);
     }
+    await adminLog("code.create", out.join(",") + " (" + days + "d, RM" + amount + ")", req);
     res.json({ ok: true, codes: out, days: days, amount: amount });
   } catch (e) { next(e); }
 });
@@ -483,6 +548,7 @@ app.post("/api/admin/promo", requireAdmin, async function (req, res, next) {
     await pool.query(
       "INSERT INTO redeem_codes(code,days,note,amount,max_uses,label,expires_at) VALUES($1,$2,$3,$4,$5,'promo',$6)",
       [code, days, note, amount, maxUses, expDays ? new Date(Date.now() + expDays * 86400000) : null]);
+    await adminLog("promo.create", code + " (" + days + "d, max " + maxUses + ", RM" + amount + ")", req);
     res.json({ ok: true, code: code, days: days, maxUses: maxUses, amount: amount });
   } catch (e) { next(e); }
 });

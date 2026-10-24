@@ -29,6 +29,15 @@ function newCode() {
       await pool.query("INSERT INTO redeem_codes(code,days,note,amount) VALUES($1,$2,$3,$4)", [c, days, note, amount]);
       console.log(c);
     }
+  } else if (cmd === "otp") {
+    const crypto = require("node:crypto");
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const hash = crypto.createHash("sha256").update(code).digest("hex");
+    await pool.query("INSERT INTO admin_otps(code_hash,expires_at) VALUES($1, now() + interval '10 minutes')", [hash]);
+    console.log(code);
+  } else if (cmd === "logs") {
+    const r = await pool.query("SELECT created_at,action,detail FROM admin_logs ORDER BY created_at DESC LIMIT 50");
+    console.table(r.rows);
   } else if (cmd === "create-promo") {
     const code = String(args[0] || "").toUpperCase().trim();
     const days = parseInt(args[1] || "30", 10);

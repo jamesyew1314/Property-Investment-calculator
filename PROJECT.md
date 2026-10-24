@@ -431,6 +431,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-25 | v0.55 | **收据 PDF + 优惠码 + 到期当天提醒**：服务端 `receipt-pdf.js`（pdfkit）生成 A4 收据，兑换后自动邮件发送 PDF 附件，新增 `GET /api/payments/:id/receipt.pdf`；`create-promo` 支持自定义码/天数/次数/金额/有效期（多用户多次），兑换逻辑支持 `max_uses`、`expires_at`；提醒脚本增加「已到期」第二次邮件（`expiry_notice_at`），7 天提醒只发未到期者；收据页加「下载 PDF」按钮，价格页提示可用优惠码 |
 | 2026-10-25 | v0.56 | **PWA / AI 填数 / CSV / 对比 / 多抬头 / Pro 标识**：`manifest.webmanifest` + `sw.js`（可添加到主屏幕、离线壳）；一句话填数（中英关键词+万/千/k/m，月租自动×12）；导出 Excel/CSV；方案 A/B 快照对比表；公司抬头多套保存/切换/删除；免费用户按钮显示「🔒 Pro」角标并拦截 PDF/分享/存档/CSV/对比 |
 | 2026-10-25 | v0.57 | **网页管理后台** `/admin/`：独立管理员密码（`ADMIN_PASSWORD`/`ADMIN_SECRET`，与用户账号分离），HttpOnly+Secure+SameSite=Strict 会话 12h、登录限流 5/10min；功能：概览、生成开通码（选天数/数量/金额）、优惠码、码列表、用户查询、留言、7 日访问量；`robots.txt` 屏蔽 `/admin` 与 `/receipt`；noindex |
+| 2026-10-25 | v0.58 | 后台增强：**两步验证**（密码 + 邮件 6 位码，10 分钟有效，`ADMIN_EMAIL` 默认 andylau.theroof@gmail.com；应急 `admin.js otp`）、**操作日志**（登录/发码/改密/延期/降级，记录 IP 哈希）、**用户管理**（改密码并踢出会话、手动延期 Pro、设为免费），后台新增「操作日志」标签与用户操作按钮 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 
 ---
