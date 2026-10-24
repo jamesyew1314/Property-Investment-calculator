@@ -59,6 +59,16 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | `web/calc/index.html` | 自动计算系统（3 个 Part），部署在 `/calc/` |
 | `web/calc/calc.js` | 核心公式库：等额本息/法定费用/RPGT/逐年投影/XIRR/分享编解码 |
 | `web/test.js` | 53 项回归（`node web/test.js`，必须全过） |
+| `web/pricing/` `web/privacy/` `web/terms/` `web/receipt/` `web/admin/` `web/card/` | 价格页 / 隐私政策 / 使用条款 / 收据页 / 后台 / 电子名片 |
+| `work/api-server.js` | Express API（部署时改名 **`server.js`**，否则 systemd 跑的是旧文件） |
+| `work/admin.js` | 后台 CLI：开通码、优惠码、用户、日志、OTP 兜底 |
+| `work/mail-layout.js` | 品牌邮件 HTML 模板（API、提醒、月度、运维通知共用） |
+| `work/receipt-pdf.js` | pdfkit 收据 PDF |
+| `work/send-reminders.js` / `work/send-monthly.js` | 到期提醒 / 月度邮件 |
+| `work/migrations/*.sql` | 数据库迁移（012 两步验证、013 月度邮件） |
+| `work/ops/` | 运维脚本：`backup.sh`、`restore-drill.sh`、`monitor.js`、`notify.js`、`offsite-backup.sh`、`setup-staging.sh`、`setup-calc-subdomain.sh`、`deploy-staging.sh` |
+| `docs/服务器信息.md` | 服务器总览（含运维脚本、staging、异地备份、子域步骤） |
+| `docs/推广资料.md` | Google 商家资料 / Facebook / WhatsApp / 目录登记文案 |
 | `work/make_arch2.py` / `work/make_erd.py` | 生成架构图 / ERD |
 | `work/full.docx` / `work/full.pdf` | 构建中间物 |
 | `work/validation.xlsx` / `work/validation_calc.xlsx` | 构建中间物；后者是 LibreOffice 重算后的版本 |
@@ -443,6 +453,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-25 | v0.62 | **账号安全与合规 + 品牌邮件**：用户端可自助开关**两步验证**（登录 -> 密码 -> 邮件 6 位码，10 分钟有效、5 次上限，`login_codes` 表）；**PDPA 一键下载我的资料** `GET /api/me/export`（账号 + 方案 + 收据 + 留言，JSON 附件）；**未验证邮箱不能写云端**（存方案/导入/兑换返回 403 `email_unverified`，前端中英提示）；全部系统邮件改为**品牌 HTML 模板**（`work/mail-layout.js`：深蓝页头 + Logo + 金色分隔 + 按钮 + 页脚，纯文本仍保留，链接自动转按钮）；企业站与计算器加 **Cookie 同意横幅**（必要 / 全部接受，记 `kwthye_cookie_consent`，为 GA4 预留 `kwthyeLoadAnalytics` 钩子） |
 | 2026-10-25 | v0.63 | **运维三件套 + 备份加固**：① 备份脚本重写（dump 可读性 + 表数量与线上一致 + sha256，失败非 0 退出并告警）；② **恢复演练脚本** `ops/restore-drill.sh`（真的恢复到 scratch 库 + 逐表行数比对 + 邮件报告，每月 1 号 03:30 自动跑，首次演练 PASS）；③ **监控告警** `ops/monitor.js`（每 10 分钟：站点/API/数据库/磁盘/内存/证书/服务/备份新鲜度，只在状态变化发信、持续故障 6 小时再提醒）；④ **staging 预发环境** `https://kwongthye.com/staging/`（Basic Auth + 独立 API `:3001` + `fangchan_staging` 克隆库 + cookie 隔离 `fc_sid_stg`，不发真邮件）；⑤ 清理根目录旧文件（`web/calc.js`、`web/qrcode.js`、`web/logo.jpg`、`calc/logo.jpg`）；⑥ 备份脚本首次修复发现**唯一备份是 13:51 的旧快照（缺 10 张表）**，已重新生成并验证 |
 | 2026-10-25 | v0.64 | **名片页 + 月度邮件 + 推广资料**：`/card/` 电子名片（vCard 一键存通讯录、二维码可切成「名片/网站」、WhatsApp/电话/电邮/分享、A4 打印 89×51mm 名片版式）；**月度邮件**（每月 1 号 10:00，已验证 + 未退订用户，一人一月最多一封，4 条轮换小贴士，签名链接退订 `/api/unsubscribe`，账号页可自助开关 `monthlyOptOut`）；首页 JSON-LD 补 `openingHoursSpecification/geo/hasMap/priceRange/contactPoint`；新增 `docs/推广资料.md`（Google 商家资料、Facebook 专页、WhatsApp Business、Mudah/PropertyGuru 目录清单与文案） |
+| 2026-10-25 | v0.64.1 | Cookie 同意横幅补齐到 `/pricing/`、`/privacy/`、`/terms/`（原先只有企业站与计算器）；价格页与法律页同样记录 `kwthye_cookie_consent` 并为 GA4 预留 `kwthyeLoadAnalytics` 钩子；全站 6 个页面 + staging 巡检 0 个 JS 错误 |
 | 2026-10-25 | — | 新增 `docs/服务器信息.md`：服务器规格、域名/DNS、架构、目录、数据库、环境变量、定时任务、备份恢复、SSL、安全、运维命令、发布流程、风险清单、费用 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 

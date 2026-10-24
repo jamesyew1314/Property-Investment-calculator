@@ -141,6 +141,7 @@
 (function () {
   var I18N = {
     zh: {
+      ckTitle:"Cookie 使用",ckText:"必要 Cookie 用于登录与安全；分析 Cookie 帮助我们改进网站。您可以自由选择。",ckMore:"了解详情",ckNec:"仅必要",ckAll:"全部接受",
       back: "← 返回公司网站", title: "价格",
       lead: "计算器全部功能免费使用。需要保存更多方案时，月付 RM9.90 或年付 RM99（年付更省）。",
       "free.title": "免费版", "free.per": "永久免费",
@@ -167,6 +168,7 @@
       terms: "使用条款", privacy: "隐私政策", calc: "投资计算器"
     },
     en: {
+      ckTitle:"Cookies",ckText:"Essential cookies keep you signed in and secure; analytics cookies help us improve the site. You choose.",ckMore:"Details",ckNec:"Essential only",ckAll:"Accept all",
       back: "← Back to company site", title: "Pricing",
       lead: "Every calculator feature is free. Upgrade for RM9.90/month or RM99/year when you need more saved plans.",
       "free.title": "Free", "free.per": "forever",
@@ -220,6 +222,51 @@
     });
   });
   apply();
+})();
+</script>
+<style>
+  #ckBar{position:fixed;left:12px;right:12px;bottom:12px;z-index:70;max-width:880px;margin:0 auto;
+    background:#0E2438;color:#fff;border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;
+    flex-wrap:wrap;box-shadow:0 10px 30px rgba(14,36,56,.28);font-size:12.5px;line-height:1.6;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  #ckBar[hidden]{display:none !important}
+  #ckBar b{display:block;font-size:13px;color:#E7D3A8;margin-bottom:2px}
+  #ckBar .ckTx{flex:1 1 340px;min-width:220px}
+  #ckBar .ckBtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  #ckBar .ckBtns button{border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;
+    border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff}
+  #ckBar .ckBtns button#ckAll{background:#C6A15B;border-color:#C6A15B;color:#1B2430}
+  #ckBar .ckLnk{color:#C9D6E6;font-size:12px;text-decoration:underline}
+</style>
+<div id="ckBar" hidden>
+  <div class="ckTx">
+    <b data-i18n="ckTitle">Cookie 使用 / Cookies</b>
+    <span data-i18n="ckText">必要 Cookie 用于登录与安全；分析 Cookie 帮助我们改进网站。您可以自由选择。</span>
+  </div>
+  <div class="ckBtns">
+    <a class="ckLnk" href="/privacy/" data-i18n="ckMore">了解详情</a>
+    <button id="ckNec" data-i18n="ckNec">仅必要</button>
+    <button id="ckAll" data-i18n="ckAll">全部接受</button>
+  </div>
+</div>
+<script>
+(function () {
+  var KEY = "kwthye_cookie_consent";
+  var bar = document.getElementById("ckBar");
+  if (!bar) return;
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  if (!saved) bar.hidden = false;
+  else if (saved === "all" && typeof window.kwthyeLoadAnalytics === "function") { try { window.kwthyeLoadAnalytics(); } catch (e) {} }
+  window.kwthyeConsent = saved || null;
+  function set(v) {
+    try { localStorage.setItem(KEY, v); } catch (e) {}
+    bar.hidden = true;
+    window.kwthyeConsent = v;
+    if (v === "all" && typeof window.kwthyeLoadAnalytics === "function") { try { window.kwthyeLoadAnalytics(); } catch (e) {} }
+  }
+  document.getElementById("ckAll").addEventListener("click", function () { set("all"); });
+  document.getElementById("ckNec").addEventListener("click", function () { set("necessary"); });
 })();
 </script>
 </body>
