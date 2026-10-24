@@ -66,11 +66,25 @@
   .company summary { cursor:pointer; font-size:13px; color:var(--blue); font-weight:600; }
   .company .row { margin-top:8px; }
   [hidden] { display:none !important; }
+  .headbtns { display:flex; align-items:center; gap:8px; flex:none; }
+  .hbtn { border:1px solid rgba(255,255,255,.6); background:transparent; color:#fff; border-radius:9px;
+          padding:6px 10px; font-size:13px; font-weight:600; cursor:pointer; max-width:150px;
+          overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .modalMask { position:fixed; inset:0; background:rgba(15,23,42,.45); display:flex; align-items:center;
+               justify-content:center; padding:16px; z-index:60; }
+  .modalCard { position:relative; background:#fff; border-radius:14px; width:100%; max-width:390px;
+               padding:18px; box-shadow:0 20px 50px rgba(0,0,0,.25); }
+  .modalCard h3 { margin:0 0 12px; font-size:16px; color:var(--navy); }
+  .modalClose { position:absolute; top:8px; right:10px; border:none; background:none; font-size:22px;
+                line-height:1; cursor:pointer; color:#999; }
+  .modalCard .row { margin-bottom:8px; }
+  .modalCard .legend { margin-top:8px; }
   .viewBanner { background:#FFF3CD; border:1px solid #E4CE8B; color:#7A5B12; border-radius:10px; padding:10px 12px;
                 margin:0 0 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; }
   .viewBanner button { border:1px solid #C9A227; background:#fff; color:#7A5B12; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:600; cursor:pointer; }
   .view-only main input, .view-only main select { pointer-events:none; }
-  .view-only #toolSec, .view-only #accountSec { display:none !important; }
+  .view-only #toolSec { display:none !important; }
+  .view-only #acctBtn { display:none !important; }
   .view-only .only-edit { display:none !important; }
   .shareRow { display:flex; gap:8px; margin-top:8px; }
   .shareBtn { flex:1; padding:11px 0; border:0; border-radius:12px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; }
@@ -114,7 +128,10 @@
 <header>
   <div class="headrow">
     <h1><img src="logo.jpg" alt="logo" class="logo"><span data-i18n="appName">房地产投资快速计算器</span> <span class="tag" data-i18n="beta">v0.1 内测</span></h1>
-    <button id="langBtn">EN</button>
+    <div class="headbtns">
+      <button id="acctBtn" class="hbtn">👤 <span id="acctBtnTxt">登录</span></button>
+      <button id="langBtn">EN</button>
+    </div>
   </div>
   <p data-i18n="appSub">个人买入 → 持有 1–5 年 → 卖出 · 所有金额 RM</p>
 </header>
@@ -135,27 +152,6 @@
     <span data-i18n="viewBannerText">🔗 这是分享的估算（只读）</span>
     <button id="editCopy" data-i18n="btnEditCopy">在我这边继续编辑</button>
   </div>
-
-  <!-- 我的账号 -->
-  <section class="part no-print" id="accountSec">
-    <h2 data-i18n="acctTitle">我的账号</h2>
-    <div id="acctLoggedOut">
-      <div class="row"><label data-i18n="fEmail">邮箱</label><input class="manual" id="acctEmail" type="email" autocomplete="email" inputmode="email"><span class="unit"></span></div>
-      <div class="row"><label data-i18n="fPassword">密码</label><input class="manual" id="acctPassword" type="password" autocomplete="current-password"><span class="unit"></span></div>
-      <div class="btnRow">
-        <button class="btn" id="loginBtn" data-i18n="btnLogin">登录</button>
-        <button class="btn btn2" id="registerBtn" data-i18n="btnRegister">注册</button>
-      </div>
-      <div class="legend" data-i18n="acctNote">登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。</div>
-    </div>
-    <div id="acctLoggedIn" hidden>
-      <div class="out">
-        <div class="line"><span data-i18n="acctEmailLabel">邮箱</span><b id="acctWho">—</b></div>
-        <div class="line"><span data-i18n="acctPlanLabel">版本</span><span id="acctPlan">—</span></div>
-      </div>
-      <div class="btnRow"><button class="btn btn2" id="logoutBtn" data-i18n="btnLogout">退出登录</button></div>
-    </div>
-  </section>
 
   <!-- 方案存档 / 分享 / 公司抬头 -->
   <section class="part no-print" id="toolSec">
@@ -291,6 +287,29 @@
   <div id="toast"></div>
 </main>
 
+<div class="modalMask no-print" id="acctModal" hidden>
+  <div class="modalCard" role="dialog" aria-modal="true">
+    <button class="modalClose" id="acctClose" aria-label="Close">×</button>
+    <h3 data-i18n="acctTitle">我的账号</h3>
+    <div id="acctLoggedOut">
+      <div class="row"><label data-i18n="fEmail">邮箱</label><input class="manual" id="acctEmail" type="email" autocomplete="email" inputmode="email"><span class="unit"></span></div>
+      <div class="row"><label data-i18n="fPassword">密码</label><input class="manual" id="acctPassword" type="password" autocomplete="current-password"><span class="unit"></span></div>
+      <div class="btnRow">
+        <button class="btn" id="loginBtn" data-i18n="btnLogin">登录</button>
+        <button class="btn btn2" id="registerBtn" data-i18n="btnRegister">注册</button>
+      </div>
+      <div class="legend" data-i18n="acctNote">登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。</div>
+    </div>
+    <div id="acctLoggedIn" hidden>
+      <div class="out">
+        <div class="line"><span data-i18n="acctEmailLabel">邮箱</span><b id="acctWho">—</b></div>
+        <div class="line"><span data-i18n="acctPlanLabel">版本</span><span id="acctPlan">—</span></div>
+      </div>
+      <div class="btnRow"><button class="btn btn2" id="logoutBtn" data-i18n="btnLogout">退出登录</button></div>
+    </div>
+  </div>
+</div>
+
 <script src="qrcode.js"></script>
 <script src="calc.js"></script>
 <script>
@@ -332,7 +351,7 @@
       yearRow: "第 {y} 年", xirrNA: "无法计算",
       btnDemo: "填入示例（SPA 1M / 实价 800k / 贷 800k / 一年后卖 900k）", btnReset: "清空",
       exportTitle: "导出 / 分享",
-      acctTitle: "我的账号", fEmail: "邮箱", fPassword: "密码", btnLogin: "登录", btnRegister: "注册",
+      acctTitle: "我的账号", fEmail: "邮箱", fPassword: "密码", btnLogin: "登录", btnRegister: "注册", btnLoginShort: "登录",
       acctNote: "登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。",
       acctEmailLabel: "邮箱", acctPlanLabel: "版本", btnLogout: "退出登录",
       planFree: "免费版", planPro: "专业版", planUnlimited: "个方案（不限）",
@@ -389,7 +408,7 @@
       yearRow: "Year {y}", xirrNA: "n/a",
       btnDemo: "Fill Example (SPA 1M / actual 800k / loan 800k / sell 900k after 1 yr)", btnReset: "Clear",
       exportTitle: "Export / Share",
-      acctTitle: "My Account", fEmail: "Email", fPassword: "Password", btnLogin: "Log In", btnRegister: "Sign Up",
+      acctTitle: "My Account", fEmail: "Email", fPassword: "Password", btnLogin: "Log In", btnRegister: "Sign Up", btnLoginShort: "Log in",
       acctNote: "Log in to save plans to the cloud (3 free); local saving still works without an account.",
       acctEmailLabel: "Email", acctPlanLabel: "Plan", btnLogout: "Log Out",
       planFree: "Free", planPro: "Pro", planUnlimited: "plans (unlimited)",
@@ -925,6 +944,8 @@
     var logged = !!(me && me.ok && me.user);
     $("acctLoggedOut").hidden = logged;
     $("acctLoggedIn").hidden = !logged;
+    $("acctBtnTxt").textContent = logged ? me.user.email.split("@")[0] : t("btnLoginShort");
+    $("acctBtn").title = logged ? me.user.email : t("acctTitle");
     if (logged) {
       $("acctWho").textContent = me.user.email;
       var planName = me.user.plan === "pro" ? t("planPro") : t("planFree");
@@ -944,14 +965,22 @@
         $("acctPassword").value = "";
         toast(t(path.indexOf("register") >= 0 ? "toastRegisterOk" : "toastLoginOk"));
         refreshMe();
+        closeAcct();
       } else { toast(errMsg(j.error)); }
     }).catch(function () { toast(t("errGeneric")); });
   }
   $("loginBtn").addEventListener("click", function () { authAction("/auth/login"); });
   $("registerBtn").addEventListener("click", function () { authAction("/auth/register"); });
   $("logoutBtn").addEventListener("click", function () {
-    api("/auth/logout", { method: "POST" }).then(function () { setAccount(null); toast(t("toastLogout")); });
+    api("/auth/logout", { method: "POST" }).then(function () { setAccount(null); closeAcct(); toast(t("toastLogout")); });
   });
+  function openAcct() { $("acctModal").hidden = false; }
+  function closeAcct() { $("acctModal").hidden = true; }
+  $("acctBtn").addEventListener("click", openAcct);
+  $("acctClose").addEventListener("click", closeAcct);
+  $("acctModal").addEventListener("click", function (e) { if (e.target === this) closeAcct(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAcct(); });
+
   refreshMe();
 
   applyLang();
