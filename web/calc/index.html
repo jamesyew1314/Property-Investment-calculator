@@ -679,9 +679,9 @@
       footer: "⚠️ Legal fees / stamp duty follow statutory rates; RPGT is an estimate (30/20/15/0); interest is equal-instalment. Actual amounts follow lawyer quotes, bank settlement and LHDN. This calculator is not legal or tax advice."
     }
   };
-  var LANG_KEY = "fangchan_lang";
+  var LANG_KEY = "kwongthye_lang";   // 与全站共用；旧键 fangchan_lang 仍然兼容
   var lang = "zh";
-  try { lang = localStorage.getItem(LANG_KEY) || "zh"; } catch (e) {}
+  try { lang = localStorage.getItem(LANG_KEY) || localStorage.getItem("fangchan_lang") || "zh"; } catch (e) {}
   var lastInp = null, lastRes = null;
   function t(key) { return I18N[lang][key] || key; }
   function fmt(key, vars) {
@@ -704,7 +704,7 @@
     }
     if ($("planName")) $("planName").placeholder = lang === "zh" ? "方案名称（例：Bukit Jalil A）" : "Plan name (e.g. Bukit Jalil A)";
     try { renderCmpSelects(); } catch (e) {}
-    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+    try { localStorage.setItem(LANG_KEY, lang); localStorage.setItem("fangchan_lang", lang); } catch (e) {}
     document.querySelectorAll(".printdate").forEach(function (el) {
       el.textContent = new Date().toLocaleDateString(lang === "zh" ? "zh-CN" : "en-MY");
     });

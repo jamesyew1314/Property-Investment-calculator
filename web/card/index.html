@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Andy Lau 刘泌光 · 名片 / Digital Card — KWONG THYE 光泰</title>
-<meta name="description" content="KWONG THYE 光泰 创办人 Andy Lau 刘泌光的电子名片：一键保存到通讯录、WhatsApp、电话、电邮与二维码。">
+<meta name="description" content="KWONG THYE 光泰 创办人 Andy Lau 刘泌光的电子名片：一键保存到通讯录、WhatsApp、电话、电邮与二维码。Digital name card with vCard download and QR.">
 <meta name="robots" content="index,follow">
 <link rel="icon" type="image/png" href="/icon-256.png">
 <link rel="apple-touch-icon" href="/icon-256.png">
@@ -15,6 +15,9 @@
   body{margin:0;background:var(--cream);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.6}
   .wrap{max-width:520px;margin:0 auto;padding:22px 16px 40px}
+  .topbar{display:flex;justify-content:flex-end;margin-bottom:10px}
+  #langBtn{background:#fff;border:1px solid var(--line);color:var(--navy);border-radius:999px;
+    padding:6px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
   .card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;
     box-shadow:0 10px 30px rgba(14,36,56,.10)}
   .cardTop{background:var(--navy);padding:20px 22px 18px;position:relative}
@@ -24,10 +27,9 @@
   .name{font-family:Georgia,"Songti SC",serif;font-size:25px;font-weight:700;color:var(--navy);line-height:1.2}
   .name small{display:block;font-family:inherit;font-size:15px;font-weight:400;color:var(--muted);margin-top:4px;letter-spacing:.02em}
   .role{font-size:13px;color:var(--gold);font-weight:700;margin-top:8px;letter-spacing:.02em}
-  .role span{color:var(--muted);font-weight:400}
   .facts{padding:14px 22px 4px}
   .fact{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:13.5px}
-  .fact .k{flex:0 0 74px;color:var(--muted);font-size:12.5px;padding-top:2px}
+  .fact .k{flex:0 0 84px;color:var(--muted);font-size:12.5px;padding-top:2px}
   .fact .v{flex:1}
   .fact a{color:#2E5496;text-decoration:none;word-break:break-word}
   .qrBox{display:flex;gap:16px;align-items:center;padding:14px 22px 20px;border-top:1px dashed var(--line);margin-top:12px}
@@ -36,7 +38,7 @@
   .qrTxt b{color:var(--navy);font-size:13px;display:block;margin-bottom:2px}
   .seg{display:flex;gap:6px;margin-top:8px}
   .seg button{border:1px solid var(--line);background:#F5F8FE;color:#334E68;border-radius:8px;
-    padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
+    padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
   .seg button[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
   .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
   .actions a,.actions button{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 8px;
@@ -50,7 +52,7 @@
   @media print{
     body{background:#fff}
     .wrap{padding:0;max-width:none}
-    .actions,.note,.back,.seg{display:none !important}
+    .actions,.note,.back,.seg,.topbar{display:none !important}
     .card{border:1px solid #999;border-radius:10px;box-shadow:none;width:89mm;height:51mm;margin:14mm auto;overflow:hidden}
     .cardTop{padding:7mm 7mm 3mm}
     .cardTop img{height:7mm}
@@ -68,19 +70,21 @@
 </head>
 <body>
 <div class="wrap">
+  <div class="topbar"><button id="langBtn">EN</button></div>
+
   <div class="card">
     <div class="cardTop"><img src="/logo-white.png" alt="KWONG THYE 光泰"></div>
     <div class="identity">
-      <div class="name">Andy Lau 刘泌光<small>Pik Kwong Lau</small></div>
-      <div class="role">创办人 Founder <span>· KWONG THYE 光泰</span></div>
+      <div class="name"><span id="nm">Andy Lau 刘泌光</span><small>Pik Kwong Lau</small></div>
+      <div class="role" id="role">创办人 · KWONG THYE 光泰</div>
     </div>
     <div class="facts">
-      <div class="fact"><span class="k">手机 / 微信</span><span class="v"><a id="tel" href="tel:+60165280918">+60 16-528 0918</a></span></div>
+      <div class="fact"><span class="k" data-i18n="kPhone">手机 / 微信</span><span class="v"><a href="tel:+60165280918">+60 16-528 0918</a></span></div>
       <div class="fact"><span class="k">WhatsApp</span><span class="v"><a href="https://wa.me/60165280918" target="_blank" rel="noopener">wa.me/60165280918</a></span></div>
-      <div class="fact"><span class="k">电邮 Email</span><span class="v"><a href="mailto:andylau.theroof@gmail.com">andylau.theroof@gmail.com</a></span></div>
-      <div class="fact"><span class="k">公司</span><span class="v">THE ROOF REALTY SDN BHD<br>E(1)1605/1 · REN 32839</span></div>
-      <div class="fact"><span class="k">办公室 Office</span><span class="v">No 10A, Jalan Sutera Tanjung 8/4,<br>Taman Sutera Utama, 81300 Skudai, Johor</span></div>
-      <div class="fact"><span class="k">网站 Web</span><span class="v"><a href="https://kwongthye.com">kwongthye.com</a></span></div>
+      <div class="fact"><span class="k" data-i18n="kEmail">电邮</span><span class="v"><a href="mailto:andylau.theroof@gmail.com">andylau.theroof@gmail.com</a></span></div>
+      <div class="fact"><span class="k" data-i18n="kCompany">公司</span><span class="v">THE ROOF REALTY SDN BHD<br>E(1)1605/1 · REN 32839</span></div>
+      <div class="fact"><span class="k" data-i18n="kOffice">办公室</span><span class="v" data-i18n="officeAddr">No 10A, Jalan Sutera Tanjung 8/4,<br>Taman Sutera Utama, 81300 Skudai, Johor</span></div>
+      <div class="fact"><span class="k" data-i18n="kWeb">网站</span><span class="v"><a href="https://kwongthye.com">kwongthye.com</a></span></div>
     </div>
     <div class="qrBox">
       <img id="qr" alt="QR code">
@@ -96,48 +100,78 @@
   </div>
 
   <div class="actions">
-    <button class="gold" id="saveCard">📇 保存到通讯录</button>
+    <button class="gold" id="saveCard" data-i18n="saveCard">📇 保存到通讯录</button>
     <a class="green" href="https://wa.me/60165280918" target="_blank" rel="noopener">WhatsApp</a>
-    <a class="ghost" href="tel:+60165280918">📞 打电话</a>
-    <a class="ghost" href="mailto:andylau.theroof@gmail.com">✉️ 电邮</a>
-    <button class="primary" id="shareBtn" style="grid-column:1 / -1">🔗 分享名片</button>
+    <a class="ghost" href="tel:+60165280918" data-i18n="call">📞 打电话</a>
+    <a class="ghost" href="mailto:andylau.theroof@gmail.com" data-i18n="mail">✉️ 电邮</a>
+    <button class="primary" id="shareBtn" style="grid-column:1 / -1" data-i18n="share">🔗 分享名片</button>
   </div>
-  <div class="note">
-    打印建议：A4 纸，卡片 89 × 51 mm（标准名片尺寸），可留白裁切。<br>
-    Print tip: A4 paper, 89 × 51 mm card — trim along the border.
+  <div class="note" data-i18n="printTip">
+    打印建议：A4 纸，卡片 89 × 51 mm（标准名片尺寸），可留白裁切。
   </div>
-  <a class="back" href="/">← 返回 KWONG THYE 光泰</a>
+  <a class="back" href="/" data-i18n="back">← 返回 KWONG THYE 光泰</a>
 </div>
 
 <script src="/calc/qrcode.js"></script>
 <script>
 (function () {
   "use strict";
+  var I18N = {
+    zh: {
+      role: "创办人 · KWONG THYE 光泰", nm: "Andy Lau 刘泌光",
+      kPhone: "手机 / 微信", kEmail: "电邮", kCompany: "公司", kOffice: "办公室", kWeb: "网站",
+      officeAddr: "No 10A, Jalan Sutera Tanjung 8/4,<br>Taman Sutera Utama, 81300 Skudai, Johor",
+      saveCard: "📇 保存到通讯录", call: "📞 打电话", mail: "✉️ 电邮", share: "🔗 分享名片",
+      printTip: "打印建议：A4 纸，卡片 89 × 51 mm（标准名片尺寸），可留白裁切。",
+      back: "← 返回 KWONG THYE 光泰",
+      qrCard: "扫码存名片", qrCardHint: "手机相机扫描 → 加入通讯录",
+      qrWeb: "扫码打开网站", qrWebHint: "kwongthye.com",
+      segCard: "名片", segWeb: "网站",
+      copied: "已复制名片链接：", copyMan: "复制这个链接：",
+      shareText: "名片 / Digital name card", title: "Andy Lau · KWONG THYE 光泰"
+    },
+    en: {
+      role: "Founder · KWONG THYE", nm: "Andy Lau",
+      kPhone: "Mobile / WeChat", kEmail: "Email", kCompany: "Company", kOffice: "Office", kWeb: "Website",
+      officeAddr: "No 10A, Jalan Sutera Tanjung 8/4,<br>Taman Sutera Utama, 81300 Skudai, Johor, Malaysia",
+      saveCard: "📇 Save to contacts", call: "📞 Call", mail: "✉️ Email", share: "🔗 Share card",
+      printTip: "Print: A4 paper, card 89 × 51 mm (standard business card) — trim along the border.",
+      back: "← Back to KWONG THYE",
+      qrCard: "Scan to save contact", qrCardHint: "Use your phone camera → Add contact",
+      qrWeb: "Scan to open website", qrWebHint: "kwongthye.com",
+      segCard: "Card", segWeb: "Web",
+      copied: "Card link copied: ", copyMan: "Copy this link: ",
+      shareText: "Digital name card", title: "Andy Lau · KWONG THYE"
+    }
+  };
+  var KEY = "kwongthye_lang";
+  var lang = "zh";
+  try { lang = localStorage.getItem(KEY) || "zh"; } catch (e) {}
+  function t(k) { return (I18N[lang] && I18N[lang][k]) || I18N.zh[k] || k; }
+
   var V = {
-    name: "Andy Lau Pik Kwong",
-    nameZh: "刘泌光",
     org: "KWONG THYE 光泰",
-    title: "Founder 创办人 · THE ROOF REALTY SDN BHD (E(1)1605/1)",
+    title: "Founder · THE ROOF REALTY SDN BHD (E(1)1605/1)",
     tel: "+60165280918",
     email: "andylau.theroof@gmail.com",
-    address: "No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor, Malaysia",
     url: "https://kwongthye.com",
     ren: "REN 32839"
   };
   var vcard = [
     "BEGIN:VCARD", "VERSION:3.0",
     "N:Lau;Andy;Pik Kwong;;",
-    "FN:Andy Lau (" + V.nameZh + ") — KWONG THYE 光泰",
+    "FN:Andy Lau (刘泌光) — KWONG THYE 光泰",
     "ORG:" + V.org,
     "TITLE:" + V.title,
     "TEL;TYPE=CELL,VOICE:" + V.tel,
     "EMAIL;TYPE=WORK:" + V.email,
     "URL:" + V.url,
     "ADR;TYPE=WORK:;;No 10A Jalan Sutera Tanjung 8/4, Taman Sutera Utama;Skudai;Johor;81300;Malaysia",
-    "NOTE:" + V.ren + " · WHATSAPP " + V.tel + " · KUALA LUMPUR / JOHOR BAHRU",
+    "NOTE:" + V.ren + " · WHATSAPP " + V.tel + " · JOHOR BAHRU",
     "END:VCARD"
   ].join("\r\n");
 
+  var mode = "card";
   var qrEl = document.getElementById("qr");
   function draw(text) {
     try {
@@ -148,21 +182,44 @@
       qrEl.src = q.createDataURL(5, 2);
     } catch (e) { qrEl.style.visibility = "hidden"; }
   }
-  var mode = "card";
-  draw(vcard);
+
+  function render() {
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+    document.title = lang === "zh"
+      ? "Andy Lau 刘泌光 · 名片 — KWONG THYE 光泰"
+      : "Andy Lau · Digital Name Card — KWONG THYE";
+    document.getElementById("langBtn").textContent = lang === "zh" ? "EN" : "中文";
+    document.getElementById("role").textContent = t("role");
+    document.getElementById("nm").textContent = t("nm");
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n");
+      var v = I18N[lang][k];
+      if (v == null) return;
+      if (v.indexOf("<br>") >= 0) el.innerHTML = v; else el.textContent = v;
+    });
+    document.getElementById("segCard").textContent = t("segCard");
+    document.getElementById("segWeb").textContent = t("segWeb");
+    var isCard = mode === "card";
+    document.getElementById("qrTitle").textContent = t(isCard ? "qrCard" : "qrWeb");
+    document.getElementById("qrHint").textContent = t(isCard ? "qrCardHint" : "qrWebHint");
+    draw(isCard ? vcard : V.url + "/?utm_source=namecard&utm_medium=qr");
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+  }
+
+  document.getElementById("langBtn").addEventListener("click", function () {
+    lang = lang === "zh" ? "en" : "zh"; render();
+  });
   document.getElementById("segCard").addEventListener("click", function () {
-    mode = "card"; this.setAttribute("aria-pressed", "true");
+    mode = "card";
+    this.setAttribute("aria-pressed", "true");
     document.getElementById("segWeb").setAttribute("aria-pressed", "false");
-    document.getElementById("qrTitle").textContent = "扫码存名片";
-    document.getElementById("qrHint").textContent = "手机相机扫描 → 加入通讯录";
-    draw(vcard);
+    render();
   });
   document.getElementById("segWeb").addEventListener("click", function () {
-    mode = "web"; this.setAttribute("aria-pressed", "true");
+    mode = "web";
+    this.setAttribute("aria-pressed", "true");
     document.getElementById("segCard").setAttribute("aria-pressed", "false");
-    document.getElementById("qrTitle").textContent = "扫码打开网站";
-    document.getElementById("qrHint").textContent = "kwongthye.com";
-    draw(V.url + "/?utm_source=namecard&utm_medium=qr");
+    render();
   });
 
   function download(name, text, type) {
@@ -179,14 +236,16 @@
   document.getElementById("shareBtn").addEventListener("click", function () {
     var url = location.origin + "/card/";
     if (navigator.share) {
-      navigator.share({ title: "Andy Lau · KWONG THYE 光泰", text: "名片 / Digital name card", url: url }).catch(function () {});
+      navigator.share({ title: t("title"), text: t("shareText"), url: url }).catch(function () {});
       return;
     }
-    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () {
-      alert("已复制名片链接 / Link copied:\n" + url);
-    }).catch(function () { prompt("复制这个链接 / Copy:", url); });
-    else prompt("复制这个链接 / Copy:", url);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(function () { alert(t("copied") + url); })
+        .catch(function () { prompt(t("copyMan"), url); });
+    } else { prompt(t("copyMan"), url); }
   });
+
+  render();
 })();
 </script>
 </body>

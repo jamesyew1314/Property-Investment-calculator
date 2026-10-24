@@ -69,6 +69,10 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | `work/ops/` | 运维脚本：`backup.sh`、`restore-drill.sh`、`monitor.js`、`notify.js`、`offsite-backup.sh`、`setup-staging.sh`、`setup-calc-subdomain.sh`、`deploy-staging.sh` |
 | `docs/服务器信息.md` | 服务器总览（含运维脚本、staging、异地备份、子域步骤） |
 | `docs/推广资料.md` | Google 商家资料 / Facebook / WhatsApp / 目录登记文案 |
+
+> **语言约定**：全站 8 个页面都用同一个 localStorage 键 `kwongthye_lang`（`zh` / `en`），切换后跨页面保持。
+> 新增文案时必须在 `zh` 与 `en` 两个字典里都加，否则英文模式下会回退成中文。
+> 收据 PDF 依赖服务器字体 `fonts-noto-cjk`（`apt install fonts-noto-cjk`），缺字体时 PDF 自动只打英文。
 | `work/make_arch2.py` / `work/make_erd.py` | 生成架构图 / ERD |
 | `work/full.docx` / `work/full.pdf` | 构建中间物 |
 | `work/validation.xlsx` / `work/validation_calc.xlsx` | 构建中间物；后者是 LibreOffice 重算后的版本 |
@@ -454,6 +458,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-25 | v0.63 | **运维三件套 + 备份加固**：① 备份脚本重写（dump 可读性 + 表数量与线上一致 + sha256，失败非 0 退出并告警）；② **恢复演练脚本** `ops/restore-drill.sh`（真的恢复到 scratch 库 + 逐表行数比对 + 邮件报告，每月 1 号 03:30 自动跑，首次演练 PASS）；③ **监控告警** `ops/monitor.js`（每 10 分钟：站点/API/数据库/磁盘/内存/证书/服务/备份新鲜度，只在状态变化发信、持续故障 6 小时再提醒）；④ **staging 预发环境** `https://kwongthye.com/staging/`（Basic Auth + 独立 API `:3001` + `fangchan_staging` 克隆库 + cookie 隔离 `fc_sid_stg`，不发真邮件）；⑤ 清理根目录旧文件（`web/calc.js`、`web/qrcode.js`、`web/logo.jpg`、`calc/logo.jpg`）；⑥ 备份脚本首次修复发现**唯一备份是 13:51 的旧快照（缺 10 张表）**，已重新生成并验证 |
 | 2026-10-25 | v0.64 | **名片页 + 月度邮件 + 推广资料**：`/card/` 电子名片（vCard 一键存通讯录、二维码可切成「名片/网站」、WhatsApp/电话/电邮/分享、A4 打印 89×51mm 名片版式）；**月度邮件**（每月 1 号 10:00，已验证 + 未退订用户，一人一月最多一封，4 条轮换小贴士，签名链接退订 `/api/unsubscribe`，账号页可自助开关 `monthlyOptOut`）；首页 JSON-LD 补 `openingHoursSpecification/geo/hasMap/priceRange/contactPoint`；新增 `docs/推广资料.md`（Google 商家资料、Facebook 专页、WhatsApp Business、Mudah/PropertyGuru 目录清单与文案） |
 | 2026-10-25 | v0.64.1 | Cookie 同意横幅补齐到 `/pricing/`、`/privacy/`、`/terms/`（原先只有企业站与计算器）；价格页与法律页同样记录 `kwthye_cookie_consent` 并为 GA4 预留 `kwthyeLoadAnalytics` 钩子；全站 6 个页面 + staging 巡检 0 个 JS 错误 |
+| 2026-10-25 | v0.65 | **全站中英双语补齐**：`/receipt/`、`/card/`、`/admin/` 三个页面新增 中文/EN 切换（此前收据只用内嵌双语、名片部分中文、后台全中文）；**语言偏好全站统一**（`kwongthye_lang`，计算器原来的 `fangchan_lang` 兼容读取并双写），在一个页面切换后其它 8 个页面自动跟随；后台 8 个标签页登录态实测 0 处残留中文；**收据 PDF 改为中英双语**（服务器装 `fonts-noto-cjk`，pdfkit 注册 NotoSansCJK，没有字体时自动退回英文避免乱码）；名片姓名随语言显示（中文显示「刘泌光」） |
 | 2026-10-25 | — | 新增 `docs/服务器信息.md`：服务器规格、域名/DNS、架构、目录、数据库、环境变量、定时任务、备份恢复、SSL、安全、运维命令、发布流程、风险清单、费用 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 

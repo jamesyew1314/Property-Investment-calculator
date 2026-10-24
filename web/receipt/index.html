@@ -14,17 +14,19 @@
   header{background:var(--navy);color:#fff;padding:18px 0}
   .bar{display:flex;align-items:center;gap:12px}
   .bar img{height:42px}
-  .bar a{margin-left:auto;color:#D7E0EA;font-size:12.5px;text-decoration:none}
+  .bar a.back{margin-left:auto;color:#D7E0EA;font-size:12.5px;text-decoration:none}
+  #langBtn{background:none;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:999px;
+    padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
   main{padding:34px 0 60px}
   .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:32px}
   h1{font-family:Georgia,"Songti SC",serif;color:var(--navy);font-size:26px;margin:0 0 4px}
   .sub{color:var(--muted);font-size:12.5px;margin-bottom:24px}
   .row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px dashed #E9E3D7;font-size:14px}
-  .row b{color:var(--navy)}
+  .row b{color:var(--navy);text-align:right}
   .amount{font-family:Georgia,serif;font-size:28px;color:var(--navy);margin:18px 0 4px}
   .muted{color:var(--muted);font-size:12px}
   .actions{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}
-  button,.btn{background:var(--navy);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-size:13.5px;cursor:pointer;text-decoration:none}
+  button,.btn{background:var(--navy);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-size:13.5px;cursor:pointer;text-decoration:none;font-family:inherit}
   .btn.ghost{background:none;color:var(--navy);border:1px solid var(--line)}
   .err{color:#B23B3B;font-size:14px}
   footer{padding:0 0 40px;color:var(--muted);font-size:11.5px;text-align:center}
@@ -40,53 +42,112 @@
 <header>
   <div class="wrap bar">
     <img src="/logo-white.png" alt="KWONG THYE 光泰">
-    <a href="/calc/">← 返回计算器 / Back</a>
+    <a class="back" href="/calc/" data-i18n="back">← 返回计算器</a>
+    <button id="langBtn">EN</button>
   </div>
 </header>
 <main>
   <div class="wrap">
     <div class="card" id="card">
-      <h1>收据 <span style="font-size:16px;color:#5D6B7A">Receipt</span></h1>
-      <div class="sub">KWONG THYE 光泰 · kwongthye.com</div>
-      <div id="body"><p class="muted">加载中… / Loading…</p></div>
+      <h1 id="pageTitle">收据</h1>
+      <div class="sub" data-i18n="brandLine">KWONG THYE 光泰 · kwongthye.com</div>
+      <div id="body"><p class="muted" data-i18n="loading">加载中…</p></div>
     </div>
     <footer>
-      <p class="noprint">此收据由系统自动生成，无需签名。/ This receipt is generated automatically and requires no signature.</p>
+      <p class="noprint" data-i18n="autoNote">此收据由系统自动生成，无需签名。</p>
       <p class="noprint">KWONG THYE · Johor Bahru, Malaysia · andylau.theroof@gmail.com</p>
     </footer>
   </div>
 </main>
 <script>
 (function () {
+  "use strict";
+  var I18N = {
+    zh: {
+      back: "← 返回计算器", loading: "加载中…", title: "收据",
+      autoNote: "此收据由系统自动生成，无需签名。",
+      no: "收据编号", date: "日期", billed: "客户", desc: "项目", valid: "有效期至", status: "状态",
+      paid: "已付款", plan: "KWONG THYE 专业版", days: "天",
+      payment: "付款方式：银行转账 / 开通码",
+      pdf: "下载 PDF", print: "打印", pricing: "价格",
+      auth: "请先登录后查看收据。", signin: "去登录",
+      notfound: "找不到这张收据。", backBtn: "返回"
+    },
+    en: {
+      back: "← Back to calculator", loading: "Loading…", title: "Receipt",
+      autoNote: "This receipt is generated automatically and requires no signature.",
+      no: "Receipt No.", date: "Date", billed: "Billed to", desc: "Description", valid: "Valid until", status: "Status",
+      paid: "Paid", plan: "KWONG THYE Pro", days: "days",
+      payment: "Payment: bank transfer / activation code",
+      pdf: "Download PDF", print: "Print", pricing: "Pricing",
+      auth: "Please sign in to view this receipt.", signin: "Sign in",
+      notfound: "Receipt not found.", backBtn: "Back"
+    }
+  };
+  var KEY = "kwongthye_lang";
+  var lang = "zh";
+  try { lang = localStorage.getItem(KEY) || localStorage.getItem("fangchan_lang") || "zh"; } catch (e) {}
+  function t(k) { return (I18N[lang] && I18N[lang][k]) || I18N.zh[k] || k; }
+
   var id = new URLSearchParams(location.search).get("id");
   var body = document.getElementById("body");
+  var lastState = null;
+
   function fmt(d) { return new Date(d).toLocaleDateString("en-MY", { year: "numeric", month: "short", day: "2-digit" }); }
+
+  function render() {
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+    document.title = (lang === "zh" ? "收据 Receipt" : "Receipt") + " — KWONG THYE";
+    document.getElementById("langBtn").textContent = lang === "zh" ? "EN" : "中文";
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n");
+      if (I18N[lang][k]) el.textContent = I18N[lang][k];
+    });
+    document.getElementById("pageTitle").textContent = t("title");
+    if (lastState === "loading") { body.innerHTML = '<p class="muted">' + t("loading") + "</p>"; }
+    else if (lastState === "auth") {
+      body.innerHTML = '<p class="err">' + t("auth") + "</p>" +
+        '<div class="actions"><a class="btn" href="/calc/">' + t("signin") + "</a></div>";
+    } else if (lastState === "notfound") {
+      body.innerHTML = '<p class="err">' + t("notfound") + "</p>" +
+        '<div class="actions"><a class="btn ghost" href="/calc/">' + t("backBtn") + "</a></div>";
+    } else if (lastState && lastState.receipt) {
+      var p = lastState.receipt, u = lastState.user;
+      body.innerHTML =
+        '<div class="row"><span>' + t("no") + "</span><b>" + p.receipt_no + "</b></div>" +
+        '<div class="row"><span>' + t("date") + "</span><b>" + fmt(p.created_at) + "</b></div>" +
+        '<div class="row"><span>' + t("billed") + "</span><b>" + (u && u.email || "") + "</b></div>" +
+        '<div class="row"><span>' + t("desc") + "</span><b>" + t("plan") + " — " + p.days + " " + t("days") + "</b></div>" +
+        (p.expires_after ? '<div class="row"><span>' + t("valid") + "</span><b>" + fmt(p.expires_after) + "</b></div>" : "") +
+        '<div class="row"><span>' + t("status") + "</span><b>" + t("paid") + "</b></div>" +
+        '<div class="amount">RM ' + Number(p.amount).toFixed(2) + "</div>" +
+        '<div class="muted">' + t("payment") + "</div>" +
+        '<div class="actions"><a class="btn" href="/api/payments/' + p.id + '/receipt.pdf">' + t("pdf") + "</a>" +
+        '<button class="btn ghost" onclick="window.print()">' + t("print") + "</button>" +
+        '<a class="btn ghost" href="/pricing/">' + t("pricing") + "</a></div>";
+    }
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+  }
+
+  document.getElementById("langBtn").addEventListener("click", function () {
+    lang = lang === "zh" ? "en" : "zh";
+    render();
+  });
+
+  lastState = "loading";
+  render();
+
   fetch("/api/payments", { credentials: "same-origin" }).then(function (r) {
     if (r.status === 401) throw new Error("auth");
     return r.json();
   }).then(function (j) {
     var p = (j.payments || []).filter(function (x) { return x.id === id; })[0];
     if (!p) throw new Error("notfound");
-    body.innerHTML =
-      '<div class="row"><span>收据编号 / Receipt No.</span><b>' + p.receipt_no + '</b></div>' +
-      '<div class="row"><span>日期 / Date</span><b>' + fmt(p.created_at) + '</b></div>' +
-      '<div class="row"><span>客户 / Billed to</span><b>' + (j.user && j.user.email || "") + '</b></div>' +
-      '<div class="row"><span>项目 / Description</span><b>KWONG THYE Pro — ' + p.days + ' 天 / days</b></div>' +
-      (p.expires_after ? '<div class="row"><span>有效期至 / Valid until</span><b>' + fmt(p.expires_after) + '</b></div>' : '') +
-      '<div class="row"><span>状态 / Status</span><b>已付款 / Paid</b></div>' +
-      '<div class="amount">RM ' + Number(p.amount).toFixed(2) + '</div>' +
-      '<div class="muted">付款方式：银行转账 / 开通码 · Payment: bank transfer / activation code</div>' +
-      '<div class="actions"><a class="btn" href="/api/payments/' + p.id + '/receipt.pdf">下载 PDF / Download PDF</a>' +
-      '<button class="btn ghost" onclick="window.print()">打印 / Print</button>' +
-      '<a class="btn ghost" href="/pricing/">价格 / Pricing</a></div>';
+    lastState = { receipt: p, user: j.user };
+    render();
   }).catch(function (e) {
-    if (e.message === "auth") {
-      body.innerHTML = '<p class="err">请先登录后查看收据。/ Please sign in to view this receipt.</p>' +
-        '<div class="actions"><a class="btn" href="/calc/">去登录 / Sign in</a></div>';
-    } else {
-      body.innerHTML = '<p class="err">找不到这张收据。/ Receipt not found.</p>' +
-        '<div class="actions"><a class="btn ghost" href="/calc/">返回 / Back</a></div>';
-    }
+    lastState = e.message === "auth" ? "auth" : "notfound";
+    render();
   });
 })();
 </script>

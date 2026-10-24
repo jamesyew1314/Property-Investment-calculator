@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>管理后台 — KWONG THYE</title>
+<title>管理后台 Admin — KWONG THYE</title>
 <link rel="icon" type="image/png" href="/icon-256.png">
 <style>
   :root{--navy:#0E2438;--gold:#C6A15B;--cream:#F6F7FB;--ink:#1B2430;--muted:#5D6B7A;--line:#E2E6EE;--blue:#2E5496}
@@ -13,11 +13,12 @@
   body{margin:0;background:var(--cream);color:var(--ink);font:14px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
   header{background:var(--navy);color:#fff}
   .wrap{width:min(1080px,94vw);margin:0 auto}
-  .bar{display:flex;align-items:center;gap:12px;height:64px}
+  .bar{display:flex;align-items:center;gap:10px;height:64px}
   .bar img{height:38px}
   .bar b{font-family:Georgia,serif;font-size:16px}
   .bar .sp{margin-left:auto}
-  .bar button{background:none;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer}
+  .bar button{background:none;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+  #langBtn{font-weight:700;min-width:52px}
   main{padding:26px 0 60px}
   h1{font-size:20px;margin:0 0 16px;color:var(--navy)}
   .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
@@ -28,7 +29,7 @@
   label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:5px}
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .btn{background:var(--navy);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-size:13.5px;cursor:pointer;font-weight:600}
+  .btn{background:var(--navy);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-size:13.5px;cursor:pointer;font-weight:600;font-family:inherit}
   .btn.gold{background:var(--gold);color:#1B2430}
   .btn.ghost{background:none;color:var(--navy);border:1px solid var(--line)}
   .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
@@ -36,7 +37,7 @@
   .stat b{display:block;font-family:Georgia,serif;font-size:20px;color:var(--navy)}
   .stat span{font-size:11px;color:var(--muted)}
   .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-  .tabs button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 14px;font-size:12.5px;cursor:pointer}
+  .tabs button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 14px;font-size:12.5px;cursor:pointer;font-family:inherit}
   .tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
   .tab{display:none}
   .tab.on{display:block}
@@ -46,7 +47,7 @@
   .mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
   .codes{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
   .code{background:#F3F7FF;border:1px dashed #B9C8E4;border-radius:10px;padding:8px 10px;font-family:ui-monospace,Menlo,monospace;font-size:13px;display:flex;gap:8px;align-items:center}
-  .code button{border:none;background:none;color:var(--blue);cursor:pointer;font-size:11px}
+  .code button{border:none;background:none;color:var(--blue);cursor:pointer;font-size:11px;font-family:inherit}
   .msg{font-size:12.5px;margin-top:10px}
   .msg.err{color:#B23B3B}.msg.ok{color:#166E52}
   .muted{color:var(--muted);font-size:11.5px}
@@ -59,60 +60,66 @@
 <header>
   <div class="wrap bar">
     <a href="/"><img src="/logo-white.png" alt="KWONG THYE"></a>
-    <b>管理后台 <span style="color:#C6A15B;font-size:12px">Admin</span></b>
+    <b><span data-i18n="adminTitle">管理后台</span> <span style="color:#C6A15B;font-size:12px">Admin</span></b>
     <span class="sp"></span>
-    <span id="who" hidden style="color:#8FE3B0;font-size:12px;margin-right:10px">● 已登录</span>
+    <span id="who" hidden style="color:#8FE3B0;font-size:12px;margin-right:6px" data-i18n="signedIn">● 已登录</span>
     <span id="roleTag" hidden class="tag" style="margin-right:8px"></span>
-    <button id="pwdBtn" hidden style="margin-right:8px">修改密码</button>
-    <button id="logoutBtn" hidden>退出</button>
+    <button id="langBtn">EN</button>
+    <button id="pwdBtn" hidden style="margin-right:4px" data-i18n="changePwd">修改密码</button>
+    <button id="logoutBtn" hidden data-i18n="logout">退出</button>
   </div>
 </header>
 <main>
   <div class="wrap">
     <div class="login" id="loginBox">
-      <h2>管理员登录</h2>
-      <p>仅限内部使用。密码与用户账号无关。登录状态保持 2 小时，退出后需重新验证。</p>
-      <label>管理员邮箱（owner 留空）</label>
+      <h2 data-i18n="loginTitle">管理员登录</h2>
+      <p data-i18n="loginNote">仅限内部使用。密码与用户账号无关。登录状态保持 2 小时，退出后需重新验证。</p>
+      <label data-i18n="lblAdminEmail">管理员邮箱（owner 留空）</label>
       <input id="admEmail" type="email" autocomplete="username" placeholder="admin@example.com">
-      <label style="margin-top:10px">密码</label>
+      <label style="margin-top:10px" data-i18n="lblPassword">密码</label>
       <input id="pw" type="password" autocomplete="current-password" placeholder="••••••••">
-      <button class="btn" id="loginBtn" style="margin-top:12px;width:100%">登录</button>
+      <button class="btn" id="loginBtn" style="margin-top:12px;width:100%" data-i18n="btnLogin">登录</button>
       <div id="otpWrap" hidden style="margin-top:14px">
-        <label>邮箱验证码（6 位）</label>
+        <label data-i18n="lblOtp">邮箱验证码（6 位）</label>
         <input id="otp" class="mono" inputmode="numeric" maxlength="6" placeholder="123456">
-        <button class="btn gold" id="verifyBtn" style="margin-top:10px;width:100%">验证并进入</button>
-        <p class="muted" style="margin:8px 0 0">验证码已发到管理员邮箱，10 分钟内有效。</p>
+        <button class="btn gold" id="verifyBtn" style="margin-top:10px;width:100%" data-i18n="btnVerify">验证并进入</button>
+        <p class="muted" style="margin:8px 0 0" data-i18n="otpNote">验证码已发到管理员邮箱，10 分钟内有效。</p>
       </div>
       <div class="msg" id="loginMsg"></div>
     </div>
 
     <div id="app" hidden>
       <div style="display:flex;align-items:baseline;gap:10px;margin:0 0 14px">
-        <h1 style="margin:0">后台概览</h1>
+        <h1 style="margin:0" data-i18n="overview">后台概览</h1>
         <span class="muted" id="whoLine"></span>
       </div>
       <div class="stats" id="stats"></div>
 
       <div class="tabs">
-        <button data-tab="codes" class="on">生成开通码</button>
-        <button data-tab="promo">优惠码</button>
-        <button data-tab="list">码列表</button>
-        <button data-tab="users">用户</button>
-        <button data-tab="msgs">留言</button>
-        <button data-tab="views">访问量</button>
-        <button data-tab="logs">操作日志</button>
-        <button data-tab="admins" id="tabBtnAdmins" hidden>管理员</button>
+        <button data-tab="codes" class="on" data-i18n="tabCodes">生成开通码</button>
+        <button data-tab="promo" data-i18n="tabPromo">优惠码</button>
+        <button data-tab="list" data-i18n="tabList">码列表</button>
+        <button data-tab="users" data-i18n="tabUsers">用户</button>
+        <button data-tab="msgs" data-i18n="tabMsgs">留言</button>
+        <button data-tab="views" data-i18n="tabViews">访问量</button>
+        <button data-tab="logs" data-i18n="tabLogs">操作日志</button>
+        <button data-tab="admins" id="tabBtnAdmins" hidden data-i18n="tabAdmins">管理员</button>
       </div>
 
       <section class="tab on" id="tab-codes">
         <div class="card">
           <div class="grid3">
-            <div><label>天数</label><select id="cDays"><option value="30">30 天（月付）</option><option value="365">365 天（年付）</option><option value="90">90 天</option><option value="180">180 天</option></select></div>
-            <div><label>数量</label><input id="cCount" type="number" min="1" max="50" value="1"></div>
-            <div><label>金额 RM（留空自动）</label><input id="cAmount" type="number" step="0.01" placeholder="自动"></div>
+            <div><label data-i18n="lblDays">天数</label><select id="cDays">
+              <option value="30" data-i18n="opt30">30 天（月付）</option>
+              <option value="365" data-i18n="opt365">365 天（年付）</option>
+              <option value="90" data-i18n="opt90">90 天</option>
+              <option value="180" data-i18n="opt180">180 天</option>
+            </select></div>
+            <div><label data-i18n="lblCount">数量</label><input id="cCount" type="number" min="1" max="50" value="1"></div>
+            <div><label data-i18n="lblAmountAuto">金额 RM（留空自动）</label><input id="cAmount" type="number" step="0.01" data-i18n-ph="phAuto" placeholder="自动"></div>
           </div>
-          <div style="margin-top:12px"><label>备注（可选）</label><input id="cNote" maxlength="120" placeholder="例：10 月促销 / 客户姓名"></div>
-          <button class="btn gold" id="genBtn" style="margin-top:14px">生成</button>
+          <div style="margin-top:12px"><label data-i18n="lblNoteOpt">备注（可选）</label><input id="cNote" maxlength="120" data-i18n-ph="phNote" placeholder="例：10 月促销 / 客户姓名"></div>
+          <button class="btn gold" id="genBtn" style="margin-top:14px" data-i18n="btnGenerate">生成</button>
           <div class="codes" id="genOut"></div>
           <div class="msg" id="genMsg"></div>
         </div>
@@ -121,65 +128,88 @@
       <section class="tab" id="tab-promo">
         <div class="card">
           <div class="grid">
-            <div><label>优惠码（自定义）</label><input id="pCode" class="mono" placeholder="EARLY79"></div>
-            <div><label>天数</label><input id="pDays" type="number" value="365"></div>
-            <div><label>最多使用次数</label><input id="pMax" type="number" value="10"></div>
-            <div><label>金额 RM</label><input id="pAmount" type="number" step="0.01" value="79"></div>
-            <div><label>有效期（天，留空永久）</label><input id="pExp" type="number" placeholder="30"></div>
-            <div><label>备注</label><input id="pNote" maxlength="120" placeholder="早鸟年付"></div>
+            <div><label data-i18n="lblPromoCode">优惠码（自定义）</label><input id="pCode" class="mono" placeholder="EARLY79"></div>
+            <div><label data-i18n="lblDays2">天数</label><input id="pDays" type="number" value="365"></div>
+            <div><label data-i18n="lblMaxUses">最多使用次数</label><input id="pMax" type="number" value="10"></div>
+            <div><label data-i18n="lblAmount">金额 RM</label><input id="pAmount" type="number" step="0.01" value="79"></div>
+            <div><label data-i18n="lblExpiry">有效期（天，留空永久）</label><input id="pExp" type="number" placeholder="30"></div>
+            <div><label data-i18n="lblNote">备注</label><input id="pNote" maxlength="120" data-i18n-ph="phPromoNote" placeholder="早鸟年付"></div>
           </div>
-          <button class="btn gold" id="promoBtn" style="margin-top:14px">创建优惠码</button>
+          <button class="btn gold" id="promoBtn" style="margin-top:14px" data-i18n="btnCreatePromo">创建优惠码</button>
           <div class="msg" id="promoMsg"></div>
         </div>
       </section>
 
       <section class="tab" id="tab-list">
         <div class="card" style="padding:0;overflow:auto;max-height:70vh">
-          <table><thead><tr><th>码</th><th>天</th><th>金额</th><th>已用</th><th>类型</th><th>备注</th><th>创建</th></tr></thead><tbody id="listBody"></tbody></table>
+          <table><thead><tr>
+            <th data-i18n="thCode">码</th><th data-i18n="thDays">天</th><th data-i18n="thAmount">金额</th>
+            <th data-i18n="thUsed">已用</th><th data-i18n="thType">类型</th><th data-i18n="thNote">备注</th><th data-i18n="thCreated">创建</th>
+          </tr></thead><tbody id="listBody"></tbody></table>
         </div>
       </section>
 
       <section class="tab" id="tab-users">
         <div class="card">
-          <div style="display:flex;gap:8px"><input id="uQuery" placeholder="搜索邮箱"><button class="btn ghost" id="uSearch">搜索</button></div>
+          <div style="display:flex;gap:8px">
+            <input id="uQuery" data-i18n-ph="phSearchEmail" placeholder="搜索邮箱">
+            <button class="btn ghost" id="uSearch" style="flex:none" data-i18n="btnSearch">搜索</button>
+          </div>
         </div>
         <div class="card" style="padding:0;overflow:auto;max-height:70vh">
-          <table><thead><tr><th>邮箱</th><th>版本</th><th>到期</th><th>验证</th><th>操作</th></tr></thead><tbody id="userBody"></tbody></table>
+          <table><thead><tr>
+            <th data-i18n="thEmail">邮箱</th><th data-i18n="thPlan">版本</th><th data-i18n="thExpiry">到期</th>
+            <th data-i18n="thVerified">验证</th><th data-i18n="thActions">操作</th>
+          </tr></thead><tbody id="userBody"></tbody></table>
         </div>
       </section>
 
       <section class="tab" id="tab-msgs">
         <div class="card" style="padding:0;overflow:auto;max-height:70vh">
-          <table><thead><tr><th>时间</th><th>姓名</th><th>联系</th><th>留言</th></tr></thead><tbody id="msgBody"></tbody></table>
+          <table><thead><tr>
+            <th data-i18n="thTime">时间</th><th data-i18n="thName">姓名</th><th data-i18n="thContact">联系</th><th data-i18n="thMessage">留言</th>
+          </tr></thead><tbody id="msgBody"></tbody></table>
         </div>
       </section>
 
       <section class="tab" id="tab-admins">
         <div class="card">
-          <h3 style="margin:0 0 10px;font-size:15px;color:var(--navy)">新增管理员</h3>
+          <h3 style="margin:0 0 10px;font-size:15px;color:var(--navy)" data-i18n="newAdmin">新增管理员</h3>
           <div class="grid3">
-            <div><label>邮箱</label><input id="naEmail" type="email" placeholder="staff@example.com"></div>
-            <div><label>初始密码（≥8 位）</label><input id="naPw" type="password"></div>
-            <div><label>权限</label><select id="naRole"><option value="admin">管理员（可发码/改用户）</option><option value="viewer">只读（仅查看）</option></select></div>
+            <div><label data-i18n="thEmail">邮箱</label><input id="naEmail" type="email" placeholder="staff@example.com"></div>
+            <div><label data-i18n="lblInitPw">初始密码（≥8 位）</label><input id="naPw" type="password"></div>
+            <div><label data-i18n="lblRole">权限</label><select id="naRole">
+              <option value="admin" data-i18n="optRoleAdmin">管理员（可发码/改用户）</option>
+              <option value="viewer" data-i18n="optRoleViewer">只读（仅查看）</option>
+            </select></div>
           </div>
-          <button class="btn gold" id="naBtn" style="margin-top:12px">添加</button>
+          <button class="btn gold" id="naBtn" style="margin-top:12px" data-i18n="btnAdd">添加</button>
           <div class="msg" id="naMsg"></div>
         </div>
         <div class="card" style="padding:0;overflow:auto">
-          <table><thead><tr><th>邮箱</th><th>权限</th><th>状态</th><th>最近登录</th><th>操作</th></tr></thead><tbody id="admBody"></tbody></table>
+          <table><thead><tr>
+            <th data-i18n="thEmail">邮箱</th><th data-i18n="lblRole">权限</th><th data-i18n="thStatus">状态</th>
+            <th data-i18n="thLastLogin">最近登录</th><th data-i18n="thActions">操作</th>
+          </tr></thead><tbody id="admBody"></tbody></table>
         </div>
       </section>
 
       <section class="tab" id="tab-logs">
         <div class="card" style="padding:0;overflow:auto;max-height:70vh">
-          <table><thead><tr><th>时间</th><th>动作</th><th>详情</th></tr></thead><tbody id="logBody"></tbody></table>
+          <table><thead><tr>
+            <th data-i18n="thTime">时间</th><th data-i18n="thAction">动作</th><th data-i18n="thDetail">详情</th>
+          </tr></thead><tbody id="logBody"></tbody></table>
         </div>
       </section>
 
       <section class="tab" id="tab-views">
         <div class="grid">
-          <div class="card" style="padding:0;overflow:auto"><table><thead><tr><th>日期</th><th>浏览</th></tr></thead><tbody id="dayBody"></tbody></table></div>
-          <div class="card" style="padding:0;overflow:auto"><table><thead><tr><th>页面</th><th>浏览</th></tr></thead><tbody id="topBody"></tbody></table></div>
+          <div class="card" style="padding:0;overflow:auto"><table><thead><tr>
+            <th data-i18n="thDate">日期</th><th data-i18n="thViews">浏览</th>
+          </tr></thead><tbody id="dayBody"></tbody></table></div>
+          <div class="card" style="padding:0;overflow:auto"><table><thead><tr>
+            <th data-i18n="thPage">页面</th><th data-i18n="thViews">浏览</th>
+          </tr></thead><tbody id="topBody"></tbody></table></div>
         </div>
       </section>
     </div>
@@ -187,24 +217,135 @@
 </main>
 <div id="pwdModal" hidden style="position:fixed;inset:0;background:rgba(10,20,30,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:60">
   <div style="background:#fff;border-radius:14px;padding:22px;max-width:380px;width:100%">
-    <h3 style="margin:0 0 12px;color:var(--navy);font-size:16px">修改登录密码</h3>
-    <label>当前密码</label>
+    <h3 style="margin:0 0 12px;color:var(--navy);font-size:16px" data-i18n="pwdTitle">修改登录密码</h3>
+    <label data-i18n="lblCurrentPw">当前密码</label>
     <input id="cpCur" type="password" autocomplete="current-password">
-    <label style="margin-top:10px">新密码（至少 8 位）</label>
+    <label style="margin-top:10px" data-i18n="lblNewPw8">新密码（至少 8 位）</label>
     <input id="cpNew" type="password" autocomplete="new-password">
-    <label style="margin-top:10px">确认新密码</label>
+    <label style="margin-top:10px" data-i18n="lblConfirmPw">确认新密码</label>
     <input id="cpNew2" type="password" autocomplete="new-password">
     <div class="msg" id="cpMsg"></div>
     <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="btn gold" id="cpSave">保存</button>
-      <button class="btn ghost" id="cpCancel">取消</button>
+      <button class="btn gold" id="cpSave" data-i18n="btnSave">保存</button>
+      <button class="btn ghost" id="cpCancel" data-i18n="btnCancel">取消</button>
     </div>
   </div>
 </div>
 
 <script>
 (function () {
+  "use strict";
   var $ = function (id) { return document.getElementById(id); };
+
+  var I18N = {
+    zh: {
+      adminTitle: "管理后台", signedIn: "● 已登录", logout: "退出", changePwd: "修改密码",
+      loginTitle: "管理员登录",
+      loginNote: "仅限内部使用。密码与用户账号无关。登录状态保持 2 小时，退出后需重新验证。",
+      lblAdminEmail: "管理员邮箱（owner 留空）", lblPassword: "密码", btnLogin: "登录",
+      lblOtp: "邮箱验证码（6 位）", btnVerify: "验证并进入", otpNote: "验证码已发到管理员邮箱，10 分钟内有效。",
+      overview: "后台概览", loggedAt: "已登录 · {d}",
+      tabCodes: "生成开通码", tabPromo: "优惠码", tabList: "码列表", tabUsers: "用户",
+      tabMsgs: "留言", tabViews: "访问量", tabLogs: "操作日志", tabAdmins: "管理员",
+      lblDays: "天数", lblDays2: "天数", lblCount: "数量", lblAmountAuto: "金额 RM（留空自动）",
+      lblNoteOpt: "备注（可选）", phAuto: "自动", phNote: "例：10 月促销 / 客户姓名",
+      btnGenerate: "生成", opt30: "30 天（月付）", opt365: "365 天（年付）", opt90: "90 天", opt180: "180 天",
+      lblPromoCode: "优惠码（自定义）", lblMaxUses: "最多使用次数", lblAmount: "金额 RM",
+      lblExpiry: "有效期（天，留空永久）", lblNote: "备注", phPromoNote: "早鸟年付",
+      btnCreatePromo: "创建优惠码",
+      thCode: "码", thDays: "天", thAmount: "金额", thUsed: "已用", thType: "类型", thNote: "备注", thCreated: "创建",
+      thEmail: "邮箱", thPlan: "版本", thExpiry: "到期", thVerified: "验证", thActions: "操作",
+      thTime: "时间", thName: "姓名", thContact: "联系", thMessage: "留言",
+      thStatus: "状态", thLastLogin: "最近登录", thAction: "动作", thDetail: "详情",
+      thDate: "日期", thViews: "浏览", thPage: "页面",
+      phSearchEmail: "搜索邮箱", btnSearch: "搜索",
+      newAdmin: "新增管理员", lblInitPw: "初始密码（≥8 位）", lblRole: "权限",
+      optRoleAdmin: "管理员（可发码/改用户）", optRoleViewer: "只读（仅查看）", btnAdd: "添加",
+      pwdTitle: "修改登录密码", lblCurrentPw: "当前密码", lblNewPw8: "新密码（至少 8 位）",
+      lblConfirmPw: "确认新密码", btnSave: "保存", btnCancel: "取消",
+      statUsers: "用户", statPro: "Pro", statPlans: "方案", statMessages: "留言", statPayments: "收据", statViews: "7日浏览",
+      empty: "暂无", emptyAdmins: "暂无管理员（owner 可直接用密码登录）",
+      typePromo: "优惠", typeNormal: "普通", planFree: "免费",
+      actPwd: "改密码", actExtend: "延期", actFree: "免费",
+      btnResetPwd: "重置密码", btnDisable: "停用", btnEnable: "启用", btnDelete: "删除",
+      statusActive: "启用", statusInactive: "停用",
+      roleOwner: "Owner", roleAdmin: "管理员", roleViewer: "只读",
+      copy: "复制", copied: "已复制",
+      promptSetPw: "给 {email} 设置新密码（至少 8 位）",
+      promptExtend: "给 {email} 延长 Pro（天数）", confirmFree: "把 {email} 设为免费版？",
+      donePwd: "已修改，用户需重新登录", doneExtend: "已延期至 {date}", doneFree: "已设为免费版",
+      doneReset: "已重置，该管理员需重新登录", doneDeleted: "已删除", doneAdded: "已添加",
+      promptNewPw: "新密码（≥8 位）", confirmDeleteAdmin: "删除 {email}？",
+      failed: "失败：{e}",
+      genFail: "生成失败：{e}", genOk: "已生成 {n} 个（{days} 天 · RM{amount}）",
+      promoFail: "创建失败：{e}", promoOk: "优惠码 {code} 已创建（{days} 天 · RM{amount} · 最多 {max} 次）",
+      pwTooShort: "新密码至少 8 位", pwMismatch: "两次输入不一致",
+      pwChanged: "密码已修改，其他设备的登录已失效。",
+      badCurrent: "当前密码不对", ownerEnv: "主 Owner 密码需在服务器 .env 修改", pwFail: "修改失败（{e}）",
+      otpSent: "验证码已发到 {email}，10 分钟内有效。", otpBad: "验证码错误或已失效",
+      badPassword: "密码错误", mailFailed: "验证码邮件发送失败，请稍后重试；紧急可让 Owner 运行 admin.js otp 生成",
+      loginFail: "无法登录（{e}）"
+    },
+    en: {
+      adminTitle: "Admin Panel", signedIn: "● Signed in", logout: "Sign out", changePwd: "Change password",
+      loginTitle: "Administrator sign-in",
+      loginNote: "Internal use only. This password is separate from customer accounts. Sessions last 2 hours; after signing out you must verify again.",
+      lblAdminEmail: "Admin email (leave blank for owner)", lblPassword: "Password", btnLogin: "Sign in",
+      lblOtp: "Email code (6 digits)", btnVerify: "Verify & enter", otpNote: "A code was emailed to the admin mailbox, valid for 10 minutes.",
+      overview: "Overview", loggedAt: "Signed in · {d}",
+      tabCodes: "Create codes", tabPromo: "Promo codes", tabList: "All codes", tabUsers: "Users",
+      tabMsgs: "Enquiries", tabViews: "Traffic", tabLogs: "Audit log", tabAdmins: "Admins",
+      lblDays: "Days", lblDays2: "Days", lblCount: "Quantity", lblAmountAuto: "Amount RM (blank = auto)",
+      lblNoteOpt: "Note (optional)", phAuto: "auto", phNote: "e.g. October promo / customer name",
+      btnGenerate: "Generate", opt30: "30 days (monthly)", opt365: "365 days (yearly)", opt90: "90 days", opt180: "180 days",
+      lblPromoCode: "Promo code (custom)", lblMaxUses: "Max uses", lblAmount: "Amount RM",
+      lblExpiry: "Valid for (days, blank = forever)", lblNote: "Note", phPromoNote: "Early-bird yearly",
+      btnCreatePromo: "Create promo code",
+      thCode: "Code", thDays: "Days", thAmount: "Amount", thUsed: "Used", thType: "Type", thNote: "Note", thCreated: "Created",
+      thEmail: "Email", thPlan: "Plan", thExpiry: "Expires", thVerified: "Verified", thActions: "Actions",
+      thTime: "Time", thName: "Name", thContact: "Contact", thMessage: "Message",
+      thStatus: "Status", thLastLogin: "Last login", thAction: "Action", thDetail: "Detail",
+      thDate: "Date", thViews: "Views", thPage: "Page",
+      phSearchEmail: "Search email", btnSearch: "Search",
+      newAdmin: "Add administrator", lblInitPw: "Initial password (≥8 chars)", lblRole: "Role",
+      optRoleAdmin: "Admin (issue codes / edit users)", optRoleViewer: "Viewer (read-only)", btnAdd: "Add",
+      pwdTitle: "Change sign-in password", lblCurrentPw: "Current password", lblNewPw8: "New password (min 8 chars)",
+      lblConfirmPw: "Confirm new password", btnSave: "Save", btnCancel: "Cancel",
+      statUsers: "Users", statPro: "Pro", statPlans: "Plans", statMessages: "Enquiries", statPayments: "Receipts", statViews: "Views 7d",
+      empty: "Nothing yet", emptyAdmins: "No administrators yet (owner can sign in with a password)",
+      typePromo: "Promo", typeNormal: "Standard", planFree: "Free",
+      actPwd: "Password", actExtend: "Extend", actFree: "Set free",
+      btnResetPwd: "Reset password", btnDisable: "Disable", btnEnable: "Enable", btnDelete: "Delete",
+      statusActive: "Active", statusInactive: "Disabled",
+      roleOwner: "Owner", roleAdmin: "Admin", roleViewer: "Viewer",
+      copy: "Copy", copied: "Copied",
+      promptSetPw: "Set a new password for {email} (min 8 chars)",
+      promptExtend: "Extend Pro for {email} (days)", confirmFree: "Set {email} to the free plan?",
+      donePwd: "Updated — the user must sign in again", doneExtend: "Extended until {date}", doneFree: "Set to free plan",
+      doneReset: "Reset — that admin must sign in again", doneDeleted: "Deleted", doneAdded: "Added",
+      promptNewPw: "New password (≥8 chars)", confirmDeleteAdmin: "Delete {email}?",
+      failed: "Failed: {e}",
+      genFail: "Could not generate: {e}", genOk: "Generated {n} code(s) ({days} days · RM{amount})",
+      promoFail: "Could not create: {e}", promoOk: "Promo code {code} created ({days} days · RM{amount} · max {max} uses)",
+      pwTooShort: "New password must be at least 8 characters", pwMismatch: "The two passwords do not match",
+      pwChanged: "Password changed. Other devices have been signed out.",
+      badCurrent: "Current password is wrong", ownerEnv: "The master owner password must be changed in the server .env", pwFail: "Change failed ({e})",
+      otpSent: "A code was sent to {email}, valid for 10 minutes.", otpBad: "Code is wrong or expired",
+      badPassword: "Wrong password", mailFailed: "The code email could not be sent. Try again shortly; in an emergency the owner can run admin.js otp",
+      loginFail: "Cannot sign in ({e})"
+    }
+  };
+
+  var KEY = "kwongthye_lang";
+  var lang = "zh";
+  try { lang = localStorage.getItem(KEY) || "zh"; } catch (e) {}
+
+  function t(k, vars) {
+    var s = (I18N[lang] && I18N[lang][k]) || I18N.zh[k] || k;
+    if (vars) Object.keys(vars).forEach(function (n) { s = s.split("{" + n + "}").join(vars[n]); });
+    return s;
+  }
+
   function api(path, opts) {
     opts = opts || {};
     return fetch("/api/admin" + path, {
@@ -217,21 +358,53 @@
     });
   }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  var myRole = "owner";
+  var isApp = false;
+
+  function applyLang() {
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+    document.title = (lang === "zh" ? "管理后台" : "Admin") + " — KWONG THYE";
+    $("langBtn").textContent = lang === "zh" ? "EN" : "中文";
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n");
+      if (I18N[lang][k]) el.textContent = I18N[lang][k];
+    });
+    document.querySelectorAll("[data-i18n-ph]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n-ph");
+      if (I18N[lang][k]) el.placeholder = I18N[lang][k];
+    });
+    if (isApp) {
+      renderRoleTag();
+      renderWhoLine();
+      loadStats(); loadList(); loadUsers($("uQuery").value.trim());
+      loadMsgs(); loadViews(); loadLogs();
+      if (myRole === "owner") loadAdmins();
+    }
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+  }
+
+  function renderWhoLine() {
+    var d = new Date();
+    $("whoLine").textContent = t("loggedAt", {
+      d: d.toLocaleDateString(lang === "zh" ? "zh-CN" : "en-MY") + " " +
+         d.toLocaleTimeString(lang === "zh" ? "zh-CN" : "en-MY", { hour: "2-digit", minute: "2-digit" })
+    });
+  }
+
   function show(v) {
+    isApp = v;
     $("app").hidden = !v; $("loginBox").hidden = v;
     $("logoutBtn").hidden = !v; $("who").hidden = !v; $("pwdBtn").hidden = !v;
-    if (v) {
-      var d = new Date();
-      $("whoLine").textContent = "已登录 · " + d.toLocaleDateString("en-MY") + " " + d.toLocaleTimeString("en-MY", { hour: "2-digit", minute: "2-digit" });
-      window.scrollTo(0, 0);
-    }
+    if (v) { renderWhoLine(); window.scrollTo(0, 0); }
   }
 
   function loadStats() {
     api("/overview").then(function (j) {
       if (!j.ok) return;
-      var items = [["用户", j.users], ["Pro", j.pro], ["方案", j.plans], ["留言", j.messages], ["收据", j.payments], ["7日浏览", j.views7]];
-      $("stats").innerHTML = items.map(function (x) { return '<div class="stat"><b>' + x[1] + '</b><span>' + x[0] + '</span></div>'; }).join("");
+      var items = [[t("statUsers"), j.users], [t("statPro"), j.pro], [t("statPlans"), j.plans],
+        [t("statMessages"), j.messages], [t("statPayments"), j.payments], [t("statViews"), j.views7]];
+      $("stats").innerHTML = items.map(function (x) { return '<div class="stat"><b>' + x[1] + "</b><span>" + x[0] + "</span></div>"; }).join("");
     });
   }
 
@@ -240,9 +413,9 @@
       if (!j.ok) return;
       $("listBody").innerHTML = (j.codes || []).map(function (c) {
         return "<tr><td class='mono'>" + esc(c.code) + "</td><td>" + c.days + "</td><td>RM" + Number(c.amount).toFixed(2) +
-          "</td><td>" + (c.used_count || 0) + "/" + c.max_uses + "</td><td>" + (c.label === "promo" ? "优惠" : "普通") +
+          "</td><td>" + (c.used_count || 0) + "/" + c.max_uses + "</td><td>" + (c.label === "promo" ? t("typePromo") : t("typeNormal")) +
           "</td><td>" + esc(c.note || "") + "</td><td class='muted'>" + String(c.created_at).slice(0, 10) + "</td></tr>";
-      }).join("") || "<tr><td colspan=7 class='muted'>暂无</td></tr>";
+      }).join("") || "<tr><td colspan=7 class='muted'>" + t("empty") + "</td></tr>";
     });
   }
 
@@ -251,13 +424,13 @@
       if (!j.ok) return;
       $("userBody").innerHTML = (j.users || []).map(function (u) {
         var pro = u.plan === "pro" && (!u.plan_expires_at || new Date(u.plan_expires_at) > new Date());
-        return "<tr><td>" + esc(u.email) + "</td><td><span class='tag " + (pro ? "pro" : "") + "'>" + (pro ? "Pro" : "免费") +
+        return "<tr><td>" + esc(u.email) + "</td><td><span class='tag " + (pro ? "pro" : "") + "'>" + (pro ? "Pro" : t("planFree")) +
           "</span></td><td>" + (u.plan_expires_at ? String(u.plan_expires_at).slice(0, 10) : "—") +
           "</td><td>" + (u.email_verified_at ? "✓" : "—") +
-          "</td><td><button class='btn ghost' style='padding:4px 8px;font-size:11px' data-act='pwd' data-id='" + u.id + "'>改密码</button> " +
-          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-act='ext' data-id='" + u.id + "' data-email='" + esc(u.email) + "'>延期</button> " +
-          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-act='free' data-id='" + u.id + "' data-email='" + esc(u.email) + "'>免费</button></td></tr>";
-      }).join("") || "<tr><td colspan=5 class='muted'>暂无</td></tr>";
+          "</td><td><button class='btn ghost' style='padding:4px 8px;font-size:11px' data-act='pwd' data-id='" + u.id + "'>" + t("actPwd") + "</button> " +
+          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-act='ext' data-id='" + u.id + "' data-email='" + esc(u.email) + "'>" + t("actExtend") + "</button> " +
+          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-act='free' data-id='" + u.id + "' data-email='" + esc(u.email) + "'>" + t("actFree") + "</button></td></tr>";
+      }).join("") || "<tr><td colspan=5 class='muted'>" + t("empty") + "</td></tr>";
     });
   }
 
@@ -267,7 +440,7 @@
       $("msgBody").innerHTML = (j.messages || []).map(function (m) {
         return "<tr><td class='muted'>" + String(m.created_at).slice(0, 16).replace("T", " ") + "</td><td>" + esc(m.name) +
           "</td><td>" + esc(m.phone || "") + "<br>" + esc(m.email || "") + "</td><td>" + esc(m.message) + "</td></tr>";
-      }).join("") || "<tr><td colspan=4 class='muted'>暂无</td></tr>";
+      }).join("") || "<tr><td colspan=4 class='muted'>" + t("empty") + "</td></tr>";
     });
   }
 
@@ -275,7 +448,7 @@
     api("/views?days=7").then(function (j) {
       if (!j.ok) return;
       $("dayBody").innerHTML = (j.days || []).map(function (d) { return "<tr><td>" + String(d.day).slice(0, 10) + "</td><td>" + d.views + "</td></tr>"; }).join("");
-      $("topBody").innerHTML = (j.top || []).map(function (t) { return "<tr><td class='mono'>" + esc(t.path) + "</td><td>" + t.views + "</td></tr>"; }).join("");
+      $("topBody").innerHTML = (j.top || []).map(function (tp) { return "<tr><td class='mono'>" + esc(tp.path) + "</td><td>" + tp.views + "</td></tr>"; }).join("");
     });
   }
 
@@ -284,42 +457,44 @@
       if (!j.ok) return;
       $("logBody").innerHTML = (j.logs || []).map(function (l) {
         return "<tr><td class='muted'>" + String(l.created_at).slice(0, 16).replace("T", " ") + "</td><td class='mono'>" + esc(l.action) + "</td><td>" + esc(l.detail || "") + "</td></tr>";
-      }).join("") || "<tr><td colspan=3 class='muted'>暂无</td></tr>";
+      }).join("") || "<tr><td colspan=3 class='muted'>" + t("empty") + "</td></tr>";
     });
   }
 
-  document.querySelector("#userBody").addEventListener("click", function (e) {
+  $("userBody").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-act]");
     if (!b) return;
     var id = b.getAttribute("data-id"), act = b.getAttribute("data-act"), email = b.getAttribute("data-email") || "";
     if (act === "pwd") {
-      var pw = prompt("给 " + email + " 设置新密码（至少 8 位）");
+      var pw = prompt(t("promptSetPw", { email: email }));
       if (!pw) return;
       api("/users/" + id + "/password", { method: "POST", body: { password: pw } }).then(function (j) {
-        alert(j.ok ? "已修改，用户需重新登录" : "失败：" + (j.error || j._status));
+        alert(j.ok ? t("donePwd") : t("failed", { e: j.error || j._status }));
         if (j.ok) loadLogs();
       });
     } else if (act === "ext") {
-      var days = prompt("给 " + email + " 延长 Pro（天数）", "30");
+      var days = prompt(t("promptExtend", { email: email }), "30");
       if (!days) return;
       api("/users/" + id + "/extend", { method: "POST", body: { days: days } }).then(function (j) {
-        alert(j.ok ? "已延期至 " + String(j.planExpiresAt).slice(0, 10) : "失败：" + (j.error || j._status));
+        alert(j.ok ? t("doneExtend", { date: String(j.planExpiresAt).slice(0, 10) }) : t("failed", { e: j.error || j._status }));
         loadUsers($("uQuery").value.trim()); loadLogs(); loadStats();
       });
     } else if (act === "free") {
-      if (!confirm("把 " + email + " 设为免费版？")) return;
+      if (!confirm(t("confirmFree", { email: email }))) return;
       api("/users/" + id + "/free", { method: "POST" }).then(function (j) {
-        alert(j.ok ? "已设为免费版" : "失败：" + (j.error || j._status));
+        alert(j.ok ? t("doneFree") : t("failed", { e: j.error || j._status }));
         loadUsers($("uQuery").value.trim()); loadLogs(); loadStats();
       });
     }
   });
 
-  var myRole = "owner";
+  function renderRoleTag() {
+    $("roleTag").hidden = false;
+    $("roleTag").textContent = myRole === "owner" ? t("roleOwner") : (myRole === "admin" ? t("roleAdmin") : t("roleViewer"));
+  }
   function applyRole(role) {
     myRole = role || "owner";
-    $("roleTag").hidden = false;
-    $("roleTag").textContent = myRole === "owner" ? "Owner" : (myRole === "admin" ? "管理员" : "只读");
+    renderRoleTag();
     $("tabBtnAdmins").hidden = myRole !== "owner";
     if (myRole === "viewer") {
       ["genBtn", "promoBtn"].forEach(function (id) { if ($(id)) $(id).disabled = true; });
@@ -330,27 +505,27 @@
       if (!j.ok) return;
       $("admBody").innerHTML = (j.admins || []).map(function (a) {
         var sel = "<select data-a='role' data-id='" + a.id + "' style='padding:4px;font-size:11px'>" +
-          "<option value='admin'" + (a.role === "admin" ? " selected" : "") + ">管理员</option>" +
-          "<option value='viewer'" + (a.role === "viewer" ? " selected" : "") + ">只读</option>" +
-          "<option value='owner'" + (a.role === "owner" ? " selected" : "") + ">Owner</option></select>";
+          "<option value='admin'" + (a.role === "admin" ? " selected" : "") + ">" + t("roleAdmin") + "</option>" +
+          "<option value='viewer'" + (a.role === "viewer" ? " selected" : "") + ">" + t("roleViewer") + "</option>" +
+          "<option value='owner'" + (a.role === "owner" ? " selected" : "") + ">" + t("roleOwner") + "</option></select>";
         return "<tr><td>" + esc(a.email) + "</td><td>" + sel +
-          "</td><td>" + (a.active ? "启用" : "停用") + "</td><td class='muted'>" + (a.last_login_at ? String(a.last_login_at).slice(0, 16).replace("T", " ") : "—") +
-          "</td><td><button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='pwd' data-id='" + a.id + "'>重置密码</button> " +
-          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='toggle' data-id='" + a.id + "' data-active='" + a.active + "'>" + (a.active ? "停用" : "启用") + "</button> " +
-          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='del' data-id='" + a.id + "' data-email='" + esc(a.email) + "'>删除</button></td></tr>";
-      }).join("") || "<tr><td colspan=5 class='muted'>暂无管理员（owner 可直接用密码登录）</td></tr>";
+          "</td><td>" + (a.active ? t("statusActive") : t("statusInactive")) + "</td><td class='muted'>" + (a.last_login_at ? String(a.last_login_at).slice(0, 16).replace("T", " ") : "—") +
+          "</td><td><button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='pwd' data-id='" + a.id + "'>" + t("btnResetPwd") + "</button> " +
+          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='toggle' data-id='" + a.id + "' data-active='" + a.active + "'>" + (a.active ? t("btnDisable") : t("btnEnable")) + "</button> " +
+          "<button class='btn ghost' style='padding:4px 8px;font-size:11px' data-a='del' data-id='" + a.id + "' data-email='" + esc(a.email) + "'>" + t("btnDelete") + "</button></td></tr>";
+      }).join("") || "<tr><td colspan=5 class='muted'>" + t("emptyAdmins") + "</td></tr>";
     });
   }
   $("naBtn").onclick = function () {
     api("/admins", { method: "POST", body: { email: $("naEmail").value.trim(), password: $("naPw").value, role: $("naRole").value } }).then(function (j) {
-      if (j.ok) { $("naMsg").className = "msg ok"; $("naMsg").textContent = "已添加"; $("naEmail").value = ""; $("naPw").value = ""; loadAdmins(); }
-      else { $("naMsg").className = "msg err"; $("naMsg").textContent = "失败：" + (j.error || j._status); }
+      if (j.ok) { $("naMsg").className = "msg ok"; $("naMsg").textContent = t("doneAdded"); $("naEmail").value = ""; $("naPw").value = ""; loadAdmins(); }
+      else { $("naMsg").className = "msg err"; $("naMsg").textContent = t("failed", { e: j.error || j._status }); }
     });
   };
   $("admBody").addEventListener("change", function (e) {
     var sel = e.target.closest("select[data-a='role']"); if (!sel) return;
     api("/admins/" + sel.getAttribute("data-id"), { method: "PATCH", body: { role: sel.value } }).then(function (j) {
-      if (!j.ok) alert("失败：" + (j.error || j._status));
+      if (!j.ok) alert(t("failed", { e: j.error || j._status }));
       loadAdmins(); loadLogs();
     });
   });
@@ -358,14 +533,14 @@
     var b = e.target.closest("button[data-a]"); if (!b) return;
     var id = b.getAttribute("data-id"), act = b.getAttribute("data-a");
     if (act === "pwd") {
-      var pw = prompt("新密码（≥8 位）"); if (!pw) return;
-      api("/admins/" + id, { method: "PATCH", body: { password: pw } }).then(function (j) { alert(j.ok ? "已重置，该管理员需重新登录" : "失败：" + (j.error || j._status)); loadAdmins(); });
+      var pw = prompt(t("promptNewPw")); if (!pw) return;
+      api("/admins/" + id, { method: "PATCH", body: { password: pw } }).then(function (j) { alert(j.ok ? t("doneReset") : t("failed", { e: j.error || j._status })); loadAdmins(); });
     } else if (act === "toggle") {
       var active = b.getAttribute("data-active") === "true";
-      api("/admins/" + id, { method: "PATCH", body: { active: !active } }).then(function (j) { if (!j.ok) alert("失败：" + (j.error || j._status)); loadAdmins(); });
+      api("/admins/" + id, { method: "PATCH", body: { active: !active } }).then(function (j) { if (!j.ok) alert(t("failed", { e: j.error || j._status })); loadAdmins(); });
     } else if (act === "del") {
-      if (!confirm("删除 " + b.getAttribute("data-email") + "？")) return;
-      api("/admins/" + id, { method: "DELETE" }).then(function (j) { alert(j.ok ? "已删除" : "失败：" + (j.error || j._status)); loadAdmins(); });
+      if (!confirm(t("confirmDeleteAdmin", { email: b.getAttribute("data-email") }))) return;
+      api("/admins/" + id, { method: "DELETE" }).then(function (j) { alert(j.ok ? t("doneDeleted") : t("failed", { e: j.error || j._status })); loadAdmins(); });
     }
   });
 
@@ -389,15 +564,17 @@
   $("cpSave").onclick = function () {
     var cur = $("cpCur").value, nw = $("cpNew").value, nw2 = $("cpNew2").value;
     var msg = $("cpMsg");
-    if (nw.length < 8) { msg.className = "msg err"; msg.textContent = "新密码至少 8 位"; return; }
-    if (nw !== nw2) { msg.className = "msg err"; msg.textContent = "两次输入不一致"; return; }
+    if (nw.length < 8) { msg.className = "msg err"; msg.textContent = t("pwTooShort"); return; }
+    if (nw !== nw2) { msg.className = "msg err"; msg.textContent = t("pwMismatch"); return; }
     api("/change-password", { method: "POST", body: { current: cur, password: nw } }).then(function (j) {
       if (j.ok) {
         $("pwdModal").hidden = true;
-        alert("密码已修改，其他设备的登录已失效。");
+        alert(t("pwChanged"));
       } else {
         msg.className = "msg err";
-        msg.textContent = j.error === "bad_current" ? "当前密码不对" : j.error === "owner_env" ? "主 Owner 密码需在服务器 .env 修改" : "修改失败（" + (j.error || j._status) + "）";
+        msg.textContent = j.error === "bad_current" ? t("badCurrent")
+          : j.error === "owner_env" ? t("ownerEnv")
+          : t("pwFail", { e: j.error || j._status });
       }
     });
   };
@@ -411,13 +588,13 @@
         loginEmail = j.email || "";
         $("otpWrap").hidden = false; $("otp").focus();
         $("loginMsg").className = "msg ok";
-        $("loginMsg").textContent = "验证码已发到 " + loginEmail + "，10 分钟内有效。";
+        $("loginMsg").textContent = t("otpSent", { email: loginEmail });
       } else if (j.ok) { boot(j); }
       else {
         $("loginMsg").className = "msg err";
-        $("loginMsg").textContent = j.error === "bad_password" ? "密码错误"
-          : j.error === "mail_failed" ? "验证码邮件发送失败，请稍后重试；紧急可让 Owner 运行 admin.js otp 生成"
-          : "无法登录（" + (j.error || j._status) + "）";
+        $("loginMsg").textContent = j.error === "bad_password" ? t("badPassword")
+          : j.error === "mail_failed" ? t("mailFailed")
+          : t("loginFail", { e: j.error || j._status });
       }
     });
   };
@@ -426,7 +603,7 @@
     if (!code) return;
     api("/verify", { method: "POST", body: { code: code, email: loginEmail } }).then(function (j) {
       if (j.ok) { $("otp").value = ""; $("otpWrap").hidden = true; boot(j); }
-      else { $("loginMsg").className = "msg err"; $("loginMsg").textContent = "验证码错误或已失效"; }
+      else { $("loginMsg").className = "msg err"; $("loginMsg").textContent = t("otpBad"); }
     });
   };
   $("pw").addEventListener("keydown", function (e) { if (e.key === "Enter") $("loginBtn").click(); });
@@ -449,14 +626,14 @@
     var body = { days: $("cDays").value, count: $("cCount").value, note: $("cNote").value };
     if ($("cAmount").value) body.amount = $("cAmount").value;
     api("/codes", { method: "POST", body: body }).then(function (j) {
-      if (!j.ok) { $("genMsg").className = "msg err"; $("genMsg").textContent = "生成失败：" + (j.error || j._status); return; }
+      if (!j.ok) { $("genMsg").className = "msg err"; $("genMsg").textContent = t("genFail", { e: j.error || j._status }); return; }
       $("genMsg").className = "msg ok";
-      $("genMsg").textContent = "已生成 " + j.codes.length + " 个（" + j.days + " 天 · RM" + Number(j.amount).toFixed(2) + "）";
+      $("genMsg").textContent = t("genOk", { n: j.codes.length, days: j.days, amount: Number(j.amount).toFixed(2) });
       $("genOut").innerHTML = j.codes.map(function (c) {
-        return '<span class="code"><b>' + esc(c) + '</b><button data-c="' + esc(c) + '">复制</button></span>';
+        return '<span class="code"><b>' + esc(c) + '</b><button data-c="' + esc(c) + '">' + t("copy") + "</button></span>";
       }).join("");
       $("genOut").querySelectorAll("button").forEach(function (b) {
-        b.onclick = function () { navigator.clipboard.writeText(b.getAttribute("data-c")); b.textContent = "已复制"; };
+        b.onclick = function () { navigator.clipboard.writeText(b.getAttribute("data-c")); b.textContent = t("copied"); };
       });
       loadList(); loadStats();
     });
@@ -465,15 +642,21 @@
   $("promoBtn").onclick = function () {
     var body = { code: $("pCode").value, days: $("pDays").value, maxUses: $("pMax").value, amount: $("pAmount").value, note: $("pNote").value, expiryDays: $("pExp").value };
     api("/promo", { method: "POST", body: body }).then(function (j) {
-      if (!j.ok) { $("promoMsg").className = "msg err"; $("promoMsg").textContent = "创建失败：" + (j.error || j._status); return; }
+      if (!j.ok) { $("promoMsg").className = "msg err"; $("promoMsg").textContent = t("promoFail", { e: j.error || j._status }); return; }
       $("promoMsg").className = "msg ok";
-      $("promoMsg").textContent = "优惠码 " + j.code + " 已创建（" + j.days + " 天 · RM" + j.amount + " · 最多 " + j.maxUses + " 次）";
+      $("promoMsg").textContent = t("promoOk", { code: j.code, days: j.days, amount: j.amount, max: j.maxUses });
       loadList();
     });
   };
 
   $("uSearch").onclick = function () { loadUsers($("uQuery").value.trim()); };
 
+  $("langBtn").onclick = function () {
+    lang = lang === "zh" ? "en" : "zh";
+    applyLang();
+  };
+
+  applyLang();
   api("/me").then(function (j) { if (j.ok) boot(j); else show(false); }).catch(function () { show(false); });
 })();
 </script>
