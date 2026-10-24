@@ -329,7 +329,7 @@
         <button class="btn" id="loginBtn" data-i18n="btnLogin">登录</button>
         <button class="btn btn2" id="registerBtn" data-i18n="btnRegister">注册</button>
       </div>
-      <div class="legend" data-i18n="acctNote">登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。</div>
+      <div class="legend" data-i18n="acctNote">免费版仅提供计算。升级 Pro 后可云端存档、本机存档、PDF / 打印与分享。</div>
       <button class="linkbtn" id="forgotBtn" data-i18n="forgotBtn">忘记密码？</button>
     </div>
     <div id="forgotBox" hidden>
@@ -419,7 +419,7 @@
       btnDemo: "填入示例（SPA 1M / 实价 800k / 贷 800k / 一年后卖 900k）", btnReset: "清空",
       exportTitle: "导出 / 分享",
       acctTitle: "我的账号", fEmail: "邮箱", fPassword: "密码", btnLogin: "登录", btnRegister: "注册", btnLoginShort: "登录",
-      acctNote: "登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。",
+      acctNote: "免费版仅提供计算。升级 Pro 后可云端存档、本机存档、PDF / 打印与分享。",
       acctEmailLabel: "邮箱", acctPlanLabel: "版本", acctExpiry: "到期", btnLogout: "退出登录",
       fCode: "开通码", btnRedeem: "开通 / 续费", proNote: "专业版 RM9.90/月 或 RM99/年：方案不限个数。付款后输入开通码即可开通或续费。",
       toastRedeemed: "已开通 {n} 天专业版", errCode: "开通码无效或已被使用",
@@ -495,7 +495,7 @@
       btnDemo: "Fill Example (SPA 1M / actual 800k / loan 800k / sell 900k after 1 yr)", btnReset: "Clear",
       exportTitle: "Export / Share",
       acctTitle: "My Account", fEmail: "Email", fPassword: "Password", btnLogin: "Log In", btnRegister: "Sign Up", btnLoginShort: "Log in",
-      acctNote: "Log in to save plans to the cloud (3 free); local saving still works without an account.",
+      acctNote: "The free plan is calculation-only. Upgrade to Pro for cloud/local saving, PDF, printing and sharing.",
       acctEmailLabel: "Email", acctPlanLabel: "Plan", acctExpiry: "Expires", btnLogout: "Log Out",
       fCode: "Activation code", btnRedeem: "Activate / Renew", proNote: "Pro RM9.90/month or RM99/year: unlimited saved plans. Enter your activation code after payment to activate or renew.",
       toastRedeemed: "{n} days of Pro activated", errCode: "Invalid or already-used code",
@@ -555,6 +555,11 @@
       el.textContent = t(el.getAttribute("data-i18n"));
     });
     $("langBtn").textContent = lang === "zh" ? "EN" : "中文";
+    if (logged && me && me.ok) renderAcctDetails();
+    if (typeof planMode !== "undefined" && $("planMode")) {
+      $("planMode").textContent = logged ? t("planModeCloud") : t("planModeLocal");
+      $("planNote").textContent = logged ? t("planNoteCloud") : t("planNote");
+    }
     if ($("planName")) $("planName").placeholder = lang === "zh" ? "方案名称（例：Bukit Jalil A）" : "Plan name (e.g. Bukit Jalil A)";
     try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
     document.querySelectorAll(".printdate").forEach(function (el) {
@@ -1150,19 +1155,23 @@
     $("acctBtn").title = logged ? me.user.email : t("acctTitle");
     if (logged) {
       showAcctView("me");
-      $("acctWho").textContent = me.user.email;
-      renderVerify(me.user);
-      loadPayments();
-      var planName = me.user.plan === "pro" ? t("planPro") : t("planFree");
-      var used = (me.quota === null) ? (me.plans + " " + t("planUnlimited"))
-        : (me.quota === 0 ? t("freeCalcOnly") : (me.plans + " / " + me.quota));
-      $("acctPlan").textContent = planName + " · " + used;
-      var exp = me.user.planExpiresAt ? new Date(me.user.planExpiresAt) : null;
-      if (exp && !isNaN(exp.getTime())) {
-        var days = Math.ceil((exp.getTime() - Date.now()) / 86400000);
-        $("acctExpiry").textContent = exp.toLocaleDateString(lang === "zh" ? "zh-CN" : "en-MY") + " · " + days + (lang === "zh" ? " 天" : " d");
-      } else { $("acctExpiry").textContent = "—"; }
+      renderAcctDetails();
     }
+  }
+  function renderAcctDetails() {
+    if (!(logged && me && me.ok && me.user)) return;
+    $("acctWho").textContent = me.user.email;
+    renderVerify(me.user);
+    loadPayments();
+    var planName = me.user.plan === "pro" ? t("planPro") : t("planFree");
+    var used = (me.quota === null) ? (me.plans + " " + t("planUnlimited"))
+      : (me.quota === 0 ? t("freeCalcOnly") : (me.plans + " / " + me.quota));
+    $("acctPlan").textContent = planName + " · " + used;
+    var exp = me.user.planExpiresAt ? new Date(me.user.planExpiresAt) : null;
+    if (exp && !isNaN(exp.getTime())) {
+      var days = Math.ceil((exp.getTime() - Date.now()) / 86400000);
+      $("acctExpiry").textContent = exp.toLocaleDateString(lang === "zh" ? "zh-CN" : "en-MY") + " · " + days + (lang === "zh" ? " 天" : " d");
+    } else { $("acctExpiry").textContent = "—"; }
   }
   function refreshMe() {
     return api("/me").then(function (j) { setAccount(j); }).catch(function () { setAccount(null); });
