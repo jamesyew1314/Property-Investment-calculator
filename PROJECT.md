@@ -416,3 +416,4 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 - 公式与对账（Markdown）：[`deliverables/投资系统_公式验证与案例对账_v1.1.md`](deliverables/投资系统_公式验证与案例对账_v1.1.md)
 - 公式工作簿（XLSX）：[`deliverables/投资系统_公式验证与案例对账_v1.1.xlsx`](deliverables/投资系统_公式验证与案例对账_v1.1.xlsx)
 - 交付物说明：[`deliverables/README.md`](deliverables/README.md)
+- 计算器功能说明（发客户/朋友）：[`deliverables/房地产投资计算器_功能说明_v0.34.md`](deliverables/房地产投资计算器_功能说明_v0.34.md)
