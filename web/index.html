@@ -67,6 +67,13 @@
   .company .row { margin-top:8px; }
   [hidden] { display:none !important; }
   .headbtns { display:flex; align-items:center; gap:8px; flex:none; }
+  .quickbar { display:flex; gap:8px; align-items:center; background:#fff; border-radius:12px;
+              padding:8px 10px; margin-bottom:10px; box-shadow:0 2px 10px rgba(31,56,100,.08); }
+  .quickbar input { flex:1 1 auto; min-width:0; border:1px solid #E0E5EE; border-radius:8px;
+                    padding:8px 10px; font-size:14px; background:#FFF6DD; }
+  .quickbar .btn { flex:0 0 auto; width:44px; height:38px; min-width:0; margin:0; padding:0;
+                   font-size:17px; line-height:1; border-radius:10px; }
+  .quickbar .btn2 { border:1px solid #CFDBEE; background:#F5F8FE; }
   .hbtn { border:1px solid rgba(255,255,255,.6); background:transparent; color:#fff; border-radius:9px;
           padding:6px 10px; font-size:13px; font-weight:600; cursor:pointer; max-width:150px;
           overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -154,34 +161,12 @@
   </div>
 
   <!-- 方案存档 / 分享 / 公司抬头 -->
-  <section class="part no-print" id="toolSec">
-    <h2 data-i18n="toolTitle">方案存档 / 分享</h2>
-    <div class="row"><label data-i18n="fPlanName">方案名称</label><input class="manual" id="planName" type="text" data-i18n-ph="phPlanName" placeholder="例：Bukit Jalil 公寓 A"><span class="unit"></span></div>
-    <div class="btnRow">
-      <button class="btn only-edit" id="savePlan" data-i18n="btnSavePlan">💾 保存方案</button>
-      <button class="btn btn2" id="shareLink" data-i18n="btnShareLink">🔗 复制分享链接</button>
-    </div>
-    <div class="row"><label data-i18n="fPlanList">已存方案</label><select class="manual" id="planList"></select></div>
-    <div class="btnRow">
-      <button class="btn btn2 only-edit" id="loadPlan" data-i18n="btnLoad">加载</button>
-      <button class="btn btn2 only-edit" id="delPlan" data-i18n="btnDelete">删除</button>
-    </div>
-    <div class="btnRow only-edit">
-      <button class="btn btn2" id="exportJson" data-i18n="btnExport">导出 JSON</button>
-      <button class="btn btn2" id="importJson" data-i18n="btnImport">导入 JSON</button>
-      <input type="file" id="importFile" accept="application/json,.json" hidden>
-    </div>
-    <details class="company only-edit">
-      <summary data-i18n="companyTitle">公司抬头（打印用）</summary>
-      <div class="row"><label data-i18n="fCompany">公司名</label><input class="manual" id="coName" type="text"></div>
-      <div class="row"><label data-i18n="fPhone">电话</label><input class="manual" id="coPhone" type="text"></div>
-      <div class="row"><label data-i18n="fWechat">微信</label><input class="manual" id="coWechat" type="text"></div>
-      <div class="row"><label data-i18n="fAddress">地址</label><input class="manual" id="coAddress" type="text"></div>
-      <div class="row"><label data-i18n="fCustomer">客户 / 项目</label><input class="manual" id="coClient" type="text"></div>
-      <div class="btnRow"><button class="btn btn2" id="coSave" data-i18n="btnSaveCo">保存抬头</button></div>
-    </details>
-    <div class="legend" data-i18n="planNote">💾 方案存在本机浏览器；换设备或换域名时请用「导出 / 导入 JSON」。</div>
-  </section>
+  <div class="quickbar no-print" id="toolSec">
+    <input class="manual" id="planName" type="text" placeholder="方案名称 Plan name">
+    <button class="btn" id="savePlan" title="保存方案 Save">💾</button>
+    <button class="btn btn2" id="shareLink" title="复制分享链接 Share">🔗</button>
+    <button class="btn btn2" id="planMore" title="方案列表 / 导出">⋯</button>
+  </div>
 
   <!-- Part 1 -->
   <section class="part" id="part1Sec">
@@ -286,6 +271,33 @@
   </footer>
   <div id="toast"></div>
 </main>
+
+<div class="modalMask no-print" id="planModal" hidden>
+  <div class="modalCard" role="dialog" aria-modal="true">
+    <button class="modalClose" id="planClose" aria-label="Close">×</button>
+    <h3 data-i18n="toolTitle">方案存档 / 分享</h3>
+    <div class="row"><label data-i18n="fPlanList">已存方案</label><select class="manual" id="planList"></select></div>
+    <div class="btnRow">
+      <button class="btn btn2" id="loadPlan" data-i18n="btnLoad">加载</button>
+      <button class="btn btn2" id="delPlan" data-i18n="btnDelete">删除</button>
+    </div>
+    <div class="btnRow">
+      <button class="btn btn2" id="exportJson" data-i18n="btnExport">导出 JSON</button>
+      <button class="btn btn2" id="importJson" data-i18n="btnImport">导入 JSON</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+    <details class="company">
+      <summary data-i18n="companyTitle">公司抬头（打印用）</summary>
+      <div class="row"><label data-i18n="fCompany">公司名</label><input class="manual" id="coName" type="text"></div>
+      <div class="row"><label data-i18n="fPhone">电话</label><input class="manual" id="coPhone" type="text"></div>
+      <div class="row"><label data-i18n="fWechat">微信</label><input class="manual" id="coWechat" type="text"></div>
+      <div class="row"><label data-i18n="fAddress">地址</label><input class="manual" id="coAddress" type="text"></div>
+      <div class="row"><label data-i18n="fCustomer">客户 / 项目</label><input class="manual" id="coClient" type="text"></div>
+      <div class="btnRow"><button class="btn btn2" id="coSave" data-i18n="btnSaveCo">保存抬头</button></div>
+    </details>
+    <div class="legend" data-i18n="planNote">💾 方案存在本机浏览器；换设备或换域名时请用「导出 / 导入 JSON」。</div>
+  </div>
+</div>
 
 <div class="modalMask no-print" id="acctModal" hidden>
   <div class="modalCard" role="dialog" aria-modal="true">
@@ -974,12 +986,18 @@
   $("logoutBtn").addEventListener("click", function () {
     api("/auth/logout", { method: "POST" }).then(function () { setAccount(null); closeAcct(); toast(t("toastLogout")); });
   });
+  function openPlan() { renderPlanList(); $("planModal").hidden = false; }
+  function closePlan() { $("planModal").hidden = true; }
+  $("planMore").addEventListener("click", openPlan);
+  $("planClose").addEventListener("click", closePlan);
+  $("planModal").addEventListener("click", function (e) { if (e.target === this) closePlan(); });
+
   function openAcct() { $("acctModal").hidden = false; }
   function closeAcct() { $("acctModal").hidden = true; }
   $("acctBtn").addEventListener("click", openAcct);
   $("acctClose").addEventListener("click", closeAcct);
   $("acctModal").addEventListener("click", function (e) { if (e.target === this) closeAcct(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAcct(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { closeAcct(); closePlan(); } });
 
   refreshMe();
 
