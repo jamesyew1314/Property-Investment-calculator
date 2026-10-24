@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Andy Lau 刘泌光 · 名片 / Digital Card — KWONG THYE 光泰</title>
+<meta name="description" content="KWONG THYE 光泰 创办人 Andy Lau 刘泌光的电子名片：一键保存到通讯录、WhatsApp、电话、电邮与二维码。">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" href="/icon-256.png">
+<link rel="apple-touch-icon" href="/icon-256.png">
+<meta name="theme-color" content="#0E2438">
+<style>
+  :root{--navy:#0E2438;--gold:#C6A15B;--cream:#F7F4EE;--ink:#1B2430;--muted:#6B7787;--line:#E6E1D6}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.6}
+  .wrap{max-width:520px;margin:0 auto;padding:22px 16px 40px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 10px 30px rgba(14,36,56,.10)}
+  .cardTop{background:var(--navy);padding:20px 22px 18px;position:relative}
+  .cardTop img{height:34px;width:auto;display:block}
+  .cardTop::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--gold)}
+  .identity{padding:20px 22px 6px}
+  .name{font-family:Georgia,"Songti SC",serif;font-size:25px;font-weight:700;color:var(--navy);line-height:1.2}
+  .name small{display:block;font-family:inherit;font-size:15px;font-weight:400;color:var(--muted);margin-top:4px;letter-spacing:.02em}
+  .role{font-size:13px;color:var(--gold);font-weight:700;margin-top:8px;letter-spacing:.02em}
+  .role span{color:var(--muted);font-weight:400}
+  .facts{padding:14px 22px 4px}
+  .fact{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:13.5px}
+  .fact .k{flex:0 0 74px;color:var(--muted);font-size:12.5px;padding-top:2px}
+  .fact .v{flex:1}
+  .fact a{color:#2E5496;text-decoration:none;word-break:break-word}
+  .qrBox{display:flex;gap:16px;align-items:center;padding:14px 22px 20px;border-top:1px dashed var(--line);margin-top:12px}
+  .qrBox img{width:112px;height:112px;image-rendering:pixelated;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .qrTxt{font-size:12.5px;color:var(--muted);line-height:1.7}
+  .qrTxt b{color:var(--navy);font-size:13px;display:block;margin-bottom:2px}
+  .seg{display:flex;gap:6px;margin-top:8px}
+  .seg button{border:1px solid var(--line);background:#F5F8FE;color:#334E68;border-radius:8px;
+    padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .actions a,.actions button{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 8px;
+    border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;border:0;font-family:inherit}
+  .primary{background:var(--navy);color:#fff}
+  .gold{background:var(--gold);color:#1B2430}
+  .ghost{background:#fff;color:var(--navy);border:1.5px solid #CFDBEE !important}
+  .green{background:#25D366;color:#fff}
+  .note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:16px;line-height:1.7}
+  .back{display:block;text-align:center;margin-top:18px;font-size:12.5px;color:#2E5496;text-decoration:none}
+  @media print{
+    body{background:#fff}
+    .wrap{padding:0;max-width:none}
+    .actions,.note,.back,.seg{display:none !important}
+    .card{border:1px solid #999;border-radius:10px;box-shadow:none;width:89mm;height:51mm;margin:14mm auto;overflow:hidden}
+    .cardTop{padding:7mm 7mm 3mm}
+    .cardTop img{height:7mm}
+    .identity{padding:3mm 7mm 0}
+    .name{font-size:14pt}
+    .role{font-size:8pt;margin-top:1.5mm}
+    .facts{padding:1.5mm 7mm 0}
+    .fact{font-size:7.4pt;padding:1px 0}
+    .qrBox{border-top:0;padding:0 7mm;margin-top:1mm;gap:4mm}
+    .qrBox img{width:18mm;height:18mm}
+    .qrTxt{font-size:6.6pt}
+    @page{size:A4;margin:12mm}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="cardTop"><img src="/logo-white.png" alt="KWONG THYE 光泰"></div>
+    <div class="identity">
+      <div class="name">Andy Lau 刘泌光<small>Pik Kwong Lau</small></div>
+      <div class="role">创办人 Founder <span>· KWONG THYE 光泰</span></div>
+    </div>
+    <div class="facts">
+      <div class="fact"><span class="k">手机 / 微信</span><span class="v"><a id="tel" href="tel:+60165280918">+60 16-528 0918</a></span></div>
+      <div class="fact"><span class="k">WhatsApp</span><span class="v"><a href="https://wa.me/60165280918" target="_blank" rel="noopener">wa.me/60165280918</a></span></div>
+      <div class="fact"><span class="k">电邮 Email</span><span class="v"><a href="mailto:andylau.theroof@gmail.com">andylau.theroof@gmail.com</a></span></div>
+      <div class="fact"><span class="k">公司</span><span class="v">THE ROOF REALTY SDN BHD<br>E(1)1605/1 · REN 32839</span></div>
+      <div class="fact"><span class="k">办公室 Office</span><span class="v">No 10A, Jalan Sutera Tanjung 8/4,<br>Taman Sutera Utama, 81300 Skudai, Johor</span></div>
+      <div class="fact"><span class="k">网站 Web</span><span class="v"><a href="https://kwongthye.com">kwongthye.com</a></span></div>
+    </div>
+    <div class="qrBox">
+      <img id="qr" alt="QR code">
+      <div class="qrTxt">
+        <b id="qrTitle">扫码存名片</b>
+        <span id="qrHint">手机相机扫描 → 加入通讯录</span>
+        <div class="seg">
+          <button id="segCard" aria-pressed="true">名片</button>
+          <button id="segWeb" aria-pressed="false">网站</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="gold" id="saveCard">📇 保存到通讯录</button>
+    <a class="green" href="https://wa.me/60165280918" target="_blank" rel="noopener">WhatsApp</a>
+    <a class="ghost" href="tel:+60165280918">📞 打电话</a>
+    <a class="ghost" href="mailto:andylau.theroof@gmail.com">✉️ 电邮</a>
+    <button class="primary" id="shareBtn" style="grid-column:1 / -1">🔗 分享名片</button>
+  </div>
+  <div class="note">
+    打印建议：A4 纸，卡片 89 × 51 mm（标准名片尺寸），可留白裁切。<br>
+    Print tip: A4 paper, 89 × 51 mm card — trim along the border.
+  </div>
+  <a class="back" href="/">← 返回 KWONG THYE 光泰</a>
+</div>
+
+<script src="/calc/qrcode.js"></script>
+<script>
+(function () {
+  "use strict";
+  var V = {
+    name: "Andy Lau Pik Kwong",
+    nameZh: "刘泌光",
+    org: "KWONG THYE 光泰",
+    title: "Founder 创办人 · THE ROOF REALTY SDN BHD (E(1)1605/1)",
+    tel: "+60165280918",
+    email: "andylau.theroof@gmail.com",
+    address: "No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor, Malaysia",
+    url: "https://kwongthye.com",
+    ren: "REN 32839"
+  };
+  var vcard = [
+    "BEGIN:VCARD", "VERSION:3.0",
+    "N:Lau;Andy;Pik Kwong;;",
+    "FN:Andy Lau (" + V.nameZh + ") — KWONG THYE 光泰",
+    "ORG:" + V.org,
+    "TITLE:" + V.title,
+    "TEL;TYPE=CELL,VOICE:" + V.tel,
+    "EMAIL;TYPE=WORK:" + V.email,
+    "URL:" + V.url,
+    "ADR;TYPE=WORK:;;No 10A Jalan Sutera Tanjung 8/4, Taman Sutera Utama;Skudai;Johor;81300;Malaysia",
+    "NOTE:" + V.ren + " · WHATSAPP " + V.tel + " · KUALA LUMPUR / JOHOR BAHRU",
+    "END:VCARD"
+  ].join("\r\n");
+
+  var qrEl = document.getElementById("qr");
+  function draw(text) {
+    try {
+      if (typeof qrcode !== "function") { qrEl.style.visibility = "hidden"; return; }
+      var q = qrcode(0, "M");
+      q.addData(text);
+      q.make();
+      qrEl.src = q.createDataURL(5, 2);
+    } catch (e) { qrEl.style.visibility = "hidden"; }
+  }
+  var mode = "card";
+  draw(vcard);
+  document.getElementById("segCard").addEventListener("click", function () {
+    mode = "card"; this.setAttribute("aria-pressed", "true");
+    document.getElementById("segWeb").setAttribute("aria-pressed", "false");
+    document.getElementById("qrTitle").textContent = "扫码存名片";
+    document.getElementById("qrHint").textContent = "手机相机扫描 → 加入通讯录";
+    draw(vcard);
+  });
+  document.getElementById("segWeb").addEventListener("click", function () {
+    mode = "web"; this.setAttribute("aria-pressed", "true");
+    document.getElementById("segCard").setAttribute("aria-pressed", "false");
+    document.getElementById("qrTitle").textContent = "扫码打开网站";
+    document.getElementById("qrHint").textContent = "kwongthye.com";
+    draw(V.url + "/?utm_source=namecard&utm_medium=qr");
+  });
+
+  function download(name, text, type) {
+    var blob = new Blob([text], { type: type });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  }
+  document.getElementById("saveCard").addEventListener("click", function () {
+    download("Andy-Lau-KWONG-THYE.vcf", vcard, "text/vcard;charset=utf-8");
+  });
+  document.getElementById("shareBtn").addEventListener("click", function () {
+    var url = location.origin + "/card/";
+    if (navigator.share) {
+      navigator.share({ title: "Andy Lau · KWONG THYE 光泰", text: "名片 / Digital name card", url: url }).catch(function () {});
+      return;
+    }
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () {
+      alert("已复制名片链接 / Link copied:\n" + url);
+    }).catch(function () { prompt("复制这个链接 / Copy:", url); });
+    else prompt("复制这个链接 / Copy:", url);
+  });
+})();
+</script>
+</body>
+</html>

@@ -2,14 +2,23 @@
   "name": "KWONG THYE 房地产投资计算器",
   "short_name": "KWTHYE 计算器",
   "description": "马来西亚房地产投资计算器：买入、持有、出租、出售回报与 RPGT。",
-  "start_url": "/calc/",
-  "scope": "/calc/",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#F6F7FB",
   "theme_color": "#0E2438",
   "lang": "zh-CN",
   "icons": [
-    { "src": "/icon-256.png", "sizes": "256x256", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

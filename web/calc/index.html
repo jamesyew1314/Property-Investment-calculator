@@ -453,6 +453,9 @@
         </div>
         <div class="legend" data-i18n="twofaHint">开启后每次登录需再输入邮箱验证码（10 分钟有效）。</div>
         <div class="hr"></div>
+        <div class="line"><span data-i18n="monthlyLabel">月度邮件（每月 1 封）</span><b id="monthlyState">—</b></div>
+        <div class="btnRow"><button class="btn btn2" id="monthlyToggle" data-i18n="btnMonthlyOn">退订</button></div>
+        <div class="hr"></div>
         <div class="legend" data-i18n="exportNote">下载我保存的全部资料（JSON）：账号、方案、收据、留言。依据马来西亚 PDPA 查阅权。</div>
         <div class="btnRow"><a class="btn btn2" id="dataExport" href="/api/me/export" data-i18n="btnDataExport">下载我的资料</a></div>
         <div class="hr"></div>
@@ -533,6 +536,9 @@
       printHeadLbl: "页眉", headFull: "完整（Logo + 抬头 + 二维码）", headSimple: "简洁（公司名 + 日期）", headNone: "无页眉",
       cmpCash: "购房现金", cmpAcq: "总购置费", cmpPmt: "月供", cmpRent: "年净租金",
       cmpSell: "出售利润", cmpNet: "投资净利润", cmpRoi: "Total ROI", cmpRotc: "总成本回报", cmpRpgt: "RPGT",
+      monthlyLabel: "月度邮件（每月 1 封）", monthlyOn: "已订阅", monthlyOff: "已退订",
+      btnMonthlyStop: "退订", btnMonthlyResume: "重新订阅",
+      toastMonthlyOn: "已订阅月度邮件", toastMonthlyOff: "已退订月度邮件",
       twofaNote: "两步验证已开启。请输入我们发到您邮箱的 6 位验证码。",
       twofaCodeLbl: "验证码", btn2faGo: "验证并登录", twofaLabel: "两步验证（邮件验证码）",
       btn2faOn: "开启", btn2faOff: "关闭", twofaOnState: "已开启", twofaOffState: "未开启",
@@ -632,6 +638,9 @@
       printHeadLbl: "Header", headFull: "Full (logo + header + QR)", headSimple: "Simple (company + date)", headNone: "No header",
       cmpCash: "Upfront cash", cmpAcq: "Acquisition costs", cmpPmt: "Monthly instalment", cmpRent: "Annual net rent",
       cmpSell: "Selling profit", cmpNet: "Net investment profit", cmpRoi: "Total ROI", cmpRotc: "Return on total cost", cmpRpgt: "RPGT",
+      monthlyLabel: "Monthly email (one per month)", monthlyOn: "Subscribed", monthlyOff: "Unsubscribed",
+      btnMonthlyStop: "Unsubscribe", btnMonthlyResume: "Re-subscribe",
+      toastMonthlyOn: "Subscribed to the monthly email", toastMonthlyOff: "Unsubscribed from the monthly email",
       twofaNote: "Two-step verification is on. Enter the 6-digit code we emailed you.",
       twofaCodeLbl: "Code", btn2faGo: "Verify & sign in", twofaLabel: "Two-step verification (email code)",
       btn2faOn: "Turn on", btn2faOff: "Turn off", twofaOnState: "On", twofaOffState: "Off",
@@ -1290,7 +1299,8 @@
   function registerSW() {
     if (!("serviceWorker" in navigator)) return;
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js", { scope: "/calc/" }).catch(function () {});
+      var scope = location.pathname.replace(/[^/]*$/, "");
+      navigator.serviceWorker.register("sw.js", { scope: scope || "/" }).catch(function () {});
     });
   }
   function exportCsv() {
@@ -1573,6 +1583,12 @@
     var used = (me.quota === null) ? (me.plans + " " + t("planUnlimited"))
       : (me.quota === 0 ? t("freeCalcOnly") : (me.plans + " / " + me.quota));
     $("acctPlan").textContent = planName + " · " + used;
+    if ($("monthlyState")) {
+      var off = !!me.user.monthlyOptOut;
+      $("monthlyState").textContent = off ? t("monthlyOff") : t("monthlyOn");
+      $("monthlyState").style.color = off ? "#8A5A2B" : "#166E52";
+      $("monthlyToggle").textContent = off ? t("btnMonthlyResume") : t("btnMonthlyStop");
+    }
     if ($("twofaState")) {
       $("twofaState").textContent = me.user.twofaEnabled ? t("twofaOnState") : t("twofaOffState");
       $("twofaState").style.color = me.user.twofaEnabled ? "#166E52" : "#8A5A2B";
@@ -1728,6 +1744,16 @@
       } else { toast(j.error === "bad_credentials" ? t("errCurrent") : errMsg(j.error)); }
     }).catch(function () { toast(t("errGeneric")); });
   }
+  $("monthlyToggle").addEventListener("click", function () {
+    var want = !(me && me.user && me.user.monthlyOptOut);
+    api("/me/prefs", { method: "POST", body: { monthly: want } }).then(function (j) {
+      if (j.ok) {
+        if (me && me.user) me.user.monthlyOptOut = !!j.monthlyOptOut;
+        renderAcctDetails();
+        toast(t(want ? "toastMonthlyOn" : "toastMonthlyOff"));
+      } else { toast(errMsg(j.error)); }
+    }).catch(function () { toast(t("errGeneric")); });
+  });
   $("twofaOn").addEventListener("click", function () { twofaSet(true); });
   $("twofaOff").addEventListener("click", function () { twofaSet(false); });
   $("changePwdBtn").addEventListener("click", function () {

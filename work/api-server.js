@@ -11,6 +11,9 @@ const { Pool } = require("pg");
 const PORT = process.env.PORT || 3000;
 const FREE_QUOTA = 0;
 const SESSION_DAYS = 30;
+// 可用环境变量改 cookie 名/路径（staging 用，避免覆盖正式会话）
+const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME || "fc_sid";
+const COOKIE_PATH = process.env.SESSION_COOKIE_PATH || "/";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
 const app = express();
@@ -41,17 +44,17 @@ function parseCookies(req) {
 }
 function publicUser(u) {
   return { id: u.id, email: u.email, displayName: u.display_name || null, plan: u.plan, planExpiresAt: u.plan_expires_at,
-           emailVerified: !!u.email_verified_at, twofaEnabled: !!u.twofa_enabled };
+           emailVerified: !!u.email_verified_at, twofaEnabled: !!u.twofa_enabled, monthlyOptOut: !!u.monthly_opt_out };
 }
 function quotaFor(u) {
   const paid = u.plan === "pro" && (!u.plan_expires_at || new Date(u.plan_expires_at) > new Date());
   return paid ? null : FREE_QUOTA;
 }
 function setSessionCookie(res, token) {
-  res.setHeader("Set-Cookie", "fc_sid=" + token + "; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=" + (SESSION_DAYS * 86400));
+  res.setHeader("Set-Cookie", SESSION_COOKIE + "=" + token + "; HttpOnly; Secure; SameSite=Lax; Path=" + COOKIE_PATH + "; Max-Age=" + (SESSION_DAYS * 86400));
 }
 function clearSessionCookie(res) {
-  res.setHeader("Set-Cookie", "fc_sid=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0");
+  res.setHeader("Set-Cookie", SESSION_COOKIE + "=; HttpOnly; Secure; SameSite=Lax; Path=" + COOKIE_PATH + "; Max-Age=0");
 }
 async function createSession(userId) {
   const token = crypto.randomBytes(32).toString("hex");
@@ -153,10 +156,10 @@ app.use("/api", function (req, res, next) {
 });
 const requireAuth = async function (req, res, next) {
   try {
-    const token = parseCookies(req).fc_sid;
+    const token = parseCookies(req)[SESSION_COOKIE];
     if (!token) return res.status(401).json({ ok: false, error: "auth_required" });
     const r = await pool.query(
-      "SELECT u.id,u.email,u.display_name,u.plan,u.plan_expires_at,u.email_verified_at,u.twofa_enabled " +
+      "SELECT u.id,u.email,u.display_name,u.plan,u.plan_expires_at,u.email_verified_at,u.twofa_enabled,u.monthly_opt_out " +
       "FROM sessions s JOIN users u ON u.id = s.user_id " +
       "WHERE s.token_hash = $1 AND s.expires_at > now()", [sha256(token)]);
     if (!r.rows[0]) return res.status(401).json({ ok: false, error: "auth_required" });
@@ -284,7 +287,7 @@ app.post("/api/auth/2fa/settings", requireAuth, rateLimit(10, 600000), async fun
 
 app.post("/api/auth/logout", async function (req, res, next) {
   try {
-    const token = parseCookies(req).fc_sid;
+    const token = parseCookies(req)[SESSION_COOKIE];
     if (token) await pool.query("DELETE FROM sessions WHERE token_hash=$1", [sha256(token)]);
     clearSessionCookie(res);
     res.json({ ok: true });
@@ -383,7 +386,7 @@ app.post("/api/auth/change-password", requireAuth, rateLimit(10, 600000), async 
     const r = await pool.query("SELECT password_hash FROM users WHERE id=$1", [req.user.id]);
     if (!scryptVerify(current, r.rows[0].password_hash)) return res.status(400).json({ ok: false, error: "bad_current" });
     await pool.query("UPDATE users SET password_hash=$1, updated_at=now() WHERE id=$2", [scryptHash(password), req.user.id]);
-    const token = parseCookies(req).fc_sid;
+    const token = parseCookies(req)[SESSION_COOKIE];
     if (token) await pool.query("DELETE FROM sessions WHERE user_id=$1 AND token_hash<>$2", [req.user.id, sha256(token)]);
     res.json({ ok: true });
   } catch (e) { next(e); }
@@ -507,7 +510,7 @@ app.post("/api/plans/import", requireAuth, requireVerified, async function (req,
 });
 
 // ---------- admin ----------
-const ADMIN_COOKIE = "fc_admin";
+const ADMIN_COOKIE = process.env.ADMIN_COOKIE_NAME || "fc_admin";
 function adminToken() {
   return crypto.createHash("sha256")
     .update(String(process.env.ADMIN_PASSWORD || "") + "|" + String(process.env.ADMIN_SECRET || "kwthye"))
@@ -592,14 +595,14 @@ app.post("/api/admin/verify", rateLimit(10, 600000), async function (req, res) {
   await pool.query("INSERT INTO admin_sessions(token_hash,admin_id,email,role,expires_at) VALUES($1,$2,$3,$4, now() + interval '2 hours')",
     [sha256(token), admin.id, admin.email, admin.role]);
   if (admin.id) await pool.query("UPDATE admins SET last_login_at=now() WHERE id=$1", [admin.id]);
-  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=" + token + "; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=7200");
+  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=" + token + "; HttpOnly; Secure; SameSite=Strict; Path=" + COOKIE_PATH + "; Max-Age=7200");
   await adminLog("login.ok", admin.email + " (" + admin.role + ")", req);
   res.json({ ok: true, email: admin.email, role: admin.role });
 });
 app.post("/api/admin/logout", async function (req, res) {
   const t = parseCookies(req)[ADMIN_COOKIE] || "";
   if (t) await pool.query("DELETE FROM admin_sessions WHERE token_hash=$1", [sha256(t)]);
-  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0");
+  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=; HttpOnly; Secure; SameSite=Strict; Path=" + COOKIE_PATH + "; Max-Age=0");
   res.json({ ok: true });
 });
 app.get("/api/admin/me", requireAdmin, function (req, res) { res.json({ ok: true, email: req.admin.email, role: req.admin.role }); });
@@ -851,6 +854,46 @@ app.post("/api/contact", rateLimit(3, 600000), async function (req, res, next) {
 });
 
 // ---------- analytics ----------
+// 月度邮件退订（签名链接，无需登录）
+function unsubSig(id) {
+  return crypto.createHmac("sha256", process.env.ADMIN_SECRET || "kwongthye")
+    .update("unsub:" + id).digest("hex").slice(0, 32);
+}
+app.get("/api/unsubscribe", async function (req, res, next) {
+  try {
+    const id = String(req.query.u || "");
+    const t = String(req.query.t || "");
+    const expect = unsubSig(id);
+    const good = id.length > 10 && t.length === expect.length &&
+      crypto.timingSafeEqual(Buffer.from(t), Buffer.from(expect));
+    let msg = "链接无效或已过期。";
+    if (good) {
+      const r = await pool.query("UPDATE users SET monthly_opt_out=true WHERE id=$1 RETURNING email", [id]);
+      msg = r.rowCount ? "已退订月度邮件，您仍会收到账号与付款相关的必要通知。" : "找不到该账号。";
+    }
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send("<!doctype html><html lang=zh><head><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\">" +
+      "<title>退订 / Unsubscribe — KWONG THYE</title><style>body{margin:0;background:#F7F4EE;font-family:-apple-system,'PingFang SC',sans-serif;" +
+      "color:#1B2430;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:20px}" +
+      ".c{background:#fff;border:1px solid #E6E1D6;border-radius:14px;max-width:420px;padding:26px;text-align:center}" +
+      "h1{font-family:Georgia,serif;color:#0E2438;font-size:19px;margin:0 0 10px}p{font-size:14px;line-height:1.7;color:#3A4351}" +
+      "a{display:inline-block;margin-top:16px;background:#0E2438;color:#fff;text-decoration:none;padding:11px 20px;border-radius:9px;font-weight:700;font-size:14px}" +
+      "</style></head><body><div class=c><h1>月度邮件 / Monthly email</h1><p>" + msg +
+      "</p><p style=\"font-size:12.5px;color:#8A929E\">You can re-subscribe anytime in your account settings.</p>" +
+      "<a href=\"/calc/\">返回计算器 / Back to calculator</a></div></body></html>");
+  } catch (e) { next(e); }
+});
+
+// 邮件偏好（登录后开关）
+app.post("/api/me/prefs", requireAuth, rateLimit(20, 600000), async function (req, res, next) {
+  try {
+    const monthly = (req.body || {}).monthly;
+    if (typeof monthly !== "boolean") return res.status(400).json({ ok: false, error: "bad_request" });
+    await pool.query("UPDATE users SET monthly_opt_out=$2 WHERE id=$1", [req.user.id, !monthly]);
+    res.json({ ok: true, monthlyOptOut: !monthly });
+  } catch (e) { next(e); }
+});
+
 app.post("/api/track", rateLimit(120, 60000), async function (req, res) {
   try {
     const path = String((req.body || {}).path || "").slice(0, 200);
