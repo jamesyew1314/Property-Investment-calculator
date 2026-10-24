@@ -185,6 +185,23 @@
     </div>
   </div>
 </main>
+<div id="pwdModal" hidden style="position:fixed;inset:0;background:rgba(10,20,30,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:60">
+  <div style="background:#fff;border-radius:14px;padding:22px;max-width:380px;width:100%">
+    <h3 style="margin:0 0 12px;color:var(--navy);font-size:16px">修改登录密码</h3>
+    <label>当前密码</label>
+    <input id="cpCur" type="password" autocomplete="current-password">
+    <label style="margin-top:10px">新密码（至少 8 位）</label>
+    <input id="cpNew" type="password" autocomplete="new-password">
+    <label style="margin-top:10px">确认新密码</label>
+    <input id="cpNew2" type="password" autocomplete="new-password">
+    <div class="msg" id="cpMsg"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn gold" id="cpSave">保存</button>
+      <button class="btn ghost" id="cpCancel">取消</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -460,21 +477,5 @@
   api("/me").then(function (j) { if (j.ok) boot(j); else show(false); }).catch(function () { show(false); });
 })();
 </script>
-<div id="pwdModal" hidden style="position:fixed;inset:0;background:rgba(10,20,30,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:60">
-  <div style="background:#fff;border-radius:14px;padding:22px;max-width:380px;width:100%">
-    <h3 style="margin:0 0 12px;color:var(--navy);font-size:16px">修改登录密码</h3>
-    <label>当前密码</label>
-    <input id="cpCur" type="password" autocomplete="current-password">
-    <label style="margin-top:10px">新密码（至少 8 位）</label>
-    <input id="cpNew" type="password" autocomplete="new-password">
-    <label style="margin-top:10px">确认新密码</label>
-    <input id="cpNew2" type="password" autocomplete="new-password">
-    <div class="msg" id="cpMsg"></div>
-    <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="btn gold" id="cpSave">保存</button>
-      <button class="btn ghost" id="cpCancel">取消</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
