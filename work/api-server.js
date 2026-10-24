@@ -402,6 +402,127 @@ app.post("/api/plans/import", requireAuth, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
+// ---------- admin ----------
+const ADMIN_COOKIE = "fc_admin";
+function adminToken() {
+  return crypto.createHash("sha256")
+    .update(String(process.env.ADMIN_PASSWORD || "") + "|" + String(process.env.ADMIN_SECRET || "kwthye"))
+    .digest("hex");
+}
+function requireAdmin(req, res, next) {
+  if (!process.env.ADMIN_PASSWORD) return res.status(503).json({ ok: false, error: "admin_disabled" });
+  const t = parseCookies(req)[ADMIN_COOKIE] || "";
+  const exp = adminToken();
+  if (t.length !== exp.length || !crypto.timingSafeEqual(Buffer.from(t), Buffer.from(exp))) {
+    return res.status(401).json({ ok: false, error: "admin_required" });
+  }
+  next();
+}
+function adminCode() {
+  return Array.from({ length: 3 }, function () { return Math.random().toString(36).slice(2, 6).toUpperCase(); }).join("-");
+}
+
+app.post("/api/admin/login", rateLimit(5, 600000), function (req, res) {
+  if (!process.env.ADMIN_PASSWORD) return res.status(503).json({ ok: false, error: "admin_disabled" });
+  const pw = String((req.body || {}).password || "");
+  const exp = Buffer.from(String(process.env.ADMIN_PASSWORD));
+  const got = Buffer.from(pw);
+  const ok = got.length === exp.length && crypto.timingSafeEqual(got, exp);
+  if (!ok) return res.status(401).json({ ok: false, error: "bad_password" });
+  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=" + adminToken() + "; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=43200");
+  res.json({ ok: true });
+});
+app.post("/api/admin/logout", function (req, res) {
+  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0");
+  res.json({ ok: true });
+});
+app.get("/api/admin/me", requireAdmin, function (req, res) { res.json({ ok: true }); });
+
+app.get("/api/admin/overview", requireAdmin, async function (req, res, next) {
+  try {
+    const q = async (sql) => (await pool.query(sql)).rows[0].n;
+    res.json({
+      ok: true,
+      users: await q("SELECT count(*)::int n FROM users"),
+      pro: await q("SELECT count(*)::int n FROM users WHERE plan='pro' AND (plan_expires_at IS NULL OR plan_expires_at > now())"),
+      plans: await q("SELECT count(*)::int n FROM plans"),
+      messages: await q("SELECT count(*)::int n FROM contact_messages"),
+      payments: await q("SELECT count(*)::int n FROM payments"),
+      views7: await q("SELECT count(*)::int n FROM pageviews WHERE created_at > now() - interval '7 days'")
+    });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/admin/codes", requireAdmin, async function (req, res, next) {
+  try {
+    const b = req.body || {};
+    const days = Math.max(1, Math.min(3660, parseInt(b.days || "30", 10)));
+    const count = Math.max(1, Math.min(50, parseInt(b.count || "1", 10)));
+    const note = String(b.note || "").slice(0, 120) || null;
+    const amount = b.amount !== undefined && b.amount !== "" ? parseFloat(b.amount) : (days >= 365 ? 99 : Math.round(9.9 * Math.ceil(days / 30) * 100) / 100);
+    const out = [];
+    for (let i = 0; i < count; i++) {
+      let code = adminCode();
+      await pool.query("INSERT INTO redeem_codes(code,days,note,amount) VALUES($1,$2,$3,$4)", [code, days, note, amount]);
+      out.push(code);
+    }
+    res.json({ ok: true, codes: out, days: days, amount: amount });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/admin/promo", requireAdmin, async function (req, res, next) {
+  try {
+    const b = req.body || {};
+    const code = String(b.code || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 32);
+    const days = Math.max(1, Math.min(3660, parseInt(b.days || "365", 10)));
+    const maxUses = Math.max(1, Math.min(10000, parseInt(b.maxUses || "10", 10)));
+    const amount = b.amount !== undefined && b.amount !== "" ? parseFloat(b.amount) : 99;
+    const note = String(b.note || "").slice(0, 120) || null;
+    const expDays = b.expiryDays ? Math.max(1, parseInt(b.expiryDays, 10)) : null;
+    if (!code) return res.status(400).json({ ok: false, error: "bad_code" });
+    await pool.query(
+      "INSERT INTO redeem_codes(code,days,note,amount,max_uses,label,expires_at) VALUES($1,$2,$3,$4,$5,'promo',$6)",
+      [code, days, note, amount, maxUses, expDays ? new Date(Date.now() + expDays * 86400000) : null]);
+    res.json({ ok: true, code: code, days: days, maxUses: maxUses, amount: amount });
+  } catch (e) { next(e); }
+});
+
+app.get("/api/admin/codes", requireAdmin, async function (req, res, next) {
+  try {
+    const r = await pool.query(
+      "SELECT code,days,amount,note,used_count,max_uses,label,used_at,expires_at,created_at FROM redeem_codes ORDER BY created_at DESC LIMIT 200");
+    res.json({ ok: true, codes: r.rows });
+  } catch (e) { next(e); }
+});
+
+app.get("/api/admin/users", requireAdmin, async function (req, res, next) {
+  try {
+    const q = String(req.query.q || "").trim();
+    const r = q
+      ? await pool.query("SELECT id,email,plan,plan_expires_at,email_verified_at,created_at FROM users WHERE email ILIKE $1 ORDER BY created_at DESC LIMIT 100", ["%" + q + "%"])
+      : await pool.query("SELECT id,email,plan,plan_expires_at,email_verified_at,created_at FROM users ORDER BY created_at DESC LIMIT 100");
+    res.json({ ok: true, users: r.rows });
+  } catch (e) { next(e); }
+});
+
+app.get("/api/admin/messages", requireAdmin, async function (req, res, next) {
+  try {
+    const days = Math.max(1, parseInt(req.query.days || "30", 10));
+    const r = await pool.query(
+      "SELECT id,name,phone,email,subject,message,emailed,created_at FROM contact_messages WHERE created_at > now() - ($1 || ' days')::interval ORDER BY created_at DESC LIMIT 100", [days]);
+    res.json({ ok: true, messages: r.rows });
+  } catch (e) { next(e); }
+});
+
+app.get("/api/admin/views", requireAdmin, async function (req, res, next) {
+  try {
+    const days = Math.max(1, parseInt(req.query.days || "7", 10));
+    const d = await pool.query("SELECT created_at::date AS day, count(*)::int AS views FROM pageviews WHERE created_at > now() - ($1 || ' days')::interval GROUP BY 1 ORDER BY 1 DESC", [days]);
+    const t = await pool.query("SELECT path, count(*)::int AS views FROM pageviews WHERE created_at > now() - ($1 || ' days')::interval GROUP BY 1 ORDER BY 2 DESC LIMIT 10", [days]);
+    res.json({ ok: true, days: d.rows, top: t.rows });
+  } catch (e) { next(e); }
+});
+
 // ---------- contact form ----------
 app.post("/api/contact", rateLimit(3, 600000), async function (req, res, next) {
   try {

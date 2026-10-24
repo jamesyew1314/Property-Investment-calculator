@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>管理后台 — KWONG THYE</title>
+<link rel="icon" type="image/png" href="/icon-256.png">
+<style>
+  :root{--navy:#0E2438;--gold:#C6A15B;--cream:#F6F7FB;--ink:#1B2430;--muted:#5D6B7A;--line:#E2E6EE;--blue:#2E5496}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font:14px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  header{background:var(--navy);color:#fff}
+  .wrap{width:min(1080px,94vw);margin:0 auto}
+  .bar{display:flex;align-items:center;gap:12px;height:64px}
+  .bar img{height:38px}
+  .bar b{font-family:Georgia,serif;font-size:16px}
+  .bar .sp{margin-left:auto}
+  .bar button{background:none;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer}
+  main{padding:26px 0 60px}
+  h1{font-size:20px;margin:0 0 16px;color:var(--navy)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+  .login{max-width:420px;margin:40px auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px}
+  .login h2{margin:0 0 6px;color:var(--navy);font-size:18px}
+  .login p{margin:0 0 16px;color:var(--muted);font-size:12.5px}
+  input,select,textarea{width:100%;padding:10px 11px;border:1px solid #D6DCE7;border-radius:9px;font:inherit;font-size:14px;background:#FCFDFF}
+  label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:5px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .btn{background:var(--navy);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-size:13.5px;cursor:pointer;font-weight:600}
+  .btn.gold{background:var(--gold);color:#1B2430}
+  .btn.ghost{background:none;color:var(--navy);border:1px solid var(--line)}
+  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
+  .stat b{display:block;font-family:Georgia,serif;font-size:20px;color:var(--navy)}
+  .stat span{font-size:11px;color:var(--muted)}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .tabs button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 14px;font-size:12.5px;cursor:pointer}
+  .tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .tab{display:none}
+  .tab.on{display:block}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
+  th,td{border-bottom:1px solid #EEF1F6;padding:8px 8px;text-align:left;vertical-align:top}
+  th{background:#F8FAFD;color:var(--navy);font-size:11.5px;position:sticky;top:0}
+  .mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .codes{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .code{background:#F3F7FF;border:1px dashed #B9C8E4;border-radius:10px;padding:8px 10px;font-family:ui-monospace,Menlo,monospace;font-size:13px;display:flex;gap:8px;align-items:center}
+  .code button{border:none;background:none;color:var(--blue);cursor:pointer;font-size:11px}
+  .msg{font-size:12.5px;margin-top:10px}
+  .msg.err{color:#B23B3B}.msg.ok{color:#166E52}
+  .muted{color:var(--muted);font-size:11.5px}
+  .tag{display:inline-block;border-radius:999px;padding:1px 8px;font-size:11px;background:#EEF2F8;color:#456}
+  .tag.pro{background:#EAF6EF;color:#166E52}
+  @media(max-width:820px){.stats{grid-template-columns:repeat(3,1fr)}.grid,.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a href="/"><img src="/logo-white.png" alt="KWONG THYE"></a>
+    <b>管理后台 <span style="color:#C6A15B;font-size:12px">Admin</span></b>
+    <span class="sp"></span>
+    <button id="logoutBtn" hidden>退出</button>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <div class="login" id="loginBox">
+      <h2>管理员登录</h2>
+      <p>仅限内部使用。密码与用户账号无关。</p>
+      <label>管理密码</label>
+      <input id="pw" type="password" autocomplete="current-password" placeholder="••••••••">
+      <button class="btn" id="loginBtn" style="margin-top:12px;width:100%">登录</button>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+
+    <div id="app" hidden>
+      <div class="stats" id="stats"></div>
+
+      <div class="tabs">
+        <button data-tab="codes" class="on">生成开通码</button>
+        <button data-tab="promo">优惠码</button>
+        <button data-tab="list">码列表</button>
+        <button data-tab="users">用户</button>
+        <button data-tab="msgs">留言</button>
+        <button data-tab="views">访问量</button>
+      </div>
+
+      <section class="tab on" id="tab-codes">
+        <div class="card">
+          <div class="grid3">
+            <div><label>天数</label><select id="cDays"><option value="30">30 天（月付）</option><option value="365">365 天（年付）</option><option value="90">90 天</option><option value="180">180 天</option></select></div>
+            <div><label>数量</label><input id="cCount" type="number" min="1" max="50" value="1"></div>
+            <div><label>金额 RM（留空自动）</label><input id="cAmount" type="number" step="0.01" placeholder="自动"></div>
+          </div>
+          <div style="margin-top:12px"><label>备注（可选）</label><input id="cNote" maxlength="120" placeholder="例：10 月促销 / 客户姓名"></div>
+          <button class="btn gold" id="genBtn" style="margin-top:14px">生成</button>
+          <div class="codes" id="genOut"></div>
+          <div class="msg" id="genMsg"></div>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-promo">
+        <div class="card">
+          <div class="grid">
+            <div><label>优惠码（自定义）</label><input id="pCode" class="mono" placeholder="EARLY79"></div>
+            <div><label>天数</label><input id="pDays" type="number" value="365"></div>
+            <div><label>最多使用次数</label><input id="pMax" type="number" value="10"></div>
+            <div><label>金额 RM</label><input id="pAmount" type="number" step="0.01" value="79"></div>
+            <div><label>有效期（天，留空永久）</label><input id="pExp" type="number" placeholder="30"></div>
+            <div><label>备注</label><input id="pNote" maxlength="120" placeholder="早鸟年付"></div>
+          </div>
+          <button class="btn gold" id="promoBtn" style="margin-top:14px">创建优惠码</button>
+          <div class="msg" id="promoMsg"></div>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-list">
+        <div class="card" style="padding:0;overflow:auto;max-height:70vh">
+          <table><thead><tr><th>码</th><th>天</th><th>金额</th><th>已用</th><th>类型</th><th>备注</th><th>创建</th></tr></thead><tbody id="listBody"></tbody></table>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-users">
+        <div class="card">
+          <div style="display:flex;gap:8px"><input id="uQuery" placeholder="搜索邮箱"><button class="btn ghost" id="uSearch">搜索</button></div>
+        </div>
+        <div class="card" style="padding:0;overflow:auto;max-height:70vh">
+          <table><thead><tr><th>邮箱</th><th>版本</th><th>到期</th><th>验证</th><th>注册</th></tr></thead><tbody id="userBody"></tbody></table>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-msgs">
+        <div class="card" style="padding:0;overflow:auto;max-height:70vh">
+          <table><thead><tr><th>时间</th><th>姓名</th><th>联系</th><th>留言</th></tr></thead><tbody id="msgBody"></tbody></table>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-views">
+        <div class="grid">
+          <div class="card" style="padding:0;overflow:auto"><table><thead><tr><th>日期</th><th>浏览</th></tr></thead><tbody id="dayBody"></tbody></table></div>
+          <div class="card" style="padding:0;overflow:auto"><table><thead><tr><th>页面</th><th>浏览</th></tr></thead><tbody id="topBody"></tbody></table></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function api(path, opts) {
+    opts = opts || {};
+    return fetch("/api/admin" + path, {
+      method: opts.method || "GET",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    }).then(function (r) {
+      return r.json().then(function (j) { j._status = r.status; return j; }).catch(function () { return { ok: false, _status: r.status }; });
+    });
+  }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function show(v) { $("app").hidden = !v; $("loginBox").hidden = v; $("logoutBtn").hidden = !v; }
+
+  function loadStats() {
+    api("/overview").then(function (j) {
+      if (!j.ok) return;
+      var items = [["用户", j.users], ["Pro", j.pro], ["方案", j.plans], ["留言", j.messages], ["收据", j.payments], ["7日浏览", j.views7]];
+      $("stats").innerHTML = items.map(function (x) { return '<div class="stat"><b>' + x[1] + '</b><span>' + x[0] + '</span></div>'; }).join("");
+    });
+  }
+
+  function loadList() {
+    api("/codes").then(function (j) {
+      if (!j.ok) return;
+      $("listBody").innerHTML = (j.codes || []).map(function (c) {
+        return "<tr><td class='mono'>" + esc(c.code) + "</td><td>" + c.days + "</td><td>RM" + Number(c.amount).toFixed(2) +
+          "</td><td>" + (c.used_count || 0) + "/" + c.max_uses + "</td><td>" + (c.label === "promo" ? "优惠" : "普通") +
+          "</td><td>" + esc(c.note || "") + "</td><td class='muted'>" + String(c.created_at).slice(0, 10) + "</td></tr>";
+      }).join("") || "<tr><td colspan=7 class='muted'>暂无</td></tr>";
+    });
+  }
+
+  function loadUsers(q) {
+    api("/users?q=" + encodeURIComponent(q || "")).then(function (j) {
+      if (!j.ok) return;
+      $("userBody").innerHTML = (j.users || []).map(function (u) {
+        var pro = u.plan === "pro" && (!u.plan_expires_at || new Date(u.plan_expires_at) > new Date());
+        return "<tr><td>" + esc(u.email) + "</td><td><span class='tag " + (pro ? "pro" : "") + "'>" + (pro ? "Pro" : "免费") +
+          "</span></td><td>" + (u.plan_expires_at ? String(u.plan_expires_at).slice(0, 10) : "—") +
+          "</td><td>" + (u.email_verified_at ? "✓" : "—") + "</td><td class='muted'>" + String(u.created_at).slice(0, 10) + "</td></tr>";
+      }).join("") || "<tr><td colspan=5 class='muted'>暂无</td></tr>";
+    });
+  }
+
+  function loadMsgs() {
+    api("/messages?days=30").then(function (j) {
+      if (!j.ok) return;
+      $("msgBody").innerHTML = (j.messages || []).map(function (m) {
+        return "<tr><td class='muted'>" + String(m.created_at).slice(0, 16).replace("T", " ") + "</td><td>" + esc(m.name) +
+          "</td><td>" + esc(m.phone || "") + "<br>" + esc(m.email || "") + "</td><td>" + esc(m.message) + "</td></tr>";
+      }).join("") || "<tr><td colspan=4 class='muted'>暂无</td></tr>";
+    });
+  }
+
+  function loadViews() {
+    api("/views?days=7").then(function (j) {
+      if (!j.ok) return;
+      $("dayBody").innerHTML = (j.days || []).map(function (d) { return "<tr><td>" + String(d.day).slice(0, 10) + "</td><td>" + d.views + "</td></tr>"; }).join("");
+      $("topBody").innerHTML = (j.top || []).map(function (t) { return "<tr><td class='mono'>" + esc(t.path) + "</td><td>" + t.views + "</td></tr>"; }).join("");
+    });
+  }
+
+  function boot() {
+    show(true);
+    loadStats(); loadList(); loadUsers(""); loadMsgs(); loadViews();
+    $("logoutBtn").onclick = function () {
+      api("/logout", { method: "POST" }).then(function () { show(false); });
+    };
+  }
+
+  $("loginBtn").onclick = function () {
+    var pw = $("pw").value;
+    if (!pw) return;
+    $("loginMsg").textContent = ""; $("loginMsg").className = "msg";
+    api("/login", { method: "POST", body: { password: pw } }).then(function (j) {
+      if (j.ok) { $("pw").value = ""; boot(); }
+      else { $("loginMsg").className = "msg err"; $("loginMsg").textContent = j.error === "bad_password" ? "密码错误" : "无法登录（" + (j.error || j._status) + "）"; }
+    });
+  };
+  $("pw").addEventListener("keydown", function (e) { if (e.key === "Enter") $("loginBtn").click(); });
+
+  document.querySelectorAll(".tabs button").forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll(".tabs button").forEach(function (x) { x.classList.remove("on"); });
+      document.querySelectorAll(".tab").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on"); $("tab-" + b.getAttribute("data-tab")).classList.add("on");
+      if (b.getAttribute("data-tab") === "list") loadList();
+      if (b.getAttribute("data-tab") === "msgs") loadMsgs();
+      if (b.getAttribute("data-tab") === "views") loadViews();
+    };
+  });
+
+  $("genBtn").onclick = function () {
+    var body = { days: $("cDays").value, count: $("cCount").value, note: $("cNote").value };
+    if ($("cAmount").value) body.amount = $("cAmount").value;
+    api("/codes", { method: "POST", body: body }).then(function (j) {
+      if (!j.ok) { $("genMsg").className = "msg err"; $("genMsg").textContent = "生成失败：" + (j.error || j._status); return; }
+      $("genMsg").className = "msg ok";
+      $("genMsg").textContent = "已生成 " + j.codes.length + " 个（" + j.days + " 天 · RM" + Number(j.amount).toFixed(2) + "）";
+      $("genOut").innerHTML = j.codes.map(function (c) {
+        return '<span class="code"><b>' + esc(c) + '</b><button data-c="' + esc(c) + '">复制</button></span>';
+      }).join("");
+      $("genOut").querySelectorAll("button").forEach(function (b) {
+        b.onclick = function () { navigator.clipboard.writeText(b.getAttribute("data-c")); b.textContent = "已复制"; };
+      });
+      loadList(); loadStats();
+    });
+  };
+
+  $("promoBtn").onclick = function () {
+    var body = { code: $("pCode").value, days: $("pDays").value, maxUses: $("pMax").value, amount: $("pAmount").value, note: $("pNote").value, expiryDays: $("pExp").value };
+    api("/promo", { method: "POST", body: body }).then(function (j) {
+      if (!j.ok) { $("promoMsg").className = "msg err"; $("promoMsg").textContent = "创建失败：" + (j.error || j._status); return; }
+      $("promoMsg").className = "msg ok";
+      $("promoMsg").textContent = "优惠码 " + j.code + " 已创建（" + j.days + " 天 · RM" + j.amount + " · 最多 " + j.maxUses + " 次）";
+      loadList();
+    });
+  };
+
+  $("uSearch").onclick = function () { loadUsers($("uQuery").value.trim()); };
+
+  api("/me").then(function (j) { if (j.ok) boot(); else show(false); }).catch(function () { show(false); });
+})();
+</script>
+</body>
+</html>
