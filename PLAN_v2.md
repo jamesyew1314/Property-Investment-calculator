@@ -223,3 +223,67 @@ Internet
 3. **Week 1**：Phase 1（存档 + 分享链接）上线。
 4. **Week 2–3**：Phase 2 正式 PDF。
 5. 之后：Phase 3 账号/订阅（此时再加邮件与支付）。
+
+---
+
+## 9. Phase 3 设计（账号 + 云存档 + 订阅）
+
+> 地基已完成（2026-10-24，v0.35）：Node 22 + PostgreSQL 16 + `fangchan-api.service`（systemd）+ nginx `/api/` 反代，线上健康检查 `https://kwongthye.com/api/health` 返回 `{"ok":true,"db":true}`。数据库 `fangchan` 已有 `users / plans / sessions / subscriptions` 四张表。
+
+### 9.1 目标
+
+1. 邮箱 + 密码注册/登录（不用短信，零成本）
+2. 方案云端存档：登录后跨设备同步；未登录仍可用本地模式（现有功能不变）
+3. 订阅：免费版限 **3 个方案**；付费 **RM 50/年** 不限方案数
+4. 支付：先「手动开通」（转账/WhatsApp 收款 → 后台一条命令开通），Billplz 以后接
+
+### 9.2 接口
+
+| 方法 | 路径 | 说明 |
+| :--- | :--- | :--- |
+| POST | `/api/auth/register` | email + password → 建用户 + 发 session cookie |
+| POST | `/api/auth/login` | 登录 |
+| POST | `/api/auth/logout` | 注销（删 session） |
+| GET | `/api/me` | 当前用户 + 订阅状态 + 方案数 |
+| GET | `/api/plans` | 我的方案列表（含 payload） |
+| POST | `/api/plans` | 新建（免费版超 3 个返回 402） |
+| PUT | `/api/plans/:id` | 更新 |
+| DELETE | `/api/plans/:id` | 删除 |
+| POST | `/api/plans/import` | 批量导入本机方案（登录后一键迁移） |
+| POST | `/api/subscription/redeem` | 输入开通码（手动收款后生成） |
+
+### 9.3 安全
+
+- 密码：`node:crypto` scrypt（N=16384），不引入原生依赖
+- 会话：32 字节随机 token，DB 只存 SHA-256；Cookie `HttpOnly + Secure + SameSite=Lax`，30 天
+- 限流：登录/注册 5 次/分钟/IP；写接口 60 次/分钟/用户
+- 校验：email 格式、密码 ≥ 8 位、payload 限 200 KB
+- CSRF：SameSite=Lax + 校验 `Origin` 头
+- 只存 email 与方案，不存姓名/电话/身份证
+
+### 9.4 前端改动
+
+- 顶部加「登录 / 我的账号」（未登录不打扰，现有本地模式照用）
+- 登录后：方案列表改为云端；保存/加载/删除走 API；掉线自动回退本地
+- 首次登录提示「把本机的 N 个方案上传到云端」
+- 订阅页：显示剩余天数 + 续费方式（先 WhatsApp 联系 + 开通码）
+
+### 9.5 运维
+
+- 每日 `pg_dump` + 保留 30 天（v0.36 一起做）
+- 日志：`/srv/fangchan/logs/api.log`（logrotate）
+- 备份恢复演练：每季度
+
+### 9.6 上线顺序
+
+1. **v0.35（已完成）**：Node + Postgres + `/api/health`
+2. **v0.36**：注册/登录/会话 + `/api/me`（前端登录页）
+3. **v0.37**：云端方案 CRUD + 本机方案导入 + 免费额度
+4. **v0.38**：订阅（手动开通码）+ 到期提醒 + 每日备份
+5. 以后：Billplz 自动收款、邮件通知、多方案对比
+
+### 9.7 需要拍板
+
+1. 登录方式：邮箱+密码（推荐，零成本）还是手机号+短信（要买短信服务，约 RM0.1/条）？
+2. 免费额度：3 个方案（推荐）还是 1 个？
+3. 收款：先手动（推荐，马上能用）还是直接接 Billplz（需要 SSM 公司资料审核）？
