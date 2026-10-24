@@ -37,3 +37,7 @@ work/xlsx_prev/
 
 # 本地密钥（绝不提交）
 .secrets/
+
+# 本地打印测试产物
+print-test.pdf
+.chrome-tmp/

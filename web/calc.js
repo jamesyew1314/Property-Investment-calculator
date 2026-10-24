@@ -128,6 +128,28 @@
     return (lo + hi) / 2;
   }
 
+  // ---- 分享链接 / 方案存档 编解码 ----
+  function encodeState(obj) {
+    try {
+      var json = JSON.stringify(obj);
+      var b64 = (typeof btoa === "function")
+        ? btoa(unescape(encodeURIComponent(json)))
+        : Buffer.from(json, "utf8").toString("base64");
+      return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    } catch (e) { return ""; }
+  }
+  function decodeState(str) {
+    try {
+      if (!str) return null;
+      var s = String(str).replace(/-/g, "+").replace(/_/g, "/");
+      while (s.length % 4) s += "=";
+      var json = (typeof atob === "function")
+        ? decodeURIComponent(escape(atob(s)))
+        : Buffer.from(s, "base64").toString("utf8");
+      return JSON.parse(json);
+    } catch (e) { return null; }
+  }
+
   // ---- 主计算 ----
   function compute(inp) {
     var yearsLoan = Math.max(1, Math.min(50, Math.round(inp.yearsLoan || 30)));
@@ -264,6 +286,7 @@
     loanLegal: loanLegal, loanDuty: loanDuty, loanMisc: loanMisc,
     valuationFee: valuationFee,
     sst: sst, spaLegalTotal: spaLegalTotal, loanLegalTotal: loanLegalTotal, sellLegalTotal: sellLegalTotal,
+    encodeState: encodeState, decodeState: decodeState,
     instalment: instalment, balanceAt: balanceAt, yearAmort: yearAmort,
     rpgtRate: rpgtRate, rpgt: rpgt,
     initialOutlay: initialOutlay,

@@ -3,6 +3,11 @@
 "use strict";
 const C = require("./calc.js");
 let pass = 0, fail = 0;
+function eq(got, expect, name) {
+  const ok = got === expect;
+  console.log((ok ? "PASS" : "FAIL") + "  " + name + "  got=" + got + "  expect=" + expect);
+  ok ? pass++ : fail++;
+}
 function a(got, expect, name) {
   const ok = Math.abs(got - expect) < 0.011;
   console.log((ok ? "PASS" : "FAIL") + "  " + name + "  got=" + got + "  expect=" + expect);
@@ -62,6 +67,16 @@ a(sa.sale.sellCosts, 18708, "出售总费用 = 12,000 + RPGT 6,708");
 a(sa.out.sellingProfit, 15652, "出售利润 = 34,360 − 18,708");
 a(sa.out.totalCost, 884348, "Total Cost = 购置 65,640 + 实价 800,000 + 出售 18,708");
 a(boss.out.tcr, 0.0544, "完整口径总成本回报率 = 净利润 ÷ Total Cost");
+
+// 分享链接 / 方案存档 编解码
+const st = { v: 1, d: { spa: "1,000,000.00", actual: "800,000.00", 备注: "测试中文" }, o: { spaFee: true } };
+const enc = C.encodeState(st);
+const dec = C.decodeState(enc);
+eq(dec.d.spa, "1,000,000.00", "分享链接 encode/decode 往返（金额）");
+eq(dec.d["备注"], "测试中文", "分享链接 encode/decode 往返（中文）");
+eq(dec.o.spaFee, true, "分享链接 encode/decode 往返（覆盖标记）");
+eq(C.decodeState("%%%broken"), null, "非法分享参数返回 null");
+eq(C.decodeState(""), null, "空分享参数返回 null");
 a(boss.part2.firstYearMonthlyInterest, 3000, "平均月利息 = 800k×4.5%/12 = 3,000");
 a(boss.out.holdingProfit, 24000, "老板例：持有年净利润 = 60,000 − 36,000（平均利息）");
 a(boss.out.holdingAnnual, 0.3656, "老板例：持有年利润 ≈ 36.56%");

@@ -395,6 +395,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-19 | 版本管理 | 初始化 git 仓库并推送到 GitHub 私有仓库 `jamesyew1314/Property-nvestment-calculator`；标签 v0.32 |
 | 2026-10-24 | 部署 | 正式迁移到阿里云**吉隆坡**服务器 47.254.235.22：域名 **kwongthye.com**（+ www），Let's Encrypt HTTPS 自动续期，HTTP 301 跳 HTTPS，HSTS 已开；配置：Ubuntu 24.04 / 2C4G / ufw / fail2ban / 自动安全更新 / 2G swap；旧深圳站保留 |
 | 2026-10-24 | 域名计划 | 计算器暂放主域名 kwongthye.com；开发完成后迁到 **calc.kwongthye.com**，主域名留作公司主页（迁移步骤见 PLAN_v2 §8.5；注意 localStorage 不跨子域，Phase 1 需带导出/导入） |
+| 2026-10-24 | v0.34 | **Phase 1 上线**：方案存档（命名保存/加载/删除/覆盖同名）、导出/导入 JSON、分享链接（`?d=` base64 全参数，只读模式可转编辑，localStorage 持久化）；**Phase 2 上线**：公司抬头（公司名/电话/微信/地址/客户项目 → 打印页头）、分享链接二维码（qrcode.js 本地化）、打印排版压到 2 页（Part 1 一页 / Part 2+3 一页）；test.js 扩到 53 项 |
 
 ---
 

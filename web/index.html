@@ -60,6 +60,18 @@
          padding:1px 6px; margin-left:6px; vertical-align:2px; }
   .neg { color:var(--red); }
   .printhead { display:none; }
+  .btnRow { display:flex; gap:8px; flex-wrap:wrap; }
+  .btnRow .btn, .btnRow .btn2 { flex:1 1 0; min-width:120px; }
+  .company { margin-top:10px; }
+  .company summary { cursor:pointer; font-size:13px; color:var(--blue); font-weight:600; }
+  .company .row { margin-top:8px; }
+  [hidden] { display:none !important; }
+  .viewBanner { background:#FFF3CD; border:1px solid #E4CE8B; color:#7A5B12; border-radius:10px; padding:10px 12px;
+                margin:0 0 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; }
+  .viewBanner button { border:1px solid #C9A227; background:#fff; color:#7A5B12; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:600; cursor:pointer; }
+  .view-only main input, .view-only main select { pointer-events:none; }
+  .view-only #toolSec { display:none !important; }
+  .view-only .only-edit { display:none !important; }
   .shareRow { display:flex; gap:8px; margin-top:8px; }
   .shareBtn { flex:1; padding:11px 0; border:0; border-radius:12px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; }
   #toast { position:fixed; left:50%; bottom:90px; transform:translateX(-50%); background:rgba(31,56,100,.95);
@@ -67,18 +79,34 @@
            transition:opacity .25s; pointer-events:none; z-index:99; }
   @media print {
     header, .no-print, .sub, .btn, .shareRow { display:none !important; }
-    .printhead { display:flex !important; align-items:center; font-size:17px; font-weight:700; color:#1F3864;
-                 border-bottom:2px solid #1F3864; padding:8px 4px 10px; margin-bottom:10px; }
-    .printhead .printdate { margin-left:auto; font-size:12px; font-weight:400; color:#68707C; }
+    .printhead { display:flex !important; align-items:flex-start; gap:10px; color:#1F3864;
+                 border-bottom:2px solid #1F3864; padding:6px 4px 8px; margin-bottom:8px; }
+    .printhead .phLogo { height:42px; width:auto; border-radius:6px; }
+    .printhead .phMain { flex:1 1 auto; }
+    .printhead .phCo { font-weight:700; font-size:16px; }
+    .printhead .phContact { font-size:10.5px; color:#555; font-weight:400; margin-top:2px; }
+    .printhead .phMeta { text-align:right; font-size:10.5px; color:#555; font-weight:400; }
+    .printhead .phMeta .printdate { font-size:11px; color:#333; font-weight:600; }
+    .printhead .phMeta img { width:62px; height:62px; display:block; margin:4px 0 0 auto; }
     body { background:#fff; }
     main { max-width:none; padding:0; }
-    .part { box-shadow:none; border:1px solid #C9D3E2; border-radius:0; padding:10px 12px; margin-bottom:10px;
+    .part { box-shadow:none; border:1px solid #C9D3E2; border-radius:0; padding:6px 10px; margin-bottom:6px;
             break-inside:avoid; page-break-inside:avoid; }
+    .part h2 { font-size:14px; margin-bottom:2px; }
+    .subh { font-size:12.5px; margin:6px 0 0; }
     #part1Sec { page-break-after:always; }
-    .row { margin-bottom:6px; }
-    .row input, .row select { border:none; background:#fff !important; padding:4px 6px; }
-    table { font-size:11px; }
-    footer { display:none; }
+    .row { margin-bottom:3px; }
+    .row label { font-size:11.5px; }
+    .row input, .row select { border:none; background:#fff !important; padding:2px 5px; font-size:12.5px; }
+    .out { padding:5px 8px; margin-top:3px; }
+    .out .line { font-size:11.5px; padding:1px 0; }
+    .out .line b { font-size:13px; }
+    .big { font-size:15px !important; }
+    .legend { display:none !important; }
+    table { font-size:9.5px; margin-top:4px; }
+    th, td { padding:2px 3px; }
+    .hr { margin:4px 0; }
+    footer { display:block; font-size:8.5px; padding:4px 8px 0; line-height:1.4; }
   }
 </style>
 </head>
@@ -91,11 +119,52 @@
   <p data-i18n="appSub">个人买入 → 持有 1–5 年 → 卖出 · 所有金额 RM</p>
 </header>
 <div class="printhead">
-  <img src="logo.jpg" alt="logo" style="height:26px;width:auto;border-radius:6px;margin-right:8px;">
-  <span data-i18n="appName">房地产投资快速计算器</span>
-  <span class="printdate"></span>
+  <img class="phLogo" src="logo.jpg" alt="logo">
+  <div class="phMain">
+    <div class="phCo" id="phCo">房地产投资快速计算器</div>
+    <div class="phContact" id="phContact"></div>
+  </div>
+  <div class="phMeta">
+    <div id="phClient"></div>
+    <div class="printdate"></div>
+    <img id="phQr" alt="QR">
+  </div>
 </div>
 <main>
+  <div class="viewBanner no-print" id="viewBanner" hidden>
+    <span data-i18n="viewBannerText">🔗 这是分享的估算（只读）</span>
+    <button id="editCopy" data-i18n="btnEditCopy">在我这边继续编辑</button>
+  </div>
+
+  <!-- 方案存档 / 分享 / 公司抬头 -->
+  <section class="part no-print" id="toolSec">
+    <h2 data-i18n="toolTitle">方案存档 / 分享</h2>
+    <div class="row"><label data-i18n="fPlanName">方案名称</label><input class="manual" id="planName" type="text" data-i18n-ph="phPlanName" placeholder="例：Bukit Jalil 公寓 A"><span class="unit"></span></div>
+    <div class="btnRow">
+      <button class="btn only-edit" id="savePlan" data-i18n="btnSavePlan">💾 保存方案</button>
+      <button class="btn btn2" id="shareLink" data-i18n="btnShareLink">🔗 复制分享链接</button>
+    </div>
+    <div class="row"><label data-i18n="fPlanList">已存方案</label><select class="manual" id="planList"></select></div>
+    <div class="btnRow">
+      <button class="btn btn2 only-edit" id="loadPlan" data-i18n="btnLoad">加载</button>
+      <button class="btn btn2 only-edit" id="delPlan" data-i18n="btnDelete">删除</button>
+    </div>
+    <div class="btnRow only-edit">
+      <button class="btn btn2" id="exportJson" data-i18n="btnExport">导出 JSON</button>
+      <button class="btn btn2" id="importJson" data-i18n="btnImport">导入 JSON</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+    <details class="company only-edit">
+      <summary data-i18n="companyTitle">公司抬头（打印用）</summary>
+      <div class="row"><label data-i18n="fCompany">公司名</label><input class="manual" id="coName" type="text"></div>
+      <div class="row"><label data-i18n="fPhone">电话</label><input class="manual" id="coPhone" type="text"></div>
+      <div class="row"><label data-i18n="fWechat">微信</label><input class="manual" id="coWechat" type="text"></div>
+      <div class="row"><label data-i18n="fAddress">地址</label><input class="manual" id="coAddress" type="text"></div>
+      <div class="row"><label data-i18n="fCustomer">客户 / 项目</label><input class="manual" id="coClient" type="text"></div>
+      <div class="btnRow"><button class="btn btn2" id="coSave" data-i18n="btnSaveCo">保存抬头</button></div>
+    </details>
+    <div class="legend" data-i18n="planNote">💾 方案存在本机浏览器；换设备或换域名时请用「导出 / 导入 JSON」。</div>
+  </section>
 
   <!-- Part 1 -->
   <section class="part" id="part1Sec">
@@ -201,6 +270,7 @@
   <div id="toast"></div>
 </main>
 
+<script src="qrcode.js"></script>
 <script src="calc.js"></script>
 <script>
 (function () {
@@ -241,6 +311,17 @@
       yearRow: "第 {y} 年", xirrNA: "无法计算",
       btnDemo: "填入示例（SPA 1M / 实价 800k / 贷 800k / 一年后卖 900k）", btnReset: "清空",
       exportTitle: "导出 / 分享",
+      toolTitle: "方案存档 / 分享", fPlanName: "方案名称", phPlanName: "例：Bukit Jalil 公寓 A",
+      btnSavePlan: "💾 保存方案", btnShareLink: "🔗 复制分享链接",
+      fPlanList: "已存方案", optPick: "（选择已存方案）", optNone: "（还没有存档）",
+      btnLoad: "加载", btnDelete: "删除", btnExport: "导出 JSON", btnImport: "导入 JSON",
+      companyTitle: "公司抬头（打印用）", fCompany: "公司名", fPhone: "电话", fWechat: "微信", fAddress: "地址", fCustomer: "客户 / 项目", btnSaveCo: "保存抬头",
+      planNote: "💾 方案存在本机浏览器；换设备或换域名时请用「导出 / 导入 JSON」。",
+      viewBannerText: "🔗 这是分享的估算（只读）", btnEditCopy: "在我这边继续编辑",
+      toastSaved: "方案已保存", toastLoaded: "方案已加载", toastDeleted: "方案已删除", toastNeedName: "先给方案起个名字",
+      toastExported: "已导出 JSON 文件", toastImported: "已导入", toastImportBad: "文件格式不对，导入失败",
+      toastLinkCopied: "分享链接已复制", toastCoSaved: "公司抬头已保存", toastEditable: "已切换为可编辑",
+      confirmDelete: "确定删除这个方案？", toastStorageFull: "浏览器存储已满，建议先导出再删旧方案",
       printBtn: "🖨️ 导出 PDF / 打印（Part 1 一页 · Part 2+3 一页）",
       shareNote: "WhatsApp / Facebook 直接打开；微信没有网页分享接口，点「微信」会复制文字，粘贴到微信即可。",
       copyOk: "已复制，去微信粘贴即可",
@@ -280,6 +361,17 @@
       yearRow: "Year {y}", xirrNA: "n/a",
       btnDemo: "Fill Example (SPA 1M / actual 800k / loan 800k / sell 900k after 1 yr)", btnReset: "Clear",
       exportTitle: "Export / Share",
+      toolTitle: "Saved Plans / Share", fPlanName: "Plan Name", phPlanName: "e.g. Bukit Jalil Condo A",
+      btnSavePlan: "💾 Save Plan", btnShareLink: "🔗 Copy Share Link",
+      fPlanList: "Saved Plans", optPick: "(select a saved plan)", optNone: "(no saved plans yet)",
+      btnLoad: "Load", btnDelete: "Delete", btnExport: "Export JSON", btnImport: "Import JSON",
+      companyTitle: "Company Header (for print)", fCompany: "Company", fPhone: "Phone", fWechat: "WeChat", fAddress: "Address", fCustomer: "Client / Project", btnSaveCo: "Save Header",
+      planNote: "💾 Plans are stored in this browser only. Use Export / Import JSON when changing device or domain.",
+      viewBannerText: "🔗 Shared estimate (read-only)", btnEditCopy: "Continue editing here",
+      toastSaved: "Plan saved", toastLoaded: "Plan loaded", toastDeleted: "Plan deleted", toastNeedName: "Please name the plan first",
+      toastExported: "JSON exported", toastImported: "Imported", toastImportBad: "Invalid file — import failed",
+      toastLinkCopied: "Share link copied", toastCoSaved: "Company header saved", toastEditable: "Editable mode",
+      confirmDelete: "Delete this plan?", toastStorageFull: "Browser storage full — export and remove old plans",
       printBtn: "🖨️ Export PDF / Print (Part 1 on page 1 · Parts 2+3 on page 2)",
       shareNote: "WhatsApp / Facebook open directly. WeChat has no web share API — tapping WeChat copies the text; paste it in WeChat.",
       copyOk: "Copied — paste it in WeChat",
@@ -593,6 +685,191 @@
       legacyCopy(txt); ok();
     }
   });
+
+  // ================= Phase 1/2：存档 / 分享 / 公司抬头 =================
+  var PLAN_KEY = "fangchan_plans_v1";
+  var CO_KEY = "fangchan_company_v1";
+  var company = { name: "", phone: "", wechat: "", address: "", client: "" };
+  try { var coSaved = JSON.parse(localStorage.getItem(CO_KEY) || "null"); if (coSaved) Object.assign(company, coSaved); } catch (e) {}
+
+  var STATE_FIELDS = ["spa", "actual", "loan", "loanPct", "rate", "tenure", "agent", "consent", "other",
+    "mgmt", "quit", "assess", "repair", "insur", "rentAgent", "sell", "hold", "rent", "sellAgent", "sellLegal", "sellMisc"];
+
+  function collectState() {
+    var d = {};
+    STATE_FIELDS.forEach(function (id) { if ($(id)) d[id] = $(id).value; });
+    return { v: 1, d: d, o: { spaFee: !!autoManual.spaFee, laFee: !!autoManual.laFee, valFee: !!autoManual.valFee, sellAgent: !!autoManual.sellAgent, sellLegal: !!autoManual.sellLegal } };
+  }
+  function applyState(st) {
+    if (!st || !st.d) return false;
+    STATE_FIELDS.forEach(function (id) { if ($(id) && st.d[id] != null) $(id).value = st.d[id]; });
+    Object.keys(autoManual).forEach(function (id) { autoManual[id] = !!(st.o && st.o[id]); });
+    ["spaFee", "laFee", "valFee", "sellAgent", "sellLegal"].forEach(function (id) { $(id).classList.toggle("override", !!autoManual[id]); });
+    document.querySelectorAll("input.money").forEach(function (el) { if (el.value.trim() !== "") el.value = moneyBlur(el.value); });
+    loanFromPct = false;
+    recalc();
+    return true;
+  }
+
+  function loadPlans() {
+    try { var v = JSON.parse(localStorage.getItem(PLAN_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+  }
+  function persistPlans(list) {
+    try { localStorage.setItem(PLAN_KEY, JSON.stringify(list)); } catch (e) { toast(t("toastStorageFull")); }
+    renderPlanList();
+  }
+  function renderPlanList(sel) {
+    var list = loadPlans(), el = $("planList");
+    el.innerHTML = "";
+    var o0 = document.createElement("option");
+    o0.value = "";
+    o0.textContent = list.length ? t("optPick") : t("optNone");
+    el.appendChild(o0);
+    list.forEach(function (p) {
+      var o = document.createElement("option");
+      o.value = p.id;
+      o.textContent = p.name + " · " + String(p.updatedAt || "").slice(0, 10);
+      el.appendChild(o);
+    });
+    if (sel) el.value = sel;
+  }
+
+  $("savePlan").addEventListener("click", function () {
+    var name = $("planName").value.trim();
+    if (!name) { $("planName").focus(); toast(t("toastNeedName")); return; }
+    var list = loadPlans(), st = collectState(), now = new Date().toISOString();
+    var found = false;
+    list.forEach(function (p) { if (p.name === name) { p.state = st; p.updatedAt = now; found = true; } });
+    if (!found) list.push({ id: "p" + Date.now(), name: name, createdAt: now, updatedAt: now, state: st });
+    persistPlans(list);
+    renderPlanList(list[list.length - 1].id);
+    toast(t("toastSaved"));
+  });
+
+  $("loadPlan").addEventListener("click", function () {
+    var id = $("planList").value;
+    if (!id) return;
+    var p = loadPlans().filter(function (x) { return x.id === id; })[0];
+    if (!p) return;
+    if (applyState(p.state)) { $("planName").value = p.name; toast(t("toastLoaded")); }
+  });
+
+  $("delPlan").addEventListener("click", function () {
+    var id = $("planList").value;
+    if (!id) return;
+    if (!confirm(t("confirmDelete"))) return;
+    persistPlans(loadPlans().filter(function (x) { return x.id !== id; }));
+    toast(t("toastDeleted"));
+  });
+
+  $("exportJson").addEventListener("click", function () {
+    var name = $("planName").value.trim() || "plan";
+    var payload = { name: name, exportedAt: new Date().toISOString(), state: collectState() };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "fangchan-" + name.replace(/[^\w\u4e00-\u9fa5-]+/g, "_") + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    toast(t("toastExported"));
+  });
+
+  $("importJson").addEventListener("click", function () { $("importFile").click(); });
+  $("importFile").addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    var self = this;
+    reader.onload = function () {
+      try {
+        var obj = JSON.parse(reader.result);
+        var st = (obj && obj.state) ? obj.state : obj;
+        if (st && st.d && applyState(st)) {
+          if (obj && obj.name) $("planName").value = obj.name;
+          toast(t("toastImported"));
+        } else { toast(t("toastImportBad")); }
+      } catch (e) { toast(t("toastImportBad")); }
+    };
+    reader.readAsText(f);
+    self.value = "";
+  });
+
+  function shareUrl() {
+    var base = location.origin + location.pathname.replace(/index\.html$/, "");
+    return base + "?d=" + Calc.encodeState(collectState());
+  }
+  $("shareLink").addEventListener("click", function () {
+    var url = shareUrl();
+    var ok = function () { toast(t("toastLinkCopied")); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(ok, function () { legacyCopy(url); ok(); });
+    } else { legacyCopy(url); ok(); }
+    updatePrintHeader();
+  });
+
+  function setViewOnly(on) {
+    document.body.classList.toggle("view-only", !!on);
+    $("viewBanner").hidden = !on;
+    document.querySelectorAll("main input, main select, main button").forEach(function (el) {
+      if (el.id === "shareLink" || el.id === "editCopy" || el.id === "printBtn" || el.id === "waBtn" || el.id === "wxBtn" || el.id === "fbBtn") return;
+      el.disabled = !!on;
+    });
+  }
+  $("editCopy").addEventListener("click", function () {
+    history.replaceState(null, "", location.pathname);
+    setViewOnly(false);
+    recalc();
+    toast(t("toastEditable"));
+  });
+
+  function fillCompanyForm() {
+    $("coName").value = company.name || "";
+    $("coPhone").value = company.phone || "";
+    $("coWechat").value = company.wechat || "";
+    $("coAddress").value = company.address || "";
+    $("coClient").value = company.client || "";
+  }
+  $("coSave").addEventListener("click", function () {
+    company = {
+      name: $("coName").value.trim(), phone: $("coPhone").value.trim(), wechat: $("coWechat").value.trim(),
+      address: $("coAddress").value.trim(), client: $("coClient").value.trim()
+    };
+    try { localStorage.setItem(CO_KEY, JSON.stringify(company)); } catch (e) {}
+    updatePrintHeader();
+    toast(t("toastCoSaved"));
+  });
+
+  function updatePrintHeader() {
+    $("phCo").textContent = company.name || t("appName");
+    var bits = [];
+    if (company.phone) bits.push("☎ " + company.phone);
+    if (company.wechat) bits.push("WeChat: " + company.wechat);
+    if (company.address) bits.push(company.address);
+    $("phContact").textContent = bits.join(" · ");
+    $("phClient").textContent = company.client || "";
+    var qr = $("phQr");
+    qr.style.display = "";
+    try {
+      if (typeof qrcode === "function") {
+        var q = qrcode(0, "M");
+        q.addData(shareUrl());
+        q.make();
+        qr.src = q.createDataURL(4, 6);
+      } else { qr.style.display = "none"; }
+    } catch (e) { qr.style.display = "none"; }
+  }
+  window.addEventListener("beforeprint", updatePrintHeader);
+
+  renderPlanList();
+  fillCompanyForm();
+  var qd = new URLSearchParams(location.search).get("d");
+  if (qd) {
+    var st0 = Calc.decodeState(qd);
+    if (st0 && applyState(st0)) setViewOnly(true);
+  }
+  updatePrintHeader();
 
   applyLang();
 })();
