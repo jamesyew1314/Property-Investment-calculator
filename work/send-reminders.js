@@ -34,17 +34,23 @@ const replyTo = process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
   for (const u of r.rows) {
     const days = Math.max(0, Math.ceil((new Date(u.plan_expires_at) - Date.now()) / 86400000));
     const subject = days > 0
-      ? "KWONG THYE Pro 到期提醒 / Renewal reminder"
-      : "KWONG THYE Pro 已到期 / Plan expired";
+      ? "Pro 到期提醒 / Renewal reminder — KWONG THYE"
+      : "Pro 已到期 / Plan expired — KWONG THYE";
+    const dateStr = new Date(u.plan_expires_at).toLocaleDateString("en-MY");
     const text = [
-      "您好，",
+      "您好 / Hello,",
       "",
       days > 0
-        ? "您的 KWONG THYE 专业版还剩 " + days + " 天到期（" + new Date(u.plan_expires_at).toLocaleDateString("en-MY") + "）。"
-        : "您的 KWONG THYE 专业版已于 " + new Date(u.plan_expires_at).toLocaleDateString("en-MY") + " 到期。",
-      "续费后方案数量不限。回复此邮件或 WhatsApp +60 16-528 0918 获取开通码。",
+        ? "您的 KWONG THYE 专业版还剩 " + days + " 天到期（" + dateStr + "）。"
+        : "您的 KWONG THYE 专业版已于 " + dateStr + " 到期。",
+      days > 0
+        ? "Your KWONG THYE Pro plan expires in " + days + " day(s) on " + dateStr + "."
+        : "Your KWONG THYE Pro plan expired on " + dateStr + ".",
       "",
-      "登录：https://kwongthye.com/calc/",
+      "续费后方案数量不限。回复此邮件或 WhatsApp +60 16-528 0918 获取开通码。",
+      "Renew to keep unlimited plans. Reply to this email or WhatsApp +60 16-528 0918 for an activation code.",
+      "",
+      "登录 / Sign in: https://kwongthye.com/calc/",
       "",
       "KWONG THYE 光泰"
     ].join("\n");

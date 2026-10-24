@@ -64,8 +64,21 @@ async function sendVerifyMail(userId, email) {
   const token = crypto.randomBytes(32).toString("hex");
   await pool.query("INSERT INTO email_verifications(user_id,token_hash,expires_at) VALUES($1,$2, now() + interval '24 hours')", [userId, sha256(token)]);
   const link = "https://kwongthye.com/calc/?verify=" + token;
-  const text = "Verify your KWONG THYE account email:\n\n" + link + "\n\nThis link expires in 24 hours. If you did not create an account, ignore this email.";
-  return sendMail(email, "Verify your email — KWONG THYE", text);
+  const text = [
+    "您好 / Hello,",
+    "",
+    "感谢注册 KWONG THYE。请点击以下链接验证您的邮箱（24 小时内有效）：",
+    "Thank you for signing up. Please verify your email (valid for 24 hours):",
+    "",
+    link,
+    "",
+    "如果这不是您本人的操作，请忽略此邮件。",
+    "If you did not create an account, please ignore this email.",
+    "",
+    "KWONG THYE 光泰",
+    "https://kwongthye.com"
+  ].join("\n");
+  return sendMail(email, "验证邮箱 / Verify your email — KWONG THYE", text);
 }
 
 let smtpTransport = null;
@@ -216,9 +229,22 @@ app.post("/api/auth/forgot", rateLimit(5, 900000), async function (req, res, nex
       const token = crypto.randomBytes(32).toString("hex");
       await pool.query("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES($1,$2, now() + interval '1 hour')", [u.rows[0].id, sha256(token)]);
       const link = "https://kwongthye.com/calc/?reset=" + token;
-      const text = "Reset your KWONG THYE password:\n\n" + link + "\n\nThis link expires in 1 hour. If you did not request it, ignore this email.";
+      const text = [
+        "您好 / Hello,",
+        "",
+        "请点击以下链接重置您的 KWONG THYE 账户密码（1 小时内有效）：",
+        "Click the link below to reset your KWONG THYE password (valid for 1 hour):",
+        "",
+        link,
+        "",
+        "如果这不是您本人的操作，请忽略此邮件。",
+        "If you did not request this, please ignore this email.",
+        "",
+        "KWONG THYE 光泰",
+        "https://kwongthye.com"
+      ].join("\n");
       try {
-        const r = await sendMail(email, "Reset your password — KWONG THYE", text);
+        const r = await sendMail(email, "重置密码 / Reset your password — KWONG THYE", text);
         console.log("reset mail", r, email);
       } catch (e) {
         console.error("reset mail failed", email, e.message);
