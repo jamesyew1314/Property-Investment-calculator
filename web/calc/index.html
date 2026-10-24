@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" type="image/png" href="/icon-256.png">
-<title>房地产投资快速计算器 v0.1</title>
+<title>房地产投资快速计算器 | Property Investment Calculator</title>
+<meta name="description" content="马来西亚房地产投资计算器：买入费用、贷款月供、年度持有费用、出租回报、RPGT 与出售利润，一键算清。">
 <style>
   :root {
     --navy:#1F3864; --blue:#2E5496; --light:#EAF0FA; --ink:#222; --grey:#68707C;
@@ -135,7 +136,7 @@
 <body>
 <header>
   <div class="headrow">
-    <h1><img src="logo-white.png" alt="logo" class="logo"><span data-i18n="appName">房地产投资快速计算器</span> <span class="tag" data-i18n="beta">v0.1 内测</span></h1>
+    <h1><img src="logo-white.png" alt="logo" class="logo"><span data-i18n="appName">房地产投资快速计算器</span></h1>
     <div class="headbtns">
       <button id="acctBtn" class="hbtn">👤 <span id="acctBtnTxt">登录</span></button>
       <button id="langBtn">EN</button>
@@ -343,7 +344,7 @@
 
   var I18N = {
     zh: {
-      appName: "房地产投资快速计算器", beta: "v0.1 内测",
+      appName: "房地产投资快速计算器",
       appSub: "个人买入 → 持有 1–5 年 → 卖出 · 所有金额 RM",
       legendFill: "✍️ 自己填 · ⚙️ 自动算",
       p1Title: "Part 1 · 买入（第一次要出的费用）",
@@ -406,7 +407,7 @@
       footer: "⚠️ 律师费/印花税按法定费率自动估算，RPGT 为估算（30/20/15/0），银行利息为等额本息——实际金额以律师报价、银行结算单与 LHDN 为准。本计算器不构成法律或税务意见。"
     },
     en: {
-      appName: "Property Investment Calculator", beta: "v0.1 beta",
+      appName: "Property Investment Calculator",
       appSub: "Buy → Hold 1–5 yrs → Sell · All amounts in RM",
       legendFill: "✍️ Manual · ⚙️ Auto",
       p1Title: "Part 1 · Purchase (one-time outlay)",
@@ -481,7 +482,7 @@
   }
   function applyLang() {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-    document.title = t("appName") + " v0.1";
+    document.title = t("appName") + (lang === "zh" ? "" : " | Kwong Thye");
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       el.textContent = t(el.getAttribute("data-i18n"));
     });
