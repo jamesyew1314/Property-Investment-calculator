@@ -3,6 +3,7 @@ const express = require("express");
 const crypto = require("node:crypto");
 const fsp = require("node:fs/promises");
 const nodemailer = require("nodemailer");
+const { buildReceiptPdf } = require("./receipt-pdf");
 const pathMod = require("node:path");
 const { Pool } = require("pg");
 
@@ -94,19 +95,19 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
   });
 }
 
-async function sendMail(to, subject, text, replyToOverride) {
+async function sendMail(to, subject, text, replyToOverride, attachments) {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.MAIL_FROM || (process.env.SMTP_USER ? "KWONG THYE <" + process.env.SMTP_USER + ">" : "KWONG THYE <noreply@kwongthye.com>");
   const replyTo = replyToOverride || process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
   if (smtpTransport) {
-    await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text });
+    await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text, attachments: attachments || [] });
     return "sent";
   }
   if (key) {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: from, to: [to], reply_to: replyTo, subject: subject, text: text })
+      body: JSON.stringify({ from: from, to: [to], reply_to: replyTo, subject: subject, text: text, attachments: (attachments || []).map(function (a) { return { filename: a.filename, content: Buffer.from(a.content).toString("base64") }; }) })
     });
     if (!r.ok) throw new Error("mail_failed");
     return "sent";
@@ -324,6 +325,18 @@ app.get("/api/payments", requireAuth, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
+app.get("/api/payments/:id/receipt.pdf", requireAuth, async function (req, res, next) {
+  try {
+    const r = await pool.query("SELECT * FROM payments WHERE id=$1 AND user_id=$2", [req.params.id, req.user.id]);
+    const p = r.rows[0];
+    if (!p) return res.status(404).json({ ok: false, error: "not_found" });
+    const pdf = await buildReceiptPdf(Object.assign({}, p, { email: req.user.email }));
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'attachment; filename="' + p.receipt_no + '.pdf"');
+    res.send(pdf);
+  } catch (e) { next(e); }
+});
+
 // ---------- plans ----------
 app.get("/api/plans", requireAuth, async function (req, res, next) {
   try {
@@ -453,8 +466,12 @@ app.post("/api/subscription/redeem", requireAuth, rateLimit(10, 60000), async fu
     await client.query("BEGIN");
     const r = await client.query("SELECT * FROM redeem_codes WHERE code=$1 FOR UPDATE", [code]);
     const c = r.rows[0];
-    if (!c || c.used_by) { await client.query("ROLLBACK"); return res.status(400).json({ ok: false, error: "invalid_code" }); }
-    await client.query("UPDATE redeem_codes SET used_by=$1, used_at=now() WHERE id=$2", [req.user.id, c.id]);
+    const exhausted = !c || (c.used_by && (c.max_uses || 1) <= 1) || (c.used_count || 0) >= (c.max_uses || 1);
+    const expired = c && c.expires_at && new Date(c.expires_at) < new Date();
+    if (exhausted || expired) { await client.query("ROLLBACK"); return res.status(400).json({ ok: false, error: "invalid_code" }); }
+    await client.query(
+      "UPDATE redeem_codes SET used_count=used_count+1, used_by=COALESCE(used_by,$1), used_at=COALESCE(used_at,now()) WHERE id=$2",
+      [req.user.id, c.id]);
     const u = await client.query(
       "UPDATE users SET plan='pro', plan_expires_at = GREATEST(COALESCE(plan_expires_at, now()), now()) + ($1 || ' days')::interval, updated_at=now() WHERE id=$2 RETURNING plan, plan_expires_at",
       [c.days, req.user.id]);
@@ -465,6 +482,30 @@ app.post("/api/subscription/redeem", requireAuth, rateLimit(10, 60000), async fu
       [req.user.id, c.id, c.days, c.amount || 50, u.rows[0].plan_expires_at]);
     await client.query("COMMIT");
     res.json({ ok: true, plan: u.rows[0].plan, planExpiresAt: u.rows[0].plan_expires_at, days: c.days, receipt: pay.rows[0] });
+    try {
+      const pdf = await buildReceiptPdf(Object.assign({}, pay.rows[0], {
+        email: req.user.email, days: c.days, expires_after: u.rows[0].plan_expires_at
+      }));
+      const text = [
+        "您好 / Hello,",
+        "",
+        "已收到您的付款，专业版已开通 / 续费。",
+        "Payment received — your Pro plan is now active.",
+        "",
+        "收据 / Receipt: " + pay.rows[0].receipt_no,
+        "金额 / Amount: RM " + Number(pay.rows[0].amount).toFixed(2),
+        "到期 / Valid until: " + new Date(u.rows[0].plan_expires_at).toLocaleDateString("en-MY"),
+        "",
+        "收据 PDF 见附件；也可在账号 → 付款记录查看。",
+        "The receipt PDF is attached; you can also view it under Account → Payments.",
+        "",
+        "KWONG THYE 光泰",
+        "https://kwongthye.com/calc/"
+      ].join("\n");
+      await sendMail(req.user.email, "收据 / Receipt — " + pay.rows[0].receipt_no + " · KWONG THYE", text, null,
+        [{ filename: pay.rows[0].receipt_no + ".pdf", content: pdf }]);
+      console.log("receipt mail sent", pay.rows[0].receipt_no, req.user.email);
+    } catch (e) { console.error("receipt mail failed", e.message); }
   } catch (e) {
     await client.query("ROLLBACK");
     next(e);

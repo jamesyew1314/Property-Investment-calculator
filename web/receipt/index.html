@@ -76,7 +76,8 @@
       '<div class="row"><span>状态 / Status</span><b>已付款 / Paid</b></div>' +
       '<div class="amount">RM ' + Number(p.amount).toFixed(2) + '</div>' +
       '<div class="muted">付款方式：银行转账 / 开通码 · Payment: bank transfer / activation code</div>' +
-      '<div class="actions"><button onclick="window.print()">打印 / 保存 PDF · Print / Save PDF</button>' +
+      '<div class="actions"><a class="btn" href="/api/payments/' + p.id + '/receipt.pdf">下载 PDF / Download PDF</a>' +
+      '<button class="btn ghost" onclick="window.print()">打印 / Print</button>' +
       '<a class="btn ghost" href="/pricing/">价格 / Pricing</a></div>';
   }).catch(function (e) {
     if (e.message === "auth") {

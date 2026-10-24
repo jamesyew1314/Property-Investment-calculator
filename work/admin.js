@@ -29,6 +29,20 @@ function newCode() {
       await pool.query("INSERT INTO redeem_codes(code,days,note,amount) VALUES($1,$2,$3,$4)", [c, days, note, amount]);
       console.log(c);
     }
+  } else if (cmd === "create-promo") {
+    const code = String(args[0] || "").toUpperCase().trim();
+    const days = parseInt(args[1] || "30", 10);
+    const maxUses = parseInt(args[2] || "10", 10);
+    const amount = args[3] !== undefined ? parseFloat(args[3]) : (days >= 365 ? 99 : 9.9);
+    const note = args[4] || null;
+    const expDays = args[5] ? parseInt(args[5], 10) : null;
+    if (!code) { console.log("usage: create-promo <CODE> <days> <maxUses> <amount> [note] [expiryDays]"); }
+    else {
+      await pool.query(
+        "INSERT INTO redeem_codes(code,days,note,amount,max_uses,label,expires_at) VALUES($1,$2,$3,$4,$5,$6,$7)",
+        [code, days, note, amount, maxUses, "promo", expDays ? new Date(Date.now() + expDays * 86400000) : null]);
+      console.log("promo created:", code, days + " days", "max " + maxUses + " uses", "RM" + amount);
+    }
   } else if (cmd === "list-codes") {
     const r = await pool.query("SELECT code, days, note, (used_by IS NOT NULL) AS used, created_at FROM redeem_codes ORDER BY created_at DESC LIMIT 50");
     console.table(r.rows);
