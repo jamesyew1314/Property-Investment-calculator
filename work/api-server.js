@@ -218,6 +218,19 @@ app.post("/api/plans/import", requireAuth, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
+// ---------- analytics ----------
+app.post("/api/track", rateLimit(120, 60000), async function (req, res) {
+  try {
+    const path = String((req.body || {}).path || "").slice(0, 200);
+    const ref = String((req.body || {}).ref || "").slice(0, 300);
+    const ipHash = crypto.createHash("sha256").update((req.ip || "") + (process.env.IP_SALT || "fc")).digest("hex").slice(0, 24);
+    if (path) await pool.query("INSERT INTO pageviews(path,referrer,ip_hash) VALUES($1,$2,$3)", [path, ref, ipHash]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
+
 // ---------- subscription ----------
 app.post("/api/subscription/redeem", requireAuth, rateLimit(10, 60000), async function (req, res, next) {
   const code = String((req.body || {}).code || "").trim().toUpperCase();

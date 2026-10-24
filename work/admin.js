@@ -38,6 +38,12 @@ function newCode() {
       "UPDATE users SET plan='pro', plan_expires_at = GREATEST(COALESCE(plan_expires_at, now()), now()) + ($1 || ' days')::interval, updated_at=now() WHERE email=$2 RETURNING email, plan, plan_expires_at",
       [days, email]);
     console.log(r.rows[0] || "user not found");
+  } else if (cmd === "pageviews") {
+    const days = parseInt(args[0] || "7", 10);
+    const d = await pool.query("SELECT created_at::date AS day, count(*)::int AS views FROM pageviews WHERE created_at > now() - ($1 || ' days')::interval GROUP BY 1 ORDER BY 1 DESC", [days]);
+    const t = await pool.query("SELECT path, count(*)::int AS views FROM pageviews WHERE created_at > now() - ($1 || ' days')::interval GROUP BY 1 ORDER BY 2 DESC LIMIT 10", [days]);
+    console.table(d.rows);
+    console.table(t.rows);
   } else if (cmd === "stats") {
     const u = await pool.query("SELECT count(*)::int AS users, count(*) FILTER (WHERE plan='pro')::int AS pro FROM users");
     const p = await pool.query("SELECT count(*)::int AS plans FROM plans");

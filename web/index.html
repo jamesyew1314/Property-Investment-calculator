@@ -124,7 +124,8 @@
   footer{background:#0B1D2E;color:#9FB0C1;font-size:12.5px;padding:44px 0 34px}
   footer .cols{display:flex;gap:40px;justify-content:space-between;flex-wrap:wrap;margin-bottom:26px}
   footer b{color:#fff;font-family:Georgia,serif}
-  footer p{margin:6px 0 0;max-width:640px;line-height:1.8}
+  footer p{margin:6px 0 0;max-width:760px;line-height:1.8}
+  footer .regline{color:#7E90A2;font-size:11.5px;margin-top:16px;border-top:1px solid rgba(255,255,255,.12);padding-top:14px}
   .wa-fab{position:fixed;right:18px;bottom:18px;z-index:60;background:#25D366;color:#fff;border-radius:999px;
           padding:12px 18px;font-weight:700;font-size:14px;box-shadow:0 10px 24px rgba(0,0,0,.22)}
   @media (max-width:960px){
@@ -402,6 +403,10 @@
           <div class="line"><b data-i18n="contact.phone">电话 / WhatsApp</b><span><a href="https://wa.me/60165280918">+60 16-528 0918</a></span></div>
           <div class="line"><b data-i18n="contact.web">网站</b><span><a href="https://kwongthye.com/">www.kwongthye.com</a></span></div>
           <div class="line"><b data-i18n="contact.calc">投资计算器</b><span><a href="/calc/">kwongthye.com/calc</a></span></div>
+          <div class="line"><b data-i18n="contact.email">电邮</b><span><a href="mailto:andylau.theroof@gmail.com">andylau.theroof@gmail.com</a></span></div>
+          <div class="line"><b data-i18n="contact.office">办公室</b><span data-i18n="contact.officev">No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor</span></div>
+          <div class="line"><b data-i18n="contact.reg">注册代理</b><span data-i18n="contact.regv">THE ROOF REALTY SDN BHD · E(1)1605/1</span></div>
+          <div class="line"><b data-i18n="contact.ren">REN</b><span data-i18n="contact.renv">Andy Lau · REN 32839</span></div>
           <ul class="enq">
             <li data-i18n="contact.e1">房地产销售与顾问</li>
             <li data-i18n="contact.e2">房地产投资机会</li>
@@ -431,6 +436,7 @@
       </div>
     </div>
     <p data-i18n="footer.disclaimer">Kwong Thye 通过旗下各公司经营相关房地产业务。房地产投资涉及财务、市场、融资及流动性风险；历史投资成果不代表未来表现。所有投资机会、项目预测及合作安排均须经独立评估，并受适用监管要求及正式协议约束。开发中的房地产科技产品将分阶段推出，实际可用性以平台公布为准。</p>
+    <p class="regline" data-i18n="footer.reg">THE ROOF REALTY SDN BHD · Registered Estate Agent E(1)1605/1 · Andy Lau REN 32839 · No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor · andylau.theroof@gmail.com</p>
     <p style="margin-top:18px">© 2026 Kwong Thye. All Rights Reserved.</p>
   </div>
 </footer>
@@ -497,12 +503,16 @@
       "values.5":"长期价值","values.5p":"重视可持续发展与审慎投资管理。",
       "contact.kicker":"联系我们","contact.title":"欢迎洽谈房地产销售、投资合作与科技平台",
       "contact.market":"主要市场","contact.marketv":"马来西亚 · 柔佛新山","contact.phone":"电话 / WhatsApp",
-      "contact.web":"网站","contact.calc":"投资计算器",
+      "contact.web":"网站","contact.calc":"投资计算器","contact.email":"电邮","contact.office":"办公室",
+      "contact.officev":"No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor",
+      "contact.reg":"注册代理","contact.regv":"THE ROOF REALTY SDN BHD · E(1)1605/1","contact.ren":"REN","contact.renv":"Andy Lau · REN 32839",
       "contact.e1":"房地产销售与顾问","contact.e2":"房地产投资机会","contact.e3":"房地产投资合作","contact.e4":"房地产科技方案与合作",
       "contact.co1":"房地产销售 · 市场分析 · 投资顾问","contact.co2":"房地产收购 · 资产增值 · 翻新转售",
       "contact.cta":"WhatsApp 直接联系",
       "footer.addr":"马来西亚柔佛新山 · 房地产投资 · 专业顾问 · 科技创新",
       "footer.tag":"Connecting Properties, Technology & Investment Opportunities.",
+      "footer.reg":"THE ROOF REALTY SDN BHD · 注册房地产代理 E(1)1605/1 · Andy Lau REN 32839 · No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor · andylau.theroof@gmail.com",
+      "footer.reg":"THE ROOF REALTY SDN BHD · Registered Estate Agent E(1)1605/1 · Andy Lau REN 32839 · No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor · andylau.theroof@gmail.com",
       "footer.disclaimer":"Kwong Thye 通过旗下各公司经营相关房地产业务。房地产投资涉及财务、市场、融资及流动性风险；历史投资成果不代表未来表现。所有投资机会、项目预测及合作安排均须经独立评估，并受适用监管要求及正式协议约束。开发中的房地产科技产品将分阶段推出，实际可用性以平台公布为准。"
     },
     en: {
@@ -562,7 +572,9 @@
       "values.5":"Long-Term Value","values.5p":"Sustainable growth and prudent investment management.",
       "contact.kicker":"Contact Us","contact.title":"Let's talk about property sales, investment partnerships and PropTech",
       "contact.market":"Primary market","contact.marketv":"Johor Bahru, Johor, Malaysia","contact.phone":"Phone / WhatsApp",
-      "contact.web":"Website","contact.calc":"Calculator",
+      "contact.web":"Website","contact.calc":"Calculator","contact.email":"Email","contact.office":"Office",
+      "contact.officev":"No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor",
+      "contact.reg":"Registered agent","contact.regv":"THE ROOF REALTY SDN BHD · E(1)1605/1","contact.ren":"REN","contact.renv":"Andy Lau · REN 32839",
       "contact.e1":"Property sales & advisory","contact.e2":"Property investment opportunities","contact.e3":"Property investment partnerships","contact.e4":"PropTech solutions & collaboration",
       "contact.co1":"Property sales · Market analysis · Investment advisory","contact.co2":"Acquisition · Asset enhancement · Renovation-resale",
       "contact.cta":"Chat on WhatsApp",
@@ -614,8 +626,30 @@
   "description": "Real estate investment, property advisory and PropTech in Johor Bahru, Malaysia.",
   "areaServed": "Johor Bahru, Johor, Malaysia",
   "telephone": "+60 16-528 0918",
+  "email": "andylau.theroof@gmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama",
+    "addressLocality": "Skudai",
+    "addressRegion": "Johor",
+    "postalCode": "81300",
+    "addressCountry": "MY"
+  },
+  "employee": {
+    "@type": "Person",
+    "name": "Andy Lau Pik Kwong",
+    "jobTitle": "Founder",
+    "identifier": "REN 32839"
+  },
   "sameAs": ["https://kwongthye.com/"]
 }
+</script>
+<script>
+(function () {
+  try {
+    if (navigator.sendBeacon) navigator.sendBeacon("/api/track", JSON.stringify({ path: location.pathname, ref: document.referrer || "" }));
+  } catch (e) {}
+})();
 </script>
 </body>
 </html>
