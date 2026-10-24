@@ -7,7 +7,7 @@ const pathMod = require("node:path");
 const { Pool } = require("pg");
 
 const PORT = process.env.PORT || 3000;
-const FREE_QUOTA = 3;
+const FREE_QUOTA = 0;
 const SESSION_DAYS = 30;
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
