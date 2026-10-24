@@ -218,6 +218,30 @@ app.post("/api/plans/import", requireAuth, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
+// ---------- subscription ----------
+app.post("/api/subscription/redeem", requireAuth, rateLimit(10, 60000), async function (req, res, next) {
+  const code = String((req.body || {}).code || "").trim().toUpperCase();
+  if (!code) return res.status(400).json({ ok: false, error: "bad_code" });
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const r = await client.query("SELECT * FROM redeem_codes WHERE code=$1 FOR UPDATE", [code]);
+    const c = r.rows[0];
+    if (!c || c.used_by) { await client.query("ROLLBACK"); return res.status(400).json({ ok: false, error: "invalid_code" }); }
+    await client.query("UPDATE redeem_codes SET used_by=$1, used_at=now() WHERE id=$2", [req.user.id, c.id]);
+    const u = await client.query(
+      "UPDATE users SET plan='pro', plan_expires_at = GREATEST(COALESCE(plan_expires_at, now()), now()) + ($1 || ' days')::interval, updated_at=now() WHERE id=$2 RETURNING plan, plan_expires_at",
+      [c.days, req.user.id]);
+    await client.query("COMMIT");
+    res.json({ ok: true, plan: u.rows[0].plan, planExpiresAt: u.rows[0].plan_expires_at, days: c.days });
+  } catch (e) {
+    await client.query("ROLLBACK");
+    next(e);
+  } finally {
+    client.release();
+  }
+});
+
 // ---------- fallbacks ----------
 app.use("/api", function (req, res) { res.status(404).json({ ok: false, error: "not_found" }); });
 app.use(function (err, req, res, next) {

@@ -320,6 +320,12 @@
       <div class="out">
         <div class="line"><span data-i18n="acctEmailLabel">邮箱</span><b id="acctWho">—</b></div>
         <div class="line"><span data-i18n="acctPlanLabel">版本</span><span id="acctPlan">—</span></div>
+        <div class="line"><span data-i18n="acctExpiry">到期</span><span id="acctExpiry">—</span></div>
+      </div>
+      <div id="proBox">
+        <div class="legend" data-i18n="proNote">专业版 RM 50/年：方案不限个数。付款后输入开通码即可开通或续费。</div>
+        <div class="row"><label data-i18n="fCode">开通码</label><input class="manual" id="proCode" type="text" placeholder="XXXX-XXXX-XXXX"><span class="unit"></span></div>
+        <div class="btnRow"><button class="btn" id="redeemBtn" data-i18n="btnRedeem">开通 / 续费</button></div>
       </div>
       <div class="btnRow"><button class="btn btn2" id="logoutBtn" data-i18n="btnLogout">退出登录</button></div>
     </div>
@@ -369,7 +375,9 @@
       exportTitle: "导出 / 分享",
       acctTitle: "我的账号", fEmail: "邮箱", fPassword: "密码", btnLogin: "登录", btnRegister: "注册", btnLoginShort: "登录",
       acctNote: "登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。",
-      acctEmailLabel: "邮箱", acctPlanLabel: "版本", btnLogout: "退出登录",
+      acctEmailLabel: "邮箱", acctPlanLabel: "版本", acctExpiry: "到期", btnLogout: "退出登录",
+      fCode: "开通码", btnRedeem: "开通 / 续费", proNote: "专业版 RM 50/年：方案不限个数。付款后输入开通码即可开通或续费。",
+      toastRedeemed: "已开通 {n} 天专业版", errCode: "开通码无效或已被使用",
       planFree: "免费版", planPro: "专业版", planUnlimited: "个方案（不限）",
       errEmail: "请填正确的邮箱", errPassword: "密码至少 8 位", errExists: "这个邮箱已注册", errLogin: "邮箱或密码不对",
       errRate: "太频繁，请稍后再试", errQuota: "免费版最多 3 个方案", errGeneric: "网络错误，请稍后再试",
@@ -430,7 +438,9 @@
       exportTitle: "Export / Share",
       acctTitle: "My Account", fEmail: "Email", fPassword: "Password", btnLogin: "Log In", btnRegister: "Sign Up", btnLoginShort: "Log in",
       acctNote: "Log in to save plans to the cloud (3 free); local saving still works without an account.",
-      acctEmailLabel: "Email", acctPlanLabel: "Plan", btnLogout: "Log Out",
+      acctEmailLabel: "Email", acctPlanLabel: "Plan", acctExpiry: "Expires", btnLogout: "Log Out",
+      fCode: "Activation code", btnRedeem: "Activate / Renew", proNote: "Pro RM 50/year: unlimited saved plans. Enter your activation code after payment to activate or renew.",
+      toastRedeemed: "{n} days of Pro activated", errCode: "Invalid or already-used code",
       planFree: "Free", planPro: "Pro", planUnlimited: "plans (unlimited)",
       errEmail: "Please enter a valid email", errPassword: "Password must be at least 8 characters", errExists: "This email is already registered", errLogin: "Wrong email or password",
       errRate: "Too many attempts, try again later", errQuota: "Free plan allows 3 saved plans", errGeneric: "Network error, please retry",
@@ -1056,6 +1066,11 @@
       var planName = me.user.plan === "pro" ? t("planPro") : t("planFree");
       var used = (me.quota === null) ? (me.plans + " " + t("planUnlimited")) : (me.plans + " / " + me.quota);
       $("acctPlan").textContent = planName + " · " + used;
+      var exp = me.user.planExpiresAt ? new Date(me.user.planExpiresAt) : null;
+      if (exp && !isNaN(exp.getTime())) {
+        var days = Math.ceil((exp.getTime() - Date.now()) / 86400000);
+        $("acctExpiry").textContent = exp.toLocaleDateString(lang === "zh" ? "zh-CN" : "en-MY") + " · " + days + (lang === "zh" ? " 天" : " d");
+      } else { $("acctExpiry").textContent = "—"; }
     }
   }
   function refreshMe() {
@@ -1079,6 +1094,15 @@
   $("logoutBtn").addEventListener("click", function () {
     api("/auth/logout", { method: "POST" }).then(function () { setAccount(null); closeAcct(); toast(t("toastLogout")); });
   });
+  $("redeemBtn").addEventListener("click", function () {
+    var code = $("proCode").value.trim();
+    if (!code) { toast(t("errCode")); return; }
+    api("/subscription/redeem", { method: "POST", body: { code: code } }).then(function (j) {
+      if (j.ok) { $("proCode").value = ""; toast(fmt("toastRedeemed", { n: j.days })); refreshMe(); }
+      else { toast(j.error === "invalid_code" ? t("errCode") : errMsg(j.error)); }
+    }).catch(function () { toast(t("errGeneric")); });
+  });
+
   function openPlan() { renderPlanList(); $("planModal").hidden = false; }
   function closePlan() { $("planModal").hidden = true; }
   $("planMore").addEventListener("click", openPlan);
