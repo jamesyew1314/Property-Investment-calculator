@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" type="image/png" href="/icon-256.png">
+<link rel="apple-touch-icon" href="/icon-256.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0E2438">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="KWTHYE">
 <title>房地产投资快速计算器 | Property Investment Calculator</title>
 <meta name="description" content="马来西亚房地产投资计算器：买入费用、贷款月供、年度持有费用、出租回报、RPGT 与出售利润，一键算清。">
 <style>
@@ -95,6 +100,19 @@
   .payList{font-size:12px;color:#4A5563;margin-top:6px}
   .payRow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #EEF0F5}
   .payRow a{color:var(--blue);white-space:nowrap}
+  .locked{position:relative}
+  .locked::after{content:"🔒 Pro";position:absolute;top:-8px;right:-6px;background:#fff;color:#B26A00;
+    border:1px solid #EADFC8;border-radius:999px;font-size:9px;line-height:1.4;padding:0 5px;white-space:nowrap;
+    box-shadow:0 1px 2px rgba(0,0,0,.08);pointer-events:none}
+  .aiRow{display:flex;gap:8px;margin:10px 0 4px;flex-wrap:wrap}
+  .aiRow input{flex:1;min-width:240px;padding:10px 12px;border:1px solid #D8DEE9;border-radius:9px;font:inherit;font-size:13.5px}
+  .aiRow button{flex:none}
+  .cmpTable{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px;background:#fff}
+  .cmpTable th,.cmpTable td{border:1px solid #E6E9F0;padding:7px 8px;text-align:right}
+  .cmpTable th:first-child,.cmpTable td:first-child{text-align:left;color:#4A5563}
+  .cmpTable thead th{background:#F7F9FC;color:var(--navy)}
+  .coRow{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .coRow select{flex:1;min-width:160px;padding:8px;border:1px solid #D8DEE9;border-radius:8px;font:inherit;font-size:13px}
   .btn2.danger{color:#B23B3B;border-color:#E7C3C3;background:#FDF4F4}
   .viewBanner { background:#FFF3CD; border:1px solid #E4CE8B; color:#7A5B12; border-radius:10px; padding:10px 12px;
                 margin:0 0 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; }
@@ -176,6 +194,10 @@
     <button class="btn" id="savePlan" title="保存方案 Save">💾</button>
     <button class="btn btn2" id="shareLink" title="复制分享链接 Share">🔗</button>
     <button class="btn btn2" id="planMore" title="方案列表 / 导出">⋯</button>
+  </div>
+  <div class="aiRow no-print">
+    <input id="aiText" type="text" data-i18n-ph="aiPlaceholder" placeholder="一句话填数：SPA 80万，贷 90%，租 3000，5 年后卖 100万">
+    <button class="btn btn2" id="aiFill" data-i18n="aiBtn">AI 填数</button>
   </div>
 
   <!-- Part 1 -->
@@ -273,6 +295,14 @@
       <button class="shareBtn" id="fbBtn" style="background:#1877F2">Facebook</button>
     </div>
     <div class="legend" data-i18n="shareNote">WhatsApp / Facebook 直接打开；微信没有网页分享接口，点「微信」会复制文字，粘贴到微信即可。</div>
+    <div class="shareRow">
+      <button class="shareBtn" id="csvBtn" style="background:#1F7A4D" data-i18n="btnCsv">📊 导出 Excel / CSV</button>
+      <button class="shareBtn" id="cmpA" style="background:#334E68" data-i18n="cmpA">＋ 对比 A</button>
+      <button class="shareBtn" id="cmpB" style="background:#334E68" data-i18n="cmpB">＋ 对比 B</button>
+      <button class="shareBtn" id="cmpView" style="background:#C6A15B;color:#1B2430" data-i18n="cmpView">查看对比</button>
+    </div>
+    <div id="cmpBox" hidden></div>
+    <div class="legend" id="proHint" data-i18n="proHint" hidden>🔒 PDF / 分享 / 存档 / 导出为 Pro 功能。</div>
   </section>
 
   <footer data-i18n="footer">
@@ -304,6 +334,11 @@
     </div>
     <details class="company">
       <summary data-i18n="companyTitle">公司抬头（打印用）</summary>
+      <div class="coRow">
+        <select id="coProfileSel" aria-label="Company profile"></select>
+        <button class="btn btn2" id="coNew" data-i18n="coNew">另存为</button>
+        <button class="btn btn2" id="coDel" data-i18n="coDel">删除</button>
+      </div>
       <div class="row"><label data-i18n="fCompany">公司 / 中介公司</label><input class="manual" id="coName" type="text" placeholder="ABC Realty Sdn Bhd"></div>
       <div class="row"><label data-i18n="fPerson">中介姓名</label><input class="manual" id="coPerson" type="text" placeholder="Your name"></div>
       <div class="row"><label data-i18n="fRen">REN 编号（可选）</label><input class="manual" id="coRen" type="text" placeholder="REN 12345"></div>
@@ -436,7 +471,15 @@
       toastPwdChanged: "密码已修改", toastAcctDeleted: "账号已删除", errToken: "链接无效或已过期",
       errCurrent: "当前密码不对", pwdMismatch: "两次输入不一致",
       legalPrivacy: "隐私政策", legalTerms: "使用条款",
-      proMore: "查看价格 / 升级 →", freeCalcOnly: "仅计算 · 存档需 Pro", proOnlyAsk: "此功能为专业版功能。查看价格并升级？", payTitle: "付款记录 / 收据", payLoading: "加载中…",
+      proMore: "查看价格 / 升级 →", freeCalcOnly: "仅计算 · 存档需 Pro",
+      aiPlaceholder: "一句话填数：SPA 80万，贷 90%，租 3000，5 年后卖 100万", aiBtn: "AI 填数",
+      aiDone: "已填入 {n} 个字段", aiFail: "没识别到数字，试试：SPA 80万，贷 90%，租 3000",
+      btnCsv: "📊 导出 Excel / CSV", cmpA: "＋ 对比 A", cmpB: "＋ 对比 B", cmpView: "查看对比",
+      cmpHint: "先填好一个方案，点「对比 A」，改数字后再点「对比 B」。",
+      cmpNeed: "请先保存对比 A 和 B", cmpTitle: "方案对比",
+      cmpCash: "购房现金", cmpAcq: "总购置费", cmpPmt: "月供", cmpRent: "年净租金",
+      cmpSell: "出售利润", cmpNet: "投资净利润", cmpRoi: "Total ROI", cmpRotc: "总成本回报", cmpRpgt: "RPGT",
+      coNew: "另存为", coDel: "删除", coDefault: "默认抬头", proHint: "🔒 PDF / 分享 / 存档 / 导出为 Pro 功能。", proOnlyAsk: "此功能为专业版功能。查看价格并升级？", payTitle: "付款记录 / 收据", payLoading: "加载中…",
       payEmpty: "还没有付款记录。兑换开通码后，收据会显示在这里。", payReceipt: "查看收据", acctVerifyLabel: "验证", emailVerified: "邮箱已验证", emailUnverified: "邮箱未验证",
       btnSendVerify: "发送验证邮件", toastVerifySent: "验证邮件已发送（请查收邮箱）", toastVerified: "邮箱验证成功",
       toastLoginOk: "已登录", toastRegisterOk: "注册成功，已登录", toastLogout: "已退出登录",
@@ -512,7 +555,15 @@
       toastPwdChanged: "Password changed", toastAcctDeleted: "Account deleted", errToken: "Invalid or expired link",
       errCurrent: "Current password is incorrect", pwdMismatch: "Passwords do not match",
       legalPrivacy: "Privacy Policy", legalTerms: "Terms of Use",
-      proMore: "Pricing / upgrade →", freeCalcOnly: "Calculate only · Pro to save", proOnlyAsk: "This is a Pro feature. View pricing and upgrade?", payTitle: "Payments / receipts", payLoading: "Loading…",
+      proMore: "Pricing / upgrade →", freeCalcOnly: "Calculate only · Pro to save",
+      aiPlaceholder: "One sentence: SPA 800k, loan 90%, rent 3,000, sell 1M after 5 years", aiBtn: "AI fill",
+      aiDone: "Filled {n} fields", aiFail: "No numbers found. Try: SPA 800k, loan 90%, rent 3,000",
+      btnCsv: "📊 Export Excel / CSV", cmpA: "＋ Compare A", cmpB: "＋ Compare B", cmpView: "View comparison",
+      cmpHint: "Fill a scenario, click Compare A, change numbers, then Compare B.",
+      cmpNeed: "Save Compare A and B first", cmpTitle: "Scenario comparison",
+      cmpCash: "Upfront cash", cmpAcq: "Acquisition costs", cmpPmt: "Monthly instalment", cmpRent: "Annual net rent",
+      cmpSell: "Selling profit", cmpNet: "Net investment profit", cmpRoi: "Total ROI", cmpRotc: "Return on total cost", cmpRpgt: "RPGT",
+      coNew: "Save as", coDel: "Delete", coDefault: "Default header", proHint: "🔒 PDF / share / save / export are Pro features.", proOnlyAsk: "This is a Pro feature. View pricing and upgrade?", payTitle: "Payments / receipts", payLoading: "Loading…",
       payEmpty: "No payments yet. Receipts appear here after you redeem a code.", payReceipt: "Receipt", acctVerifyLabel: "Email", emailVerified: "Email verified", emailUnverified: "Email not verified",
       btnSendVerify: "Send verification email", toastVerifySent: "Verification email sent", toastVerified: "Email verified",
       toastLoginOk: "Logged in", toastRegisterOk: "Account created", toastLogout: "Logged out",
@@ -556,6 +607,7 @@
     });
     $("langBtn").textContent = lang === "zh" ? "EN" : "中文";
     if (logged && me && me.ok) renderAcctDetails();
+    updateProLocks();
     if (typeof planMode !== "undefined" && $("planMode")) {
       $("planMode").textContent = logged ? t("planModeCloud") : t("planModeLocal");
       $("planNote").textContent = logged ? t("planNoteCloud") : t("planNote");
@@ -1080,8 +1132,37 @@
       address: $("coAddress").value.trim(), client: $("coClient").value.trim(), project: $("coProject").value.trim()
     };
     try { localStorage.setItem(CO_KEY, JSON.stringify(company)); } catch (e) {}
+    var list = profileList();
+    var idx = parseInt($("coProfileSel").value, 10);
+    var prof = Object.assign({ label: company.name || ("Header " + (list.length + 1)) }, company);
+    if (isNaN(idx) || !list[idx]) list.push(prof); else list[idx] = prof;
+    saveProfileList(list);
+    renderProfiles(isNaN(idx) || !list[idx] ? list.length - 1 : idx);
     updatePrintHeader();
     toast(t("toastCoSaved"));
+  });
+  $("coNew").addEventListener("click", function () {
+    var list = profileList();
+    var label = prompt(t("coNew"), $("coName").value.trim() || ("Header " + (list.length + 1)));
+    if (!label) return;
+    var c = {
+      name: $("coName").value.trim(), person: $("coPerson").value.trim(), ren: $("coRen").value.trim(),
+      phone: $("coPhone").value.trim(), email: $("coEmail").value.trim(),
+      address: $("coAddress").value.trim(), client: $("coClient").value.trim(), project: $("coProject").value.trim(),
+      label: label
+    };
+    list.push(c); saveProfileList(list); renderProfiles(list.length - 1); toast(t("toastCoSaved"));
+  });
+  $("coDel").addEventListener("click", function () {
+    var list = profileList(); var idx = parseInt($("coProfileSel").value, 10);
+    if (isNaN(idx) || !list[idx]) return;
+    if (!confirm(t("coDel") + "?")) return;
+    list.splice(idx, 1); saveProfileList(list); renderProfiles(0);
+    if (list[0]) applyProfile(list[0]);
+  });
+  $("coProfileSel").addEventListener("change", function () {
+    var list = profileList(); var idx = parseInt(this.value, 10);
+    if (list[idx]) applyProfile(list[idx]);
   });
 
   function updatePrintHeader() {
@@ -1106,8 +1187,143 @@
   }
   window.addEventListener("beforeprint", updatePrintHeader);
 
+
+  function updateProLocks() {
+    var free = !proActive();
+    ["savePlan", "shareLink", "printBtn", "waBtn", "wxBtn", "fbBtn", "csvBtn", "cmpA", "cmpB"].forEach(function (id) {
+      var el = $(id); if (el) el.classList.toggle("locked", free);
+    });
+    var hint = $("proHint"); if (hint) hint.hidden = !free;
+  }
+  function registerSW() {
+    if (!("serviceWorker" in navigator)) return;
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js", { scope: "/calc/" }).catch(function () {});
+    });
+  }
+  function exportCsv() {
+    if (!requirePro()) return;
+    if (!lastRes || !lastInp) { toast(t("aiFail")); return; }
+    var rows = [["KWONG THYE calculator", ""], ["Plan", $("planName").value || ""], ["Exported", new Date().toLocaleString()], []];
+    rows.push(["Part 1", ""]);
+    rows.push(["SPA", lastInp.spa], ["Actual price", lastInp.actual], ["Loan", lastInp.loan],
+      ["Monthly instalment", lastRes.part1.pmt], ["Acquisition costs", lastRes.part1.purchaseCosts],
+      ["Down payment", lastRes.part1.downpayment], ["Upfront cash", lastRes.part1.initial]);
+    rows.push(["Part 2", ""]);
+    rows.push(["Annual rent", lastInp.rentY], ["Annual interest", lastRes.part2.firstYearInterest],
+      ["Annual costs", lastRes.part2.mgmtY + lastRes.part2.fixedY + lastRes.part2.firstYearInterest]);
+    rows.push(["Part 3", ""]);
+    rows.push(["Selling price", lastInp.sellPrice], ["Holding years", lastInp.holdYears],
+      ["RPGT", lastRes.out.rpgt], ["Selling profit", lastRes.out.sellingProfit],
+      ["Net investment profit", lastRes.out.netInvestmentProfit],
+      ["Total ROI", (lastRes.out.totalRoi * 100).toFixed(2) + "%"],
+      ["Return on total cost", (lastRes.out.rotc * 100).toFixed(2) + "%"]);
+    var csv = rows.map(function (r) {
+      return r.map(function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; }).join(",");
+    }).join("\r\n");
+    var blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "kwong-thye-" + Date.now() + ".csv";
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 3000);
+  }
+  function parseAi() {
+    var txt = ($("aiText").value || "").replace(/,/g, "");
+    if (!txt.trim()) return;
+    var filled = 0;
+    function grab(re) {
+      var m = txt.match(re);
+      if (!m) return null;
+      var v = parseFloat(m[1]); var u = m[2] || "";
+      if (/万/.test(u)) v *= 10000; else if (/千/.test(u)) v *= 1000;
+      else if (/[kK]/.test(u)) v *= 1000; else if (/[mM]/.test(u)) v *= 1000000;
+      return v;
+    }
+    var spa = grab(/(?:spa|买价|房价|屋价)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i);
+    var actual = grab(/(?:实价|actual)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i);
+    var pct = grab(/(?:贷|loan|ltv)\D{0,8}([\d.]+)\s*%/i);
+    var loanAmt = grab(/(?:贷|loan)\D{0,8}([\d.]+)\s*(万|千|[kKmM])/i);
+    var rate = grab(/(?:利率|rate)\D{0,6}([\d.]+)\s*%/i);
+    var tenure = grab(/(?:年限|tenure)\D{0,6}(\d+)/i);
+    var rent = grab(/(?:租金|租|rent)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i);
+    var sell = grab(/(?:卖|售|sell)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i);
+    var hold = grab(/(\d+)\s*年(?:后|卖|出售)|(?:hold|持有)\D{0,4}(\d+)/i);
+    if (spa) { $("spa").value = spa; filled++; }
+    if (actual) { $("actual").value = actual; filled++; }
+    else if (spa) { $("actual").value = spa; filled++; }
+    if (pct && spa) { $("loanPct").value = pct; $("loan").value = Math.round(spa * pct / 100); filled += 2; }
+    else if (loanAmt) { $("loan").value = loanAmt; filled++; }
+    if (rate) { $("rate").value = rate; filled++; }
+    if (tenure) { $("tenure").value = tenure; filled++; }
+    if (rent) { $("rent").value = rent < 20000 ? rent * 12 : rent; filled++; }
+    if (sell) { $("sell").value = sell; filled++; }
+    if (hold) { var hy = parseFloat(hold); if (hy >= 1 && hy <= 5) { $("hold").value = hy; filled++; } }
+    if (!filled) { toast(t("aiFail")); return; }
+    recalc();
+    toast(fmt("aiDone", { n: filled }));
+  }
+  var cmpStore = { A: null, B: null };
+  function takeCmp(slot) {
+    if (!requirePro()) return;
+    if (!lastRes || !lastInp) { toast(t("cmpNeed")); return; }
+    cmpStore[slot] = {
+      name: $("planName").value.trim() || ("Scenario " + slot),
+      cash: lastRes.part1.initial, acq: lastRes.part1.purchaseCosts, pmt: lastRes.part1.pmt,
+      rent: lastRes.years[0].netY, sell: lastRes.out.sellingProfit, net: lastRes.out.netInvestmentProfit,
+      roi: lastRes.out.totalRoi, rotc: lastRes.out.rotc
+    };
+    toast(slot + " ✓");
+  }
+  function renderCmp() {
+    var box = $("cmpBox");
+    if (!cmpStore.A || !cmpStore.B) { toast(t("cmpNeed")); return; }
+    var rows = [["cmpCash", "cash", "rm"], ["cmpAcq", "acq", "rm"], ["cmpPmt", "pmt", "rm"],
+      ["cmpRent", "rent", "rm"], ["cmpSell", "sell", "rm"], ["cmpNet", "net", "rm"],
+      ["cmpRoi", "roi", "pct"], ["cmpRotc", "rotc", "pct"]];
+    var html = '<table class="cmpTable"><thead><tr><th>' + t("cmpTitle") + '</th><th>A · ' +
+      cmpStore.A.name.replace(/</g, "&lt;") + '</th><th>B · ' + cmpStore.B.name.replace(/</g, "&lt;") + '</th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+      var a = cmpStore.A[r[1]], b = cmpStore.B[r[1]];
+      var f = function (v) { return r[2] === "pct" ? (v * 100).toFixed(2) + "%" : fmtRM(v); };
+      html += "<tr><td>" + t(r[0]) + "</td><td>" + f(a) + "</td><td>" + f(b) + "</td></tr>";
+    });
+    html += "</tbody></table>";
+    box.innerHTML = html; box.hidden = false;
+  }
+  function profileList() {
+    var list = [];
+    try { list = JSON.parse(localStorage.getItem("kwthye_co_profiles_v1") || "[]"); } catch (e) {}
+    if (!list.length && (company.name || company.person)) list = [Object.assign({ label: company.name || t("coDefault") }, company)];
+    return list;
+  }
+  function saveProfileList(list) {
+    try { localStorage.setItem("kwthye_co_profiles_v1", JSON.stringify(list)); } catch (e) {}
+  }
+  function renderProfiles(sel) {
+    var el = $("coProfileSel"); if (!el) return;
+    var list = profileList(); el.innerHTML = "";
+    if (!list.length) {
+      var o = document.createElement("option"); o.value = ""; o.textContent = t("coDefault"); el.appendChild(o); return;
+    }
+    list.forEach(function (p, i) {
+      var op = document.createElement("option"); op.value = i;
+      op.textContent = p.label || p.name || ("Header " + (i + 1)); el.appendChild(op);
+    });
+    if (sel != null && list[sel]) el.value = sel;
+  }
+  function applyProfile(c) { company = c; fillCompanyForm(); updatePrintHeader(); }
+
   renderPlanList();
   fillCompanyForm();
+  renderProfiles(0);
+  updateProLocks();
+  registerSW();
+  $("aiFill").addEventListener("click", parseAi);
+  $("csvBtn").addEventListener("click", exportCsv);
+  $("cmpA").addEventListener("click", function () { takeCmp("A"); });
+  $("cmpB").addEventListener("click", function () { takeCmp("B"); });
+  $("cmpView").addEventListener("click", renderCmp);
   var vp = new URLSearchParams(location.search).get("verify");
   if (vp) {
     api("/auth/verify-email", { method: "POST", body: { token: vp } }).then(function (j) {
@@ -1153,6 +1369,7 @@
     if (!logged && wasLogged) { cloudPlans = []; refreshPlans(); }
     $("acctBtnTxt").textContent = logged ? me.user.email.split("@")[0] : t("btnLoginShort");
     $("acctBtn").title = logged ? me.user.email : t("acctTitle");
+    updateProLocks();
     if (logged) {
       showAcctView("me");
       renderAcctDetails();
