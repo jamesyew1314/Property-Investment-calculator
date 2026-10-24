@@ -436,7 +436,7 @@
       toastPwdChanged: "密码已修改", toastAcctDeleted: "账号已删除", errToken: "链接无效或已过期",
       errCurrent: "当前密码不对", pwdMismatch: "两次输入不一致",
       legalPrivacy: "隐私政策", legalTerms: "使用条款",
-      proMore: "查看价格 / 升级 →", payTitle: "付款记录 / 收据", payLoading: "加载中…",
+      proMore: "查看价格 / 升级 →", proOnlyAsk: "此功能为专业版功能。查看价格并升级？", payTitle: "付款记录 / 收据", payLoading: "加载中…",
       payEmpty: "还没有付款记录。兑换开通码后，收据会显示在这里。", payReceipt: "查看收据", acctVerifyLabel: "验证", emailVerified: "邮箱已验证", emailUnverified: "邮箱未验证",
       btnSendVerify: "发送验证邮件", toastVerifySent: "验证邮件已发送（请查收邮箱）", toastVerified: "邮箱验证成功",
       toastLoginOk: "已登录", toastRegisterOk: "注册成功，已登录", toastLogout: "已退出登录",
@@ -512,7 +512,7 @@
       toastPwdChanged: "Password changed", toastAcctDeleted: "Account deleted", errToken: "Invalid or expired link",
       errCurrent: "Current password is incorrect", pwdMismatch: "Passwords do not match",
       legalPrivacy: "Privacy Policy", legalTerms: "Terms of Use",
-      proMore: "Pricing / upgrade →", payTitle: "Payments / receipts", payLoading: "Loading…",
+      proMore: "Pricing / upgrade →", proOnlyAsk: "This is a Pro feature. View pricing and upgrade?", payTitle: "Payments / receipts", payLoading: "Loading…",
       payEmpty: "No payments yet. Receipts appear here after you redeem a code.", payReceipt: "Receipt", acctVerifyLabel: "Email", emailVerified: "Email verified", emailUnverified: "Email not verified",
       btnSendVerify: "Send verification email", toastVerifySent: "Verification email sent", toastVerified: "Email verified",
       toastLoginOk: "Logged in", toastRegisterOk: "Account created", toastLogout: "Logged out",
@@ -805,7 +805,7 @@
   });
 
   // ---- 导出 PDF / 分享 ----
-  $("printBtn").addEventListener("click", function () { window.print(); });
+  $("printBtn").addEventListener("click", function () { if (!requirePro()) return; window.print(); });
 
   var toastTimer = null;
   function toast(msg) {
@@ -839,13 +839,13 @@
       url: url
     });
   }
-  $("waBtn").addEventListener("click", function () {
+  $("waBtn").addEventListener("click", function () { if (!requirePro()) return;
     window.open("https://wa.me/?text=" + encodeURIComponent(shareText()), "_blank");
   });
-  $("fbBtn").addEventListener("click", function () {
+  $("fbBtn").addEventListener("click", function () { if (!requirePro()) return;
     window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(location.href) + "&quote=" + encodeURIComponent(shareText()), "_blank");
   });
-  $("wxBtn").addEventListener("click", function () {
+  $("wxBtn").addEventListener("click", function () { if (!requirePro()) return;
     var txt = shareText();
     var ok = function () { toast(t("copyOk")); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -945,6 +945,7 @@
   }
 
   $("savePlan").addEventListener("click", function () {
+    if (!requirePro()) return;
     var name = $("planName").value.trim();
     if (!name) { $("planName").focus(); toast(t("toastNeedName")); return; }
     var st = collectState();
@@ -1033,7 +1034,7 @@
     var base = location.origin + location.pathname.replace(/index\.html$/, "");
     return base + "?d=" + Calc.encodeState(collectState());
   }
-  $("shareLink").addEventListener("click", function () {
+  $("shareLink").addEventListener("click", function () { if (!requirePro()) return;
     var url = shareUrl();
     var ok = function () { toast(t("toastLinkCopied")); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1178,6 +1179,19 @@
       } else { toast(errMsg(j.error)); }
     }).catch(function () { toast(t("errGeneric")); });
   }
+  function proActive() {
+    if (!logged || !me || !me.user) return false;
+    var u = me.user;
+    if (u.plan !== "pro") return false;
+    if (u.planExpiresAt && new Date(u.planExpiresAt) <= new Date()) return false;
+    return true;
+  }
+  function requirePro() {
+    if (proActive()) return true;
+    if (confirm(t("proOnlyAsk"))) window.open("/pricing/", "_blank");
+    return false;
+  }
+
   function loadPayments() {
     api("/payments").then(function (j) {
       var el = $("payList");

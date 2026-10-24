@@ -69,8 +69,8 @@
         <ul>
           <li data-i18n="free.a">全部计算功能（买入 / 持有 / 出租 / 出售）</li>
           <li data-i18n="free.b">最多 3 个云端方案</li>
-          <li data-i18n="free.c">PDF / 打印 / 分享链接</li>
-          <li data-i18n="free.d">本机存档不限</li>
+          <li data-i18n="free.c">不支持 PDF / 打印 / 分享</li>
+          <li data-i18n="free.d">不支持本机存档</li>
         </ul>
         <a class="btn ghost" href="/calc/" data-i18n="free.cta">免费开始 →</a>
       </div>
@@ -79,6 +79,8 @@
         <div class="price">RM 9.90 <small data-i18n="m.per">／月</small></div>
         <ul>
           <li data-i18n="pro.a">云端方案</li>
+          <li data-i18n="pro.pdf">PDF / 打印 / 分享链接</li>
+          <li data-i18n="pro.local">本机存档不限</li>
           <li data-i18n="pro.b">包含免费版全部功能</li>
           <li data-i18n="pro.c">到期前邮件提醒</li>
           <li data-i18n="pro.d">优先 WhatsApp 支持</li>
@@ -90,6 +92,8 @@
         <div class="price">RM 99 <small data-i18n="y.per">／年</small></div>
         <ul>
           <li data-i18n="pro.a">云端方案 · 不限个数</li>
+          <li data-i18n="pro.pdf">PDF / 打印 / 分享链接</li>
+          <li data-i18n="pro.local">本机存档不限</li>
           <li data-i18n="pro.b">包含免费版全部功能</li>
           <li data-i18n="pro.c">到期前邮件提醒</li>
           <li data-i18n="pro.d">优先 WhatsApp 支持</li>
@@ -105,7 +109,8 @@
       <thead><tr><th data-i18n="cmp.f">功能</th><th data-i18n="cmp.free">免费</th><th data-i18n="cmp.m">月付 RM9.90</th><th data-i18n="cmp.y">年付 RM99</th></tr></thead>
       <tbody>
         <tr><td data-i18n="cmp.r1">计算器全部功能</td><td>✓</td><td>✓</td><td>✓</td></tr>
-        <tr><td data-i18n="cmp.r2">PDF / 打印 / 分享</td><td>✓</td><td>✓</td><td>✓</td></tr>
+        <tr><td data-i18n="cmp.r2">PDF / 打印 / 分享</td><td>—</td><td>✓</td><td>✓</td></tr>
+        <tr><td data-i18n="cmp.local">本机存档</td><td>—</td><td>✓</td><td>✓</td></tr>
         <tr><td data-i18n="cmp.r3">云端方案数量</td><td>3</td><td data-i18n="cmp.unlimited">不限</td><td data-i18n="cmp.unlimited2">不限</td></tr>
         <tr><td data-i18n="cmp.r4">到期邮件提醒</td><td>—</td><td>✓</td><td>✓</td></tr>
         <tr><td data-i18n="cmp.r5">支持</td><td data-i18n="cmp.standard">标准</td><td data-i18n="cmp.priority">优先</td><td data-i18n="cmp.priority2">优先</td></tr>
@@ -143,13 +148,14 @@
       "y.title": "专业版 · 年付", "y.badge": "推荐", "y.per": "／年", "y.cta": "购买年付",
       "y.save": "相当于 RM8.25／月，比月付省 RM19.80",
       "free.a": "全部计算功能（买入 / 持有 / 出租 / 出售）", "free.b": "最多 3 个云端方案",
-      "free.c": "PDF / 打印 / 分享链接", "free.d": "本机存档不限", "free.cta": "免费开始 →",
+      "free.c": "不支持 PDF / 打印 / 分享", "free.d": "不支持本机存档", "free.cta": "免费开始 →",
+      "pro.pdf": "PDF / 打印 / 分享链接", "pro.local": "本机存档不限",
       "pro.title": "专业版 Pro", "pro.badge": "推荐", "pro.per": "／年",
       "pro.a": "云端方案", "pro.unlimited": "不限个数", "pro.b": "包含免费版全部功能",
       "pro.c": "到期前邮件提醒", "pro.d": "优先 WhatsApp 支持", "pro.cta": "购买 / 续费",
       "pro.note": "已有开通码？登录后到「账号 → 开通码」兑换。",
       "cmp.title": "对比", "cmp.f": "功能", "cmp.free": "免费", "cmp.m": "月付 RM9.90", "cmp.y": "年付 RM99",
-      "cmp.r1": "计算器全部功能", "cmp.r2": "PDF / 打印 / 分享", "cmp.r3": "云端方案数量",
+      "cmp.r1": "计算器全部功能", "cmp.r2": "PDF / 打印 / 分享", "cmp.local": "本机存档", "cmp.r3": "云端方案数量",
       "cmp.unlimited": "不限", "cmp.unlimited2": "不限", "cmp.r4": "到期邮件提醒", "cmp.r5": "支持",
       "cmp.standard": "标准", "cmp.priority": "优先", "cmp.priority2": "优先",
       "faq.title": "常见问题",
@@ -168,13 +174,14 @@
       "y.title": "Pro · Yearly", "y.badge": "Recommended", "y.per": "/ year", "y.cta": "Buy yearly",
       "y.save": "Works out to RM8.25/month — save RM19.80 vs monthly",
       "free.a": "All calculations (buy / hold / rent / sell)", "free.b": "Up to 3 cloud plans",
-      "free.c": "PDF / print / share links", "free.d": "Unlimited local saves", "free.cta": "Start free →",
+      "free.c": "No PDF / print / share", "free.d": "No local saves", "free.cta": "Start free →",
+      "pro.pdf": "PDF / print / share links", "pro.local": "Unlimited local saves",
       "pro.title": "Pro", "pro.badge": "Recommended", "pro.per": "/ year",
       "pro.a": "Cloud plans", "pro.unlimited": "unlimited", "pro.b": "Everything in Free",
       "pro.c": "Expiry email reminders", "pro.d": "Priority WhatsApp support", "pro.cta": "Buy / renew",
       "pro.note": "Already have an activation code? Sign in and redeem it under Account → Code.",
       "cmp.title": "Compare", "cmp.f": "Feature", "cmp.free": "Free", "cmp.m": "Monthly RM9.90", "cmp.y": "Yearly RM99",
-      "cmp.r1": "All calculator features", "cmp.r2": "PDF / print / share", "cmp.r3": "Cloud plans",
+      "cmp.r1": "All calculator features", "cmp.r2": "PDF / print / share", "cmp.local": "Local saves", "cmp.r3": "Cloud plans",
       "cmp.unlimited": "Unlimited", "cmp.unlimited2": "Unlimited", "cmp.r4": "Expiry reminders", "cmp.r5": "Support",
       "cmp.standard": "Standard", "cmp.priority": "Priority", "cmp.priority2": "Priority",
       "faq.title": "FAQ",
