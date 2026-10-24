@@ -415,6 +415,8 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-25 | v0.46 | **账号可用性**：忘记密码（`/api/auth/forgot`，重置链接 1 小时）、重置页（`?reset=`，重置后踢出所有会话）、修改密码（踢出其它设备）、删除账号（PDPA）；邮件走可插拔发送（未配 Resend 时写 `api/mail.log`，管理员可用 `admin.js reset-link <email>` 生成 24 小时链接）；curl + 浏览器全流程验证 |
 | 2026-10-25 | v0.47 | **邮件真发**：阿里云 DirectMail 发信域名验证通过（MX/SPF/DKIM/DMARC），发信地址 `noreply@kwongthye.com`，服务器 SMTP `smtpdm.aliyun.com:465`（nodemailer）；`admin.js mail-test <email>` 测试命令；忘记密码已可真实发送重置邮件（凭据只在服务器 `.env`，不入库） |
 | 2026-10-25 | v0.47.1 | 邮件健壮性：SMTP 改连接池（pool/maxConnections 1，避免连续登录被 535 限流）、加 `replyTo=jamesyew1314@gmail.com`、忘记密码发信记日志；测试信两封均送达 Gmail（DirectMail 会拒收 example.com 假地址，属正常反垃圾） |
+| 2026-10-25 | v0.48 | **邮箱验证 + 到期提醒**：注册自动发验证邮件（24h，`/calc/?verify=`），账号页显示状态并可重发；企业站 `?reset/?verify` 自动跳 `/calc/`；每日 09:00 检查 Pro 到期（7 天内）发提醒并记 `plan_reminder_at`；`admin.js verify-link` 供人工补发 |
+| 2026-10-25 | v0.48.1 | 邮件全部中英双语（验证邮箱 / 重置密码 / Pro 到期与已到期提醒，主题同步双语），实测送达 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 
 ---
