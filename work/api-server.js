@@ -65,6 +65,9 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT || "465", 10),
     secure: (process.env.SMTP_SECURE || "true") !== "false",
+    pool: true,
+    maxConnections: 1,
+    maxMessages: 100,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
   });
 }
@@ -72,15 +75,16 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
 async function sendMail(to, subject, text) {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.MAIL_FROM || (process.env.SMTP_USER ? "KWONG THYE <" + process.env.SMTP_USER + ">" : "KWONG THYE <noreply@kwongthye.com>");
+  const replyTo = process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
   if (smtpTransport) {
-    await smtpTransport.sendMail({ from: from, to: to, subject: subject, text: text });
+    await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text });
     return "sent";
   }
   if (key) {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: from, to: [to], subject: subject, text: text })
+      body: JSON.stringify({ from: from, to: [to], reply_to: replyTo, subject: subject, text: text })
     });
     if (!r.ok) throw new Error("mail_failed");
     return "sent";
@@ -198,7 +202,12 @@ app.post("/api/auth/forgot", rateLimit(5, 900000), async function (req, res, nex
       await pool.query("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES($1,$2, now() + interval '1 hour')", [u.rows[0].id, sha256(token)]);
       const link = "https://kwongthye.com/?reset=" + token;
       const text = "Reset your KWONG THYE password:\n\n" + link + "\n\nThis link expires in 1 hour. If you did not request it, ignore this email.";
-      try { await sendMail(email, "Reset your password — KWONG THYE", text); } catch (e) {}
+      try {
+        const r = await sendMail(email, "Reset your password — KWONG THYE", text);
+        console.log("reset mail", r, email);
+      } catch (e) {
+        console.error("reset mail failed", email, e.message);
+      }
     }
     res.json({ ok: true });
   } catch (e) { next(e); }

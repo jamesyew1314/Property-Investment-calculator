@@ -52,6 +52,7 @@ function newCode() {
       const info = await t.sendMail({
         from: process.env.MAIL_FROM || process.env.SMTP_USER,
         to: to,
+        replyTo: process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com",
         subject: "KWONG THYE 邮件测试 / Mail test",
         text: "这是一封来自 kwongthye.com 的测试邮件。\n\nThis is a test email from kwongthye.com.\n\n如果收到，说明 SMTP 配置成功。"
       });
