@@ -315,6 +315,15 @@ app.post("/api/auth/resend-verification", requireAuth, rateLimit(3, 900000), asy
   } catch (e) { next(e); }
 });
 
+app.get("/api/payments", requireAuth, async function (req, res, next) {
+  try {
+    const r = await pool.query(
+      "SELECT id, receipt_no, days, amount, currency, expires_after, created_at FROM payments WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50",
+      [req.user.id]);
+    res.json({ ok: true, payments: r.rows, user: { email: req.user.email } });
+  } catch (e) { next(e); }
+});
+
 // ---------- plans ----------
 app.get("/api/plans", requireAuth, async function (req, res, next) {
   try {
@@ -449,8 +458,13 @@ app.post("/api/subscription/redeem", requireAuth, rateLimit(10, 60000), async fu
     const u = await client.query(
       "UPDATE users SET plan='pro', plan_expires_at = GREATEST(COALESCE(plan_expires_at, now()), now()) + ($1 || ' days')::interval, updated_at=now() WHERE id=$2 RETURNING plan, plan_expires_at",
       [c.days, req.user.id]);
+    const pay = await client.query(
+      "INSERT INTO payments(user_id,code_id,days,amount,currency,receipt_no,expires_after) " +
+      "VALUES($1,$2,$3,$4,'MYR','KT-' || to_char(now(),'YYYYMM') || '-' || lpad(nextval('receipt_seq')::text,4,'0'),$5) " +
+      "RETURNING receipt_no, amount, created_at",
+      [req.user.id, c.id, c.days, c.amount || 50, u.rows[0].plan_expires_at]);
     await client.query("COMMIT");
-    res.json({ ok: true, plan: u.rows[0].plan, planExpiresAt: u.rows[0].plan_expires_at, days: c.days });
+    res.json({ ok: true, plan: u.rows[0].plan, planExpiresAt: u.rows[0].plan_expires_at, days: c.days, receipt: pay.rows[0] });
   } catch (e) {
     await client.query("ROLLBACK");
     next(e);

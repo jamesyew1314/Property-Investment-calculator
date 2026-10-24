@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>收据 / Receipt — KWONG THYE 光泰</title>
+<link rel="icon" type="image/png" href="/icon-256.png">
+<style>
+  :root{--navy:#0E2438;--gold:#C6A15B;--cream:#F7F4EE;--ink:#1B2430;--muted:#5D6B7A;--line:#E4DED2}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{width:min(720px,92vw);margin:0 auto}
+  header{background:var(--navy);color:#fff;padding:18px 0}
+  .bar{display:flex;align-items:center;gap:12px}
+  .bar img{height:42px}
+  .bar a{margin-left:auto;color:#D7E0EA;font-size:12.5px;text-decoration:none}
+  main{padding:34px 0 60px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:32px}
+  h1{font-family:Georgia,"Songti SC",serif;color:var(--navy);font-size:26px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:12.5px;margin-bottom:24px}
+  .row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px dashed #E9E3D7;font-size:14px}
+  .row b{color:var(--navy)}
+  .amount{font-family:Georgia,serif;font-size:28px;color:var(--navy);margin:18px 0 4px}
+  .muted{color:var(--muted);font-size:12px}
+  .actions{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}
+  button,.btn{background:var(--navy);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-size:13.5px;cursor:pointer;text-decoration:none}
+  .btn.ghost{background:none;color:var(--navy);border:1px solid var(--line)}
+  .err{color:#B23B3B;font-size:14px}
+  footer{padding:0 0 40px;color:var(--muted);font-size:11.5px;text-align:center}
+  @media print{
+    header,.actions,footer .noprint{display:none}
+    body{background:#fff}
+    .card{border:none;padding:0}
+    main{padding:0}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <img src="/logo-white.png" alt="KWONG THYE 光泰">
+    <a href="/calc/">← 返回计算器 / Back</a>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <div class="card" id="card">
+      <h1>收据 <span style="font-size:16px;color:#5D6B7A">Receipt</span></h1>
+      <div class="sub">KWONG THYE 光泰 · kwongthye.com</div>
+      <div id="body"><p class="muted">加载中… / Loading…</p></div>
+    </div>
+    <footer>
+      <p class="noprint">此收据由系统自动生成，无需签名。/ This receipt is generated automatically and requires no signature.</p>
+      <p class="noprint">KWONG THYE · Johor Bahru, Malaysia · andylau.theroof@gmail.com</p>
+    </footer>
+  </div>
+</main>
+<script>
+(function () {
+  var id = new URLSearchParams(location.search).get("id");
+  var body = document.getElementById("body");
+  function fmt(d) { return new Date(d).toLocaleDateString("en-MY", { year: "numeric", month: "short", day: "2-digit" }); }
+  fetch("/api/payments", { credentials: "same-origin" }).then(function (r) {
+    if (r.status === 401) throw new Error("auth");
+    return r.json();
+  }).then(function (j) {
+    var p = (j.payments || []).filter(function (x) { return x.id === id; })[0];
+    if (!p) throw new Error("notfound");
+    body.innerHTML =
+      '<div class="row"><span>收据编号 / Receipt No.</span><b>' + p.receipt_no + '</b></div>' +
+      '<div class="row"><span>日期 / Date</span><b>' + fmt(p.created_at) + '</b></div>' +
+      '<div class="row"><span>客户 / Billed to</span><b>' + (j.user && j.user.email || "") + '</b></div>' +
+      '<div class="row"><span>项目 / Description</span><b>KWONG THYE Pro — ' + p.days + ' 天 / days</b></div>' +
+      (p.expires_after ? '<div class="row"><span>有效期至 / Valid until</span><b>' + fmt(p.expires_after) + '</b></div>' : '') +
+      '<div class="row"><span>状态 / Status</span><b>已付款 / Paid</b></div>' +
+      '<div class="amount">RM ' + Number(p.amount).toFixed(2) + '</div>' +
+      '<div class="muted">付款方式：银行转账 / 开通码 · Payment: bank transfer / activation code</div>' +
+      '<div class="actions"><button onclick="window.print()">打印 / 保存 PDF · Print / Save PDF</button>' +
+      '<a class="btn ghost" href="/pricing/">价格 / Pricing</a></div>';
+  }).catch(function (e) {
+    if (e.message === "auth") {
+      body.innerHTML = '<p class="err">请先登录后查看收据。/ Please sign in to view this receipt.</p>' +
+        '<div class="actions"><a class="btn" href="/calc/">去登录 / Sign in</a></div>';
+    } else {
+      body.innerHTML = '<p class="err">找不到这张收据。/ Receipt not found.</p>' +
+        '<div class="actions"><a class="btn ghost" href="/calc/">返回 / Back</a></div>';
+    }
+  });
+})();
+</script>
+</body>
+</html>

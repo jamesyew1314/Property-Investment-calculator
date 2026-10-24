@@ -92,6 +92,9 @@
   .acctMore{margin:10px 0 4px;border-top:1px solid #E6E9F0;padding-top:8px}
   .acctMore summary{cursor:pointer;font-size:13px;color:var(--blue);font-weight:600}
   .acctMore .row{margin-top:8px}
+  .payList{font-size:12px;color:#4A5563;margin-top:6px}
+  .payRow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #EEF0F5}
+  .payRow a{color:var(--blue);white-space:nowrap}
   .btn2.danger{color:#B23B3B;border-color:#E7C3C3;background:#FDF4F4}
   .viewBanner { background:#FFF3CD; border:1px solid #E4CE8B; color:#7A5B12; border-radius:10px; padding:10px 12px;
                 margin:0 0 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; }
@@ -354,7 +357,14 @@
         <div class="legend" data-i18n="proNote">专业版 RM 50/年：方案不限个数。付款后输入开通码即可开通或续费。</div>
         <div class="row"><label data-i18n="fCode">开通码</label><input class="manual" id="proCode" type="text" placeholder="XXXX-XXXX-XXXX"><span class="unit"></span></div>
         <div class="btnRow"><button class="btn" id="redeemBtn" data-i18n="btnRedeem">开通 / 续费</button></div>
+        <div class="btnRow" style="margin-top:6px">
+          <a class="btn btn2" href="/pricing/" target="_blank" rel="noopener" data-i18n="proMore">查看价格 / 升级 →</a>
+        </div>
       </div>
+      <details class="acctMore" id="payBox">
+        <summary data-i18n="payTitle">付款记录 / 收据</summary>
+        <div id="payList" class="payList" data-i18n="payLoading">加载中…</div>
+      </details>
       <details class="acctMore">
         <summary data-i18n="secTitle">账号安全</summary>
         <div class="row"><label data-i18n="currentPassword">当前密码</label><input class="manual" id="curPwd" type="password" autocomplete="current-password"><span class="unit"></span></div>
@@ -425,7 +435,9 @@
       toastResetSent: "如果该邮箱已注册，重置链接已发送（请查收邮箱）",
       toastPwdChanged: "密码已修改", toastAcctDeleted: "账号已删除", errToken: "链接无效或已过期",
       errCurrent: "当前密码不对", pwdMismatch: "两次输入不一致",
-      legalPrivacy: "隐私政策", legalTerms: "使用条款", acctVerifyLabel: "验证", emailVerified: "邮箱已验证", emailUnverified: "邮箱未验证",
+      legalPrivacy: "隐私政策", legalTerms: "使用条款",
+      proMore: "查看价格 / 升级 →", payTitle: "付款记录 / 收据", payLoading: "加载中…",
+      payEmpty: "还没有付款记录。兑换开通码后，收据会显示在这里。", payReceipt: "查看收据", acctVerifyLabel: "验证", emailVerified: "邮箱已验证", emailUnverified: "邮箱未验证",
       btnSendVerify: "发送验证邮件", toastVerifySent: "验证邮件已发送（请查收邮箱）", toastVerified: "邮箱验证成功",
       toastLoginOk: "已登录", toastRegisterOk: "注册成功，已登录", toastLogout: "已退出登录",
       toolTitle: "方案存档 / 分享", fPlanName: "方案名称", phPlanName: "例：Bukit Jalil 公寓 A",
@@ -499,7 +511,9 @@
       toastResetSent: "If this email is registered, a reset link has been sent",
       toastPwdChanged: "Password changed", toastAcctDeleted: "Account deleted", errToken: "Invalid or expired link",
       errCurrent: "Current password is incorrect", pwdMismatch: "Passwords do not match",
-      legalPrivacy: "Privacy Policy", legalTerms: "Terms of Use", acctVerifyLabel: "Email", emailVerified: "Email verified", emailUnverified: "Email not verified",
+      legalPrivacy: "Privacy Policy", legalTerms: "Terms of Use",
+      proMore: "Pricing / upgrade →", payTitle: "Payments / receipts", payLoading: "Loading…",
+      payEmpty: "No payments yet. Receipts appear here after you redeem a code.", payReceipt: "Receipt", acctVerifyLabel: "Email", emailVerified: "Email verified", emailUnverified: "Email not verified",
       btnSendVerify: "Send verification email", toastVerifySent: "Verification email sent", toastVerified: "Email verified",
       toastLoginOk: "Logged in", toastRegisterOk: "Account created", toastLogout: "Logged out",
       toolTitle: "Saved Plans / Share", fPlanName: "Plan Name", phPlanName: "e.g. Bukit Jalil Condo A",
@@ -1137,6 +1151,7 @@
       showAcctView("me");
       $("acctWho").textContent = me.user.email;
       renderVerify(me.user);
+      loadPayments();
       var planName = me.user.plan === "pro" ? t("planPro") : t("planFree");
       var used = (me.quota === null) ? (me.plans + " " + t("planUnlimited")) : (me.plans + " / " + me.quota);
       $("acctPlan").textContent = planName + " · " + used;
@@ -1163,6 +1178,30 @@
       } else { toast(errMsg(j.error)); }
     }).catch(function () { toast(t("errGeneric")); });
   }
+  function loadPayments() {
+    api("/payments").then(function (j) {
+      var el = $("payList");
+      if (!el) return;
+      if (!j.ok || !j.payments || !j.payments.length) { el.textContent = t("payEmpty"); return; }
+      el.innerHTML = "";
+      j.payments.forEach(function (p) {
+        var row = document.createElement("div");
+        row.className = "payRow";
+        var left = document.createElement("span");
+        var d = new Date(p.created_at).toLocaleDateString("en-MY");
+        left.textContent = d + " · RM" + Number(p.amount).toFixed(2) + " · " + p.receipt_no;
+        var a = document.createElement("a");
+        a.href = "/receipt/?id=" + p.id;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.textContent = t("payReceipt");
+        row.appendChild(left);
+        row.appendChild(a);
+        el.appendChild(row);
+      });
+    }).catch(function () {});
+  }
+
   function renderVerify(u) {
     var el = $("verifyLine");
     if (!el) return;
