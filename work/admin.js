@@ -58,6 +58,17 @@ function newCode() {
       });
       console.log("sent", info.messageId, info.response);
     }
+  } else if (cmd === "verify-link") {
+    const crypto = require("node:crypto");
+    const email = args[0];
+    const u = await pool.query("SELECT id FROM users WHERE email=$1", [email]);
+    if (!u.rows[0]) { console.log("user not found"); }
+    else {
+      const token = crypto.randomBytes(32).toString("hex");
+      const hash = crypto.createHash("sha256").update(token).digest("hex");
+      await pool.query("INSERT INTO email_verifications(user_id,token_hash,expires_at) VALUES($1,$2, now() + interval '24 hours')", [u.rows[0].id, hash]);
+      console.log("https://kwongthye.com/calc/?verify=" + token);
+    }
   } else if (cmd === "reset-link") {
     const crypto = require("node:crypto");
     const email = args[0];
@@ -68,7 +79,7 @@ function newCode() {
       const token = crypto.randomBytes(32).toString("hex");
       const hash = crypto.createHash("sha256").update(token).digest("hex");
       await pool.query("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES($1,$2, now() + interval '24 hours')", [u.rows[0].id, hash]);
-      console.log("https://kwongthye.com/?reset=" + token);
+      console.log("https://kwongthye.com/calc/?reset=" + token);
     }
   } else if (cmd === "pageviews") {
     const days = parseInt(args[0] || "7", 10);

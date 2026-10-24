@@ -610,7 +610,7 @@
   apply();
 
   // 旧分享链接兼容：/?d=... → /calc/?d=...
-  if (location.search.indexOf("d=") >= 0) {
+  if (/[?&](d|reset|verify)=/.test(location.search)) {
     location.replace("/calc/" + location.search);
   }
 })();

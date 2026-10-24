@@ -38,7 +38,8 @@ function parseCookies(req) {
   return out;
 }
 function publicUser(u) {
-  return { id: u.id, email: u.email, displayName: u.display_name || null, plan: u.plan, planExpiresAt: u.plan_expires_at };
+  return { id: u.id, email: u.email, displayName: u.display_name || null, plan: u.plan, planExpiresAt: u.plan_expires_at,
+           emailVerified: !!u.email_verified_at };
 }
 function quotaFor(u) {
   const paid = u.plan === "pro" && (!u.plan_expires_at || new Date(u.plan_expires_at) > new Date());
@@ -57,6 +58,14 @@ async function createSession(userId) {
     [sha256(token), userId, SESSION_DAYS]
   );
   return token;
+}
+
+async function sendVerifyMail(userId, email) {
+  const token = crypto.randomBytes(32).toString("hex");
+  await pool.query("INSERT INTO email_verifications(user_id,token_hash,expires_at) VALUES($1,$2, now() + interval '24 hours')", [userId, sha256(token)]);
+  const link = "https://kwongthye.com/calc/?verify=" + token;
+  const text = "Verify your KWONG THYE account email:\n\n" + link + "\n\nThis link expires in 24 hours. If you did not create an account, ignore this email.";
+  return sendMail(email, "Verify your email — KWONG THYE", text);
 }
 
 let smtpTransport = null;
@@ -125,7 +134,7 @@ const requireAuth = async function (req, res, next) {
     const token = parseCookies(req).fc_sid;
     if (!token) return res.status(401).json({ ok: false, error: "auth_required" });
     const r = await pool.query(
-      "SELECT u.id,u.email,u.display_name,u.plan,u.plan_expires_at " +
+      "SELECT u.id,u.email,u.display_name,u.plan,u.plan_expires_at,u.email_verified_at " +
       "FROM sessions s JOIN users u ON u.id = s.user_id " +
       "WHERE s.token_hash = $1 AND s.expires_at > now()", [sha256(token)]);
     if (!r.rows[0]) return res.status(401).json({ ok: false, error: "auth_required" });
@@ -158,6 +167,12 @@ app.post("/api/auth/register", rateLimit(5, 60000), async function (req, res, ne
       [email, scryptHash(password)]);
     const token = await createSession(r.rows[0].id);
     setSessionCookie(res, token);
+    try {
+      const mr = await sendVerifyMail(r.rows[0].id, r.rows[0].email);
+      console.log("verify mail", mr, r.rows[0].email);
+    } catch (e) {
+      console.error("verify mail failed", r.rows[0].email, e.message);
+    }
     res.status(201).json({ ok: true, user: publicUser(r.rows[0]) });
   } catch (e) { next(e); }
 });
@@ -200,7 +215,7 @@ app.post("/api/auth/forgot", rateLimit(5, 900000), async function (req, res, nex
     if (u.rows[0]) {
       const token = crypto.randomBytes(32).toString("hex");
       await pool.query("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES($1,$2, now() + interval '1 hour')", [u.rows[0].id, sha256(token)]);
-      const link = "https://kwongthye.com/?reset=" + token;
+      const link = "https://kwongthye.com/calc/?reset=" + token;
       const text = "Reset your KWONG THYE password:\n\n" + link + "\n\nThis link expires in 1 hour. If you did not request it, ignore this email.";
       try {
         const r = await sendMail(email, "Reset your password — KWONG THYE", text);
@@ -247,6 +262,29 @@ app.delete("/api/me", requireAuth, async function (req, res, next) {
   try {
     await pool.query("DELETE FROM users WHERE id=$1", [req.user.id]);
     clearSessionCookie(res);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+
+// ---------- email verification ----------
+app.post("/api/auth/verify-email", rateLimit(20, 600000), async function (req, res, next) {
+  try {
+    const token = String((req.body || {}).token || "");
+    const r = await pool.query("SELECT * FROM email_verifications WHERE token_hash=$1 AND used_at IS NULL AND expires_at > now()", [sha256(token)]);
+    const row = r.rows[0];
+    if (!row) return res.status(400).json({ ok: false, error: "invalid_token" });
+    await pool.query("UPDATE users SET email_verified_at=now() WHERE id=$1 AND email_verified_at IS NULL", [row.user_id]);
+    await pool.query("UPDATE email_verifications SET used_at=now() WHERE id=$1", [row.id]);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/auth/resend-verification", requireAuth, rateLimit(3, 900000), async function (req, res, next) {
+  try {
+    const r = await pool.query("SELECT email, email_verified_at FROM users WHERE id=$1", [req.user.id]);
+    if (!r.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    if (r.rows[0].email_verified_at) return res.json({ ok: true, already: true });
+    await sendVerifyMail(req.user.id, r.rows[0].email);
     res.json({ ok: true });
   } catch (e) { next(e); }
 });

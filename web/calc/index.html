@@ -342,6 +342,7 @@
     <div id="acctLoggedIn" hidden>
       <div class="out">
         <div class="line"><span data-i18n="acctEmailLabel">邮箱</span><b id="acctWho">—</b></div>
+        <div class="line"><span data-i18n="acctVerifyLabel">验证</span><span id="verifyLine">—</span></div>
         <div class="line"><span data-i18n="acctPlanLabel">版本</span><span id="acctPlan">—</span></div>
         <div class="line"><span data-i18n="acctExpiry">到期</span><span id="acctExpiry">—</span></div>
       </div>
@@ -420,6 +421,8 @@
       toastResetSent: "如果该邮箱已注册，重置链接已发送（请查收邮箱）",
       toastPwdChanged: "密码已修改", toastAcctDeleted: "账号已删除", errToken: "链接无效或已过期",
       errCurrent: "当前密码不对", pwdMismatch: "两次输入不一致",
+      acctVerifyLabel: "验证", emailVerified: "邮箱已验证", emailUnverified: "邮箱未验证",
+      btnSendVerify: "发送验证邮件", toastVerifySent: "验证邮件已发送（请查收邮箱）", toastVerified: "邮箱验证成功",
       toastLoginOk: "已登录", toastRegisterOk: "注册成功，已登录", toastLogout: "已退出登录",
       toolTitle: "方案存档 / 分享", fPlanName: "方案名称", phPlanName: "例：Bukit Jalil 公寓 A",
       btnSavePlan: "💾 保存方案", btnShareLink: "🔗 复制分享链接",
@@ -492,6 +495,8 @@
       toastResetSent: "If this email is registered, a reset link has been sent",
       toastPwdChanged: "Password changed", toastAcctDeleted: "Account deleted", errToken: "Invalid or expired link",
       errCurrent: "Current password is incorrect", pwdMismatch: "Passwords do not match",
+      acctVerifyLabel: "Email", emailVerified: "Email verified", emailUnverified: "Email not verified",
+      btnSendVerify: "Send verification email", toastVerifySent: "Verification email sent", toastVerified: "Email verified",
       toastLoginOk: "Logged in", toastRegisterOk: "Account created", toastLogout: "Logged out",
       toolTitle: "Saved Plans / Share", fPlanName: "Plan Name", phPlanName: "e.g. Bukit Jalil Condo A",
       btnSavePlan: "💾 Save Plan", btnShareLink: "🔗 Copy Share Link",
@@ -1079,6 +1084,14 @@
 
   renderPlanList();
   fillCompanyForm();
+  var vp = new URLSearchParams(location.search).get("verify");
+  if (vp) {
+    api("/auth/verify-email", { method: "POST", body: { token: vp } }).then(function (j) {
+      toast(t(j.ok ? "toastVerified" : "errToken"));
+      history.replaceState(null, "", location.pathname);
+      if (typeof refreshMe === "function") refreshMe();
+    }).catch(function () { toast(t("errToken")); });
+  }
   var rp = new URLSearchParams(location.search).get("reset");
   if (rp) {
     resetToken = rp;
@@ -1119,6 +1132,7 @@
     if (logged) {
       showAcctView("me");
       $("acctWho").textContent = me.user.email;
+      renderVerify(me.user);
       var planName = me.user.plan === "pro" ? t("planPro") : t("planFree");
       var used = (me.quota === null) ? (me.plans + " " + t("planUnlimited")) : (me.plans + " / " + me.quota);
       $("acctPlan").textContent = planName + " · " + used;
@@ -1145,6 +1159,29 @@
       } else { toast(errMsg(j.error)); }
     }).catch(function () { toast(t("errGeneric")); });
   }
+  function renderVerify(u) {
+    var el = $("verifyLine");
+    if (!el) return;
+    el.innerHTML = "";
+    if (!u) return;
+    if (u.emailVerified) {
+      el.textContent = "✓ " + t("emailVerified");
+      el.style.color = "#166E52";
+    } else {
+      el.textContent = t("emailUnverified") + " ";
+      el.style.color = "#B26A00";
+      var b = document.createElement("button");
+      b.className = "linkbtn";
+      b.textContent = t("btnSendVerify");
+      b.addEventListener("click", function () {
+        api("/auth/resend-verification", { method: "POST" }).then(function (j) {
+          toast(t(j.ok ? "toastVerifySent" : "errGeneric"));
+        }).catch(function () { toast(t("errGeneric")); });
+      });
+      el.appendChild(b);
+    }
+  }
+
   function showAcctView(which) {
     $("acctLoggedOut").hidden = which !== "login";
     $("acctLoggedIn").hidden = which !== "me";
