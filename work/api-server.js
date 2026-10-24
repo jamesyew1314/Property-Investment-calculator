@@ -100,7 +100,12 @@ async function sendMail(to, subject, text, replyToOverride, attachments) {
   const from = process.env.MAIL_FROM || (process.env.SMTP_USER ? "KWONG THYE <" + process.env.SMTP_USER + ">" : "KWONG THYE <noreply@kwongthye.com>");
   const replyTo = replyToOverride || process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
   if (smtpTransport) {
-    await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text, attachments: attachments || [] });
+    try {
+      await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text, attachments: attachments || [] });
+    } catch (e1) {
+      await new Promise(function (r) { setTimeout(r, 2000); });
+      await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text, attachments: attachments || [] });
+    }
     return "sent";
   }
   if (key) {
@@ -499,6 +504,24 @@ app.post("/api/admin/logout", async function (req, res) {
   res.json({ ok: true });
 });
 app.get("/api/admin/me", requireAdmin, function (req, res) { res.json({ ok: true, email: req.admin.email, role: req.admin.role }); });
+
+app.post("/api/admin/change-password", requireAdmin, rateLimit(5, 600000), async function (req, res, next) {
+  try {
+    const cur = String((req.body || {}).current || "");
+    const nw = String((req.body || {}).password || "");
+    if (nw.length < 8) return res.status(400).json({ ok: false, error: "weak_password" });
+    if (!req.admin.admin_id) return res.status(400).json({ ok: false, error: "owner_env" });
+    const r = await pool.query("SELECT password_hash FROM admins WHERE id=$1", [req.admin.admin_id]);
+    if (!r.rows[0] || !scryptVerify(cur, r.rows[0].password_hash)) {
+      return res.status(400).json({ ok: false, error: "bad_current" });
+    }
+    await pool.query("UPDATE admins SET password_hash=$1 WHERE id=$2", [scryptHash(nw), req.admin.admin_id]);
+    const t = parseCookies(req)[ADMIN_COOKIE] || "";
+    await pool.query("DELETE FROM admin_sessions WHERE admin_id=$1 AND token_hash<>$2", [req.admin.admin_id, sha256(t)]);
+    await adminLog("admin.password", req.admin.email, req);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
 
 app.get("/api/admin/admins", requireAdmin, requireOwner, async function (req, res, next) {
   try {
