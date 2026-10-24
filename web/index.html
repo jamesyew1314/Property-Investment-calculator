@@ -259,7 +259,7 @@
     <button class="btn" id="printBtn" data-i18n="printBtn">🖨️ 导出 PDF / 打印（Part 1 一页 · Part 2+3 一页）</button>
     <div class="shareRow">
       <button class="shareBtn" id="waBtn" style="background:#25D366">WhatsApp</button>
-      <button class="shareBtn" id="wxBtn" style="background:#07C160">微信</button>
+      <button class="shareBtn" id="wxBtn" style="background:#07C160" data-i18n="shareWx">微信</button>
       <button class="shareBtn" id="fbBtn" style="background:#1877F2">Facebook</button>
     </div>
     <div class="legend" data-i18n="shareNote">WhatsApp / Facebook 直接打开；微信没有网页分享接口，点「微信」会复制文字，粘贴到微信即可。</div>
@@ -384,7 +384,7 @@
       planNoteCloud: "☁️ 已登录：方案存在云端，换设备登录就能看到；也可以导出 JSON 做备份。",
       confirmUpload: "检测到本机有 {n} 个方案，要上传到云端吗？", toastUploaded: "已上传 {n} 个方案到云端",
       toastCloudSaved: "已保存到云端", toastCloudDeleted: "已从云端删除", errCloud: "云端操作失败，已保留本机数据",
-      viewBannerText: "🔗 这是分享的估算（只读）", btnEditCopy: "在我这边继续编辑",
+      viewBannerText: "🔗 这是分享的估算（只读）", btnEditCopy: "在我这边继续编辑", shareWx: "微信",
       toastSaved: "方案已保存", toastLoaded: "方案已加载", toastDeleted: "方案已删除", toastNeedName: "先给方案起个名字",
       toastExported: "已导出 JSON 文件", toastImported: "已导入", toastImportBad: "文件格式不对，导入失败",
       toastLinkCopied: "分享链接已复制", toastCoSaved: "公司抬头已保存", toastEditable: "已切换为可编辑",
@@ -445,7 +445,7 @@
       planNoteCloud: "☁️ Logged in: plans are in the cloud — log in on any device. You can still export JSON as backup.",
       confirmUpload: "Found {n} local plan(s). Upload them to the cloud?", toastUploaded: "{n} plan(s) uploaded to cloud",
       toastCloudSaved: "Saved to cloud", toastCloudDeleted: "Deleted from cloud", errCloud: "Cloud failed — local data kept",
-      viewBannerText: "🔗 Shared estimate (read-only)", btnEditCopy: "Continue editing here",
+      viewBannerText: "🔗 Shared estimate (read-only)", btnEditCopy: "Continue editing here", shareWx: "WeChat",
       toastSaved: "Plan saved", toastLoaded: "Plan loaded", toastDeleted: "Plan deleted", toastNeedName: "Please name the plan first",
       toastExported: "JSON exported", toastImported: "Imported", toastImportBad: "Invalid file — import failed",
       toastLinkCopied: "Share link copied", toastCoSaved: "Company header saved", toastEditable: "Editable mode",
@@ -474,6 +474,7 @@
       el.textContent = t(el.getAttribute("data-i18n"));
     });
     $("langBtn").textContent = lang === "zh" ? "EN" : "中文";
+    if ($("planName")) $("planName").placeholder = lang === "zh" ? "方案名称（例：Bukit Jalil A）" : "Plan name (e.g. Bukit Jalil A)";
     try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
     document.querySelectorAll(".printdate").forEach(function (el) {
       el.textContent = new Date().toLocaleDateString(lang === "zh" ? "zh-CN" : "en-MY");
@@ -481,6 +482,15 @@
     var hv = $("hold").value;
     var hyv = parseInt(hv, 10);
     $("rpgtLabel").textContent = hyv >= 1 ? fmt("rpgtLine", { y: hyv, p: Math.round(Calc.rpgtRate(hyv) * 100) }) : t("rpgtEmpty");
+    // 动态文案（由 JS 写入、没有 data-i18n 的元素）
+    if ($("acctBtnTxt") && !logged) {
+      $("acctBtnTxt").textContent = t("btnLoginShort");
+      $("acctBtn").title = t("acctTitle");
+    }
+    if ($("planMode")) {
+      $("planMode").textContent = logged ? t("planModeCloud") : t("planModeLocal");
+      $("planNote").textContent = logged ? t("planNoteCloud") : t("planNote");
+    }
     recalc(); // re-render dynamic strings (RPGT line / year table / xirr fallback)
   }
 
