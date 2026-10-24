@@ -22,7 +22,7 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | 需求确认 | ✅ 已并入 v1.1 | 10/19 意见：不做分账、1–5 年持有、等额本息、SaaS RM50/年、单一买家律师费 |
 | 方案 | ✅ 完成（v1.1） | DOCX/PDF/MD：数据模型、计算引擎、界面、架构、路线图、21 项验收 |
 | 公式验证 | ✅ 完成 | XLSX：法定费用、4 案例对账、贷款摊销、XIRR、KPI 定义 |
-| Phase 0 | 🚧 进行中 | v0.1 已部署上线：<https://laoyeshu.cn/static/fangchan/>（阿里云 39.108.108.84，`/opt/laoyeshu/static/fangchan/`）；`web/test.js` 13 项测试全过 |
+| Phase 0 | ✅ 已完成 | **正式站：<https://kwongthye.com/>**（阿里云吉隆坡 47.254.235.22，`/srv/fangchan/web/`，Let's Encrypt HTTPS 自动续期）；旧站 <https://laoyeshu.cn/static/fangchan/> 保留作备份；`web/test.js` 48 项测试全过 |
 | Phase 1–4 | ⏳ 未开始 | Web 快速计算器（自己用）→ 团队内测 → SaaS（RM50/年） |
 
 **下一步：你打开 `web/index.html` 试用（双击即可）；确认体验后补 4 案例 fixture 与 21 项测试，再进 Phase 1 Web 化。**
@@ -393,6 +393,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-19 | v0.31 | 自动格（SPA/LA 律师费、估价费、卖出中介费、卖出律师费）编辑体验重做：输入过程中不回填（可自由删改、边改边算），离开时仍为空才恢复自动值；手动改过则保持橙色覆盖 |
 | 2026-10-19 | v0.32 | RPGT 改老板口径：(卖价 − 实价 − 总购置费用 − 卖出中介费 − 卖出律师费 − 售出杂费) × 年限税率（30/20/15/0），不再用法定豁免；RPGT 行移到售出杂费下方；删「Selling related cost」标题与整个完整口径块（Net Cash Profit → XIRR）；test.js 保持 48 项 |
 | 2026-10-19 | 版本管理 | 初始化 git 仓库并推送到 GitHub 私有仓库 `jamesyew1314/Property-nvestment-calculator`；标签 v0.32 |
+| 2026-10-24 | 部署 | 正式迁移到阿里云**吉隆坡**服务器 47.254.235.22：域名 **kwongthye.com**（+ www），Let's Encrypt HTTPS 自动续期，HTTP 301 跳 HTTPS，HSTS 已开；配置：Ubuntu 24.04 / 2C4G / ufw / fail2ban / 自动安全更新 / 2G swap；旧深圳站保留 |
 
 ---
 
@@ -400,8 +401,9 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 
 - **私有仓库**：https://github.com/jamesyew1314/Property-Investment-calculator （git 地址 `ssh://git@ssh.github.com:443/jamesyew1314/Property-Investment-calculator.git`；账号 `jamesyew1314`，分支 `main`）
 - **密钥**：`~/.ssh/laoyeshu_gh`（已注册到该账号，走 443 端口）；仓库内已设 `core.sshCommand`
-- **发布流程**：改 → `node web/test.js` 全过 → 浏览器 QA → 部署（scp + chmod 644 + sha256 核对）→ `git commit` → `git tag -a vX.XX` → `git push --tags`
-- **回滚**：`git checkout <tag> -- web/` 后重新部署；服务器备份在 `/opt/laoyeshu/backups/`
+- **发布流程**：改 → `node web/test.js` 全过 → 浏览器 QA → 部署（`scp -i .secrets/fangchan_key.pem index.html calc.js logo.jpg root@47.254.235.22:/srv/fangchan/web/`）→ `chmod 644` → sha256 核对 → `git commit` → `git tag -a vX.XX` → `git push --tags`
+- **回滚**：`git checkout <tag> -- web/` 后重新部署；备份：深圳 `/opt/laoyeshu/backups/`、本地 `backups/`
+- **服务器**：吉隆坡 47.254.235.22（Ubuntu 24.04，2C4G，nginx + certbot + ufw + fail2ban，目录 `/srv/fangchan/{web,api,backups,logs}`，访问日志 `/srv/fangchan/logs/`）
 - **不纳入 git**：生成物（PDF/DOCX/XLSX）、预览产物、`backups/`、`.secrets/`
 
 ---
