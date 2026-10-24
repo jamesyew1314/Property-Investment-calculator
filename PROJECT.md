@@ -412,6 +412,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-25 | v0.44 | 创办人形象照裁紧：改为 4:5（头到胸口）800×1000，脸部占比更大，白边更少 |
 | 2026-10-25 | v0.45 | 企业站补联系方式：办公室（Skudai）、电邮 andylau.theroof@gmail.com、注册代理 THE ROOF REALTY SDN BHD E(1)1605/1、REN 32839，页脚加注册信息行与 JSON-LD address/employee；新增**第一方访问统计**（`/api/track` + `pageviews` 表 + `admin.js pageviews`，IP 仅存 sha256 前缀） |
 | 2026-10-25 | v0.45.1 | Google Search Console 验证文件上线：`/googlec72eeacfc6bd6819.html`（HTTP 200，内容校验一致）；sitemap 待提交 |
+| 2026-10-25 | v0.46 | **账号可用性**：忘记密码（`/api/auth/forgot`，重置链接 1 小时）、重置页（`?reset=`，重置后踢出所有会话）、修改密码（踢出其它设备）、删除账号（PDPA）；邮件走可插拔发送（未配 Resend 时写 `api/mail.log`，管理员可用 `admin.js reset-link <email>` 生成 24 小时链接）；curl + 浏览器全流程验证 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 
 ---

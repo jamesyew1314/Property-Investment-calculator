@@ -38,6 +38,18 @@ function newCode() {
       "UPDATE users SET plan='pro', plan_expires_at = GREATEST(COALESCE(plan_expires_at, now()), now()) + ($1 || ' days')::interval, updated_at=now() WHERE email=$2 RETURNING email, plan, plan_expires_at",
       [days, email]);
     console.log(r.rows[0] || "user not found");
+  } else if (cmd === "reset-link") {
+    const crypto = require("node:crypto");
+    const email = args[0];
+    const u = await pool.query("SELECT id FROM users WHERE email=$1", [email]);
+    if (!u.rows[0]) {
+      console.log("user not found");
+    } else {
+      const token = crypto.randomBytes(32).toString("hex");
+      const hash = crypto.createHash("sha256").update(token).digest("hex");
+      await pool.query("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES($1,$2, now() + interval '24 hours')", [u.rows[0].id, hash]);
+      console.log("https://kwongthye.com/?reset=" + token);
+    }
   } else if (cmd === "pageviews") {
     const days = parseInt(args[0] || "7", 10);
     const d = await pool.query("SELECT created_at::date AS day, count(*)::int AS views FROM pageviews WHERE created_at > now() - ($1 || ' days')::interval GROUP BY 1 ORDER BY 1 DESC", [days]);

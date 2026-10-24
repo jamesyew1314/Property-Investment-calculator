@@ -1,6 +1,8 @@
 "use strict";
 const express = require("express");
 const crypto = require("node:crypto");
+const fsp = require("node:fs/promises");
+const pathMod = require("node:path");
 const { Pool } = require("pg");
 
 const PORT = process.env.PORT || 3000;
@@ -54,6 +56,23 @@ async function createSession(userId) {
     [sha256(token), userId, SESSION_DAYS]
   );
   return token;
+}
+
+async function sendMail(to, subject, text) {
+  const key = process.env.RESEND_API_KEY;
+  const from = process.env.MAIL_FROM || "KWONG THYE <noreply@kwongthye.com>";
+  if (key) {
+    const r = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: from, to: [to], subject: subject, text: text })
+    });
+    if (!r.ok) throw new Error("mail_failed");
+    return "sent";
+  }
+  await fsp.appendFile(pathMod.join(__dirname, "mail.log"),
+    [new Date().toISOString(), "TO:", to, "|", subject, "|", text.replace(/\n/g, " ")].join(" ") + "\n");
+  return "logged";
 }
 
 // ---------- middleware ----------
@@ -150,6 +169,61 @@ app.get("/api/me", requireAuth, async function (req, res, next) {
   try {
     const c = await pool.query("SELECT count(*)::int AS n FROM plans WHERE user_id=$1", [req.user.id]);
     res.json({ ok: true, user: publicUser(req.user), plans: c.rows[0].n, quota: quotaFor(req.user) });
+  } catch (e) { next(e); }
+});
+
+// ---------- password reset / account ----------
+app.post("/api/auth/forgot", rateLimit(5, 900000), async function (req, res, next) {
+  try {
+    const email = String((req.body || {}).email || "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ ok: false, error: "bad_email" });
+    const u = await pool.query("SELECT id,email FROM users WHERE email=$1", [email]);
+    if (u.rows[0]) {
+      const token = crypto.randomBytes(32).toString("hex");
+      await pool.query("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES($1,$2, now() + interval '1 hour')", [u.rows[0].id, sha256(token)]);
+      const link = "https://kwongthye.com/?reset=" + token;
+      const text = "Reset your KWONG THYE password:\n\n" + link + "\n\nThis link expires in 1 hour. If you did not request it, ignore this email.";
+      try { await sendMail(email, "Reset your password — KWONG THYE", text); } catch (e) {}
+    }
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/auth/reset", rateLimit(10, 600000), async function (req, res, next) {
+  try {
+    const token = String((req.body || {}).token || "");
+    const password = String((req.body || {}).password || "");
+    if (password.length < 8) return res.status(400).json({ ok: false, error: "weak_password" });
+    const r = await pool.query("SELECT * FROM password_resets WHERE token_hash=$1 AND used_at IS NULL AND expires_at > now()", [sha256(token)]);
+    const row = r.rows[0];
+    if (!row) return res.status(400).json({ ok: false, error: "invalid_token" });
+    await pool.query("UPDATE users SET password_hash=$1, updated_at=now() WHERE id=$2", [scryptHash(password), row.user_id]);
+    await pool.query("UPDATE password_resets SET used_at=now() WHERE id=$1", [row.id]);
+    await pool.query("DELETE FROM sessions WHERE user_id=$1", [row.user_id]);
+    clearSessionCookie(res);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/auth/change-password", requireAuth, rateLimit(10, 600000), async function (req, res, next) {
+  try {
+    const current = String((req.body || {}).current || "");
+    const password = String((req.body || {}).password || "");
+    if (password.length < 8) return res.status(400).json({ ok: false, error: "weak_password" });
+    const r = await pool.query("SELECT password_hash FROM users WHERE id=$1", [req.user.id]);
+    if (!scryptVerify(current, r.rows[0].password_hash)) return res.status(400).json({ ok: false, error: "bad_current" });
+    await pool.query("UPDATE users SET password_hash=$1, updated_at=now() WHERE id=$2", [scryptHash(password), req.user.id]);
+    const token = parseCookies(req).fc_sid;
+    if (token) await pool.query("DELETE FROM sessions WHERE user_id=$1 AND token_hash<>$2", [req.user.id, sha256(token)]);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+
+app.delete("/api/me", requireAuth, async function (req, res, next) {
+  try {
+    await pool.query("DELETE FROM users WHERE id=$1", [req.user.id]);
+    clearSessionCookie(res);
+    res.json({ ok: true });
   } catch (e) { next(e); }
 });
 

@@ -88,6 +88,11 @@
                 line-height:1; cursor:pointer; color:#999; }
   .modalCard .row { margin-bottom:8px; }
   .modalCard .legend { margin-top:8px; }
+  .linkbtn{border:none;background:none;color:var(--blue);font-size:12.5px;text-decoration:underline;cursor:pointer;padding:6px 0}
+  .acctMore{margin:10px 0 4px;border-top:1px solid #E6E9F0;padding-top:8px}
+  .acctMore summary{cursor:pointer;font-size:13px;color:var(--blue);font-weight:600}
+  .acctMore .row{margin-top:8px}
+  .btn2.danger{color:#B23B3B;border-color:#E7C3C3;background:#FDF4F4}
   .viewBanner { background:#FFF3CD; border:1px solid #E4CE8B; color:#7A5B12; border-radius:10px; padding:10px 12px;
                 margin:0 0 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; }
   .viewBanner button { border:1px solid #C9A227; background:#fff; color:#7A5B12; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:600; cursor:pointer; }
@@ -318,6 +323,21 @@
         <button class="btn btn2" id="registerBtn" data-i18n="btnRegister">注册</button>
       </div>
       <div class="legend" data-i18n="acctNote">登录后方案可存到云端（免费 3 个）；不登录也能继续用本机存档。</div>
+      <button class="linkbtn" id="forgotBtn" data-i18n="forgotBtn">忘记密码？</button>
+    </div>
+    <div id="forgotBox" hidden>
+      <div class="legend" data-i18n="forgotNote">输入注册邮箱，我们会发送重置链接（1 小时内有效）。</div>
+      <div class="row"><label data-i18n="fEmail">邮箱</label><input class="manual" id="forgotEmail" type="email" inputmode="email"><span class="unit"></span></div>
+      <div class="btnRow">
+        <button class="btn" id="sendResetBtn" data-i18n="btnSendReset">发送重置链接</button>
+        <button class="btn btn2" id="backLoginBtn" data-i18n="btnBackLogin">返回登录</button>
+      </div>
+    </div>
+    <div id="resetBox" hidden>
+      <div class="legend" data-i18n="resetNote">设置新密码（至少 8 位），设置后所有设备需重新登录。</div>
+      <div class="row"><label data-i18n="newPassword">新密码</label><input class="manual" id="resetPwd" type="password" autocomplete="new-password"><span class="unit"></span></div>
+      <div class="row"><label data-i18n="confirmPassword">确认新密码</label><input class="manual" id="resetPwd2" type="password" autocomplete="new-password"><span class="unit"></span></div>
+      <div class="btnRow"><button class="btn" id="doResetBtn" data-i18n="btnDoReset">设置新密码</button></div>
     </div>
     <div id="acctLoggedIn" hidden>
       <div class="out">
@@ -330,6 +350,13 @@
         <div class="row"><label data-i18n="fCode">开通码</label><input class="manual" id="proCode" type="text" placeholder="XXXX-XXXX-XXXX"><span class="unit"></span></div>
         <div class="btnRow"><button class="btn" id="redeemBtn" data-i18n="btnRedeem">开通 / 续费</button></div>
       </div>
+      <details class="acctMore">
+        <summary data-i18n="secTitle">账号安全</summary>
+        <div class="row"><label data-i18n="currentPassword">当前密码</label><input class="manual" id="curPwd" type="password" autocomplete="current-password"><span class="unit"></span></div>
+        <div class="row"><label data-i18n="newPassword">新密码</label><input class="manual" id="newPwd" type="password" autocomplete="new-password"><span class="unit"></span></div>
+        <div class="btnRow"><button class="btn btn2" id="changePwdBtn" data-i18n="btnChangePwd">修改密码</button></div>
+        <div class="btnRow"><button class="btn btn2 danger" id="deleteAcctBtn" data-i18n="btnDeleteAcct">删除账号</button></div>
+      </details>
       <div class="btnRow"><button class="btn btn2" id="logoutBtn" data-i18n="btnLogout">退出登录</button></div>
     </div>
   </div>
@@ -384,6 +411,15 @@
       planFree: "免费版", planPro: "专业版", planUnlimited: "个方案（不限）",
       errEmail: "请填正确的邮箱", errPassword: "密码至少 8 位", errExists: "这个邮箱已注册", errLogin: "邮箱或密码不对",
       errRate: "太频繁，请稍后再试", errQuota: "免费版最多 3 个方案", errGeneric: "网络错误，请稍后再试",
+      forgotBtn: "忘记密码？", forgotNote: "输入注册邮箱，我们会发送重置链接（1 小时内有效）。",
+      btnSendReset: "发送重置链接", btnBackLogin: "返回登录",
+      resetNote: "设置新密码（至少 8 位），设置后所有设备需重新登录。",
+      newPassword: "新密码", confirmPassword: "确认新密码", btnDoReset: "设置新密码",
+      secTitle: "账号安全", currentPassword: "当前密码", btnChangePwd: "修改密码",
+      btnDeleteAcct: "删除账号", confirmDeleteAcct: "删除账号会同时删除云端方案，确定吗？",
+      toastResetSent: "如果该邮箱已注册，重置链接已发送（请查收邮箱）",
+      toastPwdChanged: "密码已修改", toastAcctDeleted: "账号已删除", errToken: "链接无效或已过期",
+      errCurrent: "当前密码不对", pwdMismatch: "两次输入不一致",
       toastLoginOk: "已登录", toastRegisterOk: "注册成功，已登录", toastLogout: "已退出登录",
       toolTitle: "方案存档 / 分享", fPlanName: "方案名称", phPlanName: "例：Bukit Jalil 公寓 A",
       btnSavePlan: "💾 保存方案", btnShareLink: "🔗 复制分享链接",
@@ -447,6 +483,15 @@
       planFree: "Free", planPro: "Pro", planUnlimited: "plans (unlimited)",
       errEmail: "Please enter a valid email", errPassword: "Password must be at least 8 characters", errExists: "This email is already registered", errLogin: "Wrong email or password",
       errRate: "Too many attempts, try again later", errQuota: "Free plan allows 3 saved plans", errGeneric: "Network error, please retry",
+      forgotBtn: "Forgot password?", forgotNote: "Enter your registered email and we'll send a reset link (valid 1 hour).",
+      btnSendReset: "Send reset link", btnBackLogin: "Back to login",
+      resetNote: "Set a new password (min 8 characters). All devices will need to log in again.",
+      newPassword: "New password", confirmPassword: "Confirm new password", btnDoReset: "Set new password",
+      secTitle: "Account security", currentPassword: "Current password", btnChangePwd: "Change password",
+      btnDeleteAcct: "Delete account", confirmDeleteAcct: "Deleting the account also deletes cloud plans. Continue?",
+      toastResetSent: "If this email is registered, a reset link has been sent",
+      toastPwdChanged: "Password changed", toastAcctDeleted: "Account deleted", errToken: "Invalid or expired link",
+      errCurrent: "Current password is incorrect", pwdMismatch: "Passwords do not match",
       toastLoginOk: "Logged in", toastRegisterOk: "Account created", toastLogout: "Logged out",
       toolTitle: "Saved Plans / Share", fPlanName: "Plan Name", phPlanName: "e.g. Bukit Jalil Condo A",
       btnSavePlan: "💾 Save Plan", btnShareLink: "🔗 Copy Share Link",
@@ -820,6 +865,7 @@
     renderPlanList();
   }
   var cloudPlans = [];
+  var resetToken = "";
   var logged = false;
 
   function fillPlanSelect(items, sel) {
@@ -1033,6 +1079,12 @@
 
   renderPlanList();
   fillCompanyForm();
+  var rp = new URLSearchParams(location.search).get("reset");
+  if (rp) {
+    resetToken = rp;
+    openAcct();
+    showAcctView("reset");
+  }
   var qd = new URLSearchParams(location.search).get("d");
   if (qd) {
     var st0 = Calc.decodeState(qd);
@@ -1065,6 +1117,7 @@
     $("acctBtnTxt").textContent = logged ? me.user.email.split("@")[0] : t("btnLoginShort");
     $("acctBtn").title = logged ? me.user.email : t("acctTitle");
     if (logged) {
+      showAcctView("me");
       $("acctWho").textContent = me.user.email;
       var planName = me.user.plan === "pro" ? t("planPro") : t("planFree");
       var used = (me.quota === null) ? (me.plans + " " + t("planUnlimited")) : (me.plans + " / " + me.quota);
@@ -1092,6 +1145,49 @@
       } else { toast(errMsg(j.error)); }
     }).catch(function () { toast(t("errGeneric")); });
   }
+  function showAcctView(which) {
+    $("acctLoggedOut").hidden = which !== "login";
+    $("acctLoggedIn").hidden = which !== "me";
+    $("forgotBox").hidden = which !== "forgot";
+    $("resetBox").hidden = which !== "reset";
+  }
+  $("forgotBtn").addEventListener("click", function () { showAcctView("forgot"); });
+  $("backLoginBtn").addEventListener("click", function () { showAcctView("login"); });
+  $("sendResetBtn").addEventListener("click", function () {
+    var email = $("forgotEmail").value.trim();
+    if (!email) { toast(t("errEmail")); return; }
+    api("/auth/forgot", { method: "POST", body: { email: email } }).then(function (j) {
+      toast(t(j.ok ? "toastResetSent" : "errGeneric"));
+      showAcctView("login");
+    }).catch(function () { toast(t("errGeneric")); });
+  });
+  $("doResetBtn").addEventListener("click", function () {
+    var p1 = $("resetPwd").value, p2 = $("resetPwd2").value;
+    if (p1.length < 8) { toast(t("errPassword")); return; }
+    if (p1 !== p2) { toast(t("pwdMismatch")); return; }
+    api("/auth/reset", { method: "POST", body: { token: resetToken, password: p1 } }).then(function (j) {
+      if (j.ok) {
+        toast(t("toastPwdChanged"));
+        history.replaceState(null, "", location.pathname);
+        resetToken = "";
+        showAcctView("login");
+        openAcct();
+      } else { toast(j.error === "invalid_token" ? t("errToken") : errMsg(j.error)); }
+    }).catch(function () { toast(t("errGeneric")); });
+  });
+  $("changePwdBtn").addEventListener("click", function () {
+    api("/auth/change-password", { method: "POST", body: { current: $("curPwd").value, password: $("newPwd").value } }).then(function (j) {
+      if (j.ok) { $("curPwd").value = ""; $("newPwd").value = ""; toast(t("toastPwdChanged")); }
+      else { toast(j.error === "bad_current" ? t("errCurrent") : errMsg(j.error)); }
+    }).catch(function () { toast(t("errGeneric")); });
+  });
+  $("deleteAcctBtn").addEventListener("click", function () {
+    if (!confirm(t("confirmDeleteAcct"))) return;
+    api("/me", { method: "DELETE" }).then(function (j) {
+      if (j.ok) { setAccount(null); closeAcct(); toast(t("toastAcctDeleted")); }
+      else { toast(errMsg(j.error)); }
+    }).catch(function () { toast(t("errGeneric")); });
+  });
   $("loginBtn").addEventListener("click", function () { authAction("/auth/login"); });
   $("registerBtn").addEventListener("click", function () { authAction("/auth/register"); });
   $("logoutBtn").addEventListener("click", function () {
