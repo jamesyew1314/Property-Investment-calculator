@@ -7,6 +7,7 @@
 <link rel="apple-touch-icon" href="/icon-256.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0E2438">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="KWTHYE">
 <title>房地产投资快速计算器 | Property Investment Calculator</title>
@@ -947,6 +948,7 @@
   var cloudPlans = [];
   var resetToken = "";
   var logged = false;
+  var me = null;
 
   function fillPlanSelect(items, sel) {
     var el = $("planList");
@@ -1360,7 +1362,8 @@
     var map = { bad_email: "errEmail", weak_password: "errPassword", email_exists: "errExists", bad_credentials: "errLogin", rate_limited: "errRate", quota_exceeded: "errQuota" };
     return t(map[code] || "errGeneric");
   }
-  function setAccount(me) {
+  function setAccount(data) {
+    me = data;
     var wasLogged = logged;
     logged = !!(me && me.ok && me.user);
     $("acctLoggedOut").hidden = logged;
