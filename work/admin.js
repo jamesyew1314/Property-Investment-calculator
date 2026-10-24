@@ -81,6 +81,10 @@ function newCode() {
       await pool.query("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES($1,$2, now() + interval '24 hours')", [u.rows[0].id, hash]);
       console.log("https://kwongthye.com/calc/?reset=" + token);
     }
+  } else if (cmd === "messages") {
+    const days = parseInt(args[0] || "30", 10);
+    const r = await pool.query("SELECT created_at, name, phone, email, subject, left(message,80) AS message, emailed FROM contact_messages WHERE created_at > now() - ($1 || ' days')::interval ORDER BY created_at DESC LIMIT 50", [days]);
+    console.table(r.rows);
   } else if (cmd === "pageviews") {
     const days = parseInt(args[0] || "7", 10);
     const d = await pool.query("SELECT created_at::date AS day, count(*)::int AS views FROM pageviews WHERE created_at > now() - ($1 || ' days')::interval GROUP BY 1 ORDER BY 1 DESC", [days]);

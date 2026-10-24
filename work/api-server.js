@@ -94,10 +94,10 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
   });
 }
 
-async function sendMail(to, subject, text) {
+async function sendMail(to, subject, text, replyToOverride) {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.MAIL_FROM || (process.env.SMTP_USER ? "KWONG THYE <" + process.env.SMTP_USER + ">" : "KWONG THYE <noreply@kwongthye.com>");
-  const replyTo = process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
+  const replyTo = replyToOverride || process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
   if (smtpTransport) {
     await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text });
     return "sent";
@@ -377,6 +377,48 @@ app.post("/api/plans/import", requireAuth, async function (req, res, next) {
       count++; imported++;
     }
     res.json({ ok: true, imported: imported, skipped: skipped });
+  } catch (e) { next(e); }
+});
+
+// ---------- contact form ----------
+app.post("/api/contact", rateLimit(3, 600000), async function (req, res, next) {
+  try {
+    const b = req.body || {};
+    if (String(b.website || "").trim()) return res.json({ ok: true }); // honeypot
+    const name = String(b.name || "").trim().slice(0, 80);
+    const phone = String(b.phone || "").trim().slice(0, 40);
+    const email = String(b.email || "").trim().slice(0, 120);
+    const subject = String(b.subject || "").trim().slice(0, 120);
+    const message = String(b.message || "").trim().slice(0, 2000);
+    if (name.length < 1 || message.length < 5) return res.status(400).json({ ok: false, error: "invalid" });
+    if (!phone && !email) return res.status(400).json({ ok: false, error: "contact_required" });
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ ok: false, error: "bad_email" });
+    const ipHash = crypto.createHash("sha256").update((req.ip || "") + (process.env.IP_SALT || "fc")).digest("hex").slice(0, 24);
+    const r = await pool.query(
+      "INSERT INTO contact_messages(name,phone,email,subject,message,ip_hash) VALUES($1,$2,$3,$4,$5,$6) RETURNING id",
+      [name, phone, email, subject, message, ipHash]
+    );
+    const to = process.env.CONTACT_TO || "andylau.theroof@gmail.com";
+    const text = [
+      "网站留言 / Website enquiry",
+      "",
+      "姓名 / Name: " + name,
+      "电话 / Phone: " + (phone || "-"),
+      "电邮 / Email: " + (email || "-"),
+      "项目 / Subject: " + (subject || "-"),
+      "",
+      "留言 / Message:",
+      message,
+      "",
+      "ID: " + r.rows[0].id
+    ].join("\n");
+    try {
+      await sendMail(to, "网站留言 / Website enquiry — " + name, text, email || undefined);
+      await pool.query("UPDATE contact_messages SET emailed=true WHERE id=$1", [r.rows[0].id]);
+    } catch (e) {
+      console.error("contact mail failed", e.message);
+    }
+    res.json({ ok: true });
   } catch (e) { next(e); }
 });
 

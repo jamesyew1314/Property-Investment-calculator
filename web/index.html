@@ -121,6 +121,21 @@
   .contact .line{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px}
   .contact .line b{min-width:120px;color:var(--navy)}
   .enq{margin-top:18px;padding-left:18px;color:#4A5563;font-size:14px}
+  .enq-form{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px}
+  .enq-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .enq-form label{display:block;font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.03em}
+  .enq-form input,.enq-form textarea{width:100%;margin-top:6px;padding:11px 12px;border:1px solid #D8D2C6;border-radius:9px;
+    font:inherit;font-size:14.5px;color:var(--ink);background:#FCFBF8}
+  .enq-form input:focus,.enq-form textarea:focus{outline:none;border-color:var(--gold);background:#fff}
+  .enq-form textarea{margin-top:6px;resize:vertical}
+  .enq-form .full{grid-column:1 / -1}
+  .enq-form .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+  .enq-form button{margin-top:16px}
+  .enq-note{font-size:12px;color:var(--muted);margin:12px 0 0}
+  .enq-msg{font-size:14px;margin:12px 0 0;font-weight:600}
+  .enq-msg.ok{color:#166E52}
+  .enq-msg.err{color:#B23B3B}
+  @media(max-width:700px){.enq-grid{grid-template-columns:1fr}}
   footer{background:#0B1D2E;color:#9FB0C1;font-size:12.5px;padding:44px 0 34px}
   footer .cols{display:flex;gap:40px;justify-content:space-between;flex-wrap:wrap;margin-bottom:26px}
   footer b{color:#fff;font-family:Georgia,serif}
@@ -424,6 +439,29 @@
       </div>
     </div>
   </section>
+  <!-- ENQUIRY -->
+  <section class="section" id="enquiry">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="enq.kicker">联系我们</div>
+        <h2 data-i18n="enq.title">留下资料，我们尽快联系你</h2>
+        <p data-i18n="enq.sub">留下电话或电邮，我们通常 1 个工作日内回复。也可以直接 WhatsApp。</p>
+      </div>
+      <form class="enq-form" id="enqForm" novalidate>
+        <div class="enq-grid">
+          <label data-i18n="enq.lname">姓名 *<input name="name" maxlength="80" required autocomplete="name"></label>
+          <label data-i18n="enq.lphone">电话 / WhatsApp<input name="phone" maxlength="40" autocomplete="tel"></label>
+          <label data-i18n="enq.lemail">电邮<input name="email" type="email" maxlength="120" autocomplete="email"></label>
+          <label data-i18n="enq.lsubject">项目 / 房产（可选）<input name="subject" maxlength="120"></label>
+          <label class="full" data-i18n="enq.lmessage">留言 *<textarea name="message" rows="4" maxlength="2000" required></textarea></label>
+        </div>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn gold" type="submit" data-i18n="enq.submit">发送留言</button>
+        <p class="enq-note"><span data-i18n="enq.note">提交即表示同意</span> <a href="/privacy/" data-i18n="enq.privacy">隐私政策</a><span data-i18n="enq.note2">；资料只用于回复你的询问。</span></p>
+        <p class="enq-msg" id="enqMsg" role="status"></p>
+      </form>
+    </div>
+  </section>
 </main>
 
 <footer>
@@ -510,6 +548,11 @@
       "values.3":"创新","values.3p":"持续探索科技与房地产行业的结合。",
       "values.4":"合作","values.4p":"连接不同参与者，促进资源整合与合作机会。",
       "values.5":"长期价值","values.5p":"重视可持续发展与审慎投资管理。",
+      "enq.kicker":"联系我们","enq.title":"留下资料，我们尽快联系你",
+      "enq.sub":"留下电话或电邮，我们通常 1 个工作日内回复。也可以直接 WhatsApp。",
+      "enq.lname":"姓名 *","enq.lphone":"电话 / WhatsApp","enq.lemail":"电邮","enq.lsubject":"项目 / 房产（可选）",
+      "enq.lmessage":"留言 *","enq.submit":"发送留言","enq.note":"提交即表示同意","enq.privacy":"隐私政策","enq.note2":"；资料只用于回复你的询问。",
+      "enq.ok":"已收到，我们会尽快联系你。","enq.err":"发送失败，请稍后再试，或直接 WhatsApp 我们。",
       "contact.kicker":"联系我们","contact.title":"欢迎洽谈房地产销售、投资合作与科技平台",
       "contact.market":"主要市场","contact.marketv":"马来西亚 · 柔佛新山","contact.phone":"电话 / WhatsApp",
       "contact.web":"网站","contact.calc":"投资计算器","contact.email":"电邮","contact.office":"办公室",
@@ -579,6 +622,11 @@
       "values.3":"Innovation","values.3p":"Continuously exploring the intersection of technology and real estate.",
       "values.4":"Collaboration","values.4p":"Connecting market participants and integrating resources.",
       "values.5":"Long-Term Value","values.5p":"Sustainable growth and prudent investment management.",
+      "enq.kicker":"Contact Us","enq.title":"Leave your details and we'll get back to you",
+      "enq.sub":"Leave a phone number or email — we usually reply within one business day. WhatsApp works too.",
+      "enq.lname":"Name *","enq.lphone":"Phone / WhatsApp","enq.lemail":"Email","enq.lsubject":"Project / Property (optional)",
+      "enq.lmessage":"Message *","enq.submit":"Send message","enq.note":"By submitting you agree to our","enq.privacy":"Privacy Policy","enq.note2":"; your details are used only to reply.",
+      "enq.ok":"Received — we'll contact you shortly.","enq.err":"Could not send. Please try again or WhatsApp us.",
       "contact.kicker":"Contact Us","contact.title":"Let's talk about property sales, investment partnerships and PropTech",
       "contact.market":"Primary market","contact.marketv":"Johor Bahru, Johor, Malaysia","contact.phone":"Phone / WhatsApp",
       "contact.web":"Website","contact.calc":"Calculator","contact.email":"Email","contact.office":"Office",
@@ -617,6 +665,50 @@
   menu.addEventListener("click", function () { links.classList.toggle("open"); });
   links.addEventListener("click", function (e) { if (e.target.tagName === "A") links.classList.remove("open"); });
   apply();
+
+  // 联系表单
+  var enqForm = document.getElementById("enqForm");
+  if (enqForm) {
+    enqForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var msg = document.getElementById("enqMsg");
+      var btn = enqForm.querySelector("button[type=submit]");
+      var f = enqForm.elements;
+      msg.className = "enq-msg";
+      msg.textContent = "";
+      if (!f.name.value.trim() || f.message.value.trim().length < 5) {
+        msg.className = "enq-msg err";
+        msg.textContent = I18N[lang]["enq.err"];
+        return;
+      }
+      if (!f.phone.value.trim() && !f.email.value.trim()) {
+        msg.className = "enq-msg err";
+        msg.textContent = lang === "zh" ? "请留电话或电邮，方便我们回复。" : "Please leave a phone or email so we can reply.";
+        return;
+      }
+      btn.disabled = true;
+      fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: f.name.value, phone: f.phone.value, email: f.email.value,
+          subject: f.subject.value, message: f.message.value, website: f.website.value
+        })
+      }).then(function (r) { return r.json(); }).then(function (j) {
+        if (j.ok) {
+          msg.className = "enq-msg ok";
+          msg.textContent = I18N[lang]["enq.ok"];
+          enqForm.reset();
+        } else {
+          msg.className = "enq-msg err";
+          msg.textContent = I18N[lang]["enq.err"];
+        }
+      }).catch(function () {
+        msg.className = "enq-msg err";
+        msg.textContent = I18N[lang]["enq.err"];
+      }).then(function () { btn.disabled = false; });
+    });
+  }
 
   // 旧分享链接兼容：/?d=... → /calc/?d=...
   if (/[?&](d|reset|verify)=/.test(location.search)) {
