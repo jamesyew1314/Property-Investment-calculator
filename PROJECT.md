@@ -459,6 +459,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-25 | v0.64 | **名片页 + 月度邮件 + 推广资料**：`/card/` 电子名片（vCard 一键存通讯录、二维码可切成「名片/网站」、WhatsApp/电话/电邮/分享、A4 打印 89×51mm 名片版式）；**月度邮件**（每月 1 号 10:00，已验证 + 未退订用户，一人一月最多一封，4 条轮换小贴士，签名链接退订 `/api/unsubscribe`，账号页可自助开关 `monthlyOptOut`）；首页 JSON-LD 补 `openingHoursSpecification/geo/hasMap/priceRange/contactPoint`；新增 `docs/推广资料.md`（Google 商家资料、Facebook 专页、WhatsApp Business、Mudah/PropertyGuru 目录清单与文案） |
 | 2026-10-25 | v0.64.1 | Cookie 同意横幅补齐到 `/pricing/`、`/privacy/`、`/terms/`（原先只有企业站与计算器）；价格页与法律页同样记录 `kwthye_cookie_consent` 并为 GA4 预留 `kwthyeLoadAnalytics` 钩子；全站 6 个页面 + staging 巡检 0 个 JS 错误 |
 | 2026-10-25 | v0.65 | **全站中英双语补齐**：`/receipt/`、`/card/`、`/admin/` 三个页面新增 中文/EN 切换（此前收据只用内嵌双语、名片部分中文、后台全中文）；**语言偏好全站统一**（`kwongthye_lang`，计算器原来的 `fangchan_lang` 兼容读取并双写），在一个页面切换后其它 8 个页面自动跟随；后台 8 个标签页登录态实测 0 处残留中文；**收据 PDF 改为中英双语**（服务器装 `fonts-noto-cjk`，pdfkit 注册 NotoSansCJK，没有字体时自动退回英文避免乱码）；名片姓名随语言显示（中文显示「刘泌光」） |
+| 2026-10-25 | v0.65.1 | `docs/` 纳入 git（原先在 `.gitignore`，运维与推广文档只存在本机）：服务器信息、推广资料、SaaS 商业方案、合伙人方案 4 份入库；**提交前先脱敏**——风险表里原本写着真实后台密码，已改为「值见服务器 `.env`」；`.gitignore` 移除 `docs/`，`.secrets/` 仍排除 |
 | 2026-10-25 | — | 新增 `docs/服务器信息.md`：服务器规格、域名/DNS、架构、目录、数据库、环境变量、定时任务、备份恢复、SSL、安全、运维命令、发布流程、风险清单、费用 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 
