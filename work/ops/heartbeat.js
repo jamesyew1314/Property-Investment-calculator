@@ -64,10 +64,22 @@ async function main() {
   let offsiteLine = "未配置";
   try {
     const conf = fs.readFileSync("/etc/fangchan-offsite.conf", "utf8");
+    const targetsRaw = (conf.match(/^OSS_TARGETS="?([^"\n]*)"?$/m) || [])[1] || "";
     const bucket = (conf.match(/^OSS_BUCKET=(.+)$/m) || [])[1] || "";
+    const list = targetsRaw.trim() ? targetsRaw.trim().split(/\s+/) : (bucket ? [bucket + ":" + ((conf.match(/^OSS_ENDPOINT=(.+)$/m) || [])[1] || "")] : []);
+    const label = function (ep) {
+      if (!ep) return "?";
+      if (ep.indexOf("ap-southeast-1") >= 0) return "新加坡";
+      if (ep.indexOf("ap-southeast-3") >= 0) return "吉隆坡";
+      return "其它";
+    };
+    const desc = list.map(function (t) {
+      const parts = t.split(":");
+      return label(parts[1]) + " " + parts[0];
+    }).join(" + ");
     const last = parseInt(fs.readFileSync("/srv/fangchan/logs/.offsite-last", "utf8").trim(), 10);
     const h = Math.floor((Date.now() - last * 1000) / 3600000);
-    offsiteLine = "oss://" + bucket + "/db/ · 上次上传 " + h + " 小时前" + (h < 26 ? " ✅" : " ⚠️");
+    offsiteLine = (desc || "未配置") + " · 上次上传 " + h + " 小时前" + (h < 26 ? " ✅" : " ⚠️");
   } catch (e) { offsiteLine = "未配置或从未成功上传"; }
 
   let failing = "全部正常";

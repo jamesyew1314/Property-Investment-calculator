@@ -474,6 +474,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-25 | v0.71 | **异地备份正式启用**：阿里云 OSS `kwongthye-backup`（吉隆坡·同城冗余·私有）+ RAM 子账号最小权限（仅该桶 Put/Get/Delete/List）；服务器装 ossutil 1.7.18，凭据 `/root/.ossutilconfig`（600），每天 02:40 把当日 dump **AES-256 加密后**传到 `oss://kwongthye-backup/db/日期/`；**完整链路实测**：上传 → 拉回 → 解密（逐字节一致）→ `pg_restore` 16 张表 2 用户；监控新增「异地备份新鲜度」检查（>26h 未上传告警），心跳邮件每天显示异地状态；远端保留 60 天 |
 | 2026-10-25 | v0.72 | **凭据纠偏（安全）**：发现最初拿到的是**云账号 AccessKey**（能列全部桶、能读 RAM），立即用 `aliyun` CLI 在服务器上直接创建 RAM 用户 `kwongthye-backup` + 自定义策略 `kwongthye-backup-only` + 新 AK，替换 ossutil 凭据；**双向验证**：列自己桶 ✅、列全部桶 ⛔403、访问他人桶 ⛔403、读 RAM ⛔；旧云账号 AK 用 `aliyun ram DeleteAccessKey` 删除，`sts GetCallerIdentity` 确认旧密钥已 `InvalidAccessKeyId.NotFound`、新身份为 `RAMUser .../kwongthye-backup`；清理残留 profile |
 | 2026-10-25 | v0.73 | **监控方案定稿**：按老叶树模式，不接第三方外部监控（少账号/少密钥/少维护），保留「服务器直传 OSS 加密备份 + 每日 08:00 心跳邮件 + 每 10 分钟服务器自检」三层；已知残留风险（整机宕机无自动告警）与三条备选方案（阿里云云监控 / UptimeRobot / Healthchecks）写入 `docs/服务器信息.md` §16.5 |
+| 2026-10-25 | v0.74 | **双地域异地备份**：新增新加坡桶 `kwongthye-backup-sg`（`oss-ap-southeast-1`），`offsite-backup.sh` 升级为**多目标双写**（`OSS_TARGETS` 空格分隔）；两个目标互相独立（一个失败不影响另一个，全失败才告警）；RAM 策略扩到两个桶；**新加坡副本独立恢复演练通过**（下载→解密逐字节一致→`pg_restore` 16 表 2 用户，两份 `.sha256` 相同）；心跳邮件显示「吉隆坡 + 新加坡」两地状态 |
 | 2026-10-25 | — | 新增 `docs/服务器信息.md`：服务器规格、域名/DNS、架构、目录、数据库、环境变量、定时任务、备份恢复、SSL、安全、运维命令、发布流程、风险清单、费用 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 

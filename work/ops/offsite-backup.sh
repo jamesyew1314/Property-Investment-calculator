@@ -44,15 +44,35 @@ if [ -f "$KEY" ]; then
   log "encrypted $(du -h "$UP" | cut -f1)"
 fi
 
-if ! "$OSSUTIL" -e "$ENDPOINT" cp -f "$UP" "oss://$BUCKET/db/$D/" >> "$LOG" 2>&1; then
-  log "FAIL upload $UP"; alert "上传 $(basename "$UP") 到 oss://$BUCKET/db/$D/ 失败，请检查 AccessKey/网络。"; exit 1
-fi
-[ -f "$UP.sha256" ] && "$OSSUTIL" -e "$ENDPOINT" cp -f "$UP.sha256" "oss://$BUCKET/db/$D/" >> "$LOG" 2>&1
-[ "$UP" != "$DUMP" ] && rm -f "$UP" "$UP.sha256"
-
-# 只保留 60 天的远端对象
-"$OSSUTIL" -e "$ENDPOINT" rm -r -f "oss://$BUCKET/db/$(date -d '60 days ago' +%F)/" >> "$LOG" 2>&1 || true
+# ---- 上传：支持多目标 ----
+# OSS_TARGETS="kwongthye-backup:oss-ap-southeast-3.aliyuncs.com kwongthye-backup-sg:oss-ap-southeast-1.aliyuncs.com"
+# 不设则用 OSS_BUCKET + OSS_ENDPOINT 单目标
+TARGETS="${OSS_TARGETS:-}"
+[ -z "$TARGETS" ] && TARGETS="$BUCKET:$ENDPOINT"
 
 SIZE=$(du -h "$DUMP" | cut -f1)
-log "OK oss://$BUCKET/db/$D/$(basename "$UP") size=$SIZE $([ -f "$KEY" ] && echo encrypted || echo plain)"
+OKS=0; FAILS=0; DONE=""
+for T in $TARGETS; do
+  TB="${T%%:*}"; TE="${T#*:}"
+  [ "$TE" = "$TB" ] && TE="$ENDPOINT"
+  if "$OSSUTIL" -e "$TE" cp -f "$UP" "oss://$TB/db/$D/" >> "$LOG" 2>&1; then
+    [ -f "$UP.sha256" ] && "$OSSUTIL" -e "$TE" cp -f "$UP.sha256" "oss://$TB/db/$D/" >> "$LOG" 2>&1
+    log "OK oss://$TB/db/$D/$(basename "$UP") size=$SIZE $([ -f "$KEY" ] && echo encrypted || echo plain) [$TE]"
+    OKS=$((OKS + 1)); DONE="$DONE $TB"
+    # 每个目标各自只保留 60 天
+    "$OSSUTIL" -e "$TE" rm -r -f "oss://$TB/db/$(date -d '60 days ago' +%F)/" >> "$LOG" 2>&1 || true
+  else
+    log "FAIL upload to oss://$TB/db/$D/ [$TE]"
+    FAILS=$((FAILS + 1))
+  fi
+done
+
+[ "$UP" != "$DUMP" ] && rm -f "$UP" "$UP.sha256"
+
+if [ "$OKS" = "0" ]; then
+  alert "异地备份全部失败（$((OKS + FAILS)) 个目标），请检查 AccessKey / 网络 / 桶权限。"
+  exit 1
+fi
+[ "$FAILS" -gt 0 ] && log "WARN $FAILS/$((OKS + FAILS)) 个目标失败，成功:$DONE"
+
 echo "$(date +%s)" > /srv/fangchan/logs/.offsite-last
