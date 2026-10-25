@@ -106,6 +106,7 @@
   .rfTag.ok{background:#E7F4EC;color:#166E52}
   .rfTag.no{background:#FDECEC;color:#B23B3B}
   .locked{position:relative}
+  .freeHint{color:#166E52;background:#E7F4EC;border:1px solid #C8E6D5;border-radius:8px;padding:6px 10px;margin-top:8px}
   .locked::after{content:"🔒 Pro";position:absolute;top:-8px;right:-6px;background:#fff;color:#B26A00;
     border:1px solid #EADFC8;border-radius:999px;font-size:9px;line-height:1.4;padding:0 5px;white-space:nowrap;
     box-shadow:0 1px 2px rgba(0,0,0,.08);pointer-events:none}
@@ -583,7 +584,8 @@
       errUnverified: "请先验证邮箱（账号页可重发验证邮件）",
       coNew: "另存为", coDel: "删除", coDefault: "默认抬头",
       ckTitle: "Cookie 使用", ckText: "必要 Cookie 用于登录与安全；分析 Cookie 帮助我们改进网站。您可以自由选择。",
-      ckMore: "了解详情", ckNec: "仅必要", ckAll: "全部接受", proHint: "🔒 PDF / 分享 / 存档 / 导出为 Pro 功能。", proOnlyAsk: "此功能为专业版功能。查看价格并升级？", payTitle: "付款记录 / 收据", payLoading: "加载中…",
+      ckMore: "了解详情", ckNec: "仅必要", ckAll: "全部接受", proHint: "🔒 PDF / 分享 / 存档 / 导出为 Pro 功能。", proOnlyAsk: "此功能为专业版功能。查看价格并升级？",
+      freeBadge: "🎁 现阶段全部功能免费开放（云端存档、PDF 报告、方案对比、分享导出）", errNeedLogin: "请先登录（免费）后再导出报告", payTitle: "付款记录 / 收据", payLoading: "加载中…",
       payEmpty: "还没有付款记录。兑换开通码后，收据会显示在这里。", payReceipt: "查看收据",
       btnRefund: "申请退款", refundPrompt: "请简单说明退款原因（至少 4 个字）：",
       refundNeedReason: "请填写退款原因", refundSent: "退款申请已提交，我们会在 2 个工作日内处理",
@@ -692,7 +694,8 @@
       errUnverified: "Please verify your email first (resend from your account panel)",
       coNew: "Save as", coDel: "Delete", coDefault: "Default header",
       ckTitle: "Cookies", ckText: "Essential cookies keep you signed in and secure; analytics cookies help us improve the site. You choose.",
-      ckMore: "Details", ckNec: "Essential only", ckAll: "Accept all", proHint: "🔒 PDF / share / save / export are Pro features.", proOnlyAsk: "This is a Pro feature. View pricing and upgrade?", payTitle: "Payments / receipts", payLoading: "Loading…",
+      ckMore: "Details", ckNec: "Essential only", ckAll: "Accept all", proHint: "🔒 PDF / share / save / export are Pro features.", proOnlyAsk: "This is a Pro feature. View pricing and upgrade?",
+      freeBadge: "🎁 Everything is free right now — cloud saving, PDF report, comparison, sharing", errNeedLogin: "Please sign in (free) to export the report", payTitle: "Payments / receipts", payLoading: "Loading…",
       payEmpty: "No payments yet. Receipts appear here after you redeem a code.", payReceipt: "Receipt",
       btnRefund: "Request refund", refundPrompt: "Please briefly tell us why (at least 4 characters):",
       refundNeedReason: "Please give a reason", refundSent: "Refund request submitted — we will respond within 2 business days",
@@ -1333,11 +1336,24 @@
 
 
   function updateProLocks() {
-    var free = !proActive();
+    var lock = !unlocked();
     ["savePlan", "shareLink", "printBtn", "waBtn", "wxBtn", "fbBtn", "csvBtn", "cmpSelA", "cmpSelB", "cmpView", "reportBtn"].forEach(function (id) {
-      var el = $(id); if (el) el.classList.toggle("locked", free);
+      var el = $(id); if (el) el.classList.toggle("locked", lock);
     });
-    var hint = $("proHint"); if (hint) hint.hidden = !free;
+    var hint = $("proHint");
+    if (hint) {
+      if (freeMode()) {
+        hint.hidden = false;
+        hint.removeAttribute("data-i18n");
+        hint.textContent = t("freeBadge");
+        hint.classList.add("freeHint");
+      } else {
+        hint.hidden = !lock;
+        hint.classList.remove("freeHint");
+        hint.setAttribute("data-i18n", "proHint");
+        hint.textContent = t("proHint");
+      }
+    }
   }
   function registerSW() {
     if (!("serviceWorker" in navigator)) return;
@@ -1559,6 +1575,7 @@
   $("csvBtn").addEventListener("click", exportCsv);
   function downloadReport() {
     if (!requirePro()) return;
+    if (!logged || !me || !me.user) { toast(t("errNeedLogin")); openAcct(); return; }
     if (!lastRes || !lastInp) { toast(t("cmpNeed")); return; }
     toast(t("toastReport"));
     fetch("/api/report.pdf", {
@@ -1696,15 +1713,28 @@
       } else { toast(errMsg(j.error)); }
     }).catch(function () { toast(t("errGeneric")); });
   }
+  var cfgFree = false;   // 来自 /api/config：免费开放期
+  function freeMode() {
+    if (me && me.user && me.user.freeMode) return true;
+    return !!cfgFree;
+  }
   function proActive() {
     if (!logged || !me || !me.user) return false;
+    if (me.user.freeMode) return true;          // 免费开放期：视同已解锁
     var u = me.user;
     if (u.plan !== "pro") return false;
     if (u.planExpiresAt && new Date(u.planExpiresAt) <= new Date()) return false;
     return true;
   }
+  function unlocked() { return freeMode() || proActive(); }
+  function loadConfig() {
+    return fetch("/api/config", { credentials: "same-origin" })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { cfgFree = !!(j && j.freeMode); updateProLocks(); })
+      .catch(function () {});
+  }
   function requirePro() {
-    if (proActive()) return true;
+    if (unlocked()) return true;
     if (confirm(t("proOnlyAsk"))) window.open("/pricing/", "_blank");
     return false;
   }
@@ -1896,6 +1926,7 @@
   $("acctModal").addEventListener("click", function (e) { if (e.target === this) closeAcct(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") { closeAcct(); closePlan(); } });
 
+  loadConfig();
   refreshMe();
 
   applyLang();

@@ -17,6 +17,8 @@ const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME || "fc_sid";
 const COOKIE_PATH = process.env.SESSION_COOKIE_PATH || "/";
 // 生产可设 .kwongthye.com，让 kwongthye.com 与 calc.kwongthye.com 共用登录状态
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || "";
+// 免费开放期：默认 true（所有 Pro 功能免费）；正式收费时把 .env 改成 FREE_MODE=0 即可恢复
+const FREE_MODE = process.env.FREE_MODE !== "0";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
 const app = express();
@@ -47,9 +49,11 @@ function parseCookies(req) {
 }
 function publicUser(u) {
   return { id: u.id, email: u.email, displayName: u.display_name || null, plan: u.plan, planExpiresAt: u.plan_expires_at,
-           emailVerified: !!u.email_verified_at, twofaEnabled: !!u.twofa_enabled, monthlyOptOut: !!u.monthly_opt_out };
+           emailVerified: !!u.email_verified_at, twofaEnabled: !!u.twofa_enabled, monthlyOptOut: !!u.monthly_opt_out,
+           freeMode: FREE_MODE };
 }
 function quotaFor(u) {
+  if (FREE_MODE) return null;   // 免费开放期：方案数量不限
   const paid = u.plan === "pro" && (!u.plan_expires_at || new Date(u.plan_expires_at) > new Date());
   return paid ? null : FREE_QUOTA;
 }
@@ -189,6 +193,12 @@ const requireVerified = function (req, res, next) {
   if (!req.user || !req.user.email_verified_at) return res.status(403).json({ ok: false, error: "email_unverified" });
   next();
 };
+
+// 公开配置：前端据此决定是否显示「Pro 锁定」
+app.get("/api/config", function (req, res) {
+  res.setHeader("Cache-Control", "public, max-age=60");
+  res.json({ ok: true, freeMode: FREE_MODE, plans: { freeQuota: FREE_MODE ? null : FREE_QUOTA } });
+});
 
 app.get("/api/health", async function (req, res) {
   try {
@@ -586,7 +596,7 @@ app.post("/api/report.pdf", requireAuth, rateLimit(10, 600000), async function (
   try {
     const u = req.user;
     const paid = u.plan === "pro" && (!u.plan_expires_at || new Date(u.plan_expires_at) > new Date());
-    if (!paid) return res.status(402).json({ ok: false, error: "pro_required" });
+    if (!FREE_MODE && !paid) return res.status(402).json({ ok: false, error: "pro_required" });
     const b = req.body || {};
     if (!b.input || !b.result || typeof b.result !== "object") return res.status(400).json({ ok: false, error: "bad_payload" });
     const buf = await buildReportPdf({

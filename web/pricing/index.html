@@ -47,6 +47,9 @@
   footer{border-top:1px solid var(--line);padding:20px 0 36px;color:var(--muted);font-size:12px}
   footer a{color:var(--muted);margin-right:14px;text-decoration:none}
   @media(max-width:820px){.plans{grid-template-columns:1fr}}
+  .freeNotice{max-width:760px;margin:0 auto 22px;background:#E7F4EC;border:1px solid #C8E6D5;color:#166E52;
+    border-radius:12px;padding:14px 18px;font-size:13.5px;line-height:1.7;text-align:center}
+  .plansNote{max-width:760px;margin:0 auto 14px;text-align:center;font-size:12.5px;color:#6B7787}
 </style>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KWONG THYE 光泰">
@@ -73,9 +76,11 @@
 </header>
 <main>
   <div class="wrap">
+    <div class="freeNotice" data-i18n="freeNotice">🎁 现阶段全部功能免费开放：云端存档不限数量、完整 PDF 报告、方案对比、分享导出。正式收费前会提前通知，已购买的专业版权益不受影响。</div>
     <h1 data-i18n="title">价格</h1>
     <p class="lead" data-i18n="lead">计算器全部功能免费使用。需要保存更多方案时，月付 RM9.90 或年付 RM99（年付更省）。</p>
 
+    <p class="plansNote" data-i18n="plansNote">以下为正式收费后的方案与价格（现阶段全部免费，无需购买）</p>
     <div class="plans">
       <div class="plan">
         <h2 data-i18n="free.title">免费版</h2>
@@ -157,6 +162,8 @@
     zh: {
       ckTitle:"Cookie 使用",ckText:"必要 Cookie 用于登录与安全；分析 Cookie 帮助我们改进网站。您可以自由选择。",ckMore:"了解详情",ckNec:"仅必要",ckAll:"全部接受",
       back: "← 返回公司网站", title: "价格",
+      freeNotice: "🎁 现阶段全部功能免费开放：云端存档不限数量、完整 PDF 报告、方案对比、分享导出。正式收费前会提前通知，已购买的专业版权益不受影响。",
+      plansNote: "以下为正式收费后的方案与价格（现阶段全部免费，无需购买）",
       lead: "计算器全部功能免费使用。需要保存更多方案时，月付 RM9.90 或年付 RM99（年付更省）。",
       "free.title": "免费版", "free.per": "永久免费",
       "m.title": "专业版 · 月付", "m.per": "／月", "m.cta": "购买月付",
@@ -184,6 +191,8 @@
     en: {
       ckTitle:"Cookies",ckText:"Essential cookies keep you signed in and secure; analytics cookies help us improve the site. You choose.",ckMore:"Details",ckNec:"Essential only",ckAll:"Accept all",
       back: "← Back to company site", title: "Pricing",
+      freeNotice: "🎁 Everything is free right now: unlimited cloud plans, full PDF reports, scenario comparison, sharing and export. We will announce before charging; existing Pro benefits stay unchanged.",
+      plansNote: "The plans and prices below apply once billing starts — everything is free today, no purchase needed.",
       lead: "Every calculator feature is free. Upgrade for RM9.90/month or RM99/year when you need more saved plans.",
       "free.title": "Free", "free.per": "forever",
       "m.title": "Pro · Monthly", "m.per": "/ month", "m.cta": "Buy monthly",
