@@ -101,6 +101,9 @@
   .payList{font-size:12px;color:#4A5563;margin-top:6px}
   .payRow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #EEF0F5}
   .payRow a{color:var(--blue);white-space:nowrap}
+  .rfTag{margin-left:8px;font-size:11px;border-radius:999px;padding:1px 7px;background:#FFF3CD;color:#7A5B12}
+  .rfTag.ok{background:#E7F4EC;color:#166E52}
+  .rfTag.no{background:#FDECEC;color:#B23B3B}
   .locked{position:relative}
   .locked::after{content:"🔒 Pro";position:absolute;top:-8px;right:-6px;background:#fff;color:#B26A00;
     border:1px solid #EADFC8;border-radius:999px;font-size:9px;line-height:1.4;padding:0 5px;white-space:nowrap;
@@ -580,7 +583,11 @@
       coNew: "另存为", coDel: "删除", coDefault: "默认抬头",
       ckTitle: "Cookie 使用", ckText: "必要 Cookie 用于登录与安全；分析 Cookie 帮助我们改进网站。您可以自由选择。",
       ckMore: "了解详情", ckNec: "仅必要", ckAll: "全部接受", proHint: "🔒 PDF / 分享 / 存档 / 导出为 Pro 功能。", proOnlyAsk: "此功能为专业版功能。查看价格并升级？", payTitle: "付款记录 / 收据", payLoading: "加载中…",
-      payEmpty: "还没有付款记录。兑换开通码后，收据会显示在这里。", payReceipt: "查看收据", acctVerifyLabel: "验证", emailVerified: "邮箱已验证", emailUnverified: "邮箱未验证",
+      payEmpty: "还没有付款记录。兑换开通码后，收据会显示在这里。", payReceipt: "查看收据",
+      btnRefund: "申请退款", refundPrompt: "请简单说明退款原因（至少 4 个字）：",
+      refundNeedReason: "请填写退款原因", refundSent: "退款申请已提交，我们会在 2 个工作日内处理",
+      refundWindow: "已超过 7 天退款期限", refundDup: "这张收据已提交过退款申请",
+      refundPending: "退款审核中", refundApproved: "已退款", refundRejected: "退款未通过", acctVerifyLabel: "验证", emailVerified: "邮箱已验证", emailUnverified: "邮箱未验证",
       btnSendVerify: "发送验证邮件", toastVerifySent: "验证邮件已发送（请查收邮箱）", toastVerified: "邮箱验证成功",
       toastLoginOk: "已登录", toastRegisterOk: "注册成功，已登录", toastLogout: "已退出登录",
       toolTitle: "方案存档 / 分享", fPlanName: "方案名称", phPlanName: "例：Bukit Jalil 公寓 A",
@@ -685,7 +692,11 @@
       coNew: "Save as", coDel: "Delete", coDefault: "Default header",
       ckTitle: "Cookies", ckText: "Essential cookies keep you signed in and secure; analytics cookies help us improve the site. You choose.",
       ckMore: "Details", ckNec: "Essential only", ckAll: "Accept all", proHint: "🔒 PDF / share / save / export are Pro features.", proOnlyAsk: "This is a Pro feature. View pricing and upgrade?", payTitle: "Payments / receipts", payLoading: "Loading…",
-      payEmpty: "No payments yet. Receipts appear here after you redeem a code.", payReceipt: "Receipt", acctVerifyLabel: "Email", emailVerified: "Email verified", emailUnverified: "Email not verified",
+      payEmpty: "No payments yet. Receipts appear here after you redeem a code.", payReceipt: "Receipt",
+      btnRefund: "Request refund", refundPrompt: "Please briefly tell us why (at least 4 characters):",
+      refundNeedReason: "Please give a reason", refundSent: "Refund request submitted — we will respond within 2 business days",
+      refundWindow: "The 7-day refund window has closed", refundDup: "A refund was already requested for this receipt",
+      refundPending: "Refund pending", refundApproved: "Refunded", refundRejected: "Refund declined", acctVerifyLabel: "Email", emailVerified: "Email verified", emailUnverified: "Email not verified",
       btnSendVerify: "Send verification email", toastVerifySent: "Verification email sent", toastVerified: "Email verified",
       toastLoginOk: "Logged in", toastRegisterOk: "Account created", toastLogout: "Logged out",
       toolTitle: "Saved Plans / Share", fPlanName: "Plan Name", phPlanName: "e.g. Bukit Jalil Condo A",
@@ -1697,6 +1708,18 @@
     return false;
   }
 
+  function askRefund(paymentId) {
+    var reason = prompt(t("refundPrompt"), "");
+    if (reason == null) return;
+    if (reason.trim().length < 4) { toast(t("refundNeedReason")); return; }
+    api("/refunds", { method: "POST", body: { paymentId: paymentId, reason: reason.trim() } }).then(function (j) {
+      if (j.ok) { toast(t("refundSent")); loadPayments(); }
+      else if (j.error === "refund_window_closed") toast(t("refundWindow"));
+      else if (j.error === "already_requested") toast(t("refundDup"));
+      else toast(errMsg(j.error));
+    }).catch(function () { toast(t("errGeneric")); });
+  }
+
   function loadPayments() {
     api("/payments").then(function (j) {
       var el = $("payList");
@@ -1709,13 +1732,29 @@
         var left = document.createElement("span");
         var d = new Date(p.created_at).toLocaleDateString("en-MY");
         left.textContent = d + " · RM" + Number(p.amount).toFixed(2) + " · " + p.receipt_no;
+        var right = document.createElement("span");
+        right.style.whiteSpace = "nowrap";
         var a = document.createElement("a");
         a.href = "/receipt/?id=" + p.id;
         a.target = "_blank";
         a.rel = "noopener";
         a.textContent = t("payReceipt");
+        right.appendChild(a);
+        if (p.refund_status === "pending") {
+          var tag = document.createElement("span"); tag.className = "rfTag"; tag.textContent = t("refundPending"); right.appendChild(tag);
+        } else if (p.refund_status === "approved") {
+          var t2 = document.createElement("span"); t2.className = "rfTag ok"; t2.textContent = t("refundApproved"); right.appendChild(t2);
+        } else if (p.refund_status === "rejected") {
+          var t3 = document.createElement("span"); t3.className = "rfTag no"; t3.textContent = t("refundRejected"); right.appendChild(t3);
+        } else if (Date.now() - new Date(p.created_at).getTime() < 7 * 86400000) {
+          var rb = document.createElement("button");
+          rb.className = "linkbtn"; rb.style.marginLeft = "8px"; rb.style.fontSize = "11.5px";
+          rb.textContent = t("btnRefund");
+          rb.addEventListener("click", function () { askRefund(p.id); });
+          right.appendChild(rb);
+        }
         row.appendChild(left);
-        row.appendChild(a);
+        row.appendChild(right);
         el.appendChild(row);
       });
     }).catch(function () {});
@@ -1872,52 +1911,6 @@
   } catch (e) {}
 })();
 </script>
-<style>
-  #ckBar{position:fixed;left:12px;right:12px;bottom:12px;z-index:70;max-width:880px;margin:0 auto;
-    background:#0E2438;color:#fff;border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;
-    flex-wrap:wrap;box-shadow:0 10px 30px rgba(14,36,56,.28);font-size:12.5px;line-height:1.6;
-    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
-  #ckBar[hidden]{display:none !important}
-  #ckBar b{display:block;font-size:13px;color:#E7D3A8;margin-bottom:2px}
-  #ckBar .ckTx{flex:1 1 340px;min-width:220px}
-  #ckBar .ckBtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  #ckBar .ckBtns button{border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;
-    border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff}
-  #ckBar .ckBtns button#ckAll{background:#C6A15B;border-color:#C6A15B;color:#1B2430}
-  #ckBar .ckLnk{color:#C9D6E6;font-size:12px;text-decoration:underline}
-</style>
-<div id="ckBar" hidden>
-  <div class="ckTx">
-    <b data-i18n="ckTitle">Cookie 使用 / Cookies</b>
-    <span data-i18n="ckText">必要 Cookie 用于登录与安全；分析 Cookie 帮助我们改进网站。您可以自由选择。</span>
-  </div>
-  <div class="ckBtns">
-    <a class="ckLnk" href="/privacy/" data-i18n="ckMore">了解详情</a>
-    <button id="ckNec" data-i18n="ckNec">仅必要</button>
-    <button id="ckAll" data-i18n="ckAll">全部接受</button>
-  </div>
-</div>
-<script>
-(function () {
-  var KEY = "kwthye_cookie_consent";
-  var bar = document.getElementById("ckBar");
-  if (!bar) return;
-  var saved = null;
-  try { saved = localStorage.getItem(KEY); } catch (e) {}
-  function loadAnalytics() {
-    if (typeof window.kwthyeLoadAnalytics === "function") { try { window.kwthyeLoadAnalytics(); } catch (e) {} }
-  }
-  if (!saved) bar.hidden = false; else if (saved === "all") loadAnalytics();
-  window.kwthyeConsent = saved || null;
-  function set(v) {
-    try { localStorage.setItem(KEY, v); } catch (e) {}
-    bar.hidden = true;
-    window.kwthyeConsent = v;
-    if (v === "all") loadAnalytics();
-  }
-  document.getElementById("ckAll").addEventListener("click", function () { set("all"); });
-  document.getElementById("ckNec").addEventListener("click", function () { set("necessary"); });
-})();
-</script>
+<script src="/cookie-consent.js" defer></script>
 </body>
 </html>

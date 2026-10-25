@@ -55,8 +55,22 @@ const replyTo = process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
       "",
       "KWONG THYE 光泰"
     ].join("\n");
+    let html = null;
     try {
-      await transport.sendMail({ from: from, to: u.email, replyTo: replyTo, subject: subject, text: text, html: mailLayout.brand(subject, text).html });
+      html = mailLayout.rich({
+        heading: days > 0 ? "专业版即将到期 / Renewal reminder" : "专业版已到期 / Plan expired",
+        lead: days > 0
+          ? ["您的 KWONG THYE 专业版还剩 " + days + " 天到期。续费后方案数量不限、报告与云端存档继续可用。",
+             "Your KWONG THYE Pro plan expires in " + days + " day(s). Renew to keep unlimited plans, PDF reports and cloud saving."]
+          : ["您的 KWONG THYE 专业版已于 " + dateStr + " 到期。续费后方案数量不限。",
+             "Your KWONG THYE Pro plan expired on " + dateStr + ". Renew to keep unlimited plans."],
+        rows: [["到期日 / Expiry", dateStr], ["剩余 / Remaining", days > 0 ? days + " 天 / days" : "已到期 / expired"]],
+        cta: { url: "https://kwongthye.com/pricing/", label: "查看价格 / See pricing" },
+        note: "回复此邮件或 WhatsApp +60 16-528 0918 即可获取开通码。\nReply to this email or WhatsApp +60 16-528 0918 for an activation code."
+      }).html;
+    } catch (e) {}
+    try {
+      await transport.sendMail({ from: from, to: u.email, replyTo: replyTo, subject: subject, text: text, html: html || mailLayout.brand(subject, text).html });
       await pool.query("UPDATE users SET plan_reminder_at=now() WHERE id=$1", [u.id]);
       console.log("sent", u.email, "days", days);
     } catch (e) {
@@ -86,8 +100,19 @@ const replyTo = process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
       "",
       "KWONG THYE 光泰"
     ].join("\n");
+    let html2 = null;
     try {
-      await transport.sendMail({ from: from, to: u.email, replyTo: replyTo, subject: "Pro 已到期 / Plan expired — KWONG THYE", text: text, html: mailLayout.brand("Pro 已到期 / Plan expired — KWONG THYE", text).html });
+      html2 = mailLayout.rich({
+        heading: "专业版已到期 / Plan expired",
+        lead: ["您的 KWONG THYE 专业版已于 " + dateStr + " 到期，云端存档与报告导出已暂停（已保存的方案不会删除）。",
+               "Your KWONG THYE Pro plan expired on " + dateStr + ". Cloud saving and report export are paused (your saved plans are kept)."],
+        rows: [["到期日 / Expiry", dateStr]],
+        cta: { url: "https://kwongthye.com/pricing/", label: "续费 / Renew" },
+        note: "回复此邮件或 WhatsApp +60 16-528 0918 获取开通码。\nReply to this email or WhatsApp +60 16-528 0918 for an activation code."
+      }).html;
+    } catch (e) {}
+    try {
+      await transport.sendMail({ from: from, to: u.email, replyTo: replyTo, subject: "Pro 已到期 / Plan expired — KWONG THYE", text: text, html: html2 || mailLayout.brand("Pro 已到期 / Plan expired — KWONG THYE", text).html });
       await pool.query("UPDATE users SET expiry_notice_at=now() WHERE id=$1", [u.id]);
       console.log("expired notice sent", u.email);
     } catch (e) {

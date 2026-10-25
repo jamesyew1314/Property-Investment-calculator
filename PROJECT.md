@@ -71,6 +71,9 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | `docs/推广资料.md` | Google 商家资料 / Facebook / WhatsApp / 目录登记文案 |
 | `work/report-pdf.js` | 完整投资分析报告 PDF（A4 两页，中英双语，Noto CJK） |
 | `work/ops/heartbeat.js` | 每日心跳邮件（08:00） |
+| `work/ops/staging-refresh.sh` | 每天把正式库克隆到 staging |
+| `deploy/deploy.sh` · `.github/workflows/deploy.yml` | 一键发布 / GitHub Actions 自动发布 |
+| `web/cookie-consent.js` | Cookie 偏好中心（全站共用） |
 | `web/og-image.png` · `web/404.html` | 分享预览图（1200×630）· 双语错误页 |
 
 > **语言约定**：全站 8 个页面都用同一个 localStorage 键 `kwongthye_lang`（`zh` / `en`），切换后跨页面保持。
@@ -466,6 +469,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-25 | v0.66 | **完整投资分析报告 PDF + 运维补强 + 分享预览**：① `POST /api/report.pdf`（Pro 专属）把计算器算好的数字（前端算、服务端只排版，避免两套公式）排成 A4 两页品牌报告：Part 1 购入明细/首次现金、Part 2 年度费用、Part 3 投资回报 + 逐年表 + 卖出/RPGT/Total ROI，含客户项目抬头、逐页页眉页脚与免责声明，中英双语，导出口点「📄 完整报告 PDF」；② **日志轮转** `/etc/logrotate.d/fangchan`（每日、留 14 天、压缩、copytruncate 不重启服务）；③ **每日心跳邮件** `ops/heartbeat.js` 08:00（服务器/数据/备份/证书/监控状态，几天没收到即代表服务器异常）+ UptimeRobot 外部探测配置文档；④ **修复访问量统计长期为 0**：`sendBeacon` 用 `text/plain` 发送而 `express.json` 不解析，服务端加 `express.text` 兜底 + 前端改 JSON Blob，并给 pricing/privacy/terms/card 补埋点；⑤ **分享预览图** `og-image.png`（1200×630，真实 Logo）+ 全站 og/twitter 标签；⑥ **双语 404/50x 页** + nginx `error_page` |
 | 2026-10-25 | v0.67 | **安全加固**：① nginx 加 **CSP**（默认只允许本站资源，内联脚本/样式放行；接 GA4 时需同步放行 Google 域名，已写进文档）+ `Permissions-Policy`，HSTS 加 `includeSubDomains`；② **异地备份加密**：`offsite-backup.sh` 检测到 `/root/.backup-key` 就用 AES-256-CBC（pbkdf2 20 万轮）加密再传 OSS，密钥已生成（600）、**绝不上传**；③ 加密/解密/恢复全链路已实测（解密逐字节一致 + pg_restore 15 张表）；④ 8 个页面 CSP 违规 0，CSV 与报告 PDF 的 blob 下载在 CSP 下正常 |
 | 2026-10-25 | v0.68 | **条款同意留痕 + 后台 CSV 导出**：① 注册必须勾选同意「使用条款 + 隐私政策」，后端校验 `acceptTerms`，并把**同意时间、条款版本（2026-10）、IP 单向哈希**写进 `users`（老用户按注册时间回填），隐私政策新增「同意记录」条目（中英）；② 后台新增三个导出：`/api/admin/export/users.csv`、`codes.csv`、`payments.csv`（UTF-8 BOM，Excel 直开，写审计日志），后台页头加「导出 CSV」条（中英）；③ 实测：不勾选注册返回 400 `terms_required`，勾选后 201 并留痕；CSV 三个文件均 200 可下载 |
+| 2026-10-25 | v0.69 | **C 组 + D 组收尾**：① 后台**收入/新用户/浏览量 14 天柱状图**（`/api/admin/charts`，纯 CSS 柱状，含付费转化率与累计收入）；② **退款流程**（用户 7 天内申请 → 邮件通知后台 → 后台「退款」标签批准/拒绝 → 批准即停用 Pro 并邮件通知，方案不删除；条款新增退款政策中英）；③ **邮件细分模板**：新增 `rich()` 骨架，验证/重置用按钮、后台与登录 2FA 用大号验证码框、收据用明细表+按钮、到期提醒用明细表+续费按钮、月度用贴士+按钮；④ **Cookie 偏好中心**抽成 `/cookie-consent.js`：必要（锁定）+ 分析 + 营销三类开关，`window.KWConsent.allows()` 供 GA4 使用，隐私政策页脚可重新打开；⑤ **staging 每日自动同步**（04:30 备份校验后克隆正式库）；⑥ **一键发布 + CI/CD**：`deploy/deploy.sh`（测试→同步→重启→健康检查，已实测）与 `.github/workflows/deploy.yml`（push main 自动发布，需配 3 个 Secret） |
 | 2026-10-25 | — | 新增 `docs/服务器信息.md`：服务器规格、域名/DNS、架构、目录、数据库、环境变量、定时任务、备份恢复、SSL、安全、运维命令、发布流程、风险清单、费用 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 

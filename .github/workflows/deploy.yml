@@ -1,0 +1,70 @@
+name: Deploy to production
+
+# 触发：push 到 main、或手动点 Run workflow
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "deliverables/**"
+      - "**/*.md"
+  workflow_dispatch:
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Regression tests (53 assertions)
+        run: node web/test.js
+
+      # 需要三个仓库 Secret：
+      #   SSH_HOST  47.254.235.22
+      #   SSH_KEY   部署用私钥（建议单独生成一把，只用于部署）
+      #   SSH_USER  root（可选，默认 root）
+      - name: Prepare SSH
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          set -e
+          if [ -z "${SSH_KEY:-}" ] || [ -z "${SSH_HOST:-}" ]; then
+            echo "缺少 SSH_HOST / SSH_KEY，跳过部署。"; exit 1
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          KEY=~/.ssh/deploy_key HOST="$SSH_HOST" USER_="${SSH_USER:-root}" bash deploy/deploy.sh
+
+      - name: Smoke test (public URL)
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          set -e
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://kwongthye.com/api/health || true)
+            [ "$code" = "200" ] && break || sleep 3
+          done
+          echo "health HTTP $code"
+          [ "$code" = "200" ] || exit 1
+          curl -s https://kwongthye.com/api/health | grep -q '"ok":true'
+          echo "✓ production healthy"

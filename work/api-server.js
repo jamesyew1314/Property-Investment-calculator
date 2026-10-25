@@ -84,7 +84,17 @@ async function sendVerifyMail(userId, email) {
     "KWONG THYE 光泰",
     "https://kwongthye.com"
   ].join("\n");
-  return sendMail(email, "验证邮箱 / Verify your email — KWONG THYE", text);
+  let html = null;
+  try {
+    html = mailLayout.rich({
+      heading: "验证邮箱 / Verify your email",
+      lead: ["感谢注册 KWONG THYE。请点击下面的按钮完成邮箱验证（24 小时内有效）。",
+             "Thanks for signing up. Tap the button below to verify your email (valid for 24 hours)."],
+      cta: { url: link, label: "验证邮箱 / Verify email" },
+      note: "如果这不是您本人的操作，请忽略此邮件。\nIf you did not create an account, please ignore this email."
+    }).html;
+  } catch (e) {}
+  return sendMail(email, "验证邮箱 / Verify your email — KWONG THYE", text, null, [], html);
 }
 
 let smtpTransport = null;
@@ -100,12 +110,12 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
   });
 }
 
-async function sendMail(to, subject, text, replyToOverride, attachments) {
+async function sendMail(to, subject, text, replyToOverride, attachments, htmlOverride) {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.MAIL_FROM || (process.env.SMTP_USER ? "KWONG THYE <" + process.env.SMTP_USER + ">" : "KWONG THYE <noreply@kwongthye.com>");
   const replyTo = replyToOverride || process.env.MAIL_REPLY_TO || "jamesyew1314@gmail.com";
-  let html = null;
-  try { html = mailLayout.brand(subject, text).html; } catch (e) { html = null; }
+  let html = htmlOverride || null;
+  if (!html) { try { html = mailLayout.brand(subject, text).html; } catch (e) { html = null; } }
   if (smtpTransport) {
     try {
       await smtpTransport.sendMail({ from: from, to: to, replyTo: replyTo, subject: subject, text: text, html: html || undefined, attachments: attachments || [] });
@@ -241,7 +251,18 @@ app.post("/api/auth/login", rateLimit(5, 60000), async function (req, res, next)
         "",
         "KWONG THYE 光泰"
       ].join("\n");
-      try { await sendMail(u.email, "登录验证码 / Sign-in code — KWONG THYE", text); }
+      let html2 = null;
+      try {
+        html2 = mailLayout.rich({
+          heading: "登录验证码 / Sign-in code",
+          lead: ["您好，以下是您的 KWONG THYE 登录验证码，10 分钟内有效。",
+                 "Your KWONG THYE sign-in code — valid for 10 minutes."],
+          code: code,
+          codeNote: "10 分钟内有效 / valid for 10 minutes",
+          note: "如果这不是您本人的操作，请立即修改密码。\nIf this was not you, please change your password immediately."
+        }).html;
+      } catch (e) {}
+      try { await sendMail(u.email, "登录验证码 / Sign-in code — KWONG THYE", text, null, [], html2); }
       catch (e) { console.error("login code mail failed", u.email, e.message); return res.status(503).json({ ok: false, error: "mail_failed" }); }
       return res.json({ ok: true, twofa_required: true, challenge: challenge });
     }
@@ -433,10 +454,114 @@ app.post("/api/auth/resend-verification", requireAuth, rateLimit(3, 900000), asy
 app.get("/api/payments", requireAuth, async function (req, res, next) {
   try {
     const r = await pool.query(
-      "SELECT id, receipt_no, days, amount, currency, expires_after, created_at FROM payments WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50",
+      "SELECT p.id, p.receipt_no, p.days, p.amount, p.currency, p.expires_after, p.created_at, " +
+      "(SELECT r.status FROM refund_requests r WHERE r.payment_id = p.id ORDER BY r.created_at DESC LIMIT 1) AS refund_status " +
+      "FROM payments p WHERE p.user_id=$1 ORDER BY p.created_at DESC LIMIT 50",
       [req.user.id]);
     res.json({ ok: true, payments: r.rows, user: { email: req.user.email } });
   } catch (e) { next(e); }
+});
+
+// 退款申请（7 天内、同一张收据只能申请一次）
+app.post("/api/refunds", requireAuth, rateLimit(5, 600000), async function (req, res, next) {
+  try {
+    const paymentId = String((req.body || {}).paymentId || "");
+    const reason = String((req.body || {}).reason || "").trim().slice(0, 500);
+    if (!paymentId || reason.length < 4) return res.status(400).json({ ok: false, error: "bad_request" });
+    const p = await pool.query("SELECT id,receipt_no,amount,created_at FROM payments WHERE id=$1 AND user_id=$2", [paymentId, req.user.id]);
+    if (!p.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    const pay = p.rows[0];
+    if (Date.now() - new Date(pay.created_at).getTime() > 7 * 86400000) {
+      return res.status(400).json({ ok: false, error: "refund_window_closed" });
+    }
+    const ex = await pool.query("SELECT 1 FROM refund_requests WHERE payment_id=$1 AND status IN ('pending','approved')", [paymentId]);
+    if (ex.rowCount) return res.status(409).json({ ok: false, error: "already_requested" });
+    const r = await pool.query(
+      "INSERT INTO refund_requests(user_id,payment_id,reason) VALUES($1,$2,$3) RETURNING id,created_at",
+      [req.user.id, paymentId, reason]);
+    // 通知后台
+    const to = process.env.ADMIN_EMAIL || process.env.MAIL_REPLY_TO || "andylau.theroof@gmail.com";
+    try {
+      const html = mailLayout.rich({
+        heading: "新的退款申请 / New refund request",
+        lead: ["用户提交了退款申请，请到后台「退款」标签处理。",
+               req.user.email + " requested a refund."],
+        rows: [["用户 / User", req.user.email], ["收据 / Receipt", pay.receipt_no],
+               ["金额 / Amount", "RM " + Number(pay.amount).toFixed(2)], ["原因 / Reason", reason]],
+        cta: { url: "https://kwongthye.com/admin/", label: "打开后台 / Open admin" }
+      }).html;
+      await sendMail(to, "退款申请 / Refund request — " + pay.receipt_no, [
+        "用户：" + req.user.email,
+        "收据：" + pay.receipt_no + " RM " + Number(pay.amount).toFixed(2),
+        "原因：" + reason,
+        "",
+        "到后台「退款」标签处理。"
+      ].join("\n"), req.user.email, [], html);
+    } catch (e) { console.error("refund notify failed", e.message); }
+    res.status(201).json({ ok: true, refund: r.rows[0] });
+  } catch (e) { next(e); }
+});
+
+app.get("/api/refunds", requireAuth, async function (req, res, next) {
+  try {
+    const r = await pool.query(
+      "SELECT r.id, r.payment_id, r.reason, r.status, r.admin_note, r.created_at, r.decided_at, p.receipt_no, p.amount " +
+      "FROM refund_requests r LEFT JOIN payments p ON p.id = r.payment_id " +
+      "WHERE r.user_id=$1 ORDER BY r.created_at DESC", [req.user.id]);
+    res.json({ ok: true, refunds: r.rows });
+  } catch (e) { next(e); }
+});
+
+// 后台：退款列表 + 审批
+app.get("/api/admin/refunds", requireAdmin, async function (req, res, next) {
+  try {
+    const r = await pool.query(
+      "SELECT r.id, r.reason, r.status, r.admin_note, r.created_at, r.decided_at, " +
+      "u.email, p.receipt_no, p.amount, p.id AS payment_id " +
+      "FROM refund_requests r JOIN users u ON u.id = r.user_id " +
+      "LEFT JOIN payments p ON p.id = r.payment_id ORDER BY r.created_at DESC LIMIT 200");
+    res.json({ ok: true, refunds: r.rows });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/admin/refunds/:id/decide", requireAdmin, requireWrite, async function (req, res, next) {
+  const client = await pool.connect();
+  try {
+    const approve = !!(req.body || {}).approve;
+    const note = String((req.body || {}).note || "").slice(0, 500);
+    await client.query("BEGIN");
+    const r = await client.query(
+      "SELECT r.*, u.email FROM refund_requests r JOIN users u ON u.id = r.user_id WHERE r.id=$1 FOR UPDATE", [req.params.id]);
+    const row = r.rows[0];
+    if (!row) { await client.query("ROLLBACK"); return res.status(404).json({ ok: false, error: "not_found" }); }
+    if (row.status !== "pending") { await client.query("ROLLBACK"); return res.status(409).json({ ok: false, error: "already_decided" }); }
+    await client.query(
+      "UPDATE refund_requests SET status=$2, admin_note=$3, decided_at=now(), decided_by=$4 WHERE id=$1",
+      [row.id, approve ? "approved" : "rejected", note || null, req.admin.id || null]);
+    if (approve) {
+      // 退款成功：撤销专业版（方案保留，不删除）
+      await client.query("UPDATE users SET plan='free', plan_expires_at=NULL WHERE id=$1", [row.user_id]);
+    }
+    await client.query("COMMIT");
+    await adminLog(approve ? "refund.approve" : "refund.reject", row.email + " " + (note || ""), req);
+    try {
+      const html = mailLayout.rich({
+        heading: approve ? "退款已处理 / Refund approved" : "退款申请未通过 / Refund declined",
+        lead: approve
+          ? ["您的退款申请已批准，款项将按原付款方式退回（银行转账一般 3–7 个工作日内到账）。专业版已停用，已保存的方案不会被删除。",
+             "Your refund has been approved. The amount will be returned via your original payment method (3–7 business days). Pro has been switched off; your saved plans are kept."]
+          : ["很抱歉，本次退款申请未通过。", "Unfortunately this refund request was not approved."],
+        rows: note ? [["说明 / Note", note]] : [],
+        cta: { url: "https://kwongthye.com/calc/", label: "回到计算器 / Back to calculator" }
+      }).html;
+      await sendMail(row.email, (approve ? "退款已批准 / Refund approved — " : "退款未通过 / Refund declined — ") + "KWONG THYE",
+        (approve ? "您的退款申请已批准，专业版已停用。已保存方案保留。" : "本次退款申请未通过。") + (note ? "\n说明：" + note : ""), null, [], html);
+    } catch (e) { console.error("refund mail failed", e.message); }
+    res.json({ ok: true });
+  } catch (e) {
+    await client.query("ROLLBACK");
+    next(e);
+  } finally { client.release(); }
 });
 
 app.get("/api/payments/:id/receipt.pdf", requireAuth, async function (req, res, next) {
@@ -604,8 +729,19 @@ app.post("/api/admin/login", rateLimit(5, 600000), async function (req, res) {
   const code = String(Math.floor(100000 + Math.random() * 900000));
   await pool.query("INSERT INTO admin_otps(code_hash,expires_at,email) VALUES($1, now() + interval '10 minutes',$2)", [sha256(code), to]);
   try {
-    await sendMail(to, "后台验证码 / Admin code — KWONG THYE",
-      "您的后台登录验证码 / Your admin login code:\n\n" + code + "\n\n10 分钟内有效 / valid for 10 minutes.");
+    const otpText = "您的后台登录验证码 / Your admin login code:\n\n" + code + "\n\n10 分钟内有效 / valid for 10 minutes.";
+    let otpHtml = null;
+    try {
+      otpHtml = mailLayout.rich({
+        heading: "后台验证码 / Admin code",
+        lead: ["这是 KWONG THYE 管理后台的登录验证码，10 分钟内有效。",
+               "Your KWONG THYE admin sign-in code — valid for 10 minutes."],
+        code: code,
+        codeNote: "仅本人使用，请勿转发 / never share this code",
+        note: "如非本人操作，请立即在后台修改密码。\nIf this was not you, change the admin password immediately."
+      }).html;
+    } catch (e) {}
+    await sendMail(to, "后台验证码 / Admin code — KWONG THYE", otpText, null, [], otpHtml);
   } catch (e) { console.error("admin otp mail failed", e.message); return res.status(500).json({ ok: false, error: "mail_failed" }); }
   res.json({ ok: true, needOtp: true, email: to, role: role, adminId: adminId });
 });
@@ -866,6 +1002,45 @@ app.post("/api/admin/promo", requireAdmin, requireWrite, async function (req, re
   } catch (e) { next(e); }
 });
 
+// 近 N 天趋势（收入 / 新用户 / 浏览量 / 收据数），用于后台图表
+app.get("/api/admin/charts", requireAdmin, async function (req, res, next) {
+  try {
+    const days = Math.max(7, Math.min(90, parseInt(req.query.days || "14", 10) || 14));
+    const series = async function (sql) {
+      const r = await pool.query(sql, [days]);
+      return r.rows.map(function (x) { return { day: String(x.day).slice(0, 10), n: Number(x.n) }; });
+    };
+    const revenue = await series(
+      "SELECT to_char(d.day,'YYYY-MM-DD') AS day, coalesce(sum(p.amount),0) AS n " +
+      "FROM generate_series((now()::date - ($1::int - 1)), now()::date, interval '1 day') d(day) " +
+      "LEFT JOIN payments p ON p.created_at::date = d.day GROUP BY d.day ORDER BY d.day");
+    const signups = await series(
+      "SELECT to_char(d.day,'YYYY-MM-DD') AS day, count(u.id) AS n " +
+      "FROM generate_series((now()::date - ($1::int - 1)), now()::date, interval '1 day') d(day) " +
+      "LEFT JOIN users u ON u.created_at::date = d.day GROUP BY d.day ORDER BY d.day");
+    const views = await series(
+      "SELECT to_char(d.day,'YYYY-MM-DD') AS day, count(v.id) AS n " +
+      "FROM generate_series((now()::date - ($1::int - 1)), now()::date, interval '1 day') d(day) " +
+      "LEFT JOIN pageviews v ON v.created_at::date = d.day GROUP BY d.day ORDER BY d.day");
+    const f = await pool.query(
+      "SELECT (SELECT count(*)::int FROM users) AS users, " +
+      "(SELECT count(*)::int FROM users WHERE plan='pro' AND (plan_expires_at IS NULL OR plan_expires_at > now())) AS pro, " +
+      "(SELECT count(*)::int FROM users WHERE email_verified_at IS NOT NULL) AS verified, " +
+      "(SELECT count(*)::int FROM plans) AS plans, " +
+      "(SELECT coalesce(sum(amount),0) FROM payments WHERE created_at::date = now()::date) AS today_revenue, " +
+      "(SELECT coalesce(sum(amount),0) FROM payments) AS total_revenue");
+    const k = f.rows[0] || {};
+    res.json({
+      ok: true, days: days, revenue: revenue, signups: signups, views: views,
+      totals: {
+        users: k.users, pro: k.pro, verified: k.verified, plans: k.plans,
+        todayRevenue: Number(k.today_revenue || 0), totalRevenue: Number(k.total_revenue || 0),
+        conversion: k.users ? Math.round((k.pro / k.users) * 1000) / 10 : 0
+      }
+    });
+  } catch (e) { next(e); }
+});
+
 app.get("/api/admin/codes", requireAdmin, async function (req, res, next) {
   try {
     const r = await pool.query(
@@ -1048,8 +1223,23 @@ app.post("/api/subscription/redeem", requireAuth, requireVerified, rateLimit(10,
         "KWONG THYE 光泰",
         "https://kwongthye.com/calc/"
       ].join("\n");
+      let html4 = null;
+      try {
+        html4 = mailLayout.rich({
+          heading: "收据 / Receipt — " + pay.rows[0].receipt_no,
+          lead: ["已收到您的付款，专业版已开通 / 续费。",
+                 "Payment received — your Pro plan is now active."],
+          rows: [
+            ["收据编号 / Receipt No.", pay.rows[0].receipt_no],
+            ["金额 / Amount", "RM " + Number(pay.rows[0].amount).toFixed(2)],
+            ["有效期至 / Valid until", new Date(u.rows[0].plan_expires_at).toLocaleDateString("en-MY")]
+          ],
+          cta: { url: "https://kwongthye.com/receipt/?id=" + pay.rows[0].id, label: "查看收据 / View receipt" },
+          note: "收据 PDF 也作为附件发送；可在「我的账号 → 付款记录」随时下载。\nThe receipt PDF is attached and can be downloaded anytime under Account → Payments."
+        }).html;
+      } catch (e) {}
       await sendMail(req.user.email, "收据 / Receipt — " + pay.rows[0].receipt_no + " · KWONG THYE", text, null,
-        [{ filename: pay.rows[0].receipt_no + ".pdf", content: pdf }]);
+        [{ filename: pay.rows[0].receipt_no + ".pdf", content: pdf }], html4);
       console.log("receipt mail sent", pay.rows[0].receipt_no, req.user.email);
     } catch (e) { console.error("receipt mail failed", e.message); }
   } catch (e) {

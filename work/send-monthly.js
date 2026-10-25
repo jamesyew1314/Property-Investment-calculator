@@ -97,10 +97,26 @@ function buildBody(u, tip) {
   let sent = 0, failed = 0;
 
   for (const u of r.rows) {
+    const unsub = SITE + "/api/unsubscribe?u=" + u.id + "&t=" + unsubToken(u.id);
     const subject = (TEST_TO ? "[TEST] " : "") + "本月房地产小抄 / Your monthly property note — KWONG THYE";
     const text = buildBody(u, tip);
     try {
-      await transport.sendMail({ from: from, to: TEST_TO || u.email, replyTo: replyTo, subject: subject, text: text, html: mailLayout.brand(subject, text).html });
+      let html = null;
+      try {
+        html = mailLayout.rich({
+          heading: "本月小抄 / Monthly note",
+          lead: [
+            tip.zh,
+            tip.en,
+            "把这个月要看的单位存成方案，用「方案对比」一眼看出哪间更值得买。 / Save this month's shortlisted units as plans, then use Scenario comparison."
+          ],
+          cta: { url: SITE + "/calc/", label: "打开计算器 / Open the calculator" },
+          note: (u.plan === "pro" ? "您的专业版有效期至 " + new Date(u.plan_expires_at).toLocaleDateString("en-MY") + "。\n"
+                                  : "免费版仅计算；专业版 RM9.90/月 或 RM99/年 可解锁云端存档、报告与分享。\n") +
+                "退订 / Unsubscribe: " + unsub
+        }).html;
+      } catch (e) {}
+      await transport.sendMail({ from: from, to: TEST_TO || u.email, replyTo: replyTo, subject: subject, text: text, html: html || mailLayout.brand(subject, text).html });
       if (!TEST_TO) await pool.query("UPDATE users SET monthly_sent_at = now() WHERE id=$1", [u.id]);
       sent++;
       console.log("sent", u.email);

@@ -53,6 +53,18 @@
   .muted{color:var(--muted);font-size:11.5px}
   .tag{display:inline-block;border-radius:999px;padding:1px 8px;font-size:11px;background:#EEF2F8;color:#456}
   .tag.pro{background:#EAF6EF;color:#166E52}
+  .charts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 18px}
+  .chart{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .chartHead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+  .chartHead b{font-size:12.5px;color:var(--navy)}
+  .bars{display:flex;flex-direction:column;gap:3px}
+  .barRow{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+  .barRow .d{flex:0 0 46px;font-variant-numeric:tabular-nums}
+  .barRow .track{flex:1 1 auto;background:#F1F4F9;border-radius:4px;height:9px;overflow:hidden}
+  .barRow .fill{height:9px;background:linear-gradient(90deg,#2E5496,#0E2438);border-radius:4px}
+  .barRow .fill.gold{background:linear-gradient(90deg,#E3C98F,#C6A15B)}
+  .barRow .v{flex:0 0 54px;text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+  @media(max-width:820px){.charts{grid-template-columns:1fr}}
   .exportBar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 14px}
   .exportBar .btn{padding:6px 14px;font-size:12px;text-decoration:none;display:inline-block}
   @media(max-width:820px){.stats{grid-template-columns:repeat(3,1fr)}.grid,.grid3{grid-template-columns:1fr}}
@@ -97,6 +109,21 @@
       </div>
       <div class="stats" id="stats"></div>
 
+      <div class="charts">
+        <div class="chart">
+          <div class="chartHead"><b data-i18n="chRevenue">近 14 天收入</b><span class="muted" id="chRevSum"></span></div>
+          <div class="bars" id="chRev"></div>
+        </div>
+        <div class="chart">
+          <div class="chartHead"><b data-i18n="chUsers">近 14 天新用户</b><span class="muted" id="chUserSum"></span></div>
+          <div class="bars" id="chUsers"></div>
+        </div>
+        <div class="chart">
+          <div class="chartHead"><b data-i18n="chViews">近 14 天浏览量</b><span class="muted" id="chViewSum"></span></div>
+          <div class="bars" id="chViews"></div>
+        </div>
+      </div>
+
       <div class="tabs">
         <button data-tab="codes" class="on" data-i18n="tabCodes">生成开通码</button>
         <button data-tab="promo" data-i18n="tabPromo">优惠码</button>
@@ -104,6 +131,7 @@
         <button data-tab="users" data-i18n="tabUsers">用户</button>
         <button data-tab="msgs" data-i18n="tabMsgs">留言</button>
         <button data-tab="views" data-i18n="tabViews">访问量</button>
+        <button data-tab="refunds" data-i18n="tabRefunds">退款</button>
         <button data-tab="logs" data-i18n="tabLogs">操作日志</button>
         <button data-tab="admins" id="tabBtnAdmins" hidden data-i18n="tabAdmins">管理员</button>
       </div>
@@ -203,6 +231,16 @@
         </div>
       </section>
 
+      <section class="tab" id="tab-refunds">
+        <div class="card" style="padding:0;overflow:auto;max-height:70vh">
+          <table><thead><tr>
+            <th data-i18n="thTime">时间</th><th data-i18n="thEmail">邮箱</th><th data-i18n="thReceipt">收据</th>
+            <th data-i18n="thAmount">金额</th><th data-i18n="thReason">原因</th><th data-i18n="thStatus">状态</th>
+            <th data-i18n="thActions">操作</th>
+          </tr></thead><tbody id="refundBody"></tbody></table>
+        </div>
+      </section>
+
       <section class="tab" id="tab-logs">
         <div class="card" style="padding:0;overflow:auto;max-height:70vh">
           <table><thead><tr>
@@ -254,9 +292,14 @@
       lblAdminEmail: "管理员邮箱（owner 留空）", lblPassword: "密码", btnLogin: "登录",
       lblOtp: "邮箱验证码（6 位）", btnVerify: "验证并进入", otpNote: "验证码已发到管理员邮箱，10 分钟内有效。",
       overview: "后台概览", loggedAt: "已登录 · {d}",
+      chRevenue: "近 14 天收入", chUsers: "近 14 天新用户", chViews: "近 14 天浏览量",
+      chTotal: "累计", chConv: "付费转化率",
       exportLbl: "导出 CSV：", expUsers: "用户", expCodes: "开通码", expPayments: "收据",
       tabCodes: "生成开通码", tabPromo: "优惠码", tabList: "码列表", tabUsers: "用户",
-      tabMsgs: "留言", tabViews: "访问量", tabLogs: "操作日志", tabAdmins: "管理员",
+      tabMsgs: "留言", tabViews: "访问量", tabRefunds: "退款", tabLogs: "操作日志", tabAdmins: "管理员",
+      thReceipt: "收据", thReason: "原因",
+      rfPending: "待处理", rfApproved: "已退款", rfRejected: "已拒绝", rfApprove: "批准退款", rfDecline: "拒绝",
+      rfNoteApprove: "批准退款（会立即停用该用户专业版，可写备注）：", rfNoteReject: "拒绝退款（可写原因，用户会收到邮件）：",
       lblDays: "天数", lblDays2: "天数", lblCount: "数量", lblAmountAuto: "金额 RM（留空自动）",
       lblNoteOpt: "备注（可选）", phAuto: "自动", phNote: "例：10 月促销 / 客户姓名",
       btnGenerate: "生成", opt30: "30 天（月付）", opt365: "365 天（年付）", opt90: "90 天", opt180: "180 天",
@@ -303,9 +346,14 @@
       lblAdminEmail: "Admin email (leave blank for owner)", lblPassword: "Password", btnLogin: "Sign in",
       lblOtp: "Email code (6 digits)", btnVerify: "Verify & enter", otpNote: "A code was emailed to the admin mailbox, valid for 10 minutes.",
       overview: "Overview", loggedAt: "Signed in · {d}",
+      chRevenue: "Revenue · 14 days", chUsers: "New users · 14 days", chViews: "Pageviews · 14 days",
+      chTotal: "Total", chConv: "Paid conversion",
       exportLbl: "Export CSV:", expUsers: "Users", expCodes: "Activation codes", expPayments: "Receipts",
       tabCodes: "Create codes", tabPromo: "Promo codes", tabList: "All codes", tabUsers: "Users",
-      tabMsgs: "Enquiries", tabViews: "Traffic", tabLogs: "Audit log", tabAdmins: "Admins",
+      tabMsgs: "Enquiries", tabViews: "Traffic", tabRefunds: "Refunds", tabLogs: "Audit log", tabAdmins: "Admins",
+      thReceipt: "Receipt", thReason: "Reason",
+      rfPending: "Pending", rfApproved: "Refunded", rfRejected: "Declined", rfApprove: "Approve", rfDecline: "Decline",
+      rfNoteApprove: "Approve refund (Pro will be switched off immediately; optional note):", rfNoteReject: "Decline refund (reason is emailed to the user):",
       lblDays: "Days", lblDays2: "Days", lblCount: "Quantity", lblAmountAuto: "Amount RM (blank = auto)",
       lblNoteOpt: "Note (optional)", phAuto: "auto", phNote: "e.g. October promo / customer name",
       btnGenerate: "Generate", opt30: "30 days (monthly)", opt365: "365 days (yearly)", opt90: "90 days", opt180: "180 days",
@@ -388,7 +436,7 @@
     if (isApp) {
       renderRoleTag();
       renderWhoLine();
-      loadStats(); loadList(); loadUsers($("uQuery").value.trim());
+      loadStats(); loadCharts(); loadList(); loadUsers($("uQuery").value.trim()); loadRefunds();
       loadMsgs(); loadViews(); loadLogs();
       if (myRole === "owner") loadAdmins();
     }
@@ -416,6 +464,32 @@
       var items = [[t("statUsers"), j.users], [t("statPro"), j.pro], [t("statPlans"), j.plans],
         [t("statMessages"), j.messages], [t("statPayments"), j.payments], [t("statViews"), j.views7]];
       $("stats").innerHTML = items.map(function (x) { return '<div class="stat"><b>' + x[1] + "</b><span>" + x[0] + "</span></div>"; }).join("");
+    });
+  }
+
+  function renderBars(el, data, opts) {
+    if (!el) return;
+    opts = opts || {};
+    const max = Math.max(1, ...data.map(d => d.n));
+    el.innerHTML = data.map(function (d) {
+      const w = Math.round((d.n / max) * 100);
+      const label = d.day.slice(5).replace("-", "/");
+      const val = opts.money ? ("RM" + (d.n >= 1000 ? (d.n / 1000).toFixed(1) + "k" : d.n.toFixed(0))) : String(d.n);
+      return '<div class="barRow"><span class="d">' + label + '</span>' +
+        '<span class="track"><span class="fill' + (opts.gold ? " gold" : "") + '" style="width:' + w + '%"></span></span>' +
+        '<span class="v">' + val + "</span></div>";
+    }).join("");
+  }
+  function loadCharts() {
+    api("/charts?days=14").then(function (j) {
+      if (!j.ok) return;
+      renderBars($("chRev"), j.revenue || [], { money: true, gold: true });
+      renderBars($("chUsers"), j.signups || []);
+      renderBars($("chViews"), j.views || []);
+      const sum = function (arr) { return (arr || []).reduce(function (a, b) { return a + Number(b.n || 0); }, 0); };
+      $("chRevSum").textContent = "RM " + sum(j.revenue).toFixed(2) + " · " + t("chTotal") + " RM " + Number(j.totals.totalRevenue || 0).toFixed(2);
+      $("chUserSum").textContent = "+" + sum(j.signups) + " · " + t("chConv") + " " + (j.totals.conversion || 0) + "%";
+      $("chViewSum").textContent = sum(j.views) + " PV";
     });
   }
 
@@ -462,6 +536,37 @@
       $("topBody").innerHTML = (j.top || []).map(function (tp) { return "<tr><td class='mono'>" + esc(tp.path) + "</td><td>" + tp.views + "</td></tr>"; }).join("");
     });
   }
+
+  function loadRefunds() {
+    api("/refunds").then(function (j) {
+      if (!j.ok) return;
+      const badge = function (st) {
+        if (st === "pending") return '<span class="tag" style="background:#FFF3CD;color:#7A5B12">' + t("rfPending") + "</span>";
+        if (st === "approved") return '<span class="tag pro">' + t("rfApproved") + "</span>";
+        return '<span class="tag" style="background:#FDECEC;color:#B23B3B">' + t("rfRejected") + "</span>";
+      };
+      $("refundBody").innerHTML = (j.refunds || []).map(function (r) {
+        const acts = r.status === "pending"
+          ? '<button class="btn gold" style="padding:4px 10px;font-size:11px" data-rf="ok" data-id="' + r.id + '">' + t("rfApprove") + "</button> " +
+            '<button class="btn ghost" style="padding:4px 10px;font-size:11px" data-rf="no" data-id="' + r.id + '">' + t("rfDecline") + "</button>"
+          : '<span class="muted">' + (r.admin_note ? esc(r.admin_note) : "—") + "</span>";
+        return "<tr><td class='muted'>" + String(r.created_at).slice(0, 16).replace("T", " ") + "</td><td>" + esc(r.email) +
+          "</td><td class='mono'>" + esc(r.receipt_no || "—") + "</td><td>RM" + Number(r.amount || 0).toFixed(2) +
+          "</td><td>" + esc(r.reason) + "</td><td>" + badge(r.status) + "</td><td>" + acts + "</td></tr>";
+      }).join("") || "<tr><td colspan=7 class='muted'>" + t("empty") + "</td></tr>";
+    });
+  }
+  $("refundBody").addEventListener("click", function (e) {
+    const b = e.target.closest("button[data-rf]"); if (!b) return;
+    const approve = b.getAttribute("data-rf") === "ok";
+    const note = prompt(approve ? t("rfNoteApprove") : t("rfNoteReject"), "");
+    if (note == null) return;
+    api("/refunds/" + b.getAttribute("data-id") + "/decide", { method: "POST", body: { approve: approve, note: note } })
+      .then(function (j) {
+        if (!j.ok) alert(t("failed", { e: j.error || j._status }));
+        loadRefunds(); loadLogs(); loadStats();
+      });
+  });
 
   function loadLogs() {
     api("/logs").then(function (j) {
@@ -558,7 +663,7 @@
   function boot(me) {
     show(true);
     applyRole(me && me.role);
-    loadStats(); loadList(); loadUsers(""); loadMsgs(); loadViews(); loadLogs();
+    loadStats(); loadCharts(); loadList(); loadUsers(""); loadMsgs(); loadViews(); loadLogs();
     if (myRole === "owner") loadAdmins();
     $("logoutBtn").onclick = function () {
       api("/logout", { method: "POST" }).then(function () { show(false); });
@@ -630,6 +735,7 @@
       if (b.getAttribute("data-tab") === "views") loadViews();
       if (b.getAttribute("data-tab") === "logs") loadLogs();
       if (b.getAttribute("data-tab") === "admins") loadAdmins();
+      if (b.getAttribute("data-tab") === "refunds") loadRefunds();
     };
   });
 
