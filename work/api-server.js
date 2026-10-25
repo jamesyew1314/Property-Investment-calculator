@@ -186,17 +186,23 @@ app.get("/api/health", async function (req, res) {
 });
 
 // ---------- auth ----------
+const TERMS_VERSION = "2026-10";
+
 app.post("/api/auth/register", rateLimit(5, 60000), async function (req, res, next) {
   try {
     const email = String((req.body || {}).email || "").trim().toLowerCase();
     const password = String((req.body || {}).password || "");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ ok: false, error: "bad_email" });
     if (password.length < 8) return res.status(400).json({ ok: false, error: "weak_password" });
+    if (!(req.body || {}).acceptTerms) return res.status(400).json({ ok: false, error: "terms_required" });
     const ex = await pool.query("SELECT 1 FROM users WHERE email=$1", [email]);
     if (ex.rowCount) return res.status(409).json({ ok: false, error: "email_exists" });
+    const ipHash = crypto.createHash("sha256")
+      .update((req.ip || "") + (process.env.IP_SALT || "fc")).digest("hex").slice(0, 24);
     const r = await pool.query(
-      "INSERT INTO users(email,password_hash) VALUES($1,$2) RETURNING id,email,display_name,plan,plan_expires_at",
-      [email, scryptHash(password)]);
+      "INSERT INTO users(email,password_hash,terms_accepted_at,terms_version,terms_ip_hash) " +
+      "VALUES($1,$2,now(),$3,$4) RETURNING id,email,display_name,plan,plan_expires_at",
+      [email, scryptHash(password), TERMS_VERSION, ipHash]);
     const token = await createSession(r.rows[0].id);
     setSessionCookie(res, token);
     try {
@@ -746,6 +752,66 @@ app.post("/api/admin/users/:id/free", requireAdmin, requireWrite, async function
     if (!r.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
     await adminLog("user.free", r.rows[0].email, req);
     res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+
+// ---------- 后台 CSV 导出 ----------
+function csvCell(v) {
+  const s = v == null ? "" : String(v);
+  return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function sendCsv(res, filename, header, rows) {
+  const lines = [header.map(csvCell).join(",")].concat(rows.map(function (r) { return r.map(csvCell).join(","); }));
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="' + filename + '"');
+  res.send("\ufeff" + lines.join("\r\n"));
+}
+
+app.get("/api/admin/export/users.csv", requireAdmin, async function (req, res, next) {
+  try {
+    const r = await pool.query(
+      "SELECT email,plan,plan_expires_at,email_verified_at,terms_accepted_at,terms_version,twofa_enabled,monthly_opt_out,created_at " +
+      "FROM users ORDER BY created_at");
+    const rows = r.rows.map(function (u) {
+      return [u.email, u.plan, u.plan_expires_at ? new Date(u.plan_expires_at).toISOString().slice(0, 10) : "",
+        u.email_verified_at ? "yes" : "no", u.terms_accepted_at ? new Date(u.terms_accepted_at).toISOString().slice(0, 10) : "",
+        u.terms_version || "", u.twofa_enabled ? "on" : "off", u.monthly_opt_out ? "unsubscribed" : "subscribed",
+        new Date(u.created_at).toISOString().slice(0, 10)];
+    });
+    await adminLog("export_users", "rows=" + rows.length, req);
+    sendCsv(res, "kwongthye-users-" + new Date().toISOString().slice(0, 10) + ".csv",
+      ["email", "plan", "plan_expires_at", "email_verified", "terms_accepted_at", "terms_version", "2fa", "monthly_email", "created_at"], rows);
+  } catch (e) { next(e); }
+});
+
+app.get("/api/admin/export/codes.csv", requireAdmin, async function (req, res, next) {
+  try {
+    const r = await pool.query(
+      "SELECT code,days,amount,used_count,max_uses,label,note,expires_at,created_at FROM redeem_codes ORDER BY created_at DESC");
+    const rows = r.rows.map(function (c) {
+      return [c.code, c.days, Number(c.amount).toFixed(2), c.used_count, c.max_uses, c.label || "",
+        c.note || "", c.expires_at ? new Date(c.expires_at).toISOString().slice(0, 10) : "",
+        new Date(c.created_at).toISOString().slice(0, 10)];
+    });
+    await adminLog("export_codes", "rows=" + rows.length, req);
+    sendCsv(res, "kwongthye-codes-" + new Date().toISOString().slice(0, 10) + ".csv",
+      ["code", "days", "amount", "used", "max_uses", "type", "note", "expires_at", "created_at"], rows);
+  } catch (e) { next(e); }
+});
+
+app.get("/api/admin/export/payments.csv", requireAdmin, async function (req, res, next) {
+  try {
+    const r = await pool.query(
+      "SELECT p.receipt_no,p.amount,p.days,p.currency,p.expires_after,p.created_at,u.email " +
+      "FROM payments p LEFT JOIN users u ON u.id=p.user_id ORDER BY p.created_at DESC");
+    const rows = r.rows.map(function (x) {
+      return [x.receipt_no, Number(x.amount).toFixed(2), x.currency, x.days, x.email || "",
+        x.expires_after ? new Date(x.expires_after).toISOString().slice(0, 10) : "",
+        new Date(x.created_at).toISOString().slice(0, 10)];
+    });
+    await adminLog("export_payments", "rows=" + rows.length, req);
+    sendCsv(res, "kwongthye-receipts-" + new Date().toISOString().slice(0, 10) + ".csv",
+      ["receipt_no", "amount", "currency", "days", "user_email", "valid_until", "created_at"], rows);
   } catch (e) { next(e); }
 });
 

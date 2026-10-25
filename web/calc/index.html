@@ -118,6 +118,9 @@
   .printOpts{display:flex;gap:10px;flex-wrap:wrap;margin:2px 0 10px}
   .printOpts label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#4A5563}
   .printOpts select{padding:7px 8px;border:1px solid #D8DEE9;border-radius:8px;font:inherit;font-size:12.5px;background:#fff}
+  .termsLine{display:flex;gap:7px;align-items:flex-start;font-size:12px;color:#4A5563;line-height:1.5;margin:2px 0 8px;cursor:pointer}
+  .termsLine input{flex:none;width:15px;height:15px;margin:2px 0 0}
+  .termsLine a{color:#2E5496}
   .cmpTable th,.cmpTable td{border:1px solid #E6E9F0;padding:7px 8px;text-align:right}
   .cmpTable th:first-child,.cmpTable td:first-child{text-align:left;color:#4A5563}
   .cmpTable thead th{background:#F7F9FC;color:var(--navy)}
@@ -406,6 +409,13 @@
     <div id="acctLoggedOut">
       <div class="row"><label data-i18n="fEmail">邮箱</label><input class="manual" id="acctEmail" type="email" autocomplete="email" inputmode="email"><span class="unit"></span></div>
       <div class="row"><label data-i18n="fPassword">密码</label><input class="manual" id="acctPassword" type="password" autocomplete="current-password"><span class="unit"></span></div>
+      <label class="termsLine">
+        <input type="checkbox" id="acceptTerms">
+        <span><span data-i18n="termsAgree">注册即表示我同意</span>
+          <a href="/terms/" target="_blank" rel="noopener" data-i18n="legalTerms">使用条款</a>
+          <span data-i18n="andWord">与</span>
+          <a href="/privacy/" target="_blank" rel="noopener" data-i18n="legalPrivacy">隐私政策</a></span>
+      </label>
       <div class="btnRow">
         <button class="btn" id="loginBtn" data-i18n="btnLogin">登录</button>
         <button class="btn btn2" id="registerBtn" data-i18n="btnRegister">注册</button>
@@ -556,6 +566,7 @@
       monthlyLabel: "月度邮件（每月 1 封）", monthlyOn: "已订阅", monthlyOff: "已退订",
       btnMonthlyStop: "退订", btnMonthlyResume: "重新订阅",
       toastMonthlyOn: "已订阅月度邮件", toastMonthlyOff: "已退订月度邮件",
+      termsAgree: "注册即表示我同意", andWord: "与", errTerms: "请先勾选同意使用条款与隐私政策",
       twofaNote: "两步验证已开启。请输入我们发到您邮箱的 6 位验证码。",
       twofaCodeLbl: "验证码", btn2faGo: "验证并登录", twofaLabel: "两步验证（邮件验证码）",
       btn2faOn: "开启", btn2faOff: "关闭", twofaOnState: "已开启", twofaOffState: "未开启",
@@ -660,6 +671,7 @@
       monthlyLabel: "Monthly email (one per month)", monthlyOn: "Subscribed", monthlyOff: "Unsubscribed",
       btnMonthlyStop: "Unsubscribe", btnMonthlyResume: "Re-subscribe",
       toastMonthlyOn: "Subscribed to the monthly email", toastMonthlyOff: "Unsubscribed from the monthly email",
+      termsAgree: "By registering I agree to the", andWord: "and", errTerms: "Please tick to accept the Terms and Privacy Policy first",
       twofaNote: "Two-step verification is on. Enter the 6-digit code we emailed you.",
       twofaCodeLbl: "Code", btn2faGo: "Verify & sign in", twofaLabel: "Two-step verification (email code)",
       btn2faOn: "Turn on", btn2faOff: "Turn off", twofaOnState: "On", twofaOffState: "Off",
@@ -1598,6 +1610,7 @@
   function errMsg(code) {
     var map = { bad_email: "errEmail", weak_password: "errPassword", email_exists: "errExists", bad_credentials: "errLogin",
       rate_limited: "errRate", quota_exceeded: "errQuota", email_unverified: "errUnverified", bad_code: "badCode",
+      terms_required: "errTerms",
       code_expired: "codeExpired", too_many_attempts: "tooManyAttempts", mail_failed: "errMail" };
     return t(map[code] || "errGeneric");
   }
@@ -1648,8 +1661,12 @@
   function authAction(path) {
     var email = $("acctEmail").value.trim();
     var password = $("acctPassword").value;
+    var isRegister = path.indexOf("register") >= 0;
     if (!email || !password) { toast(t("errEmail")); return; }
-    api(path, { method: "POST", body: { email: email, password: password } }).then(function (j) {
+    if (isRegister && !$("acceptTerms").checked) { toast(t("errTerms")); return; }
+    var payload = { email: email, password: password };
+    if (isRegister) payload.acceptTerms = true;
+    api(path, { method: "POST", body: payload }).then(function (j) {
       if (j.ok && j.twofa_required) {
         twofaChallenge = j.challenge;
         $("acctPassword").value = "";
