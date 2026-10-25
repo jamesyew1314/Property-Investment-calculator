@@ -60,6 +60,16 @@ async function main() {
     backupLine = require("path").basename(dump) + " · " + sizeMb + " MB · " + hours + " 小时前 · " + hasSha;
   }
 
+  // 异地备份状态
+  let offsiteLine = "未配置";
+  try {
+    const conf = fs.readFileSync("/etc/fangchan-offsite.conf", "utf8");
+    const bucket = (conf.match(/^OSS_BUCKET=(.+)$/m) || [])[1] || "";
+    const last = parseInt(fs.readFileSync("/srv/fangchan/logs/.offsite-last", "utf8").trim(), 10);
+    const h = Math.floor((Date.now() - last * 1000) / 3600000);
+    offsiteLine = "oss://" + bucket + "/db/ · 上次上传 " + h + " 小时前" + (h < 26 ? " ✅" : " ⚠️");
+  } catch (e) { offsiteLine = "未配置或从未成功上传"; }
+
   let failing = "全部正常";
   try {
     const st = JSON.parse(fs.readFileSync("/srv/fangchan/logs/monitor-state.json", "utf8"));
@@ -92,7 +102,8 @@ async function main() {
     "方案总数：" + plans,
     "",
     "【备份】",
-    backupLine,
+    "本地：" + backupLine,
+    "异地：" + offsiteLine,
     "",
     "【监控】",
     "未通过项：" + failing,

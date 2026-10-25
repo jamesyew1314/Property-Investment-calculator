@@ -2,9 +2,9 @@
 # 异地备份：把当日 dump + 校验文件上传到阿里云 OSS（新加坡/吉隆坡区域均可）
 # 依赖：ossutil（阿里云官方命令行工具）。未配置时脚本会明确报错并通知，不会静默失败。
 # 配置一次即可：
-#   1) OSS 控制台建 Bucket（同区域 oss-ap-southeast-5，读写权限「私有」）
+#   1) OSS 控制台建 Bucket（同区域「马来西亚（吉隆坡）」oss-ap-southeast-3，读写权限「私有」）
 #   2) RAM 用户只给该 Bucket 的 PutObject/GetObject 权限，生成 AccessKey
-#   3) ossutil config -e oss-ap-southeast-5.aliyuncs.com -i <AK> -k <SK>   （写入 /root/.ossutilconfig）
+#   3) ossutil config -e oss-ap-southeast-3.aliyuncs.com -i <AK> -k <SK>   （写入 /root/.ossutilconfig）
 #   4) 把桶名写进 /etc/fangchan-offsite.conf：  OSS_BUCKET=kwongthye-backup
 set -uo pipefail
 
@@ -20,7 +20,7 @@ alert() { node /srv/fangchan/ops/notify.js "[KWONG THYE] 异地备份失败" "$1
 [ -f "$CONF" ] && . "$CONF"
 BUCKET="${OSS_BUCKET:-}"
 OSSUTIL="${OSSUTIL_BIN:-$(command -v ossutil || echo /usr/local/bin/ossutil)}"
-ENDPOINT="${OSS_ENDPOINT:-oss-ap-southeast-5.aliyuncs.com}"
+ENDPOINT="${OSS_ENDPOINT:-oss-ap-southeast-3.aliyuncs.com}"   # 吉隆坡，与 ECS 同区
 
 if [ -z "$BUCKET" ]; then
   log "SKIP not configured ($CONF missing OSS_BUCKET)"; exit 0
