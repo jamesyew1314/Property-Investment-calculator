@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>找不到页面 / Page not found — KWONG THYE 光泰</title>
+<link rel="icon" type="image/png" href="/icon-256.png">
+<style>
+  :root{--navy:#0E2438;--gold:#C6A15B;--cream:#F7F4EE;--ink:#1B2430;--muted:#6B7787;--line:#E6E1D6}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  header{background:var(--navy);padding:16px 0}
+  header .wrap{width:min(880px,92vw);margin:0 auto;display:flex;align-items:center;gap:10px}
+  header img{height:36px}
+  main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+  .box{width:min(560px,92vw);background:#fff;border:1px solid var(--line);border-radius:16px;
+    padding:36px 28px;text-align:center;box-shadow:0 12px 34px rgba(14,36,56,.08)}
+  .code{font-family:Georgia,serif;font-size:64px;font-weight:700;color:var(--navy);line-height:1}
+  .code span{color:var(--gold)}
+  h1{font-size:20px;margin:14px 0 6px;color:var(--navy)}
+  .en{font-size:14px;color:var(--muted);margin:0 0 22px}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .btns a{display:inline-block;padding:11px 18px;border-radius:999px;font-size:13.5px;font-weight:700;
+    text-decoration:none;font-family:inherit}
+  .primary{background:var(--navy);color:#fff}
+  .gold{background:var(--gold);color:#1B2430}
+  .ghost{background:#fff;color:var(--navy);border:1.5px solid #CFDBEE}
+  footer{padding:0 0 26px;text-align:center;font-size:11.5px;color:var(--muted);line-height:1.7}
+  footer a{color:#2E5496;text-decoration:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap"><a href="/"><img src="/logo-white.png" alt="KWONG THYE 光泰"></a></div>
+</header>
+<main>
+  <div class="box">
+    <div class="code">4<span>0</span>4</div>
+    <h1>找不到这个页面</h1>
+    <p class="en">This page could not be found</p>
+    <div class="btns">
+      <a class="primary" href="/">返回首页 / Home</a>
+      <a class="gold" href="/calc/">投资计算器 / Calculator</a>
+      <a class="ghost" href="/pricing/">价格 / Pricing</a>
+    </div>
+  </div>
+</main>
+<footer>
+  KWONG THYE 光泰 · kwongthye.com · andylau.theroof@gmail.com<br>
+  <a href="/privacy/">隐私政策 Privacy</a> · <a href="/terms/">使用条款 Terms</a>
+</footer>
+<script>
+(function () {
+  try {
+    var payload = JSON.stringify({ path: location.pathname, ref: document.referrer || "" });
+    if (navigator.sendBeacon) {
+      try { navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" })); }
+      catch (e) { navigator.sendBeacon("/api/track", payload); }
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

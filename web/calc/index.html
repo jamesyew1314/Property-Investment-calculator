@@ -169,6 +169,20 @@
   }
 </style>
 <style id="printCfg"></style>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KWONG THYE 光泰">
+<meta property="og:title" content="房地产投资快速计算器 | Malaysia Property Investment Calculator">
+<meta property="og:description" content="买入费用、贷款月供、持有费用、租金回报、RPGT 与出售利润，一间房从买到卖一次算清。免费使用。">
+<meta property="og:url" content="https://kwongthye.com/calc/">
+<meta property="og:image" content="https://kwongthye.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_MY">
+<meta property="og:locale:alternate" content="en_MY">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="房地产投资快速计算器 | Malaysia Property Investment Calculator">
+<meta name="twitter:description" content="买入费用、贷款月供、持有费用、租金回报、RPGT 与出售利润，一间房从买到卖一次算清。免费使用。">
+<meta name="twitter:image" content="https://kwongthye.com/og-image.png">
 </head>
 <body>
 <header>
@@ -323,6 +337,7 @@
     </div>
     <div class="legend" data-i18n="shareNote">WhatsApp / Facebook 直接打开；微信没有网页分享接口，点「微信」会复制文字，粘贴到微信即可。</div>
     <div class="shareRow">
+      <button class="shareBtn" id="reportBtn" style="background:#0E2438" data-i18n="btnReport">📄 完整报告 PDF</button>
       <button class="shareBtn" id="csvBtn" style="background:#1F7A4D" data-i18n="btnCsv">📊 导出 Excel / CSV</button>
     </div>
     <div class="cmpPick">
@@ -528,7 +543,9 @@
       proMore: "查看价格 / 升级 →", freeCalcOnly: "仅计算 · 存档需 Pro",
       aiPlaceholder: "一句话填数：SPA 80万，贷 90%，租 3000，5 年后卖 100万", aiBtn: "AI 填数",
       aiDone: "已填入 {n} 个字段", aiFail: "没识别到数字，试试：SPA 80万，贷 90%，租 3000",
-      btnCsv: "📊 导出 Excel / CSV", cmpView: "查看对比",
+      btnCsv: "📊 导出 Excel / CSV", btnReport: "📄 完整报告 PDF",
+      toastReport: "正在生成报告…", errReport: "报告生成失败，请稍后再试", errProOnly: "完整报告为专业版功能",
+      cmpView: "查看对比",
       cmpHint: "先在上面「💾」保存 2 个方案，再从下拉框选择对比。",
       cmpPick: "选择已存方案", cmpNoPlan: "还没有已存方案", cmpNeed: "请先保存对比 A 和 B", cmpTitle: "方案对比",
       cmpNeedSaved: "请先保存并选择两个方案", cmpSame: "A 和 B 不能是同一个方案", cmpBad: "该方案数据不完整，无法计算",
@@ -630,7 +647,9 @@
       proMore: "Pricing / upgrade →", freeCalcOnly: "Calculate only · Pro to save",
       aiPlaceholder: "One sentence: SPA 800k, loan 90%, rent 3,000, sell 1M after 5 years", aiBtn: "AI fill",
       aiDone: "Filled {n} fields", aiFail: "No numbers found. Try: SPA 800k, loan 90%, rent 3,000",
-      btnCsv: "📊 Export Excel / CSV", cmpView: "View comparison",
+      btnCsv: "📊 Export Excel / CSV", btnReport: "📄 Full report PDF",
+      toastReport: "Generating your report…", errReport: "Could not generate the report, please try again", errProOnly: "The full report is a Pro feature",
+      cmpView: "View comparison",
       cmpHint: "Save 2 scenarios with 💾 above, then pick them from the dropdowns.",
       cmpPick: "Select a saved scenario", cmpNoPlan: "No saved scenarios yet", cmpNeed: "Save Compare A and B first", cmpTitle: "Scenario comparison",
       cmpNeedSaved: "Save and select two scenarios first", cmpSame: "A and B must be different scenarios", cmpBad: "That scenario has incomplete data",
@@ -1291,7 +1310,7 @@
 
   function updateProLocks() {
     var free = !proActive();
-    ["savePlan", "shareLink", "printBtn", "waBtn", "wxBtn", "fbBtn", "csvBtn", "cmpSelA", "cmpSelB", "cmpView"].forEach(function (id) {
+    ["savePlan", "shareLink", "printBtn", "waBtn", "wxBtn", "fbBtn", "csvBtn", "cmpSelA", "cmpSelB", "cmpView", "reportBtn"].forEach(function (id) {
       var el = $(id); if (el) el.classList.toggle("locked", free);
     });
     var hint = $("proHint"); if (hint) hint.hidden = !free;
@@ -1514,6 +1533,30 @@
   registerSW();
   $("aiFill").addEventListener("click", parseAi);
   $("csvBtn").addEventListener("click", exportCsv);
+  function downloadReport() {
+    if (!requirePro()) return;
+    if (!lastRes || !lastInp) { toast(t("cmpNeed")); return; }
+    toast(t("toastReport"));
+    fetch("/api/report.pdf", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lang: lang, company: company, input: lastInp, result: lastRes })
+    }).then(function (r) {
+      if (r.status === 402) throw new Error("pro");
+      if (!r.ok) throw new Error("bad");
+      return r.blob();
+    }).then(function (blob) {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "kwongthye-report-" + new Date().toISOString().slice(0, 10) + ".pdf";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    }).catch(function (e) {
+      toast(e && e.message === "pro" ? t("errProOnly") : t("errReport"));
+    });
+  }
+  $("reportBtn").addEventListener("click", downloadReport);
   $("cmpView").addEventListener("click", renderCmp);
   ["cmpSelA", "cmpSelB"].forEach(function (id) {
     var el = $(id);
@@ -1804,7 +1847,11 @@
 <script>
 (function () {
   try {
-    if (navigator.sendBeacon) navigator.sendBeacon("/api/track", JSON.stringify({ path: location.pathname, ref: document.referrer || "" }));
+    var payload = JSON.stringify({ path: location.pathname, ref: document.referrer || "" });
+    if (navigator.sendBeacon) {
+      try { navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" })); }
+      catch (e) { navigator.sendBeacon("/api/track", payload); }
+    }
   } catch (e) {}
 })();
 </script>

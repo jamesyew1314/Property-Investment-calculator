@@ -67,6 +67,20 @@
     @page{size:A4;margin:12mm}
   }
 </style>
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="KWONG THYE 光泰">
+<meta property="og:title" content="Andy Lau 刘泌光 · 电子名片 | KWONG THYE 光泰">
+<meta property="og:description" content="扫码存通讯录、WhatsApp、电话、电邮与二维码，KWONG THYE 光泰创办人电子名片。">
+<meta property="og:url" content="https://kwongthye.com/card/">
+<meta property="og:image" content="https://kwongthye.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_MY">
+<meta property="og:locale:alternate" content="en_MY">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Andy Lau 刘泌光 · 电子名片 | KWONG THYE 光泰">
+<meta name="twitter:description" content="扫码存通讯录、WhatsApp、电话、电邮与二维码，KWONG THYE 光泰创办人电子名片。">
+<meta name="twitter:image" content="https://kwongthye.com/og-image.png">
 </head>
 <body>
 <div class="wrap">
@@ -246,6 +260,17 @@
   });
 
   render();
+})();
+</script>
+<script>
+(function () {
+  try {
+    var payload = JSON.stringify({ path: location.pathname, ref: document.referrer || "" });
+    if (navigator.sendBeacon) {
+      try { navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" })); }
+      catch (e) { navigator.sendBeacon("/api/track", payload); }
+    }
+  } catch (e) {}
 })();
 </script>
 </body>

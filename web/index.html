@@ -5,11 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>KWONG THYE 光泰 | 房地产投资 · 专业顾问 · 科技创新</title>
 <meta name="description" content="KWONG THYE 光泰 — 立足马来西亚柔佛新山，专注房地产投资、房地产顾问与房地产科技（PropTech）。Connecting Properties, Technology & Investment Opportunities.">
-<meta property="og:title" content="KWONG THYE 光泰 | Real Estate Investment · Property Advisory · PropTech">
-<meta property="og:description" content="Connecting Properties, Technology & Investment Opportunities. 连接房地产、科技与投资机会。">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://kwongthye.com/icon-256.png">
+<meta property="og:site_name" content="KWONG THYE 光泰">
+<meta property="og:title" content="KWONG THYE 光泰 | 房地产投资 · 专业顾问 · 科技创新">
+<meta property="og:description" content="马来西亚新山房地产投资、专业顾问与房地产科技。免费投资计算器、投资分析与项目合作。">
 <meta property="og:url" content="https://kwongthye.com/">
+<meta property="og:image" content="https://kwongthye.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_MY">
+<meta property="og:locale:alternate" content="en_MY">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="KWONG THYE 光泰 | 房地产投资 · 专业顾问 · 科技创新">
+<meta name="twitter:description" content="马来西亚新山房地产投资、专业顾问与房地产科技。免费投资计算器、投资分析与项目合作。">
+<meta name="twitter:image" content="https://kwongthye.com/og-image.png">
 <link rel="icon" type="image/png" href="icon-256.png">
 <link rel="apple-touch-icon" href="icon-256.png">
 <link rel="canonical" href="https://kwongthye.com/">
@@ -771,7 +780,11 @@
 <script>
 (function () {
   try {
-    if (navigator.sendBeacon) navigator.sendBeacon("/api/track", JSON.stringify({ path: location.pathname, ref: document.referrer || "" }));
+    var payload = JSON.stringify({ path: location.pathname, ref: document.referrer || "" });
+    if (navigator.sendBeacon) {
+      try { navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" })); }
+      catch (e) { navigator.sendBeacon("/api/track", payload); }
+    }
   } catch (e) {}
 })();
 </script>

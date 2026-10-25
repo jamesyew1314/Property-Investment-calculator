@@ -30,6 +30,20 @@
   footer a{color:var(--muted);margin-right:16px}
   @media(max-width:560px){.card{padding:22px 18px}}
 </style>
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="KWONG THYE 光泰">
+<meta property="og:title" content="使用条款 | KWONG THYE 光泰">
+<meta property="og:description" content="免费版与专业版的范围、估算免责声明、责任限制与适用法律。">
+<meta property="og:url" content="https://kwongthye.com/terms/">
+<meta property="og:image" content="https://kwongthye.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_MY">
+<meta property="og:locale:alternate" content="en_MY">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="使用条款 | KWONG THYE 光泰">
+<meta name="twitter:description" content="免费版与专业版的范围、估算免责声明、责任限制与适用法律。">
+<meta name="twitter:image" content="https://kwongthye.com/og-image.png">
 </head>
 <body>
 <header>
@@ -275,6 +289,17 @@
   }
   document.getElementById("ckAll").addEventListener("click", function () { set("all"); });
   document.getElementById("ckNec").addEventListener("click", function () { set("necessary"); });
+})();
+</script>
+<script>
+(function () {
+  try {
+    var payload = JSON.stringify({ path: location.pathname, ref: document.referrer || "" });
+    if (navigator.sendBeacon) {
+      try { navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" })); }
+      catch (e) { navigator.sendBeacon("/api/track", payload); }
+    }
+  } catch (e) {}
 })();
 </script>
 </body>

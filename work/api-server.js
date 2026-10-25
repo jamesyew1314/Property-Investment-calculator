@@ -5,6 +5,7 @@ const fsp = require("node:fs/promises");
 const nodemailer = require("nodemailer");
 const { buildReceiptPdf } = require("./receipt-pdf");
 const mailLayout = require("./mail-layout");
+const { buildReportPdf } = require("./report-pdf");
 const pathMod = require("node:path");
 const { Pool } = require("pg");
 
@@ -445,6 +446,30 @@ app.get("/api/payments/:id/receipt.pdf", requireAuth, async function (req, res, 
 });
 
 // ---------- plans ----------
+// 完整投资分析报告 PDF（Pro）：前端把已算好的数字 POST 上来，服务端只负责排版
+app.post("/api/report.pdf", requireAuth, rateLimit(10, 600000), async function (req, res, next) {
+  try {
+    const u = req.user;
+    const paid = u.plan === "pro" && (!u.plan_expires_at || new Date(u.plan_expires_at) > new Date());
+    if (!paid) return res.status(402).json({ ok: false, error: "pro_required" });
+    const b = req.body || {};
+    if (!b.input || !b.result || typeof b.result !== "object") return res.status(400).json({ ok: false, error: "bad_payload" });
+    const buf = await buildReportPdf({
+      lang: b.lang === "en" ? "en" : "zh",
+      company: b.company || {},
+      input: b.input,
+      result: b.result,
+      note: b.note || "",
+      disclaimer: b.disclaimer || ""
+    });
+    const d = new Date().toISOString().slice(0, 10);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'attachment; filename="kwongthye-report-' + d + '.pdf"');
+    res.setHeader("Content-Length", buf.length);
+    res.send(buf);
+  } catch (e) { next(e); }
+});
+
 app.get("/api/plans", requireAuth, async function (req, res, next) {
   try {
     const r = await pool.query(
@@ -894,10 +919,16 @@ app.post("/api/me/prefs", requireAuth, rateLimit(20, 600000), async function (re
   } catch (e) { next(e); }
 });
 
+// sendBeacon 默认用 text/plain 发送，express.json 不会解析 → 这里用 text 解析兜底
+app.use("/api/track", express.text({ type: function () { return true; }, limit: "4kb" }));
+
 app.post("/api/track", rateLimit(120, 60000), async function (req, res) {
   try {
-    const path = String((req.body || {}).path || "").slice(0, 200);
-    const ref = String((req.body || {}).ref || "").slice(0, 300);
+    let body = req.body;
+    if (typeof body === "string") { try { body = JSON.parse(body); } catch (e) { body = {}; } }
+    body = body || {};
+    const path = String(body.path || "").slice(0, 200);
+    const ref = String(body.ref || "").slice(0, 300);
     const ipHash = crypto.createHash("sha256").update((req.ip || "") + (process.env.IP_SALT || "fc")).digest("hex").slice(0, 24);
     if (path) await pool.query("INSERT INTO pageviews(path,referrer,ip_hash) VALUES($1,$2,$3)", [path, ref, ipHash]);
     res.json({ ok: true });

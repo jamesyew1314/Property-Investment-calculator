@@ -69,6 +69,9 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | `work/ops/` | 运维脚本：`backup.sh`、`restore-drill.sh`、`monitor.js`、`notify.js`、`offsite-backup.sh`、`setup-staging.sh`、`setup-calc-subdomain.sh`、`deploy-staging.sh` |
 | `docs/服务器信息.md` | 服务器总览（含运维脚本、staging、异地备份、子域步骤） |
 | `docs/推广资料.md` | Google 商家资料 / Facebook / WhatsApp / 目录登记文案 |
+| `work/report-pdf.js` | 完整投资分析报告 PDF（A4 两页，中英双语，Noto CJK） |
+| `work/ops/heartbeat.js` | 每日心跳邮件（08:00） |
+| `web/og-image.png` · `web/404.html` | 分享预览图（1200×630）· 双语错误页 |
 
 > **语言约定**：全站 8 个页面都用同一个 localStorage 键 `kwongthye_lang`（`zh` / `en`），切换后跨页面保持。
 > 新增文案时必须在 `zh` 与 `en` 两个字典里都加，否则英文模式下会回退成中文。
@@ -460,6 +463,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-25 | v0.64.1 | Cookie 同意横幅补齐到 `/pricing/`、`/privacy/`、`/terms/`（原先只有企业站与计算器）；价格页与法律页同样记录 `kwthye_cookie_consent` 并为 GA4 预留 `kwthyeLoadAnalytics` 钩子；全站 6 个页面 + staging 巡检 0 个 JS 错误 |
 | 2026-10-25 | v0.65 | **全站中英双语补齐**：`/receipt/`、`/card/`、`/admin/` 三个页面新增 中文/EN 切换（此前收据只用内嵌双语、名片部分中文、后台全中文）；**语言偏好全站统一**（`kwongthye_lang`，计算器原来的 `fangchan_lang` 兼容读取并双写），在一个页面切换后其它 8 个页面自动跟随；后台 8 个标签页登录态实测 0 处残留中文；**收据 PDF 改为中英双语**（服务器装 `fonts-noto-cjk`，pdfkit 注册 NotoSansCJK，没有字体时自动退回英文避免乱码）；名片姓名随语言显示（中文显示「刘泌光」） |
 | 2026-10-25 | v0.65.1 | `docs/` 纳入 git（原先在 `.gitignore`，运维与推广文档只存在本机）：服务器信息、推广资料、SaaS 商业方案、合伙人方案 4 份入库；**提交前先脱敏**——风险表里原本写着真实后台密码，已改为「值见服务器 `.env`」；`.gitignore` 移除 `docs/`，`.secrets/` 仍排除 |
+| 2026-10-25 | v0.66 | **完整投资分析报告 PDF + 运维补强 + 分享预览**：① `POST /api/report.pdf`（Pro 专属）把计算器算好的数字（前端算、服务端只排版，避免两套公式）排成 A4 两页品牌报告：Part 1 购入明细/首次现金、Part 2 年度费用、Part 3 投资回报 + 逐年表 + 卖出/RPGT/Total ROI，含客户项目抬头、逐页页眉页脚与免责声明，中英双语，导出口点「📄 完整报告 PDF」；② **日志轮转** `/etc/logrotate.d/fangchan`（每日、留 14 天、压缩、copytruncate 不重启服务）；③ **每日心跳邮件** `ops/heartbeat.js` 08:00（服务器/数据/备份/证书/监控状态，几天没收到即代表服务器异常）+ UptimeRobot 外部探测配置文档；④ **修复访问量统计长期为 0**：`sendBeacon` 用 `text/plain` 发送而 `express.json` 不解析，服务端加 `express.text` 兜底 + 前端改 JSON Blob，并给 pricing/privacy/terms/card 补埋点；⑤ **分享预览图** `og-image.png`（1200×630，真实 Logo）+ 全站 og/twitter 标签；⑥ **双语 404/50x 页** + nginx `error_page` |
 | 2026-10-25 | — | 新增 `docs/服务器信息.md`：服务器规格、域名/DNS、架构、目录、数据库、环境变量、定时任务、备份恢复、SSL、安全、运维命令、发布流程、风险清单、费用 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 
