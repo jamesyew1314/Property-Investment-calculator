@@ -32,14 +32,27 @@ if [ ! -f "$DUMP" ]; then
   log "FAIL dump missing $DUMP"; alert "找不到今天的备份文件 $DUMP"; exit 1
 fi
 
-if ! "$OSSUTIL" -e "$ENDPOINT" cp -f "$DUMP" "oss://$BUCKET/db/$D/" >> "$LOG" 2>&1; then
-  log "FAIL upload $DUMP"; alert "上传 $DUMP 到 oss://$BUCKET/db/$D/ 失败，请检查 AccessKey/网络。"; exit 1
+# 加密后再上传（密钥在 /root/.backup-key，绝不上传；丢了就没法解密，务必另存一份离线）
+KEY=/root/.backup-key
+UP="$DUMP"
+if [ -f "$KEY" ]; then
+  UP="/tmp/$(basename "$DUMP").enc"
+  if ! openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -in "$DUMP" -out "$UP" -pass "file:$KEY" 2>>"$LOG"; then
+    log "FAIL encrypt $DUMP"; alert "备份加密失败，异地备份已中止。"; rm -f "$UP"; exit 1
+  fi
+  sha256sum "$UP" | awk '{print $1}' > "$UP.sha256"
+  log "encrypted $(du -h "$UP" | cut -f1)"
 fi
-[ -f "$DUMP.sha256" ] && "$OSSUTIL" -e "$ENDPOINT" cp -f "$DUMP.sha256" "oss://$BUCKET/db/$D/" >> "$LOG" 2>&1
+
+if ! "$OSSUTIL" -e "$ENDPOINT" cp -f "$UP" "oss://$BUCKET/db/$D/" >> "$LOG" 2>&1; then
+  log "FAIL upload $UP"; alert "上传 $(basename "$UP") 到 oss://$BUCKET/db/$D/ 失败，请检查 AccessKey/网络。"; exit 1
+fi
+[ -f "$UP.sha256" ] && "$OSSUTIL" -e "$ENDPOINT" cp -f "$UP.sha256" "oss://$BUCKET/db/$D/" >> "$LOG" 2>&1
+[ "$UP" != "$DUMP" ] && rm -f "$UP" "$UP.sha256"
 
 # 只保留 60 天的远端对象
 "$OSSUTIL" -e "$ENDPOINT" rm -r -f "oss://$BUCKET/db/$(date -d '60 days ago' +%F)/" >> "$LOG" 2>&1 || true
 
 SIZE=$(du -h "$DUMP" | cut -f1)
-log "OK oss://$BUCKET/db/$D/fangchan-$D.dump size=$SIZE"
+log "OK oss://$BUCKET/db/$D/$(basename "$UP") size=$SIZE $([ -f "$KEY" ] && echo encrypted || echo plain)"
 echo "$(date +%s)" > /srv/fangchan/logs/.offsite-last
