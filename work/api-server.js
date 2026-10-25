@@ -15,6 +15,8 @@ const SESSION_DAYS = 30;
 // 可用环境变量改 cookie 名/路径（staging 用，避免覆盖正式会话）
 const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME || "fc_sid";
 const COOKIE_PATH = process.env.SESSION_COOKIE_PATH || "/";
+// 生产可设 .kwongthye.com，让 kwongthye.com 与 calc.kwongthye.com 共用登录状态
+const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || "";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
 const app = express();
@@ -52,10 +54,12 @@ function quotaFor(u) {
   return paid ? null : FREE_QUOTA;
 }
 function setSessionCookie(res, token) {
-  res.setHeader("Set-Cookie", SESSION_COOKIE + "=" + token + "; HttpOnly; Secure; SameSite=Lax; Path=" + COOKIE_PATH + "; Max-Age=" + (SESSION_DAYS * 86400));
+  res.setHeader("Set-Cookie", SESSION_COOKIE + "=" + token + "; HttpOnly; Secure; SameSite=Lax; Path=" + COOKIE_PATH +
+    (COOKIE_DOMAIN ? "; Domain=" + COOKIE_DOMAIN : "") + "; Max-Age=" + (SESSION_DAYS * 86400));
 }
 function clearSessionCookie(res) {
-  res.setHeader("Set-Cookie", SESSION_COOKIE + "=; HttpOnly; Secure; SameSite=Lax; Path=" + COOKIE_PATH + "; Max-Age=0");
+  res.setHeader("Set-Cookie", SESSION_COOKIE + "=; HttpOnly; Secure; SameSite=Lax; Path=" + COOKIE_PATH +
+    (COOKIE_DOMAIN ? "; Domain=" + COOKIE_DOMAIN : "") + "; Max-Age=0");
 }
 async function createSession(userId) {
   const token = crypto.randomBytes(32).toString("hex");

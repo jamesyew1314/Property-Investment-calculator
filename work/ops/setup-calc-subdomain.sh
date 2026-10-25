@@ -47,7 +47,9 @@ server {
     add_header X-Content-Type-Options nosniff always;
     add_header X-Frame-Options SAMEORIGIN always;
     add_header Referrer-Policy strict-origin-when-cross-origin always;
-    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()" always;
 
     root /srv/fangchan/web/calc;
     index index.html;
@@ -73,7 +75,11 @@ server {
     location ^~ /terms/ { return 301 https://kwongthye.com/terms/; }
     location = /pricing { return 301 https://kwongthye.com/pricing/; }
     location ^~ /pricing/ { return 301 https://kwongthye.com/pricing/; }
-    location = / { return 301 /index.html; }
+    # 主域共用的静态资源（PWA 图标、Cookie 脚本、404 页）
+    location ~ ^/(icon-256\.png|icon-512\.png|og-image\.png|cookie-consent\.js|404\.html)$ {
+        root /srv/fangchan/web;
+    }
+    error_page 404 /404.html;
     location / { try_files \$uri \$uri/ =404; }
 
     access_log /srv/fangchan/logs/calc-access.log;
