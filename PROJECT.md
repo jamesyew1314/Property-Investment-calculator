@@ -2,7 +2,7 @@
 
 > **这是项目的“单一上下文文件”。**  
 > 后续正式开发、修改、交接，先读这一份；只有需要细节时，再打开 57 页方案或工作簿。  
-> 最后更新：2026-10-27 · 版本：v1.1（+ match-platform v0.1） · 状态：投资计算器已上线；智能房源配对本地可运行、待部署。
+> 最后更新：2026-10-27 · 版本：v1.1（+ match-platform v0.1） · 状态：投资计算器已上线；智能房源配对已上线 <https://kwongthye.com/match/>。
 
 ---
 
@@ -24,7 +24,7 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | 公式验证 | ✅ 完成 | XLSX：法定费用、4 案例对账、贷款摊销、XIRR、KPI 定义 |
 | Phase 0 | ✅ 已完成 | **正式站：<https://kwongthye.com/>**（阿里云吉隆坡 47.254.235.22，`/srv/fangchan/web/`，Let's Encrypt HTTPS 自动续期）；旧站 <https://laoyeshu.cn/static/fangchan/> 保留作备份；`web/test.js` 48 项测试全过 |
 | Phase 1–4 | ⏳ 未开始 | Web 快速计算器（自己用）→ 团队内测 → SaaS（RM50/年） |
-| **智能房源配对** | ✅ v0.1 本地可运行 | 独立 `match-platform/`：需求×房源可解释配对、可负担性、反向匹配、跟进漏斗、中英双语；**51 项测试全过**（`cd match-platform && npm test`），未部署 |
+| **智能房源配对** | ✅ v0.1 已上线 | 独立 `match-platform/`：需求×房源可解释配对、可负担性、反向匹配、跟进漏斗、中英双语；**51 项测试全过**；线上 <https://kwongthye.com/match/> |
 
 **下一步：你打开 `web/index.html` 试用（双击即可）；确认体验后补 4 案例 fixture 与 21 项测试，再进 Phase 1 Web 化。**
 
@@ -73,7 +73,7 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | `work/report-pdf.js` | 完整投资分析报告 PDF（A4 两页，中英双语，Noto CJK） |
 | `work/ops/heartbeat.js` | 每日心跳邮件（08:00） |
 | `work/ops/staging-refresh.sh` | 每天把正式库克隆到 staging |
-| `match-platform/` | **智能房源配对**（独立 Node 应用，零依赖）：`node server.js` → http://127.0.0.1:4100；`npm test` 51 项；详见 `match-platform/README.md` / `产品说明.md` / `deploy/` |
+| `match-platform/` | **智能房源配对**（独立 Node 应用，零依赖）：线上 <https://kwongthye.com/match/>；本地 `node server.js` → http://127.0.0.1:4100；`npm test` 51 项；详见 `match-platform/README.md` / `产品说明.md` / `deploy/` |
 | `deploy/deploy.sh` · `.github/workflows/deploy.yml` | 一键发布 / GitHub Actions 自动发布 |
 | `web/cookie-consent.js` | Cookie 偏好中心（全站共用） |
 | `web/og-image.png` · `web/404.html` | 分享预览图（1200×630）· 双语错误页 |
@@ -514,11 +514,11 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 项 | 内容 |
 | :--- | :--- |
 | 入口 | [`match-platform/README.md`](match-platform/README.md)（技术/算法/API/部署）· [`match-platform/产品说明.md`](match-platform/产品说明.md)（产品/给老板） |
-| 启动 | `cd match-platform && node server.js` → <http://127.0.0.1:4100>（演示 `demo@propmatch.my` / `demo1234`，或 `/?demo=1`） |
+| 启动 | 线上 <https://kwongthye.com/match/?demo=1>；本地 `cd match-platform && node server.js` → <http://127.0.0.1:4100>（演示 `demo@propmatch.my` / `demo1234`） |
 | 测试 | `cd match-platform && npm test` — **51 项全过**（金融 10 / 引擎 21 / API 12 / i18n 8） |
 | 能力 | 需求与房源 CRUD、六维可解释配对（硬门槛 + 近似匹配）、反向配对、可负担性、今日优先、跟进漏斗、房源买入成本/月供/同区参考、中英双语、JSON 导出、账号隔离 |
 | 财务口径 | 复用与第 6/7 节一致的公式：SPA 1.6M = **76,630**、贷款 765k = **18,767**、T21 余额 = **656,337.29**、收入 12k/负债 1.2k/65% DSR/90% 贷款/现金 180k = **1,076,000** |
-| 部署 | 未上线；步骤见 [`match-platform/deploy/README.md`](match-platform/deploy/README.md)（systemd + nginx + certbot + 备份 + 上线检查） |
+| 部署 | **已上线**：`/srv/propmatch` + systemd `propmatch` + nginx `https://kwongthye.com/match/`；每日备份 `/etc/cron.d/propmatch-backup`。步骤见 [`match-platform/deploy/README.md`](match-platform/deploy/README.md) |
 | 名片信息 | Andy Lau 刘泌光 · REN 32839 · +60 16-528 0918 · andylau.theroof@gmail.com · THE ROOF REALTY SDN BHD · E(1)1605/1 · No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor · kwongthye.com |
 | 下一步 | WhatsApp Cloud API、团队角色、CSV/门户导入、密码重置；商业路径见 [`docs/SaaS商业方案_Malaysia_v1.md`](docs/SaaS商业方案_Malaysia_v1.md) |
 

@@ -1,11 +1,35 @@
 # PropMatch 上线手册
 
-> 目标：把 `match-platform/` 部署到 `match.kwongthye.com`，HTTPS、单实例、每日备份。  
-> 适用：Ubuntu 24.04 + nginx + certbot + Node.js 20+（2C4G 足够）。
+> **当前线上（2026-10-27）**：<https://kwongthye.com/match/>  
+> 路径：`/srv/propmatch` · systemd `propmatch` · Node 22 · `127.0.0.1:4100` · nginx `/match/` 反代 · 每日 03:30 备份  
+> 一键更新：`KEY=../../.secrets/fangchan_key.pem bash deploy/deploy-live.sh`
+>
+> 下面的 §1–§9 是独立子域（`match.kwongthye.com`）的完整部署流程，供后续切换；当前线上直接复用主域 HTTPS，不需要新 DNS/证书。  
+> 目标：HTTPS、单实例、每日备份。适用 Ubuntu 24.04 + nginx + certbot + Node.js 20+（2C4G 足够）。
 
 ---
 
-## 0. 先决条件
+## 0. 当前线上架构（先看）
+
+```
+https://kwongthye.com/match/  → nginx location ^~ /match/
+                               → proxy_pass http://127.0.0.1:4100/
+                               → systemd propmatch (User=propmatch)
+                               → /srv/propmatch/data/db.json
+每日 03:30 → /srv/propmatch/deploy/backup.sh → /srv/propmatch/backups/
+```
+
+线上更新：
+
+```bash
+cd match-platform
+KEY=../.secrets/fangchan_key.pem bash deploy/deploy-live.sh
+```
+
+nginx 片段见 [`nginx-match-path.conf`](nginx-match-path.conf)；主域证书沿用 `kwongthye.com`。  
+没有使用 `match.kwongthye.com` 的原因：当前阿里云 DNS RAM 子账号没有 Alidns 权限；加 A 记录后可再切独立子域。
+
+## 0.1 独立子域部署先决条件
 
 - 一台已装好 nginx / certbot 的 Ubuntu 服务器；
 - 域名 A 记录：`match.kwongthye.com → 服务器公网 IP`；
