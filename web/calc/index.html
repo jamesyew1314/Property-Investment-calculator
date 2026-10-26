@@ -560,6 +560,8 @@
       aiPlaceholder: "一句话填数：买了 80 万的房子，贷 90%，月租 3000，5 年后卖 100 万", aiBtn: "AI 填数",
       aiExampleBtn: "示例", aiExampleDone: "示例已填入，再点「AI 填数」即可套用",
       aiEmpty: "请先在上面输入一句话，例如：买了 80 万的房子，贷 90%，月租 3000，5 年后卖 100 万",
+      asLoan: "贷款 90%", asRate: "利率 4.3%", asTenure: "年限 30 年", asHold: "持有 5 年",
+      aiDoneAssumed: "已填入 {n} 个字段（{d} 按常见值估算，可自行修改）",
       aiDone: "已填入 {n} 个字段", aiFail: "没识别到数字，试试：买了 80 万的房子，贷款 90%，利率 4.3%，月租 3000，5 年后卖 100 万",
       btnCsv: "📊 导出 Excel / CSV", btnReport: "📄 完整报告 PDF",
       toastReport: "正在生成报告…", errReport: "报告生成失败，请稍后再试", errProOnly: "完整报告为专业版功能",
@@ -672,6 +674,8 @@
       aiPlaceholder: "One sentence: condo 800k, 90% loan, rent 3,000, sell 1M after 5 years", aiBtn: "AI fill",
       aiExampleBtn: "Example", aiExampleDone: "Example inserted — tap \"AI fill\" to apply",
       aiEmpty: "Type a sentence first, e.g. condo 800k, 90% loan, rent 3,000, sell 1M after 5 years",
+      asLoan: "90% loan", asRate: "4.3% rate", asTenure: "30-year tenure", asHold: "5-year hold",
+      aiDoneAssumed: "Filled {n} fields ({d} assumed — feel free to change)",
       aiDone: "Filled {n} fields", aiFail: "No numbers found. Try: condo 800k, 90% loan at 4.3%, rent 3,000, sell for 1M after 5 years",
       btnCsv: "📊 Export Excel / CSV", btnReport: "📄 Full report PDF",
       toastReport: "Generating your report…", errReport: "Could not generate the report, please try again", errProOnly: "The full report is a Pro feature",
@@ -1463,8 +1467,22 @@
     if (hold) { $("hold").value = hold; filled++; }
 
     if (!filled) { toast(t("aiFail")); return; }
+
+    // 缺关键字段时补常见值，否则 recalc 会直接清空结果（看起来像「没反应」）
+    var assumed = [];
+    if (spa && !$("loan").value.toString().trim()) {
+      $("loanPct").value = 90;
+      $("loan").value = Math.round(spa * 0.9);
+      filled++; assumed.push(t("asLoan"));
+    }
+    if (!$("rate").value.toString().trim()) { $("rate").value = 4.3; filled++; assumed.push(t("asRate")); }
+    if (!$("tenure").value.toString().trim()) { $("tenure").value = 30; filled++; assumed.push(t("asTenure")); }
+    if (!$("hold").value.toString().trim()) { $("hold").value = 5; filled++; assumed.push(t("asHold")); }
+
     recalc();
-    toast(fmt("aiDone", { n: filled }));
+    toast(assumed.length
+      ? fmt("aiDoneAssumed", { n: filled, d: assumed.join("、") })
+      : fmt("aiDone", { n: filled }));
   }
 
   // ---- 方案对比：从「已存方案」里选两个 ----
