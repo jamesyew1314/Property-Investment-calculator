@@ -106,6 +106,33 @@
   .rfTag.ok{background:#E7F4EC;color:#166E52}
   .rfTag.no{background:#FDECEC;color:#B23B3B}
   .locked{position:relative}
+  .feeDetail{margin:-2px 0 10px 0;font-size:12px;color:#5A6675}
+  .feeDetail summary{cursor:pointer;color:#2E5496;font-size:11.5px;padding:2px 0;list-style:none}
+  .feeDetail summary::-webkit-details-marker{display:none}
+  .feeDetail summary::before{content:"▸ "}
+  .feeDetail[open] summary::before{content:"▾ "}
+  .feeDetail .fd{display:flex;justify-content:space-between;gap:12px;padding:3px 10px;border-bottom:1px dashed #EEF1F6}
+  .feeDetail .fd:last-child{border-bottom:0}
+  .feeDetail .fd b{font-weight:600;color:#1B2430;font-variant-numeric:tabular-nums}
+  .feeDetail .fdTotal b{color:#0E2438}
+  #helpModal .helpBody{max-height:64vh;overflow:auto;font-size:13px;line-height:1.75;color:#33404F}
+  #helpModal h4{margin:16px 0 6px;font-size:13.5px;color:#0E2438}
+  #helpModal ul{margin:4px 0 0;padding-left:18px}
+  #helpModal li{margin-bottom:4px}
+  @media(max-width:720px){
+    .part.collapsible > h2{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .part.collapsible > h2::after{content:"▾";color:#8A929E;font-size:13px;flex:none}
+    .part.collapsible.collapsed > h2::after{content:"▸"}
+    .part.collapsible.collapsed > *:not(h2){display:none!important}
+  }
+  .loginNudge{max-width:1080px;margin:10px auto 0;background:#EFF5FF;border:1px solid #CFDBEE;border-radius:10px;
+    padding:9px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:#22406B}
+  .loginNudge[hidden]{display:none!important}
+  .loginNudge span{flex:1 1 auto}
+  .loginNudge .nudgeBtn{background:#0E2438;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+  .loginNudge .nudgeX{background:transparent;border:0;font-size:16px;color:#6B7787;cursor:pointer;line-height:1}
+  .offlineBar{position:fixed;left:0;right:0;top:0;z-index:90;background:#B23B3B;color:#fff;text-align:center;
+    padding:8px 12px;font-size:12.5px;font-weight:600}
   .freeHint{color:#166E52;background:#E7F4EC;border:1px solid #C8E6D5;border-radius:8px;padding:6px 10px;margin-top:8px}
   .locked::after{content:"🔒 Pro";position:absolute;top:-8px;right:-6px;background:#fff;color:#B26A00;
     border:1px solid #EADFC8;border-radius:999px;font-size:9px;line-height:1.4;padding:0 5px;white-space:nowrap;
@@ -114,6 +141,8 @@
   .aiRow input{flex:1;min-width:240px;padding:10px 12px;border:1px solid #D8DEE9;border-radius:9px;font:inherit;font-size:13.5px}
   .aiRow button{flex:none}
   .cmpTable{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px;background:#fff}
+  .cmpAdd{border:1px dashed #B9C6DA;background:#fff;color:#2E5496;border-radius:8px;padding:8px 10px;
+    font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
   .cmpPick{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
   .cmpPick select{flex:1 1 150px;min-width:120px;padding:9px 10px;border:1px solid #D8DEE9;border-radius:9px;
     font:inherit;font-size:13px;background:#fff;color:#1B2430}
@@ -197,6 +226,7 @@
   <div class="headrow">
     <h1><img src="logo-white.png" alt="logo" class="logo"><span data-i18n="appName">房地产投资快速计算器</span></h1>
     <div class="headbtns">
+      <button id="helpBtn" class="hbtn" data-i18n="btnHelp">口径说明</button>
       <button id="acctBtn" class="hbtn">👤 <span id="acctBtnTxt">登录</span></button>
       <button id="langBtn">EN</button>
     </div>
@@ -214,6 +244,12 @@
     <div class="printdate"></div>
     <img id="phQr" alt="QR">
   </div>
+</div>
+<div id="offlineBar" class="offlineBar" hidden>📴 当前离线：可以继续计算，但云端保存 / 导出 PDF 需要联网</div>
+<div id="loginNudge" class="loginNudge no-print" hidden>
+  <span data-i18n="nudgeText">💡 已保存在这台设备。免费注册可云端保存、跨设备同步。</span>
+  <button class="nudgeBtn" id="nudgeReg" data-i18n="nudgeReg">免费注册</button>
+  <button class="nudgeX" id="nudgeClose">×</button>
 </div>
 <main>
   <div class="viewBanner no-print" id="viewBanner" hidden>
@@ -245,8 +281,27 @@
     <div class="row"><label data-i18n="fTenure">贷款年限</label><input class="manual" id="tenure" type="number" min="1" max="50" step="1" inputmode="decimal"><span class="unit" data-i18n="unitYears">年</span></div>
     <div class="row"><label data-i18n="fPmt">月供（等额本息）</label><input class="auto" id="pmt" readonly><span class="unit">RM</span></div>
     <div class="row"><label data-i18n="fSpaFee">SPA 律师费（律师费 + 印花税 + 杂费 + 8% SST）</label><input class="auto money" id="spaFee" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <details class="feeDetail" id="dtlSpa"><summary data-i18n="fdOpen">看分档明细</summary>
+      <div class="fd"><span data-i18n="fdLegal">律师费（SRO 分档）</span><b id="fdSpaLegal">—</b></div>
+      <div class="fd"><span data-i18n="fdDuty">印花税（MOT 分档）</span><b id="fdSpaDuty">—</b></div>
+      <div class="fd"><span data-i18n="fdMisc">杂费</span><b id="fdSpaMisc">—</b></div>
+      <div class="fd"><span data-i18n="fdSst">SST 8%（仅律师费）</span><b id="fdSpaSst">—</b></div>
+      <div class="fd fdTotal"><span data-i18n="fdTotal">合计</span><b id="fdSpaTotal">—</b></div>
+    </details>
     <div class="row"><label data-i18n="fLaFee">Loan Agreement 律师费（律师费 + 印花税 + 杂费 + 8% SST）</label><input class="auto money" id="laFee" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <details class="feeDetail" id="dtlLa"><summary data-i18n="fdOpen">看分档明细</summary>
+      <div class="fd"><span data-i18n="fdLegal">律师费（SRO 分档）</span><b id="fdLaLegal">—</b></div>
+      <div class="fd"><span data-i18n="fdDuty">贷款印花税 0.5%</span><b id="fdLaDuty">—</b></div>
+      <div class="fd"><span data-i18n="fdMisc">杂费</span><b id="fdLaMisc">—</b></div>
+      <div class="fd"><span data-i18n="fdSst">SST 8%（仅律师费）</span><b id="fdLaSst">—</b></div>
+      <div class="fd fdTotal"><span data-i18n="fdTotal">合计</span><b id="fdLaTotal">—</b></div>
+    </details>
     <div class="row"><label data-i18n="fVal">Property Valuation Fee 房产估价费（SPA × 0.2% + 500 杂费）</label><input class="auto money" id="valFee" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <details class="feeDetail" id="dtlVal"><summary data-i18n="fdOpen">看分档明细</summary>
+      <div class="fd"><span data-i18n="fdValFee">估价费（SPA × 0.2%）</span><b id="fdValFee">—</b></div>
+      <div class="fd"><span data-i18n="fdMisc">杂费</span><b id="fdValMisc">—</b></div>
+      <div class="fd fdTotal"><span data-i18n="fdTotal">合计</span><b id="fdValTotal">—</b></div>
+    </details>
     <div class="legend" data-i18n="lawNote">⚠️ 律师费/估价费只作估算，以律师最终报价为准。</div>
     <div class="row"><label data-i18n="fAgent">Agent Fee 中介费</label><input class="manual money" id="agent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
     <div class="row"><label data-i18n="fConsent">Consent Fee（如有）</label><input class="manual money" id="consent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
@@ -293,7 +348,13 @@
     <div class="row"><label data-i18n="fHold">Holding Period 持有年限</label><input class="manual" id="hold" type="number" min="1" max="30" step="1" inputmode="decimal"><span class="unit" data-i18n="unitYears">年</span></div>
     <div class="row"><label data-i18n="fSellAgent">Agent Fee 卖出中介费（默认 2% 卖价）</label><input class="auto money" id="sellAgent" type="text" inputmode="decimal"><span class="unit">RM</span></div>
     <div class="row"><label data-i18n="fSellLegal">Legal Fee（律师费 + 印花税 + 杂费 + 8% SST，默认 5,000）</label><input class="auto money" id="sellLegal" type="text" inputmode="decimal"><span class="unit">RM</span></div>
+    <details class="feeDetail" id="dtlSellLegal"><summary data-i18n="fdOpen">看分档明细</summary>
+      <div class="fd"><span data-i18n="fdSellRef">按 SRO 分档参考（不含 SST）</span><b id="fdSellRef">—</b></div>
+      <div class="fd"><span data-i18n="fdSellSst">含 8% SST 参考</span><b id="fdSellSst">—</b></div>
+      <div class="fd"><span data-i18n="fdSellNote">上方填的是含税合计，可自行覆盖</span><b></b></div>
+    </details>
     <div class="row"><label data-i18n="fSellMisc">Selling Miscellaneous Expenses 售出杂费</label><input class="manual money" id="sellMisc" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fOwnerType">卖家身份 Seller profile</label><select id="ownerType" class="manual"><option value="citizen">马来西亚公民 / 永久居民</option><option value="foreigner">外国人 / 非公民</option><option value="company">公司</option></select><span class="unit"></span></div>
     <div class="row"><label id="rpgtLabel">RPGT（持有 5 年 = 15%）</label><span class="autoVal" id="rpgtVal">—</span><span class="unit">RM</span></div>
     <div class="out">
       <div class="line"><span data-i18n="lSellPriceShow">Expected Selling Price 预计卖出价格</span><span id="sellPriceShow">—</span></div>
@@ -353,6 +414,9 @@
       <select id="cmpSelA" aria-label="A"></select>
       <span class="cmpVs">vs</span>
       <select id="cmpSelB" aria-label="B"></select>
+      <select id="cmpSelC" aria-label="C" hidden></select>
+      <select id="cmpSelD" aria-label="D" hidden></select>
+      <button class="cmpAdd" id="cmpAdd" data-i18n="cmpAdd">＋ 方案</button>
       <button class="cmpGo" id="cmpView" data-i18n="cmpView">查看对比</button>
     </div>
     <div id="cmpBox" hidden></div>
@@ -408,6 +472,46 @@
   </div>
 </div>
 
+<div class="modalMask no-print" id="helpModal" hidden>
+  <div class="modal" style="max-width:620px">
+    <div class="modalHead"><b data-i18n="helpTitle">计算口径说明</b><button class="x" id="helpClose">×</button></div>
+    <div class="helpBody">
+      <h4 data-i18n="helpH1">1. 法定费用（可手动覆盖）</h4>
+      <ul>
+        <li data-i18n="helpL1">SPA 律师费按 SRO 分档：首 500,000 × 1.25%，其后部分 × 1%（本计算器口径）。</li>
+        <li data-i18n="helpL2">MOT 印花税分档：首 100,000 × 1%；100,001–500,000 × 2%；500,001–1,000,000 × 3%；超过 1,000,000 × 4%。</li>
+        <li data-i18n="helpL3">律所杂费：3,600 + 0.4% × 房价；贷款杂费：3,800 + 0.2% × 贷款额。</li>
+        <li data-i18n="helpL4">贷款合同印花税：贷款额 × 0.5%。估价费：SPA × 0.2% + 500 杂费。</li>
+        <li data-i18n="helpL5">SST 8% 只对「律师费」征收，不对印花税与杂费征收。</li>
+        <li data-i18n="helpL6">蓝底为自动值，改成白底即锁定你输入的数字（覆盖后不再自动更新）。</li>
+      </ul>
+      <h4 data-i18n="helpH2">2. 贷款</h4>
+      <ul>
+        <li data-i18n="helpL7">月供按等额本息：r = 年利率 ÷ 12，月供 = 贷款 × r ÷ (1 − (1+r)^−n)。</li>
+        <li data-i18n="helpL8">逐年表的「当年利息」用平均口径（贷款 × 年利率），与银行逐月账单有差异，属估算。</li>
+        <li data-i18n="helpL9">Cashback / 超额贷款：贷款超过实价的部分，作为现金回退从首次支出里扣。</li>
+      </ul>
+      <h4 data-i18n="helpH3">3. 回报口径</h4>
+      <ul>
+        <li data-i18n="helpL10">年租金净利润 = 年租金 − 年度费用（管理费、地税、门牌税、维修、保险、出租中介费、利息）。</li>
+        <li data-i18n="helpL11">年租金回报率 = 年租金净利润 ÷ 购房所需现金总额（现金回报率）。</li>
+        <li data-i18n="helpL12">出售利润 = 资本收益 − 出售费用（中介费、律师费、杂费、RPGT）。</li>
+        <li data-i18n="helpL13">投资净利润 = 持有期总租金净利润 + 出售利润；Total ROI = 投资净利润 ÷ 首次现金 ÷ 年数。</li>
+        <li data-i18n="helpL14">Return on Total Cost = 投资净利润 ÷（实价 + 购置费用 + 出售费用）÷ 年数。</li>
+      </ul>
+      <h4 data-i18n="helpH4">4. RPGT（产业盈利税）</h4>
+      <ul>
+        <li data-i18n="helpL15">公民 / 永久居民：≤3 年 30%；第 4 年 20%；第 5 年 15%；第 6 年起 0%。</li>
+        <li data-i18n="helpL16">外国人 / 非公民：≤5 年 30%；第 6 年起 10%。</li>
+        <li data-i18n="helpL17">公司：≤3 年 30%；第 4 年 20%；第 5 年 15%；第 6 年起 10%。</li>
+        <li data-i18n="helpL18">计税基础 = 卖价 − 实价 − 购置费用 − 出售中介费 − 出售律师费 − 出售杂费；负值按 0 计。</li>
+      </ul>
+      <h4 data-i18n="helpH5">5. 免责</h4>
+      <ul><li data-i18n="helpL19">所有结果均为估算，不构成法律、税务、会计或投资意见；实际以律师报价、银行批文、LHDN 评税为准。</li></ul>
+    </div>
+    <div class="btnRow" style="margin-top:14px"><button class="btn" id="helpOk" data-i18n="helpOk">知道了</button></div>
+  </div>
+</div>
 <div class="modalMask no-print" id="acctModal" hidden>
   <div class="modalCard" role="dialog" aria-modal="true">
     <button class="modalClose" id="acctClose" aria-label="Close">×</button>
@@ -617,7 +721,39 @@
       shareNote: "WhatsApp / Facebook 直接打开；微信没有网页分享接口，点「微信」会复制文字，粘贴到微信即可。",
       copyOk: "已复制，去微信粘贴即可",
       shareTpl: "房地产投资计算｜SPA {spa} · 实价 {actual} · 贷款 {loan} · 租金 {rent}/年 → 持有年利润 {hold} · 卖出年利润 {quick}（估算，以律师/银行为准）｜{url}",
-      footer: "⚠️ 律师费/印花税按法定费率自动估算，RPGT 为估算（30/20/15/0），银行利息为等额本息——实际金额以律师报价、银行结算单与 LHDN 为准。本计算器不构成法律或税务意见。"
+      footer: "⚠️ 律师费/印花税按法定费率自动估算，RPGT 为估算（30/20/15/0），银行利息为等额本息——实际金额以律师报价、银行结算单与 LHDN 为准。本计算器不构成法律或税务意见。",
+      nudgeText: "💡 已保存在这台设备。免费注册可云端保存、跨设备同步。", nudgeReg: "免费注册", cmpAdd: "＋ 方案",
+      offlineWarn: "当前离线，登录后才能云端保存；可以先存到本机。",
+      btnHelp: "口径说明", fOwnerType: "卖家身份",
+      ownerCitizen: "马来西亚公民 / 永久居民", ownerForeigner: "外国人 / 非公民", ownerCompany: "公司",
+      fdOpen: "看分档明细", fdLegal: "律师费（SRO 分档）", fdDuty: "印花税（MOT 分档）", fdMisc: "杂费",
+      fdSst: "SST 8%（仅律师费）", fdTotal: "合计", fdValFee: "估价费（SPA × 0.2%）",
+      fdSellRef: "按 SRO 分档参考（不含 SST）", fdSellSst: "含 8% SST 参考", fdSellNote: "上方填的是含税合计，可自行覆盖",
+      helpTitle: "计算口径说明", helpOk: "知道了",
+      helpH1: "1. 法定费用（可手动覆盖）",
+      helpL1: "SPA 律师费按 SRO 分档：首 500,000 × 1.25%，其后部分 × 1%（本计算器口径）。",
+      helpL2: "MOT 印花税分档：首 100,000 × 1%；100,001–500,000 × 2%；500,001–1,000,000 × 3%；超过 1,000,000 × 4%。",
+      helpL3: "律所杂费：3,600 + 0.4% × 房价；贷款杂费：3,800 + 0.2% × 贷款额。",
+      helpL4: "贷款合同印花税：贷款额 × 0.5%。估价费：SPA × 0.2% + 500 杂费。",
+      helpL5: "SST 8% 只对「律师费」征收，不对印花税与杂费征收。",
+      helpL6: "蓝底为自动值，改成白底即锁定你输入的数字（覆盖后不再自动更新）。",
+      helpH2: "2. 贷款",
+      helpL7: "月供按等额本息：r = 年利率 ÷ 12，月供 = 贷款 × r ÷ (1 − (1+r)^−n)。",
+      helpL8: "逐年表的「当年利息」用平均口径（贷款 × 年利率），与银行逐月账单有差异，属估算。",
+      helpL9: "Cashback / 超额贷款：贷款超过实价的部分，作为现金回退从首次支出里扣。",
+      helpH3: "3. 回报口径",
+      helpL10: "年租金净利润 = 年租金 − 年度费用（管理费、地税、门牌税、维修、保险、出租中介费、利息）。",
+      helpL11: "年租金回报率 = 年租金净利润 ÷ 购房所需现金总额（现金回报率）。",
+      helpL12: "出售利润 = 资本收益 − 出售费用（中介费、律师费、杂费、RPGT）。",
+      helpL13: "投资净利润 = 持有期总租金净利润 + 出售利润；Total ROI = 投资净利润 ÷ 首次现金 ÷ 年数。",
+      helpL14: "Return on Total Cost = 投资净利润 ÷（实价 + 购置费用 + 出售费用）÷ 年数。",
+      helpH4: "4. RPGT（产业盈利税）",
+      helpL15: "公民 / 永久居民：≤3 年 30%；第 4 年 20%；第 5 年 15%；第 6 年起 0%。",
+      helpL16: "外国人 / 非公民：≤5 年 30%；第 6 年起 10%。",
+      helpL17: "公司：≤3 年 30%；第 4 年 20%；第 5 年 15%；第 6 年起 10%。",
+      helpL18: "计税基础 = 卖价 − 实价 − 购置费用 − 出售中介费 − 出售律师费 − 出售杂费；负值按 0 计。",
+      helpH5: "5. 免责",
+      helpL19: "所有结果均为估算，不构成法律、税务、会计或投资意见；实际以律师报价、银行批文、LHDN 评税为准。",
     },
     en: {
       appName: "Property Investment Calculator",
@@ -731,7 +867,39 @@
       shareNote: "WhatsApp / Facebook open directly. WeChat has no web share API — tapping WeChat copies the text; paste it in WeChat.",
       copyOk: "Copied — paste it in WeChat",
       shareTpl: "Property calc | SPA {spa} · Actual {actual} · Loan {loan} · Rent {rent}/yr → Holding {hold} · Sale {quick} (estimate) | {url}",
-      footer: "⚠️ Legal fees / stamp duty follow statutory rates; RPGT is an estimate (30/20/15/0); interest is equal-instalment. Actual amounts follow lawyer quotes, bank settlement and LHDN. This calculator is not legal or tax advice."
+      footer: "⚠️ Legal fees / stamp duty follow statutory rates; RPGT is an estimate (30/20/15/0); interest is equal-instalment. Actual amounts follow lawyer quotes, bank settlement and LHDN. This calculator is not legal or tax advice.",
+      nudgeText: "💡 Saved on this device. Sign up free to save in the cloud and sync across devices.", nudgeReg: "Sign up free", cmpAdd: "+ Plan",
+      offlineWarn: "You are offline — sign in is required for cloud saving; you can still save locally.",
+      btnHelp: "Assumptions", fOwnerType: "Seller profile",
+      ownerCitizen: "Malaysian citizen / PR", ownerForeigner: "Foreigner / non-citizen", ownerCompany: "Company",
+      fdOpen: "Show breakdown", fdLegal: "Legal fee (SRO scale)", fdDuty: "Stamp duty (MOT scale)", fdMisc: "Misc",
+      fdSst: "8% SST (legal fee only)", fdTotal: "Total", fdValFee: "Valuation (SPA × 0.2%)",
+      fdSellRef: "SRO scale reference (excl. SST)", fdSellSst: "Reference incl. 8% SST", fdSellNote: "The field above is inclusive; override anytime",
+      helpTitle: "Calculation assumptions", helpOk: "Got it",
+      helpH1: "1. Statutory costs (override anytime)",
+      helpL1: "SPA legal fee follows the SRO scale: first 500,000 × 1.25%, remainder × 1% (as used here).",
+      helpL2: "MOT stamp duty: first 100,000 × 1%; 100,001–500,000 × 2%; 500,001–1,000,000 × 3%; above 1,000,000 × 4%.",
+      helpL3: "Legal firm misc: 3,600 + 0.4% × price; loan misc: 3,800 + 0.2% × loan.",
+      helpL4: "Loan agreement stamp duty: 0.5% of loan. Valuation: SPA × 0.2% + 500 misc.",
+      helpL5: "8% SST applies to the legal fee only, not to stamp duty or misc.",
+      helpL6: "Blue fields are auto-calculated; typing a value locks it (no longer auto-updates).",
+      helpH2: "2. Loan",
+      helpL7: "Instalment uses reducing balance: r = annual rate ÷ 12; payment = loan × r ÷ (1 − (1+r)^−n).",
+      helpL8: "The yearly table uses an average interest basis (loan × annual rate); bank statements differ slightly.",
+      helpL9: "Cashback / excess loan: any loan above the purchase price is deducted from the upfront cash.",
+      helpH3: "3. Return definitions",
+      helpL10: "Net annual rent = rent − annual costs (management, quit rent, assessment, repairs, insurance, letting fee, interest).",
+      helpL11: "Annual rental return = net annual rent ÷ total upfront cash (cash-on-cash).",
+      helpL12: "Selling profit = capital gain − selling costs (agent, legal, misc, RPGT).",
+      helpL13: "Net investment profit = total rental profit over the hold + selling profit; Total ROI = that ÷ upfront cash ÷ years.",
+      helpL14: "Return on Total Cost = net investment profit ÷ (price + purchase costs + selling costs) ÷ years.",
+      helpH4: "4. RPGT",
+      helpL15: "Citizen / PR: ≤3 yrs 30%; year 4 20%; year 5 15%; year 6 onwards 0%.",
+      helpL16: "Foreigner / non-citizen: ≤5 yrs 30%; year 6 onwards 10%.",
+      helpL17: "Company: ≤3 yrs 30%; year 4 20%; year 5 15%; year 6 onwards 10%.",
+      helpL18: "Chargeable gain = price − purchase price − purchase costs − selling agent − selling legal − selling misc; floored at 0.",
+      helpH5: "5. Disclaimer",
+      helpL19: "All figures are estimates, not legal, tax, accounting or investment advice. Rely on your lawyer's quote, bank offer and LHDN assessment.",
     }
   };
   var LANG_KEY = "kwongthye_lang";   // 与全站共用；旧键 fangchan_lang 仍然兼容
@@ -758,6 +926,14 @@
       $("planNote").textContent = logged ? t("planNoteCloud") : t("planNote");
     }
     if ($("planName")) $("planName").placeholder = lang === "zh" ? "方案名称（例：Bukit Jalil A）" : "Plan name (e.g. Bukit Jalil A)";
+    if ($("ownerType")) {
+      var otSel = $("ownerType"), otVal = otSel.value || "citizen";
+      [["citizen", t("ownerCitizen")], ["foreigner", t("ownerForeigner")], ["company", t("ownerCompany")]].forEach(function (pair) {
+        var opt = otSel.querySelector('option[value="' + pair[0] + '"]');
+        if (opt) opt.textContent = pair[1];
+      });
+      otSel.value = otVal;
+    }
     try { renderCmpSelects(); } catch (e) {}
     try { localStorage.setItem(LANG_KEY, lang); localStorage.setItem("fangchan_lang", lang); } catch (e) {}
     document.querySelectorAll(".printdate").forEach(function (el) {
@@ -765,7 +941,8 @@
     });
     var hv = $("hold").value;
     var hyv = parseInt(hv, 10);
-    $("rpgtLabel").textContent = hyv >= 1 ? fmt("rpgtLine", { y: hyv, p: Math.round(Calc.rpgtRate(hyv) * 100) }) : t("rpgtEmpty");
+    var otv = $("ownerType") ? $("ownerType").value : "citizen";
+    $("rpgtLabel").textContent = hyv >= 1 ? fmt("rpgtLine", { y: hyv, p: Math.round(Calc.rpgtRate(hyv, otv) * 100) }) : t("rpgtEmpty");
     // 动态文案（由 JS 写入、没有 data-i18n 的元素）
     if ($("acctBtnTxt") && !logged) {
       $("acctBtnTxt").textContent = t("btnLoginShort");
@@ -827,11 +1004,13 @@
     $("yearTable").querySelector("tbody").innerHTML = "";
     var hv = $("hold").value;
     var hyv = parseInt(hv, 10);
-    $("rpgtLabel").textContent = hyv >= 1 ? fmt("rpgtLine", { y: hyv, p: Math.round(Calc.rpgtRate(hyv) * 100) }) : t("rpgtEmpty");
+    var otv = $("ownerType") ? $("ownerType").value : "citizen";
+    $("rpgtLabel").textContent = hyv >= 1 ? fmt("rpgtLine", { y: hyv, p: Math.round(Calc.rpgtRate(hyv, otv) * 100) }) : t("rpgtEmpty");
   }
 
   function buildInput() {
     var tenureRaw = parseInt($("tenure").value, 10);
+    var ownerType = $("ownerType") ? $("ownerType").value : "citizen";
     var holdRaw = parseInt($("hold").value, 10);
     return {
       spa: num("spa"), actual: num("actual"), loan: num("loan"),
@@ -844,9 +1023,9 @@
       holdYears: holdRaw >= 1 ? holdRaw : 1,
       spaFeeOverride: autoManual.spaFee ? num("spaFee") : null,
       laFeeOverride: autoManual.laFee ? num("laFee") : null,
-      valFeeOverride: autoManual.valFee ? num("valFee") : null
+      valFeeOverride: autoManual.valFee ? num("valFee") : null,
+      ownerType: ownerType
     };
-    return inp;
   }
 
   function recalc() {
@@ -864,6 +1043,25 @@
     if (!autoManual.spaFee) set("spaFee", r.part1.spa.total);
     if (!autoManual.laFee) set("laFee", r.part1.la.total);
     if (!autoManual.valFee) set("valFee", r.part1.valuation);
+
+    // 分档明细
+    var sd = r.part1.spa, ld = r.part1.la, vd = r.part1.valDetail;
+    $("fdSpaLegal").textContent = fmtRM(sd.legal);
+    $("fdSpaDuty").textContent = fmtRM(sd.duty);
+    $("fdSpaMisc").textContent = fmtRM(sd.misc);
+    $("fdSpaSst").textContent = fmtRM(sd.sst);
+    $("fdSpaTotal").textContent = fmtRM(sd.total);
+    $("fdLaLegal").textContent = fmtRM(ld.legal);
+    $("fdLaDuty").textContent = fmtRM(ld.duty);
+    $("fdLaMisc").textContent = fmtRM(ld.misc);
+    $("fdLaSst").textContent = fmtRM(ld.sst);
+    $("fdLaTotal").textContent = fmtRM(ld.total);
+    $("fdValFee").textContent = fmtRM(vd.fee);
+    $("fdValMisc").textContent = fmtRM(vd.misc);
+    $("fdValTotal").textContent = fmtRM(vd.total);
+    var sref = Calc.sellLegalTotal(inp.sellPrice);
+    $("fdSellRef").textContent = fmtRM(sref.legal);
+    $("fdSellSst").textContent = fmtRM(sref.total);
     $("acqTotal").textContent = fmtRM(r.part1.purchaseCosts);
     $("initial").textContent = fmtRM(r.part1.initial);
     $("down").textContent = fmtRM(r.part1.downpayment);
@@ -923,6 +1121,24 @@
       tb.appendChild(tr);
     });
   }
+
+  // 手机端：每段标题可点击收起/展开（桌面不受影响）
+  function setupCollapse() {
+    var narrow = window.matchMedia("(max-width: 720px)").matches;
+    document.querySelectorAll("section.part").forEach(function (sec) {
+      sec.classList.toggle("collapsible", narrow);
+      if (!narrow) sec.classList.remove("collapsed");
+      var h = sec.querySelector("h2");
+      if (!h || h.dataset.cbound) return;
+      h.dataset.cbound = "1";
+      h.addEventListener("click", function () {
+        if (!sec.classList.contains("collapsible")) return;
+        sec.classList.toggle("collapsed");
+      });
+    });
+  }
+  setupCollapse();
+  window.addEventListener("resize", setupCollapse);
 
   document.querySelectorAll("input, select").forEach(function (el) {
     if (el.id === "loan" || el.id === "loanPct" || el.id === "spa" || el.id === "spaFee" || el.id === "laFee" || el.id === "valFee" || el.id === "sellAgent" || el.id === "sellLegal") return;
@@ -1071,7 +1287,7 @@
   var company = { name: "", person: "", ren: "", phone: "", email: "", address: "", client: "", project: "" };
   try { var coSaved = JSON.parse(localStorage.getItem(CO_KEY) || "null"); if (coSaved) Object.assign(company, coSaved); } catch (e) {}
 
-  var STATE_FIELDS = ["spa", "actual", "loan", "loanPct", "rate", "tenure", "agent", "consent", "other",
+  var STATE_FIELDS = ["spa", "actual", "loan", "loanPct", "rate", "tenure", "ownerType", "agent", "consent", "other",
     "mgmt", "quit", "assess", "repair", "insur", "rentAgent", "sell", "hold", "rent", "sellAgent", "sellLegal", "sellMisc"];
 
   function collectState() {
@@ -1159,12 +1375,13 @@
 
   $("savePlan").addEventListener("click", function () {
     if (!requirePro()) return;
+    if (!navigator.onLine && logged) { toast(t("offlineWarn")); return; }
     var name = $("planName").value.trim();
     if (!name) { $("planName").focus(); toast(t("toastNeedName")); return; }
     var st = collectState();
     if (logged) {
       api("/plans", { method: "POST", body: { name: name, payload: st } }).then(function (j) {
-        if (j.ok) { toast(t("toastCloudSaved")); refreshMe(); refreshPlans("c:" + j.plan.id); }
+        if (j.ok) { toast(t("toastCloudSaved")); track("save_cloud"); refreshMe(); refreshPlans("c:" + j.plan.id); }
         else if (j.error === "quota_exceeded") { toast(t("errQuota")); }
         else { toast(errMsg(j.error)); }
       }).catch(function () { toast(t("errCloud")); });
@@ -1175,6 +1392,8 @@
     list.forEach(function (p) { if (p.name === name) { p.state = st; p.updatedAt = now; found = true; } });
     if (!found) list.push({ id: "p" + Date.now(), name: name, createdAt: now, updatedAt: now, state: st });
     persistPlans(list);
+    track("save_local");
+    showNudge();
     renderPlanList("l:" + list[list.length - 1].id);
     toast(t("toastSaved"));
   });
@@ -1346,7 +1565,7 @@
 
   function updateProLocks() {
     var lock = !unlocked();
-    ["savePlan", "shareLink", "printBtn", "waBtn", "wxBtn", "fbBtn", "csvBtn", "cmpSelA", "cmpSelB", "cmpView", "reportBtn"].forEach(function (id) {
+    ["savePlan", "shareLink", "printBtn", "waBtn", "wxBtn", "fbBtn", "csvBtn", "cmpSelA", "cmpSelB", "cmpSelC", "cmpSelD", "cmpView", "cmpAdd", "reportBtn"].forEach(function (id) {
       var el = $(id); if (el) el.classList.toggle("locked", lock);
     });
     var hint = $("proHint");
@@ -1480,6 +1699,7 @@
     if (!$("hold").value.toString().trim()) { $("hold").value = 5; filled++; assumed.push(t("asHold")); }
 
     recalc();
+    track("ai_fill");
     toast(assumed.length
       ? fmt("aiDoneAssumed", { n: filled, d: assumed.join("、") })
       : fmt("aiDone", { n: filled }));
@@ -1518,15 +1738,19 @@
     try { applyState(cur); } catch (e2) {}
     return res;
   }
+  function cmpSlots() {
+    return ["cmpSelA", "cmpSelB", "cmpSelC", "cmpSelD"].map(function (id) { return $(id); }).filter(function (el) { return el && !el.hidden; });
+  }
   function renderCmpSelects() {
     var a = $("cmpSelA"), b = $("cmpSelB");
     if (!a || !b) return;
-    var list = allSavedPlans(), prevA = a.value, prevB = b.value;
+    var list = allSavedPlans(), prevA = a.value, prevB = b.value, prevC = $("cmpSelC").value, prevD = $("cmpSelD").value;
     var ph = '<option value="">' + t(list.length ? "cmpPick" : "cmpNoPlan") + "</option>";
-    a.innerHTML = ph; b.innerHTML = ph;
+    ["cmpSelA", "cmpSelB", "cmpSelC", "cmpSelD"].forEach(function (id) { $(id).innerHTML = ph; });
     list.forEach(function (p, i) {
       var lbl = (p.name || ("Plan " + (i + 1))) + " · " + String(p.date || "").slice(0, 10);
-      [a, b].forEach(function (el) {
+      ["cmpSelA", "cmpSelB", "cmpSelC", "cmpSelD"].forEach(function (id) {
+        var el = $(id);
         var o = document.createElement("option");
         o.value = p.key; o.textContent = lbl; el.appendChild(o);
       });
@@ -1534,6 +1758,8 @@
     var has = function (k) { return list.some(function (p) { return p.key === k; }); };
     if (prevA && has(prevA)) a.value = prevA;
     if (prevB && has(prevB)) b.value = prevB;
+    if (prevC && has(prevC)) $("cmpSelC").value = prevC;
+    if (prevD && has(prevD)) $("cmpSelD").value = prevD;
     if (list.length >= 2) {
       if (!a.value) a.value = list[0].key;
       if (!b.value || b.value === a.value) {
@@ -1545,32 +1771,45 @@
     if (list.length < 2) $("cmpBox").hidden = true;
   }
   function renderCmp() {
+    track("compare");
     if (!requirePro()) return;
-    var ka = $("cmpSelA").value, kb = $("cmpSelB").value;
-    if (!ka || !kb) { toast(t("cmpNeedSaved")); return; }
-    if (ka === kb) { toast(t("cmpSame")); return; }
-    var A = planMetaOf(ka), B = planMetaOf(kb);
-    if (!A || !B) { renderCmpSelects(); toast(t("cmpNeedSaved")); return; }
-    var ma = metricsFromState(A.state), mb = metricsFromState(B.state);
-    if (!ma || !mb) { toast(t("cmpBad")); return; }
+    var keys = cmpSlots().map(function (el) { return el.value; }).filter(Boolean);
+    var uniq = keys.filter(function (k, i) { return keys.indexOf(k) === i; });
+    if (uniq.length < 2) { toast(t("cmpNeedSaved")); return; }
+    if (uniq.length !== keys.length) { toast(t("cmpSame")); return; }
+    var plans = uniq.map(function (k) {
+      var meta = planMetaOf(k);
+      if (!meta) return null;
+      var m = metricsFromState(meta.state);
+      return m ? { name: meta.name, m: m } : null;
+    });
+    if (plans.some(function (x) { return !x; })) { renderCmpSelects(); toast(t("cmpBad")); return; }
     var rows = [["cmpCash", "cash", "rm"], ["cmpAcq", "acq", "rm"], ["cmpPmt", "pmt", "rm"],
       ["cmpRent", "rent", "rm"], ["cmpSell", "sell", "rm"], ["cmpNet", "net", "rm"],
       ["cmpRoi", "roi", "pct"], ["cmpRotc", "rotc", "pct"]];
     var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
-    var html = '<table class="cmpTable"><thead><tr><th>' + t("cmpTitle") + "</th><th>A · " +
-      esc(A.name) + "</th><th>B · " + esc(B.name) + "</th></tr></thead><tbody>";
+    var label = "ABCD";
+    var head = '<table class="cmpTable"><thead><tr><th>' + t("cmpTitle") + "</th>";
+    plans.forEach(function (p, i) { head += "<th>" + label[i] + " · " + esc(p.name) + "</th>"; });
+    head += "</tr></thead><tbody>";
     var f = function (v, kind) {
       if (v == null || isNaN(v)) return "—";
       return kind === "pct" ? (v * 100).toFixed(2) + "%" : fmtRM(v);
     };
     rows.forEach(function (r) {
-      var va = ma[r[1]], vb = mb[r[1]];
-      var diff = (va != null && vb != null && va !== vb) ? (vb > va ? " ▲" : " ▼") : "";
-      html += "<tr><td>" + t(r[0]) + "</td><td>" + f(va, r[2]) + "</td><td>" + f(vb, r[2]) + diff + "</td></tr>";
+      var base = plans[0].m[r[1]];
+      var tr = "<tr><td>" + t(r[0]) + "</td>";
+      plans.forEach(function (p, i) {
+        var v = p.m[r[1]];
+        var diff = "";
+        if (i > 0 && base != null && v != null && v !== base) diff = v > base ? " ▲" : " ▼";
+        tr += "<td>" + f(v, r[2]) + diff + "</td>";
+      });
+      head += tr + "</tr>";
     });
-    html += "</tbody></table>";
+    head += "</tbody></table>";
     var box = $("cmpBox");
-    box.innerHTML = html; box.hidden = false;
+    box.innerHTML = head; box.hidden = false;
     try { box.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e) {}
   }
   // 打印设置：纸张 + 页眉样式
@@ -1646,6 +1885,7 @@
     if (!logged || !me || !me.user) { toast(t("errNeedLogin")); openAcct(); return; }
     if (!lastRes || !lastInp) { toast(t("cmpNeed")); return; }
     toast(t("toastReport"));
+    track("export_pdf");
     fetch("/api/report.pdf", {
       method: "POST",
       credentials: "same-origin",
@@ -1667,7 +1907,13 @@
   }
   $("reportBtn").addEventListener("click", downloadReport);
   $("cmpView").addEventListener("click", renderCmp);
-  ["cmpSelA", "cmpSelB"].forEach(function (id) {
+  $("cmpAdd").addEventListener("click", function () {
+    if ($("cmpSelC").hidden) { $("cmpSelC").hidden = false; }
+    else if ($("cmpSelD").hidden) { $("cmpSelD").hidden = false; this.hidden = true; }
+    renderCmpSelects();
+  });
+
+  ["cmpSelA", "cmpSelB", "cmpSelC", "cmpSelD"].forEach(function (id) {
     var el = $(id);
     if (el) el.addEventListener("change", function () { if (!$("cmpBox").hidden) renderCmp(); });
   });
@@ -1781,6 +2027,48 @@
       } else { toast(errMsg(j.error)); }
     }).catch(function () { toast(t("errGeneric")); });
   }
+  // ---- 轻量埋点：每个事件每次加载只发一次（calc_done 除外）----
+  var _evSent = {};
+  function track(ev, meta) {
+    try {
+      if (!ev) return;
+      if (ev !== "calc_done") { if (_evSent[ev]) return; _evSent[ev] = 1; }
+      var payload = JSON.stringify({ path: location.pathname, ref: "", event: ev, meta: meta || "" });
+      if (navigator.sendBeacon) navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+      else fetch("/api/track", { method: "POST", body: payload, headers: { "Content-Type": "application/json" }, keepalive: true });
+    } catch (e) {}
+  }
+
+  // ---- 断网提示 ----
+  function syncOnline() {
+    var bar = $("offlineBar");
+    if (bar) bar.hidden = navigator.onLine;
+  }
+  window.addEventListener("online", syncOnline);
+  window.addEventListener("offline", syncOnline);
+  syncOnline();
+
+  // ---- 免费期注册引导（不挡路，可关闭）----
+  var NUDGE_KEY = "kwthye_nudge_hidden";
+  function nudgeShown() {
+    try { return localStorage.getItem(NUDGE_KEY) === "1"; } catch (e) { return false; }
+  }
+  function showNudge() {
+    if (logged || nudgeShown()) return;
+    var el = $("loginNudge");
+    if (!el) return;
+    el.hidden = false;
+    track("nudge_shown");
+  }
+  document.addEventListener("click", function (e) {
+    if (e.target && e.target.id === "nudgeClose") {
+      $("loginNudge").hidden = true;
+      try { localStorage.setItem(NUDGE_KEY, "1"); } catch (err) {}
+      track("nudge_close");
+    }
+    if (e.target && e.target.id === "nudgeReg") { track("nudge_click"); openAcct(); }
+  });
+
   var cfgFree = false;   // 来自 /api/config：免费开放期
   function freeMode() {
     if (me && me.user && me.user.freeMode) return true;
@@ -1986,6 +2274,12 @@
   $("planMore").addEventListener("click", openPlan);
   $("planClose").addEventListener("click", closePlan);
   $("planModal").addEventListener("click", function (e) { if (e.target === this) closePlan(); });
+
+  function openHelp() { $("helpModal").hidden = false; track("help_open"); }
+  $("helpBtn").addEventListener("click", openHelp);
+  $("helpClose").addEventListener("click", function () { $("helpModal").hidden = true; });
+  $("helpOk").addEventListener("click", function () { $("helpModal").hidden = true; });
+  $("helpModal").addEventListener("click", function (e) { if (e.target === this) $("helpModal").hidden = true; });
 
   function openAcct() { $("acctModal").hidden = false; }
   function closeAcct() { $("acctModal").hidden = true; }

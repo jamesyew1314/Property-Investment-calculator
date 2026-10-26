@@ -250,6 +250,13 @@
       </section>
 
       <section class="tab" id="tab-views">
+        <div class="card" style="padding:14px;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <b data-i18n="evTitle">事件（近 7 天转化漏斗）</b>
+            <span class="muted" id="evTotal"></span>
+          </div>
+          <table><thead><tr><th data-i18n="evName">事件</th><th data-i18n="evCount">次数</th><th data-i18n="evPeople">独立访客</th></tr></thead><tbody id="evBody"></tbody></table>
+        </div>
         <div class="grid">
           <div class="card" style="padding:0;overflow:auto"><table><thead><tr>
             <th data-i18n="thDate">日期</th><th data-i18n="thViews">浏览</th>
@@ -292,6 +299,7 @@
       lblAdminEmail: "管理员邮箱（owner 留空）", lblPassword: "密码", btnLogin: "登录",
       lblOtp: "邮箱验证码（6 位）", btnVerify: "验证并进入", otpNote: "验证码已发到管理员邮箱，10 分钟内有效。",
       overview: "后台概览", loggedAt: "已登录 · {d}",
+      evTitle: "事件（近 7 天转化漏斗）", evName: "事件", evCount: "次数", evPeople: "独立访客", evTotalLbl: "合计",
       chRevenue: "近 14 天收入", chUsers: "近 14 天新用户", chViews: "近 14 天浏览量",
       chTotal: "累计", chConv: "付费转化率",
       exportLbl: "导出 CSV：", expUsers: "用户", expCodes: "开通码", expPayments: "收据",
@@ -346,6 +354,7 @@
       lblAdminEmail: "Admin email (leave blank for owner)", lblPassword: "Password", btnLogin: "Sign in",
       lblOtp: "Email code (6 digits)", btnVerify: "Verify & enter", otpNote: "A code was emailed to the admin mailbox, valid for 10 minutes.",
       overview: "Overview", loggedAt: "Signed in · {d}",
+      evTitle: "Events · 7-day funnel", evName: "Event", evCount: "Count", evPeople: "Unique visitors", evTotalLbl: "Total",
       chRevenue: "Revenue · 14 days", chUsers: "New users · 14 days", chViews: "Pageviews · 14 days",
       chTotal: "Total", chConv: "Paid conversion",
       exportLbl: "Export CSV:", expUsers: "Users", expCodes: "Activation codes", expPayments: "Receipts",
@@ -436,7 +445,7 @@
     if (isApp) {
       renderRoleTag();
       renderWhoLine();
-      loadStats(); loadCharts(); loadList(); loadUsers($("uQuery").value.trim()); loadRefunds();
+      loadStats(); loadCharts(); loadList(); loadUsers($("uQuery").value.trim()); loadRefunds(); loadEvents();
       loadMsgs(); loadViews(); loadLogs();
       if (myRole === "owner") loadAdmins();
     }
@@ -527,6 +536,16 @@
           "</td><td>" + esc(m.phone || "") + "<br>" + esc(m.email || "") + "</td><td>" + esc(m.message) + "</td></tr>";
       }).join("") || "<tr><td colspan=4 class='muted'>" + t("empty") + "</td></tr>";
     });
+  }
+
+  function loadEvents() {
+    api("/events?days=7").then(function (j) {
+      if (!j.ok) return;
+      $("evTotal").textContent = t("evTotalLbl") + " " + j.total;
+      $("evBody").innerHTML = (j.events || []).map(function (e) {
+        return "<tr><td class='mono'>" + esc(e.name) + "</td><td>" + e.n + "</td><td>" + e.people + "</td></tr>";
+      }).join("") || "<tr><td colspan=3 class='muted'>" + t("empty") + "</td></tr>";
+    }).catch(function () {});
   }
 
   function loadViews() {
@@ -663,7 +682,7 @@
   function boot(me) {
     show(true);
     applyRole(me && me.role);
-    loadStats(); loadCharts(); loadList(); loadUsers(""); loadMsgs(); loadViews(); loadLogs();
+    loadStats(); loadCharts(); loadList(); loadUsers(""); loadMsgs(); loadViews(); loadEvents(); loadLogs();
     if (myRole === "owner") loadAdmins();
     $("logoutBtn").onclick = function () {
       api("/logout", { method: "POST" }).then(function () { show(false); });

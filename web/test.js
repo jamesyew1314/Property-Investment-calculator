@@ -107,5 +107,38 @@ const tp3 = C.compute({spa:1000000, actual:800000, loan:800000, ratePct:4.5, yea
   agentFee:0, consentFee:0, other:0, mgmtM:0, quitY:0, assessY:0, repairY:0, insurY:0,
   sellAgentPct:3, rentY:60000, sellPrice:900000, holdYears:3});
 a(tp3.out.totalRentalProfit, 72000, "总年租金净利润 = 24,000 × 3 年");
+// ---- v0.78：RPGT 按卖家身份 ----
+a(C.rpgtRate(3, "citizen"), 0.30, "公民 3 年 = 30%");
+a(C.rpgtRate(6, "citizen"), 0.00, "公民 6 年 = 0%");
+a(C.rpgtRate(5, "foreigner"), 0.30, "外国人 5 年 = 30%");
+a(C.rpgtRate(6, "foreigner"), 0.10, "外国人 6 年 = 10%");
+a(C.rpgtRate(5, "company"), 0.15, "公司 5 年 = 15%");
+a(C.rpgtRate(6, "company"), 0.10, "公司 6 年 = 10%");
+a(C.rpgtRate(6, "unknown"), 0.00, "未知身份按公民处理");
+
+const fr = C.compute({spa:1000000, actual:900000, loan:800000, ratePct:4.3, yearsLoan:30,
+  agentFee:0, consentFee:0, other:0, mgmtM:0, quitY:0, assessY:0, repairY:0, insurY:0,
+  sellAgentPct:2, rentY:36000, sellPrice:1000000, holdYears:3, ownerType:"foreigner"});
+a(fr.ownerType === "foreigner", true, "compute 回传 ownerType = foreigner");
+a(fr.sale.rpgt.rate, 0.30, "外国人 3 年 RPGT 税率 30%");
+a(fr.years[2].rpgtPct, 0.30, "逐年表第 3 年税率跟随身份");
+const sameAsCitizen = C.compute({spa:1000000, actual:900000, loan:800000, ratePct:4.3, yearsLoan:30,
+  agentFee:0, consentFee:0, other:0, mgmtM:0, quitY:0, assessY:0, repairY:0, insurY:0,
+  sellAgentPct:2, rentY:36000, sellPrice:1000000, holdYears:6, ownerType:"citizen"});
+a(sameAsCitizen.sale.rpgt.rate, 0, "公民持有 6 年 RPGT = 0");
+
+// ---- 费用分档明细自洽 ----
+const det = C.compute({spa:1000000, actual:800000, loan:720000, ratePct:4.5, yearsLoan:30,
+  agentFee:0, consentFee:0, other:0, mgmtM:0, quitY:0, assessY:0, repairY:0, insurY:0,
+  sellAgentPct:2, rentY:60000, sellPrice:900000, holdYears:1});
+a(det.part1.spa.legal + det.part1.spa.duty + det.part1.spa.misc + det.part1.spa.sst, det.part1.spa.total,
+  "SPA 明细四项相加 = 合计");
+a(det.part1.la.legal + det.part1.la.duty + det.part1.la.misc + det.part1.la.sst, det.part1.la.total,
+  "LA 明细四项相加 = 合计");
+a(det.part1.valDetail.fee + det.part1.valDetail.misc, det.part1.valDetail.total,
+  "估价明细相加 = 合计");
+a(det.part1.spa.legal, 11250, "SPA 律师费 1,000,000 → 11,250（500k×1.25% + 500k×1%）");
+a(det.part1.spa.duty, 24000, "MOT 印花税 1,000,000 → 24,000（1k+8k+15k）");
+
 console.log("\n" + pass + " pass, " + fail + " fail");
 process.exit(fail === 0 ? 0 : 1);

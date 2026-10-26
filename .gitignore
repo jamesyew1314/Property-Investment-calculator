@@ -43,3 +43,7 @@ print-test.pdf
 
 # QA 截图
 qa-*.png
+
+# 独立的视频平台项目（不属于本站仓库，防止 600MB+ 被提交）
+video-platform/
+node_modules/

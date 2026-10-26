@@ -189,6 +189,31 @@ function buildReportPdf(payload) {
         return yy + 34;
       }
 
+      // 横向条形图：items = [{k: 标签, v: 数值, color}]
+      // signed=true 时以零轴居中（负数向左），否则从左侧起画（全部为正）
+      function hbars(title, items, yy, signed) {
+        if (!items || !items.length) return yy;
+        if (yy > PAGE_H - 130) { doc.addPage(); yy = M; }
+        doc.font(FB).fontSize(9).fillColor(C.navy).text(title, M, yy); yy += 15;
+        const labelW = 110, valW = 78, barW = CW - labelW - valW - 10;
+        const maxAbs = Math.max(1, items.reduce(function (a, it) { return Math.max(a, Math.abs(it.v || 0)); }, 0));
+        const zero = M + labelW + (signed ? barW / 2 : 0);
+        const half = signed ? barW / 2 : barW;
+        if (signed) doc.moveTo(zero, yy - 2).lineTo(zero, yy + items.length * 14).lineWidth(0.6).strokeColor("#C9D3E0").stroke();
+        items.forEach(function (it) {
+          const v = num(it.v) || 0;
+          const w = Math.max(1.5, Math.round(Math.abs(v) / maxAbs * half));
+          doc.font(FR).fontSize(7.8).fillColor(C.muted).text(it.k, M, yy, { width: labelW, lineBreak: false, ellipsis: true });
+          doc.rect(M + labelW, yy + 1, barW, 8).fill("#F7F9FC");
+          if (v < 0) doc.rect(zero - w, yy + 1, w, 8).fill(C.red);
+          else doc.rect(zero, yy + 1, w, 8).fill(it.color || "#2E5496");
+          doc.font(FR).fontSize(7.8).fillColor(v < 0 ? C.red : C.ink)
+            .text(money(v), M + labelW + barW + 10, yy, { width: valW, align: "right", lineBreak: false });
+          yy += 14;
+        });
+        return yy + 10;
+      }
+
       // ---------- 页头 ----------
       const logoPath = path.join(__dirname, "..", "web", "logo.png");
       if (fs.existsSync(logoPath)) { try { doc.image(logoPath, M, M - 4, { height: 40 }); } catch (e) {} }
@@ -299,6 +324,21 @@ function buildReportPdf(payload) {
       y = row(T("totalRoi"), pct(num(out.totalROI)), y);
       y = row(T("totalCost"), money(num(out.totalCost)), y);
       y = row(T("rotc"), pct(num(out.returnOnTotalCost)), y);
+
+      // ---------- 图表 ----------
+      const ys = years;
+      if (ys.length) {
+        y = hbars(pick("持有期每年净现金流（租金 − 费用 − 利息）", "Annual net cash flow (rent − costs − interest)"),
+          ys.map(function (r) { return { k: T("thYear") + " " + r.y, v: num(r.netY) }; }),
+          y + 4, true);
+      }
+      const interestSum = ys.reduce(function (a, r) { return a + (num(r.interestYear) || 0); }, 0);
+      y = hbars(pick("钱花在哪里", "Where the money goes"), [
+        { k: pick("首付", "Down payment"), v: num(r.part1 && r.part1.downpayment), color: "#2E5496" },
+        { k: pick("购置费用", "Acquisition costs"), v: num(r.part1 && r.part1.purchaseCosts), color: "#C6A15B" },
+        { k: pick("持有期利息", "Interest over hold"), v: interestSum, color: "#7A8CA3" },
+        { k: pick("出售费用（含 RPGT）", "Selling costs (incl. RPGT)"), v: num(r.sale && r.sale.sellCosts), color: "#B23B3B" }
+      ], y);
 
       // 备注
       if (txt(p.note, 600)) {

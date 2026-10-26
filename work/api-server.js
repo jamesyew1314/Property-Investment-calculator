@@ -1017,6 +1017,18 @@ app.post("/api/admin/promo", requireAdmin, requireWrite, async function (req, re
 });
 
 // 近 N 天趋势（收入 / 新用户 / 浏览量 / 收据数），用于后台图表
+// 事件统计（近 N 天）
+app.get("/api/admin/events", requireAdmin, async function (req, res, next) {
+  try {
+    const days = Math.max(1, Math.min(90, parseInt(req.query.days || "7", 10) || 7));
+    const r = await pool.query(
+      "SELECT name, count(*)::int AS n, count(DISTINCT ip_hash)::int AS people " +
+      "FROM events WHERE created_at > now() - ($1 || ' days')::interval GROUP BY name ORDER BY n DESC", [String(days)]);
+    const total = await pool.query("SELECT count(*)::int AS n FROM events WHERE created_at > now() - ($1 || ' days')::interval", [String(days)]);
+    res.json({ ok: true, days: days, total: total.rows[0].n, events: r.rows });
+  } catch (e) { next(e); }
+});
+
 app.get("/api/admin/charts", requireAdmin, async function (req, res, next) {
   try {
     const days = Math.max(7, Math.min(90, parseInt(req.query.days || "14", 10) || 14));
@@ -1184,8 +1196,11 @@ app.post("/api/track", rateLimit(120, 60000), async function (req, res) {
     body = body || {};
     const path = String(body.path || "").slice(0, 200);
     const ref = String(body.ref || "").slice(0, 300);
+    const ev = String(body.event || "").slice(0, 60);
+    const meta = String(body.meta || "").slice(0, 200);
     const ipHash = crypto.createHash("sha256").update((req.ip || "") + (process.env.IP_SALT || "fc")).digest("hex").slice(0, 24);
-    if (path) await pool.query("INSERT INTO pageviews(path,referrer,ip_hash) VALUES($1,$2,$3)", [path, ref, ipHash]);
+    if (ev) await pool.query("INSERT INTO events(name,path,meta,ip_hash) VALUES($1,$2,$3,$4)", [ev, path, meta, ipHash]);
+    else if (path) await pool.query("INSERT INTO pageviews(path,referrer,ip_hash) VALUES($1,$2,$3)", [path, ref, ipHash]);
     res.json({ ok: true });
   } catch (e) {
     res.json({ ok: false });

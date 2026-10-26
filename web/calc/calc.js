@@ -84,8 +84,20 @@
     };
   }
 
-  // ---- RPGT（个人，估算；以 LHDN 为准） ----
-  function rpgtRate(years) {
+  // ---- RPGT（估算；以 LHDN 为准）----
+  // citizen = 公民/永久居民：≤3y 30% / 4y 20% / 5y 15% / ≥6y 0%
+  // foreigner = 外国人：≤5y 30% / ≥6y 10%
+  // company = 公司：≤3y 30% / 4y 20% / 5y 15% / ≥6y 10%
+  var OWNER_TYPES = ["citizen", "foreigner", "company"];
+  function rpgtRate(years, ownerType) {
+    var k = OWNER_TYPES.indexOf(ownerType) >= 0 ? ownerType : "citizen";
+    if (k === "foreigner") return years <= 5 ? 0.30 : 0.10;
+    if (k === "company") {
+      if (years <= 3) return 0.30;
+      if (years <= 4) return 0.20;
+      if (years <= 5) return 0.15;
+      return 0.10;
+    }
     if (years <= 3) return 0.30;
     if (years <= 4) return 0.20;
     if (years <= 5) return 0.15;
@@ -93,14 +105,15 @@
   }
   // RPGT（老板口径）：(卖价 − 实价 − 总购置费用 − 卖出中介费 − 卖出律师费 − 售出杂费) × 年限税率
   // 3 年内 30% · 第 4 年 20% · 第 5 年 15% · 第 6 年起 0%
-  function rpgt(sellPrice, actualPrice, acqTotal, sellAgent, sellLegal, sellMisc, holdYears) {
+  function rpgt(sellPrice, actualPrice, acqTotal, sellAgent, sellLegal, sellMisc, holdYears, ownerType) {
     var gain = R(sellPrice - actualPrice - (acqTotal || 0) - (sellAgent || 0) - (sellLegal || 0) - (sellMisc || 0));
-    var rate = rpgtRate(holdYears);
+    var rate = rpgtRate(holdYears, ownerType);
     return {
       gain: gain,
       taxable: Math.max(0, gain),
       rate: rate,
-      tax: R(Math.max(0, gain) * rate)
+      tax: R(Math.max(0, gain) * rate),
+      ownerType: OWNER_TYPES.indexOf(ownerType) >= 0 ? ownerType : "citizen"
     };
   }
 
@@ -155,6 +168,7 @@
     var yearsLoan = Math.max(1, Math.min(50, Math.round(inp.yearsLoan || 30)));
     var rate = (inp.ratePct || 0) / 100;
     var holdY = Math.max(1, Math.min(50, Math.round(inp.holdYears || 1)));   // 0/负数按 1 年兜底，防算出怪数字
+    var ownerType = OWNER_TYPES.indexOf(inp.ownerType) >= 0 ? inp.ownerType : "citizen";
 
     // Part 1
     var spa = spaLegalTotal(inp.spa);
@@ -196,7 +210,7 @@
         rentCum: R(rentY * y),
         instalmentCum: R(cumInst),
         netHoldCum: R(cumNetHold),
-        rpgtPct: rpgtRate(y)
+        rpgtPct: rpgtRate(y, ownerType)
       });
     }
 
@@ -208,7 +222,7 @@
     var sellLegalFee = R(inp.sellLegalFee || 0);              // 卖出律师费（手填，含印花税/杂费/SST）
     var sellMiscFee = R(inp.sellMisc || 0);                   // 售出杂费（手填）
     var balance = yearAmort(inp.loan, rate, yearsLoan, holdY).balanceEnd;
-    var r = rpgt(inp.sellPrice, inp.actual, purchaseCosts, sellAgent, sellLegalFee, sellMiscFee, holdY);
+    var r = rpgt(inp.sellPrice, inp.actual, purchaseCosts, sellAgent, sellLegalFee, sellMiscFee, holdY, ownerType);
     var sellCosts = R(sellAgent + sellLegalFee + sellMiscFee + r.tax);   // Total Selling Costs
     var netSale = R(inp.sellPrice - balance - sellCosts);
 
@@ -243,8 +257,10 @@
     var irr = xirr(flows);
 
     return {
+      ownerType: ownerType,
       part1: {
         spa: spa, la: la, valuation: valuation,
+        valDetail: { fee: R(0.002 * inp.spa), misc: 500, total: valuation },
         purchaseCosts: purchaseCosts,
         downpayment: downpayment,
         cashback: cashback,
@@ -287,6 +303,8 @@
     valuationFee: valuationFee,
     sst: sst, spaLegalTotal: spaLegalTotal, loanLegalTotal: loanLegalTotal, sellLegalTotal: sellLegalTotal,
     encodeState: encodeState, decodeState: decodeState,
+    spaLegalTotal: spaLegalTotal, loanLegalTotal: loanLegalTotal, sellLegalTotal: sellLegalTotal,
+    valuationFee: valuationFee, ownerTypes: OWNER_TYPES,
     instalment: instalment, balanceAt: balanceAt, yearAmort: yearAmort,
     rpgtRate: rpgtRate, rpgt: rpgt,
     initialOutlay: initialOutlay,
