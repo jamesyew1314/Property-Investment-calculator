@@ -230,7 +230,8 @@
   </div>
   <div class="aiRow no-print">
     <input id="aiText" type="text" data-i18n-ph="aiPlaceholder" placeholder="一句话填数：SPA 80万，贷 90%，租 3000，5 年后卖 100万">
-    <button class="btn btn2" id="aiFill" data-i18n="aiBtn">AI 填数</button>
+    <button class="btn btn2" id="aiExample" data-i18n="aiExampleBtn" title="填入示例 Example">示例</button>
+    <button class="btn" id="aiFill" data-i18n="aiBtn" title="规则识别，不需要联网">AI 填数</button>
   </div>
 
   <!-- Part 1 -->
@@ -556,8 +557,10 @@
       errCurrent: "当前密码不对", pwdMismatch: "两次输入不一致",
       legalPrivacy: "隐私政策", legalTerms: "使用条款",
       proMore: "查看价格 / 升级 →", freeCalcOnly: "仅计算 · 存档需 Pro",
-      aiPlaceholder: "一句话填数：SPA 80万，贷 90%，租 3000，5 年后卖 100万", aiBtn: "AI 填数",
-      aiDone: "已填入 {n} 个字段", aiFail: "没识别到数字，试试：SPA 80万，贷 90%，租 3000",
+      aiPlaceholder: "一句话填数：买了 80 万的房子，贷 90%，月租 3000，5 年后卖 100 万", aiBtn: "AI 填数",
+      aiExampleBtn: "示例", aiExampleDone: "示例已填入，再点「AI 填数」即可套用",
+      aiEmpty: "请先在上面输入一句话，例如：买了 80 万的房子，贷 90%，月租 3000，5 年后卖 100 万",
+      aiDone: "已填入 {n} 个字段", aiFail: "没识别到数字，试试：买了 80 万的房子，贷款 90%，利率 4.3%，月租 3000，5 年后卖 100 万",
       btnCsv: "📊 导出 Excel / CSV", btnReport: "📄 完整报告 PDF",
       toastReport: "正在生成报告…", errReport: "报告生成失败，请稍后再试", errProOnly: "完整报告为专业版功能",
       cmpView: "查看对比",
@@ -666,8 +669,10 @@
       errCurrent: "Current password is incorrect", pwdMismatch: "Passwords do not match",
       legalPrivacy: "Privacy Policy", legalTerms: "Terms of Use",
       proMore: "Pricing / upgrade →", freeCalcOnly: "Calculate only · Pro to save",
-      aiPlaceholder: "One sentence: SPA 800k, loan 90%, rent 3,000, sell 1M after 5 years", aiBtn: "AI fill",
-      aiDone: "Filled {n} fields", aiFail: "No numbers found. Try: SPA 800k, loan 90%, rent 3,000",
+      aiPlaceholder: "One sentence: condo 800k, 90% loan, rent 3,000, sell 1M after 5 years", aiBtn: "AI fill",
+      aiExampleBtn: "Example", aiExampleDone: "Example inserted — tap \"AI fill\" to apply",
+      aiEmpty: "Type a sentence first, e.g. condo 800k, 90% loan, rent 3,000, sell 1M after 5 years",
+      aiDone: "Filled {n} fields", aiFail: "No numbers found. Try: condo 800k, 90% loan at 4.3%, rent 3,000, sell for 1M after 5 years",
       btnCsv: "📊 Export Excel / CSV", btnReport: "📄 Full report PDF",
       toastReport: "Generating your report…", errReport: "Could not generate the report, please try again", errProOnly: "The full report is a Pro feature",
       cmpView: "View comparison",
@@ -1389,27 +1394,63 @@
     a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 3000);
   }
+  // 一句话填数：按分句解析，避免「租」抓到「卖价」这种串味
+  var CN_NUM = { "一": 1, "二": 2, "两": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10 };
+  function aiNum(str, unit) {
+    var v = parseFloat(str);
+    if (isNaN(v)) return null;
+    if (unit === "万") v *= 10000;
+    else if (unit === "千") v *= 1000;
+    else if (unit && /[kK]/.test(unit)) v *= 1000;
+    else if (unit && /[mM]/.test(unit)) v *= 1000000;
+    return v;
+  }
   function parseAi() {
-    var txt = ($("aiText").value || "").replace(/,/g, "");
-    if (!txt.trim()) return;
-    var filled = 0;
-    function grab(re) {
-      var m = txt.match(re);
-      if (!m) return null;
-      var v = parseFloat(m[1]); var u = m[2] || "";
-      if (/万/.test(u)) v *= 10000; else if (/千/.test(u)) v *= 1000;
-      else if (/[kK]/.test(u)) v *= 1000; else if (/[mM]/.test(u)) v *= 1000000;
-      return v;
+    var txt = ($("aiText").value || "").replace(/(\d),(?=\d)/g, "$1");   // 只去掉 300,000 这种千分位
+    if (!txt.trim()) { toast(t("aiEmpty")); $("aiText").focus(); return; }
+
+    var clauses = txt.split(/[,，;；。\n]/).map(function (c) { return c.trim(); }).filter(Boolean);
+    function hit(re) {
+      for (var i = 0; i < clauses.length; i++) {
+        var m = clauses[i].match(re);
+        if (m) return m;
+      }
+      return null;
     }
-    var spa = grab(/(?:spa|买价|房价|屋价)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i);
-    var actual = grab(/(?:实价|actual)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i);
-    var pct = grab(/(?:贷|loan|ltv)\D{0,8}([\d.]+)\s*%/i);
-    var loanAmt = grab(/(?:贷|loan)\D{0,8}([\d.]+)\s*(万|千|[kKmM])/i);
-    var rate = grab(/(?:利率|rate)\D{0,6}([\d.]+)\s*%/i);
-    var tenure = grab(/(?:年限|tenure)\D{0,6}(\d+)/i);
-    var rent = grab(/(?:租金|租|rent)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i);
-    var sell = grab(/(?:卖|售|sell)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i);
-    var hold = grab(/(\d+)\s*年(?:后|卖|出售)|(?:hold|持有)\D{0,4}(\d+)/i);
+    function val(re) { var m = hit(re); return m ? aiNum(m[1], m[2] || m[3]) : null; }
+
+    var filled = 0;
+    var spa    = val(/(?:spa|买价|房价|屋价|购入价|买|购|purchase|price|condo|apartment|unit|house|property)\D{0,10}([\d.]+)\s*(万|千|[kKmM])?/i)
+              || val(/([\d.]+)\s*(万|千|[kKmM])?\s*(?:的)?\s*(?:房子|公寓|单位|房产|condo|unit|house|property)/i);
+    var actual = val(/(?:实价|实际买价|actual)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i);
+    var pct = null;
+    [/([\d.]+)\s*%\s*(?:的)?\s*(?:贷款|贷|loan|ltv)/i,
+     /(?:贷款|贷|loan|ltv)\D{0,8}([\d.]+)\s*%/].forEach(function (re) {
+      if (pct !== null) return;
+      var m = hit(re);
+      if (!m) return;
+      var v = parseFloat(m[1]);
+      if (v >= 10 && v <= 100) pct = v;   // 10%–100% 才当成贷款成数
+    });
+    var loanAmt = val(/(?:贷款额|贷款|贷|loan)\D{0,8}([\d.]+)\s*(万|千|[kKmM])/i);
+    var rate   = val(/(?:利率|利息|房贷利率|rate|interest)\D{0,8}([\d.]+)\s*%/i)
+              || val(/(?:at|@)\s*([\d.]+)\s*%/i);
+    var tenure = val(/(?:年限|tenure)\D{0,6}(\d+)/i);
+    var rent   = val(/(?:月租|租金|租|rent)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i)
+              || val(/([\d.]+)\s*(万|千|[kKmM])?\s*(?:元)?\s*(?:\/\s*月|每月)?\s*(?:rent|租金|月租)/i);
+    var sell   = val(/(?:卖|售|sell)\D{0,8}([\d.]+)\s*(万|千|[kKmM])?/i)
+              || val(/([\d.]+)\s*(万|千|[kKmM])\s*(?:卖出|卖掉|出售|sold)/i);
+
+    var mh = hit(/(?:持有|hold(?:ing)?)\D{0,4}(\d+|[一二两三四五六七八九十])\s*(?:年|years?|yrs?)/i)
+          || hit(/(\d+|[一二两三四五六七八九十])\s*年\s*后/i)
+          || hit(/(?:after|in)\s+(\d+)\s*(?:years?|yrs?)/i)
+          || hit(/(\d+)\s*(?:years?|yrs?)\s*(?:later|after)/i);
+    var hold = null;
+    if (mh) {
+      var hy = CN_NUM[mh[1]] != null ? CN_NUM[mh[1]] : parseFloat(mh[1]);
+      if (hy >= 1 && hy <= 5) hold = hy;
+    }
+
     if (spa) { $("spa").value = spa; filled++; }
     if (actual) { $("actual").value = actual; filled++; }
     else if (spa) { $("actual").value = spa; filled++; }
@@ -1419,11 +1460,13 @@
     if (tenure) { $("tenure").value = tenure; filled++; }
     if (rent) { $("rent").value = rent < 20000 ? rent * 12 : rent; filled++; }
     if (sell) { $("sell").value = sell; filled++; }
-    if (hold) { var hy = parseFloat(hold); if (hy >= 1 && hy <= 5) { $("hold").value = hy; filled++; } }
+    if (hold) { $("hold").value = hold; filled++; }
+
     if (!filled) { toast(t("aiFail")); return; }
     recalc();
     toast(fmt("aiDone", { n: filled }));
   }
+
   // ---- 方案对比：从「已存方案」里选两个 ----
   function allSavedPlans() {
     var out = [];
@@ -1572,6 +1615,13 @@
   updateProLocks();
   registerSW();
   $("aiFill").addEventListener("click", parseAi);
+  $("aiExample").addEventListener("click", function () {
+    $("aiText").value = lang === "zh"
+      ? "买了 80 万的房子，贷款 90%，利率 4.3%，月租 3000，打算 5 年后卖 100 万"
+      : "Bought a condo for 800k, 90% loan at 4.3%, rent 3,000, sell for 1M after 5 years";
+    $("aiText").focus();
+    toast(t("aiExampleDone"));
+  });
   $("csvBtn").addEventListener("click", exportCsv);
   function downloadReport() {
     if (!requirePro()) return;
