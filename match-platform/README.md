@@ -6,7 +6,7 @@
 - 版本：**v0.1.0**（2026-10-27）
 - 技术栈：**Node.js 20+ / 零第三方依赖 / JSON 原子存储 / 原生 ES Modules + 单页前端**
 - 测试：**51 项自动化测试全过**（`npm test`）
-- 状态：**已上线** <https://kwongthye.com/match/>（当前挂在主域 `/match/`；独立子域可后续切换）
+- 状态：**已上线** <https://match.kwongthye.com/>（`/match/` 301 到独立子域）
 - 关联项目：财务公式与 `web/calc/calc.js`、`PROJECT.md` 第 6/7 节同口径
 - 运营 / 联络：**THE ROOF REALTY SDN BHD** · E(1)1605/1 · **Andy Lau 刘泌光** REN 32839 · +60 16-528 0918 · andylau.theroof@gmail.com · No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor · [kwongthye.com](https://kwongthye.com)
 
@@ -38,7 +38,7 @@ PropMatch 把这几件事收进一个工作台：
 
 ## 1. 使用入口
 
-- **线上（已部署）**：<https://kwongthye.com/match/?demo=1>
+- **线上（已部署）**：<https://match.kwongthye.com/?demo=1>
 - **本地（开发）**：`node server.js` → <http://127.0.0.1:4100>
 - 线上服务器：`/srv/propmatch`，systemd `propmatch`，只监听 `127.0.0.1:4100`，由 nginx `/match/` 反代
 - 线上数据：`/srv/propmatch/data/db.json`；每日备份到 `/srv/propmatch/backups/`（保留 60 天）
@@ -375,7 +375,7 @@ sudo cp deploy/.env.example /srv/propmatch/.env
 sudo chown -R propmatch:propmatch /srv/propmatch
 sudo cp deploy/propmatch.service /etc/systemd/system/
 sudo systemctl daemon-reload && sudo systemctl enable --now propmatch
-# nginx（match.kwongthye.com）→ certbot --nginx
+# nginx（match.kwongthye.com）→ certbot
 curl -s https://match.kwongthye.com/api/health
 ```
 
@@ -383,15 +383,15 @@ curl -s https://match.kwongthye.com/api/health
 
 | 项 | 值 |
 | :--- | :--- |
-| 网址 | <https://kwongthye.com/match/>（`/match` 301 → `/match/`） |
+| 网址 | <https://match.kwongthye.com/>（`/match/` 与 `/match` 301 到这里） |
 | 应用目录 | `/srv/propmatch` |
 | 服务 | `systemctl status propmatch`（Node 22，`127.0.0.1:4100`） |
-| 反向代理 | `/etc/nginx/sites-enabled/fangchan` 中 `location ^~ /match/` |
+| 反向代理 | `/etc/nginx/sites-available/propmatch-subdomain`（443 → `127.0.0.1:4100`） |
 | 数据 | `/srv/propmatch/data/db.json` |
 | 备份 | `/etc/cron.d/propmatch-backup`，每天 03:30，60 天 |
 | 演示 | `?demo=1` 或 `demo@propmatch.my / demo1234`（正式使用前设 `SHOW_DEMO=0`） |
 
-> 为什么先挂 `/match/`：当前阿里云 DNS 子账号没有 Alidns 权限，无法自动添加 `match.kwongthye.com` 的 A 记录；用主域路径可以先上线、复用现有 HTTPS。后续在云解析加一条 A 记录（`match` → `47.254.235.22`），即可按 §8 切到独立子域。
+> 2026-10-27 已在阿里云云解析添加 `match A 47.254.235.22`（TTL 600），并为独立子域签发 Let's Encrypt 证书；旧 `/match/` 链接会 301 到子域，书签不会失效。
 
 **上线检查**
 

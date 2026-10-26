@@ -1,10 +1,11 @@
 # PropMatch 上线手册
 
-> **当前线上（2026-10-27）**：<https://kwongthye.com/match/>  
-> 路径：`/srv/propmatch` · systemd `propmatch` · Node 22 · `127.0.0.1:4100` · nginx `/match/` 反代 · 每日 03:30 备份  
+> **当前线上（2026-10-27）**：<https://match.kwongthye.com/>  
+> 路径：`/srv/propmatch` · systemd `propmatch` · Node 22 · `127.0.0.1:4100` · nginx 子域反代 · 每日 03:30 备份  
+> 旧 `/match/` 链接已 301 到子域。
 > 一键更新：`KEY=../../.secrets/fangchan_key.pem bash deploy/deploy-live.sh`
 >
-> 下面的 §1–§9 是独立子域（`match.kwongthye.com`）的完整部署流程，供后续切换；当前线上直接复用主域 HTTPS，不需要新 DNS/证书。  
+> 下面的 §1–§9 是独立子域（`match.kwongthye.com`）的完整部署流程；2026-10-27 已按此上线。  
 > 目标：HTTPS、单实例、每日备份。适用 Ubuntu 24.04 + nginx + certbot + Node.js 20+（2C4G 足够）。
 
 ---
@@ -12,10 +13,11 @@
 ## 0. 当前线上架构（先看）
 
 ```
-https://kwongthye.com/match/  → nginx location ^~ /match/
+https://match.kwongthye.com/  → nginx server_name match.kwongthye.com
                                → proxy_pass http://127.0.0.1:4100/
                                → systemd propmatch (User=propmatch)
                                → /srv/propmatch/data/db.json
+https://kwongthye.com/match/  → 301 https://match.kwongthye.com/
 每日 03:30 → /srv/propmatch/deploy/backup.sh → /srv/propmatch/backups/
 ```
 
@@ -26,8 +28,8 @@ cd match-platform
 KEY=../.secrets/fangchan_key.pem bash deploy/deploy-live.sh
 ```
 
-nginx 片段见 [`nginx-match-path.conf`](nginx-match-path.conf)；主域证书沿用 `kwongthye.com`。  
-没有使用 `match.kwongthye.com` 的原因：当前阿里云 DNS RAM 子账号没有 Alidns 权限；加 A 记录后可再切独立子域。
+nginx 配置见 [`nginx.conf`](nginx.conf)；旧路径 301 片段见 [`nginx-match-redirect.conf`](nginx-match-redirect.conf)。  
+阿里云已加 `match A 47.254.235.22`（TTL 600），证书 `/etc/letsencrypt/live/match.kwongthye.com/`。
 
 ## 0.1 独立子域部署先决条件
 
@@ -204,7 +206,7 @@ sudo systemctl start propmatch
 
 ## 10. 已知限制
 
-- JSON 单文件存储，**不支持多进程/多实例**；用户量上来后迁移 PostgreSQL（见 README 路线图）。
+- JSON 单文件存储，**不支持多进程/多实例**；用户量上来后迁移 PostgreSQL（见 DME 路线图）。
 - 图片只支持 URL；上传功能在 v0.3。
 - 没有自动 WhatsApp 发送；只生成文案并打开 `wa.me`。
 - 没有邮箱验证/忘记密码/2FA；团队版之前需补。

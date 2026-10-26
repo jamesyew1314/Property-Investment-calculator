@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy the live PropMatch instance at https://kwongthye.com/match/
+# Deploy the live PropMatch instance at https://match.kwongthye.com/
 # Usage: KEY=/path/to/key.pem bash deploy/deploy-live.sh
 # Default key: <repo>/.secrets/fangchan_key.pem
 set -euo pipefail
@@ -65,7 +65,8 @@ ssh "${SSH_OPTS[@]}" "$REMOTE_USER@$HOST" "
 
 echo
 echo "▸ 5/5 public checks"
-curl -fsS -m 10 https://kwongthye.com/match/api/health
+curl -fsS -m 10 https://match.kwongthye.com/api/health
 echo
-curl -fsS -o /dev/null -w "  https://kwongthye.com/match/  %{http_code}\n" https://kwongthye.com/match/
-echo "✓ live: https://kwongthye.com/match/?demo=1"
+curl -fsS -o /dev/null -w "  https://match.kwongthye.com/  %{http_code}\n" https://match.kwongthye.com/
+curl -sS -o /dev/null -w "  https://kwongthye.com/match/  %{http_code} -> %{redirect_url}\n" https://kwongthye.com/match/
+echo "✓ live: https://match.kwongthye.com/?demo=1"
