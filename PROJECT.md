@@ -519,6 +519,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 能力 | 需求与房源 CRUD、六维可解释配对（硬门槛 + 近似匹配）、反向配对、可负担性、今日优先、跟进漏斗、房源买入成本/月供/同区参考、中英双语、JSON 导出、账号隔离 |
 | 财务口径 | 复用与第 6/7 节一致的公式：SPA 1.6M = **76,630**、贷款 765k = **18,767**、T21 余额 = **656,337.29**、收入 12k/负债 1.2k/65% DSR/90% 贷款/现金 180k = **1,076,000** |
 | 部署 | 未上线；步骤见 [`match-platform/deploy/README.md`](match-platform/deploy/README.md)（systemd + nginx + certbot + 备份 + 上线检查） |
+| 名片信息 | Andy Lau 刘泌光 · REN 32839 · +60 16-528 0918 · andylau.theroof@gmail.com · THE ROOF REALTY SDN BHD · E(1)1605/1 · No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor · kwongthye.com |
 | 下一步 | WhatsApp Cloud API、团队角色、CSV/门户导入、密码重置；商业路径见 [`docs/SaaS商业方案_Malaysia_v1.md`](docs/SaaS商业方案_Malaysia_v1.md) |
 
 **开发约定**：新增原因码必须同步 `lib/engine.js` 的 `NOTE_CODES` 与 `public/i18n.js` 的 `note.*` 中英文字典（测试会拦）；新增区域/标签改 `lib/taxonomy.js`；改权重同步 README 与产品说明；金额原型用 Number，迁移 PostgreSQL 时改 `NUMERIC(18,2)`。

@@ -53,6 +53,11 @@ test('健康检查与演示登录', async () => {
   assert.equal(health.res.status, 200);
   assert.equal(health.data.ok, true);
 
+  const config = await call('/api/public-config');
+  assert.equal(config.res.status, 200);
+  assert.equal(config.data.contact.phone, '+60 16-528 0918');
+  assert.equal(config.data.contact.email, 'andylau.theroof@gmail.com');
+
   const login = await call('/api/auth/login', {
     method: 'POST',
     body: {email: DEMO_EMAIL, password: DEMO_PASSWORD}
@@ -72,6 +77,8 @@ test('bootstrap 返回演示数据与配对摘要', async () => {
   const {res, data} = await call('/api/bootstrap', {cookie: demoCookie});
   assert.equal(res.status, 200);
   assert.equal(data.user.email, DEMO_EMAIL);
+  assert.equal(data.user.name, 'Andy Lau 刘泌光');
+  assert.equal(data.user.phone, '+60 16-528 0918');
   assert.equal(data.listings.length, 19);
   assert.equal(data.requirements.length, 10);
   assert.ok(Object.keys(data.summary.requirements).length >= 9);
@@ -206,18 +213,32 @@ test('资料更新与改密：旧 Cookie 立即失效，新密码可登录', asy
   const email = `pw-${Date.now()}@example.com`;
   const reg = await call('/api/auth/register', {
     method: 'POST',
-    body: {name: 'Password Test', email, password: 'password123'}
+    body: {name: 'Password Test', email, password: 'password123', role: 'owner'}
   });
   assert.equal(reg.res.status, 201);
+  assert.equal(reg.data.user.role, 'agent');
   const oldCookie = reg.cookie;
 
   const patched = await call('/api/me', {
     method: 'PATCH',
     cookie: oldCookie,
-    body: {name: 'Password Test 2', phone: '+60 12-999 0000', company: 'Test Agency'}
+    body: {
+      name: 'Password Test 2',
+      name_en: 'Test Agent',
+      title: 'Senior Agent',
+      title_en: 'Senior Agent',
+      phone: '+60 12-999 0000',
+      company: 'Test Agency',
+      e_number: 'E(1)0000/0',
+      contact_email: 'test.agent@example.com',
+      website: 'kwongthye.com/test',
+      office_address: '1 Test Road, Johor'
+    }
   });
   assert.equal(patched.res.status, 200);
   assert.equal(patched.data.user.name, 'Password Test 2');
+  assert.equal(patched.data.user.contact_email, 'test.agent@example.com');
+  assert.equal(patched.data.user.website, 'https://kwongthye.com/test');
 
   const changed = await call('/api/me/password', {
     method: 'POST',

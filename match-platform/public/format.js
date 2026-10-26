@@ -90,11 +90,14 @@ export function initials(name) {
     .replace(/\b(Mr|Ms|Mrs|Mdm|Dr|Dato'?|Datin|Encik|Puan|Hj|Hjh)\.?\b/gi, '')
     .replace(/\(.*?\)/g, '')
     .trim();
+  const parts = raw.split(/[\s·•,]+/).filter(Boolean);
+  const latin = parts.filter((p) => /[A-Za-z]/.test(p));
+  if (latin.length >= 2) {
+    return ((latin[0][0] || '') + (latin[1][0] || '')).toUpperCase();
+  }
   const cjk = raw.match(/[\u4e00-\u9fa5]/);
   if (cjk) return cjk[0];
-  const parts = raw.split(/[\s·•,]+/).filter(Boolean);
   if (!parts.length) return '?';
-  if (parts.length > 1) return ((parts[0][0] || '') + (parts[1][0] || '')).toUpperCase();
   return parts[0].slice(0, 1).toUpperCase();
 }
 
@@ -326,10 +329,14 @@ export function whatsappMessage(pair, ctx) {
   if (concerns.length) lines.push(`⚠️ ${ctx.t('msg.concerns')}${colon}${concerns.join(sep)}`);
   if (listing.address) lines.push(`🗺️ ${listing.address}`);
   lines.push(ctx.t('msg.cta'));
-  const sig = [user.company, user.ren ? `REN ${user.ren}` : null, user.phone]
+  const site = user.website
+    ? user.website.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    : null;
+  const sig1 = [user.company, user.e_number, user.ren ? `REN ${user.ren}` : null]
     .filter(Boolean)
     .join(' · ');
-  if (sig) lines.push(sig);
+  const sig2 = [user.phone, site].filter(Boolean).join(' · ');
+  if (sig1 || sig2) lines.push([sig1, sig2].filter(Boolean).join('\n'));
   lines.push(ctx.t('msg.disclaimer'));
   return lines.join('\n');
 }

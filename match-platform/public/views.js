@@ -101,6 +101,14 @@ export function brandBlock(compact = false, ctx = null) {
 
 export function loginView(state, ctx) {
   const demo = state.publicConfig?.demo || state.demo;
+  const card = state.publicConfig?.contact || {};
+  const cardCompany = card.company || 'THE ROOF REALTY SDN BHD';
+  const cardENumber = card.e_number || 'E(1)1605/1';
+  const cardName = card.name || 'Andy Lau 刘泌光';
+  const cardRen = card.ren || '32839';
+  const cardPhone = card.phone || '+60 16-528 0918';
+  const cardEmail = card.email || 'andylau.theroof@gmail.com';
+  const cardSite = card.website ? card.website.replace(/^https?:\/\//, '').replace(/\/$/, '') : 'kwongthye.com';
   const mode = state.loginMode || 'login';
   const isLogin = mode === 'login';
   const hero = ctx.t('login.heroTitle');
@@ -131,7 +139,7 @@ export function loginView(state, ctx) {
           <div><b>10</b><span>${ctx.lang === 'zh' ? '组客户需求' : 'client briefs'}</span></div>
           <div><b>6</b><span>${ctx.lang === 'zh' ? '个评分维度' : 'scoring dimensions'}</span></div>
         </div>
-        <p class="login-foot">THE ROOF REALTY SDN BHD · E(1)1605/1 · Andy Lau REN 32839</p>
+        <p class="login-foot">${safe(cardCompany)} · ${safe(cardENumber)} · ${safe(cardName)} REN ${safe(cardRen)}<br>${safe(cardPhone)} · ${safe(cardEmail)} · ${safe(cardSite)}</p>
       </div>
     </section>
     <section class="login-panel">
@@ -141,7 +149,7 @@ export function loginView(state, ctx) {
           <p>${isLogin ? ctx.t('login.formSub') : ctx.t('login.registerSub')}</p>
         </div>
         <form class="form login-form" data-form="${isLogin ? 'login' : 'register'}" autocomplete="on">
-          ${isLogin ? '' : `<label class="field"><span>${ctx.t('login.name')} *</span><input name="name" required autocomplete="name" placeholder="Andy Lau"></label>`}
+          ${isLogin ? '' : `<label class="field"><span>${ctx.t('login.name')} *</span><input name="name" required autocomplete="name" placeholder="Andy Lau 刘泌光"></label>`}
           <label class="field"><span>${ctx.t('login.email')} *</span><input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></label>
           <label class="field"><span>${ctx.t('login.password')} *</span><input name="password" type="password" required minlength="8" autocomplete="${isLogin ? 'current-password' : 'new-password'}" placeholder="••••••••"></label>
           ${isLogin ? '' : `
@@ -149,7 +157,7 @@ export function loginView(state, ctx) {
               <label class="field"><span>${ctx.t('login.company')}</span><input name="company" placeholder="THE ROOF REALTY SDN BHD"></label>
               <label class="field"><span>${ctx.t('login.ren')}</span><input name="ren" placeholder="32839"></label>
             </div>
-            <label class="field"><span>${ctx.t('login.phone')}</span><input name="phone" placeholder="+60 12-345 6789"></label>`}
+            <label class="field"><span>${ctx.t('login.phone')}</span><input name="phone" placeholder="+60 16-528 0918"></label>`}
           <p class="form-error" data-error hidden></p>
           <button class="btn primary block" type="submit">${isLogin ? ctx.t('login.signIn') : ctx.t('login.signUp')}</button>
         </form>
@@ -970,6 +978,11 @@ export function matchesView(data, state, ctx) {
 export function settingsView(state, ctx) {
   const u = state.user || {};
   const isDemo = state.demo || (state.publicConfig?.demo && state.publicConfig.demo.email === u.email);
+  const cardEmail = u.contact_email || u.email;
+  const titleText = ctx.lang === 'zh' ? u.title : u.title_en || u.title;
+  const siteLabel = u.website
+    ? u.website.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    : '';
   return `${pageHead({
     eyebrow: ctx.lang === 'zh' ? '设置' : 'Settings',
     title: ctx.t('settings.title'),
@@ -979,7 +992,12 @@ export function settingsView(state, ctx) {
   <div class="settings-grid">
     <section class="panel">
       ${sectionHead(ctx.t('settings.account'))}
-      <div class="profile-row">${avatar(u.name || '', 'lg')}<div><h3>${safe(u.name || '')}</h3><p>${safe(u.company || '')}${u.ren ? ` · REN ${safe(u.ren)}` : ''}</p><p class="muted small">${safe(u.email || '')}${u.phone ? ` · ${safe(u.phone)}` : ''}</p></div></div>
+      <div class="profile-row">${avatar(u.name || '', 'lg')}<div><h3>${safe(u.name || '')}</h3><p>${u.name_en ? `${safe(u.name_en)} · ` : ''}${titleText ? safe(titleText) : '—'}</p><p>${safe(u.company || '')}${u.e_number ? ` · ${safe(u.e_number)}` : ''}${u.ren ? ` · REN ${safe(u.ren)}` : ''}</p><p class="muted small">${safe(cardEmail || '')}${u.phone ? ` · ${safe(u.phone)}` : ''}</p></div></div>
+      <div class="profile-facts">
+        ${u.office_address ? `<div><span>${ctx.t('settings.officeAddress')}</span><b>${safe(u.office_address)}</b></div>` : ''}
+        ${u.website ? `<div><span>${ctx.t('settings.website')}</span><b><a href="${attr(u.website)}" target="_blank" rel="noopener">${safe(siteLabel)}</a></b></div>` : ''}
+        <div><span>${ctx.t('settings.loginEmail')}</span><b>${safe(u.email || '')}</b></div>
+      </div>
       <div class="settings-actions">
         <button type="button" class="btn outline" data-action="edit-profile">${icon('edit', 16)}${ctx.t('settings.editProfile')}</button>
         <button type="button" class="btn ghost" data-action="change-password">${icon('shield', 16)}${ctx.t('settings.password')}</button>
@@ -1007,7 +1025,9 @@ export function settingsView(state, ctx) {
     <section class="panel wide-panel">
       ${sectionHead(ctx.t('settings.about'))}
       <p class="muted">${ctx.t('settings.aboutBody')}</p>
-      <p class="muted small" style="margin-top:12px">THE ROOF REALTY SDN BHD · E(1)1605/1 · Andy Lau REN 32839</p>
+      <p class="muted small" style="margin-top:12px">${safe(u.company || 'THE ROOF REALTY SDN BHD')} · ${safe(u.e_number || 'E(1)1605/1')} · ${safe(u.name || 'Andy Lau 刘泌光')} REN ${safe(u.ren || '32839')}</p>
+      ${u.office_address ? `<p class="muted small">${safe(u.office_address)}</p>` : ''}
+      ${u.website ? `<p class="muted small"><a href="${attr(u.website)}" target="_blank" rel="noopener">${safe(siteLabel)}</a></p>` : ''}
       <button type="button" class="btn ghost block" style="margin-top:16px" data-action="logout">${icon('logout', 16)}${ctx.t('common.logout')}</button>
     </section>
   </div>`;

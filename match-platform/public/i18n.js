@@ -7,7 +7,7 @@ const STRINGS = {
   'app.name': S('智能房源配对', 'Smart Property Matching'),
   'app.brand': S('PropMatch', 'PropMatch'),
   'app.tagline': S('把对的房子，推给对的人', 'The right property, to the right buyer'),
-  'app.brandTag': S('智能房源配对 · AI Matching', 'Smart Property Matching · AI'),
+  'app.brandTag': S('KWONG THYE 光泰 · 智能配对', 'KWONG THYE · Smart Matching'),
   'app.short': S('配对', 'Match'),
   'app.version': S('v0.1 · 中介工作台', 'v0.1 · Agent workspace'),
   'app.disclaimer': S(
@@ -444,6 +444,14 @@ const STRINGS = {
   'settings.title': S('设置与说明', 'Settings & help'),
   'settings.account': S('账号资料', 'Account'),
   'settings.editProfile': S('编辑资料', 'Edit profile'),
+  'settings.nameEn': S('英文姓名', 'English name'),
+  'settings.role': S('职称', 'Title'),
+  'settings.roleEn': S('英文职称', 'Title (EN)'),
+  'settings.eNumber': S('E 编号', 'E no.'),
+  'settings.contactEmail': S('联络电邮', 'Contact email'),
+  'settings.officeAddress': S('办公室地址', 'Office address'),
+  'settings.website': S('网站', 'Website'),
+  'settings.loginEmail': S('登录邮箱', 'Login email'),
   'settings.preferences': S('偏好', 'Preferences'),
   'settings.data': S('数据', 'Data'),
   'settings.export': S('导出全部资料（JSON）', 'Export all data (JSON)'),
@@ -469,8 +477,8 @@ const STRINGS = {
   'settings.helpCompliance': S('REN 编号与公司资料只用于对外文案；配对结果不构成估值或投资建议。', 'REN and company details are for client messages. Matches are not a valuation or investment advice.'),
   'settings.about': S('关于 PropMatch', 'About PropMatch'),
   'settings.aboutBody': S(
-    '为马来西亚房产中介设计的轻量配对工作台。由 THE ROOF REALTY 团队内部使用起步，可扩展到团队/代理公司。',
-    'A lightweight matching workspace for Malaysian real estate agents. Started inside THE ROOF REALTY and designed to grow into team/agency use.'
+    '为马来西亚房产中介设计的轻量配对工作台。由 KWONG THYE 光泰 / THE ROOF REALTY 团队内部使用起步，可扩展到团队/代理公司。',
+    'A lightweight matching workspace for Malaysian real estate agents. Started inside KWONG THYE / THE ROOF REALTY and designed to grow into team/agency use.'
   ),
   'settings.logoutConfirm': S('确定退出登录？', 'Log out?'),
 

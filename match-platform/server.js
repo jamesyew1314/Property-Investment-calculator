@@ -251,10 +251,26 @@ function makeApp({dataDir, secureCookies = false, seed = true} = {}) {
       return sendJson(res, 200, {meta: meta(), version: VERSION});
     }
     if (method === 'GET' && pathname === '/api/public-config') {
+      const demoUser = store.find('users', (u) => u.email === DEMO_EMAIL);
       return sendJson(res, 200, {
         version: VERSION,
         demo: demoEnabled ? {email: DEMO_EMAIL, password: DEMO_PASSWORD} : null,
-        seeded: !!seeded.created
+        seeded: !!seeded.created,
+        contact: demoUser
+          ? {
+              name: demoUser.name,
+              name_en: demoUser.name_en,
+              title: demoUser.title,
+              title_en: demoUser.title_en,
+              phone: demoUser.phone,
+              email: demoUser.contact_email || demoUser.email,
+              company: demoUser.company,
+              e_number: demoUser.e_number,
+              ren: demoUser.ren,
+              office_address: demoUser.office_address,
+              website: demoUser.website
+            }
+          : null
       });
     }
     if (method === 'POST' && pathname === '/api/auth/register') {

@@ -8,6 +8,7 @@
 - 测试：**51 项自动化测试全过**（`npm test`）
 - 状态：本地可运行；生产部署脚本见 [`deploy/`](deploy/)
 - 关联项目：财务公式与 `web/calc/calc.js`、`PROJECT.md` 第 6/7 节同口径
+- 运营 / 联络：**THE ROOF REALTY SDN BHD** · E(1)1605/1 · **Andy Lau 刘泌光** REN 32839 · +60 16-528 0918 · andylau.theroof@gmail.com · No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor · [kwongthye.com](https://kwongthye.com)
 
 ---
 
@@ -111,7 +112,7 @@ DATA_DIR=./data npm run seed
 | **跟进** | 收藏、已推荐、已看房、已出价、成交、未成交、不合适；备注；撤销；漏斗计数 |
 | **客户沟通** | 一键生成双语 WhatsApp 文案（房源摘要 + 匹配点 + 注意事项 + REN/公司签名 + 免责声明），复制或打开 `wa.me` |
 | **数据** | 一键导出 JSON（房源/需求/跟进/动态），演示数据重置 |
-| **体验** | 中/英切换（全站 579 个词条，双字典同步）、手机底部导航、响应式、评分明细弹窗、图片查看器 |
+| **体验** | 中/英切换（全站 587 个词条，双字典同步）、手机底部导航、响应式、评分明细弹窗、图片查看器 |
 | **账号** | 邮箱 + 密码注册/登录/退出；scrypt 哈希；HMAC 会话；改密即时撤销旧会话；账号数据隔离 |
 
 ---
@@ -465,7 +466,7 @@ match-platform/
 │   ├── forms.js              # 表单、评分明细、跟进、WhatsApp、账号
 │   ├── ui.js                 # 图标、评分环、弹窗、toast
 │   ├── format.js             # 金额/日期/标签/原因文案本地化
-│   ├── i18n.js               # 中英双字典（579 键）
+│   ├── i18n.js               # 中英双字典（587 键）
 │   ├── style.css             # 设计系统（navy/gold/cream）
 │   └── demo/                 # 演示房源照片
 ├── test/                     # 51 项测试
@@ -489,7 +490,7 @@ match-platform/
 ## 13. 与现有项目的关系
 
 - **财务公式**：`lib/finance.js` 与 `web/calc/calc.js`、`PROJECT.md` 第 6/7 节一致；T21（720k / 4.5% / 30 年第 60 个月余额 656,337.29）作为回归测试，防止两套系统漂移。
-- **品牌**：延续 kwongthye.com 的 navy/gold/cream 与 THE ROOF REALTY / REN 32839 信息。
+- **品牌**：延续 KWONG THYE 光泰 / THE ROOF REALTY 的 navy/gold/cream 与名片信息（Andy Lau 刘泌光 · REN 32839 · +60 16-528 0918 · kwongthye.com）。
 - **数据**：独立 `match-platform` 应用，不与计算器/视频平台的数据库耦合；未来可与 `video-platform` 的 `listings` 表做盘源同步（同一物业：视频素材 ↔ 配对房源）。
 - **上下文**：项目根 `PROJECT.md` 第 2 节已加入本目录入口；产品说明见 [`产品说明.md`](产品说明.md)。
 

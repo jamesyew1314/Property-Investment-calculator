@@ -99,6 +99,7 @@ test('头像缩写：中文姓氏优先，英文取两字母', () => {
   assert.equal(initials('Mr Tan · 陈先生'), '陈');
   assert.equal(initials('Ms Lim · 林小姐'), '林');
   assert.equal(initials('Andy Lau'), 'AL');
+  assert.equal(initials('Andy Lau 刘泌光'), 'AL');
   assert.equal(initials('Mr Tan (rental)'), 'T');
 });
 
@@ -111,7 +112,14 @@ test('电话号码与 WhatsApp 链接', () => {
 
 test('WhatsApp 文案包含匹配点、地址与免责声明', () => {
   const pair = {
-    user: {name: 'Andy Lau', company: 'THE ROOF REALTY SDN BHD', ren: '32839', phone: '+60 12-345 6789'},
+    user: {
+      name: 'Andy Lau 刘泌光',
+      company: 'THE ROOF REALTY SDN BHD',
+      e_number: 'E(1)1605/1',
+      ren: '32839',
+      phone: '+60 16-528 0918',
+      website: 'https://kwongthye.com'
+    },
     requirement: {client_name: 'Mr Tan', whatsapp: '+60 12-345 6789'},
     listing: {
       id: 1,
@@ -141,5 +149,8 @@ test('WhatsApp 文案包含匹配点、地址与免责声明', () => {
   assert.ok(msg.includes('RM 850,000'));
   assert.ok(msg.includes('匹配点'));
   assert.ok(msg.includes('REN 32839'));
+  assert.ok(msg.includes('E(1)1605/1'));
+  assert.ok(msg.includes('+60 16-528 0918'));
+  assert.ok(msg.includes('kwongthye.com'));
   assert.ok(msg.includes('资料仅供参考'));
 });

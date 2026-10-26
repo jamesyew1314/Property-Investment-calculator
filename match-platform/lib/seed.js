@@ -6,6 +6,19 @@ import {refFor} from './store.js';
 import {findArea} from './taxonomy.js';
 
 export const DEMO_EMAIL = 'demo@propmatch.my';
+export const DEMO_PROFILE = {
+  name: 'Andy Lau 刘泌光',
+  name_en: 'Pik Kwong Lau',
+  contact_email: 'andylau.theroof@gmail.com',
+  phone: '+60 16-528 0918',
+  company: 'THE ROOF REALTY SDN BHD',
+  e_number: 'E(1)1605/1',
+  ren: '32839',
+  title: '创办人 · KWONG THYE 光泰',
+  title_en: 'Founder · KWONG THYE',
+  office_address: 'No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor',
+  website: 'https://kwongthye.com'
+};
 export const DEMO_PASSWORD = 'demo1234';
 
 const DAY = 86400000;
@@ -928,12 +941,10 @@ function populateDemo(store, user) {
 export function seedDemo(store) {
   if (store.count('users') > 0) return {created: false};
   const user = store.insert('users', {
-    name: 'Andy Lau',
+    ...DEMO_PROFILE,
     email: DEMO_EMAIL,
-    phone: '+60 12-345 6789',
-    company: 'THE ROOF REALTY SDN BHD',
-    ren: '32839',
     role: 'owner',
+    session_version: 0,
     password_hash: hashPassword(DEMO_PASSWORD)
   });
   const res = populateDemo(store, user);

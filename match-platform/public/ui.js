@@ -65,11 +65,14 @@ function initialsLocal(name) {
     .replace(/\b(Mr|Ms|Mrs|Mdm|Dr|Dato'?|Datin|Encik|Puan|Hj|Hjh)\.?\b/gi, '')
     .replace(/\(.*?\)/g, '')
     .trim();
+  const parts = raw.split(/[\s·•,]+/).filter(Boolean);
+  const latin = parts.filter((p) => /[A-Za-z]/.test(p));
+  if (latin.length >= 2) {
+    return ((latin[0][0] || '') + (latin[1][0] || '')).toUpperCase();
+  }
   const cjk = raw.match(/[\u4e00-\u9fa5]/);
   if (cjk) return cjk[0];
-  const parts = raw.split(/[\s·•,]+/).filter(Boolean);
   if (!parts.length) return '?';
-  if (parts.length > 1) return ((parts[0][0] || '') + (parts[1][0] || '')).toUpperCase();
   return parts[0].slice(0, 1).toUpperCase();
 }
 

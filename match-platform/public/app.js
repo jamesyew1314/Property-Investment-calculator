@@ -321,7 +321,7 @@ function render() {
   if (!state.user) {
     document.body.className = 'login-body';
     app.innerHTML = loginView(state, ctx);
-    document.title = 'PropMatch · 智能房源配对';
+    document.title = 'PropMatch · KWONG THYE 光泰 智能配对';
     return;
   }
   document.body.className = 'app-body';
@@ -344,7 +344,7 @@ function render() {
     matches: ctx.t('nav.matches'),
     settings: ctx.t('nav.settings')
   };
-  document.title = `${titles[r.name] || 'PropMatch'} · PropMatch`;
+  document.title = `${titles[r.name] || 'PropMatch'} · PropMatch · KWONG THYE 光泰`;
 }
 
 function contentFor(r, ctx) {

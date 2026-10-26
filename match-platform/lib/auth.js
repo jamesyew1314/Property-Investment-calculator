@@ -49,6 +49,31 @@ export function verifyPassword(password, stored) {
   return crypto.timingSafeEqual(a, b);
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function text(value, max = 120) {
+  const s = String(value ?? '').trim();
+  return s ? s.slice(0, max) : null;
+}
+
+function mail(value) {
+  const s = text(value, 160);
+  return s && EMAIL_RE.test(s) ? s.toLowerCase() : null;
+}
+
+function website(value) {
+  let s = text(value, 200);
+  if (!s) return null;
+  if (!/^https?:\/\//i.test(s)) s = `https://${s}`;
+  try {
+    const u = new URL(s);
+    if (!['http:', 'https:'].includes(u.protocol)) return null;
+    return u.toString().replace(/\/$/, '');
+  } catch {
+    return null;
+  }
+}
+
 export function publicUser(user) {
   if (!user) return null;
   const {password_hash, session_version, ...rest} = user;
@@ -159,7 +184,21 @@ export class Auth {
     this.attempts.delete(this.rateKey(ip, email));
   }
 
-  register({name, email, password, phone, company, ren, role} = {}) {
+  register({
+    name,
+    name_en,
+    email,
+    password,
+    phone,
+    company,
+    ren,
+    e_number,
+    title,
+    title_en,
+    contact_email,
+    office_address,
+    website: site
+  } = {}) {
     const cleanName = String(name || '').trim().slice(0, 80);
     const cleanEmail = String(email || '').trim().toLowerCase().slice(0, 160);
     const pw = String(password || '');
@@ -167,6 +206,8 @@ export class Auth {
     if (cleanName.length < 2) fields.name = '请填写姓名（至少 2 个字）';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail)) fields.email = '邮箱格式不正确';
     if (pw.length < 8) fields.password = '密码至少 8 位';
+    const cleanContactEmail = mail(contact_email);
+    if (contact_email && !cleanContactEmail) fields.contact_email = '联络电邮格式不正确';
     if (Object.keys(fields).length) throw badRequest('validation', '请检查注册资料', fields);
     if (this.store.find('users', (u) => u.email === cleanEmail)) {
       throw conflict('这个邮箱已注册', {email: '邮箱已注册'});
@@ -174,11 +215,18 @@ export class Auth {
     const isFirst = this.store.count('users') === 0;
     const user = this.store.insert('users', {
       name: cleanName,
+      name_en: text(name_en, 80),
       email: cleanEmail,
+      contact_email: cleanContactEmail,
       phone: String(phone || '').trim().slice(0, 40) || null,
       company: String(company || '').trim().slice(0, 120) || null,
+      e_number: text(e_number, 40),
       ren: String(ren || '').trim().replace(/^ren\s*/i, '').slice(0, 30) || null,
-      role: isFirst ? 'owner' : role === 'owner' ? 'owner' : 'agent',
+      title: text(title, 120),
+      title_en: text(title_en, 120),
+      office_address: text(office_address, 240),
+      website: website(site),
+      role: isFirst ? 'owner' : 'agent',
       session_version: 0,
       password_hash: hashPassword(pw)
     });
@@ -207,11 +255,24 @@ export class Auth {
       if (v.length < 2) throw badRequest('validation', '姓名太短', {name: '请填写姓名'});
       next.name = v;
     }
+    if (patch.name_en != null) next.name_en = text(patch.name_en, 80);
     if (patch.phone != null) next.phone = String(patch.phone).trim().slice(0, 40) || null;
     if (patch.company != null) next.company = String(patch.company).trim().slice(0, 120) || null;
+    if (patch.e_number != null) next.e_number = text(patch.e_number, 40);
     if (patch.ren != null) {
       next.ren = String(patch.ren).trim().replace(/^ren\s*/i, '').slice(0, 30) || null;
     }
+    if (patch.title != null) next.title = text(patch.title, 120);
+    if (patch.title_en != null) next.title_en = text(patch.title_en, 120);
+    if (patch.contact_email != null) {
+      const clean = mail(patch.contact_email);
+      if (patch.contact_email && !clean) {
+        throw badRequest('validation', '联络电邮格式不正确', {contact_email: '联络电邮格式不正确'});
+      }
+      next.contact_email = clean;
+    }
+    if (patch.office_address != null) next.office_address = text(patch.office_address, 240);
+    if (patch.website != null) next.website = website(patch.website);
     return publicUser(this.store.update('users', userId, next));
   }
 

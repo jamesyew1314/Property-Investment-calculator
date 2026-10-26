@@ -818,10 +818,17 @@ export function openProfileModal({user, ctx, onSubmit}) {
     ${formError()}
     <div class="form-grid">
       ${field({label: ctx.t('login.name'), name: 'name', value: user.name, required: true})}
+      ${field({label: ctx.t('settings.nameEn'), name: 'name_en', value: user.name_en})}
+      ${field({label: ctx.t('settings.role'), name: 'title', value: user.title})}
+      ${field({label: ctx.t('settings.roleEn'), name: 'title_en', value: user.title_en})}
       ${field({label: ctx.t('login.company'), name: 'company', value: user.company})}
+      ${field({label: ctx.t('settings.eNumber'), name: 'e_number', value: user.e_number})}
       ${field({label: ctx.t('login.ren'), name: 'ren', value: user.ren})}
       ${field({label: ctx.t('login.phone'), name: 'phone', value: user.phone})}
-      ${field({label: ctx.t('login.email'), name: 'email', value: user.email, readonly: true, full: true})}
+      ${field({label: ctx.t('settings.contactEmail'), name: 'contact_email', value: user.contact_email, type: 'email'})}
+      ${field({label: ctx.t('settings.website'), name: 'website', value: user.website, placeholder: 'https://kwongthye.com'})}
+      ${field({label: ctx.t('settings.officeAddress'), name: 'office_address', value: user.office_address, full: true})}
+      ${field({label: ctx.t('settings.loginEmail'), name: 'email', value: user.email, readonly: true, full: true})}
     </div>
   </form>`;
   const close = openModal({
@@ -837,7 +844,19 @@ export function openProfileModal({user, ctx, onSubmit}) {
       form,
       () => {
         const data = fdObject(form);
-        return {name: data.name, company: data.company || null, ren: data.ren || null, phone: data.phone || null};
+        return {
+          name: data.name,
+          name_en: data.name_en || null,
+          title: data.title || null,
+          title_en: data.title_en || null,
+          company: data.company || null,
+          e_number: data.e_number || null,
+          ren: data.ren || null,
+          phone: data.phone || null,
+          contact_email: data.contact_email || null,
+          website: data.website || null,
+          office_address: data.office_address || null
+        };
       },
       onSubmit
     );
