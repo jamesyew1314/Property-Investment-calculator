@@ -1,6 +1,6 @@
 // forms.js — 新增/编辑表单、跟进弹窗、评分明细、WhatsApp 文案、账号设置
 
-import {affordability, rentAffordability} from '../lib/finance.js';
+import {affordability, rentAffordability} from './lib/finance.js';
 import {
   attr,
   esc,
@@ -342,7 +342,7 @@ export function openListingForm({listing = null, ctx, onSubmit}) {
     ${formSection(
       ctx.t('form.section.notes'),
       '',
-      `${field({label: ctx.t('form.f.photo'), name: 'photo', value: l.photo, full: true, placeholder: '/demo/shoplot-1.jpg', hint: ctx.t('form.f.photoHint')})}
+      `${field({label: ctx.t('form.f.photo'), name: 'photo', value: l.photo, full: true, placeholder: 'demo/shoplot-1.jpg', hint: ctx.t('form.f.photoHint')})}
        ${textarea({label: ctx.t('form.f.photos'), name: 'photos', value: photosValue, rows: 3, hint: ctx.t('form.f.photoHint')})}
        ${textarea({label: ctx.t('form.f.notes'), name: 'notes', value: l.notes, rows: 3})}
       `

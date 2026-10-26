@@ -413,7 +413,7 @@ const STRINGS = {
   'form.f.searchArea': S('搜索区域…', 'Search areas…'),
   'form.f.selected': S('已选 {n} 项', '{n} selected'),
   'form.f.clearAll': S('清空', 'Clear'),
-  'form.f.photoHint': S('可粘贴图片网址，或使用 /demo/ 开头的站内图片。', 'Paste an image URL, or use an in-site /demo/ image.'),
+  'form.f.photoHint': S('可粘贴图片网址，或使用 demo/ 开头的站内图片。', 'Paste an image URL, or use an in-site demo/ image.'),
   'form.f.optionalHint': S('留空表示不限。', 'Leave blank for no preference.'),
   'form.f.financeHint': S('填了收入才会显示可负担性；其余留空按 65% DSR、4.3%、30 年、90% 贷款估算。', 'Affordability appears once income is filled. Other blanks default to 65% DSR, 4.3%, 30 years, 90% loan.'),
   'form.f.rentFinanceHint': S('租客只需填收入与租金比例，即可估算建议月租上限。', 'For tenants, income and rent ratio estimate the suggested rent ceiling.'),

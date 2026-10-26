@@ -85,6 +85,8 @@ function setLang(lang) {
   document.documentElement.lang = state.lang === 'zh' ? 'zh-Hans' : 'en';
 }
 
+const BASE_PATH = new URL('.', document.baseURI).pathname.replace(/\/$/, '');
+
 function getCtx() {
   return {t: makeT(state.lang), lang: state.lang, meta: state.meta};
 }
@@ -100,7 +102,7 @@ class ApiError extends Error {
 }
 
 async function api(path, {method = 'GET', body} = {}) {
-  const res = await fetch(path, {
+  const res = await fetch(`${BASE_PATH}${path}`, {
     method,
     credentials: 'same-origin',
     headers: body !== undefined ? {'Content-Type': 'application/json'} : {},
