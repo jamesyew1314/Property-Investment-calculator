@@ -1,0 +1,19 @@
+{
+  "name": "PropMatch · 智能房源配对",
+  "short_name": "PropMatch",
+  "description": "把客户需求与房源放进同一个工作台，按六个维度解释匹配理由。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F7F4EE",
+  "theme_color": "#0E2438",
+  "lang": "zh-Hans",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

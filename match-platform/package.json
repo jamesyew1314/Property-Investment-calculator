@@ -1,0 +1,16 @@
+{
+  "name": "propmatch",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PropMatch · 智能房源配对 — 把对的房子推给对的人",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/*.test.js",
+    "seed": "node scripts/reset-demo.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

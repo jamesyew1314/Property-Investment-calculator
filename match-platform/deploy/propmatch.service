@@ -1,0 +1,29 @@
+[Unit]
+Description=PropMatch — smart property matching workspace
+Documentation=https://github.com/jamesyew1314/Property-Investment-calculator
+After=network.target
+
+[Service]
+Type=simple
+User=propmatch
+Group=propmatch
+WorkingDirectory=/srv/propmatch
+EnvironmentFile=/srv/propmatch/.env
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+
+# 单进程 JSON 存储：不要用多个 worker
+# 安全加固
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/propmatch/data
+UMask=0077
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

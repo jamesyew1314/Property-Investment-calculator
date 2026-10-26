@@ -2,7 +2,7 @@
 
 > **这是项目的“单一上下文文件”。**  
 > 后续正式开发、修改、交接，先读这一份；只有需要细节时，再打开 57 页方案或工作簿。  
-> 最后更新：2026-10-19 · 版本：v1.1 · 状态：已按你 10/19 的意见定稿（不做分账、1–5 年持有、等额本息、SaaS），等你确认后开工。
+> 最后更新：2026-10-27 · 版本：v1.1（+ match-platform v0.1） · 状态：投资计算器已上线；智能房源配对本地可运行、待部署。
 
 ---
 
@@ -24,6 +24,7 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | 公式验证 | ✅ 完成 | XLSX：法定费用、4 案例对账、贷款摊销、XIRR、KPI 定义 |
 | Phase 0 | ✅ 已完成 | **正式站：<https://kwongthye.com/>**（阿里云吉隆坡 47.254.235.22，`/srv/fangchan/web/`，Let's Encrypt HTTPS 自动续期）；旧站 <https://laoyeshu.cn/static/fangchan/> 保留作备份；`web/test.js` 48 项测试全过 |
 | Phase 1–4 | ⏳ 未开始 | Web 快速计算器（自己用）→ 团队内测 → SaaS（RM50/年） |
+| **智能房源配对** | ✅ v0.1 本地可运行 | 独立 `match-platform/`：需求×房源可解释配对、可负担性、反向匹配、跟进漏斗、中英双语；**51 项测试全过**（`cd match-platform && npm test`），未部署 |
 
 **下一步：你打开 `web/index.html` 试用（双击即可）；确认体验后补 4 案例 fixture 与 21 项测试，再进 Phase 1 Web 化。**
 
@@ -72,6 +73,7 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | `work/report-pdf.js` | 完整投资分析报告 PDF（A4 两页，中英双语，Noto CJK） |
 | `work/ops/heartbeat.js` | 每日心跳邮件（08:00） |
 | `work/ops/staging-refresh.sh` | 每天把正式库克隆到 staging |
+| `match-platform/` | **智能房源配对**（独立 Node 应用，零依赖）：`node server.js` → http://127.0.0.1:4100；`npm test` 51 项；详见 `match-platform/README.md` / `产品说明.md` / `deploy/` |
 | `deploy/deploy.sh` · `.github/workflows/deploy.yml` | 一键发布 / GitHub Actions 自动发布 |
 | `web/cookie-consent.js` | Cookie 偏好中心（全站共用） |
 | `web/og-image.png` · `web/404.html` | 分享预览图（1200×630）· 双语错误页 |
@@ -502,3 +504,21 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 - 公式工作簿（XLSX）：[`deliverables/投资系统_公式验证与案例对账_v1.1.xlsx`](deliverables/投资系统_公式验证与案例对账_v1.1.xlsx)
 - 交付物说明：[`deliverables/README.md`](deliverables/README.md)
 - 计算器功能说明（发客户/朋友）：[`deliverables/房地产投资计算器_功能说明_v0.34.md`](deliverables/房地产投资计算器_功能说明_v0.34.md)
+
+---
+
+## 16. 智能房源配对（match-platform，v0.1 · 2026-10-27）
+
+> 与投资计算器并列的独立产品，不改变计算器 v1 的范围。
+
+| 项 | 内容 |
+| :--- | :--- |
+| 入口 | [`match-platform/README.md`](match-platform/README.md)（技术/算法/API/部署）· [`match-platform/产品说明.md`](match-platform/产品说明.md)（产品/给老板） |
+| 启动 | `cd match-platform && node server.js` → <http://127.0.0.1:4100>（演示 `demo@propmatch.my` / `demo1234`，或 `/?demo=1`） |
+| 测试 | `cd match-platform && npm test` — **51 项全过**（金融 10 / 引擎 21 / API 12 / i18n 8） |
+| 能力 | 需求与房源 CRUD、六维可解释配对（硬门槛 + 近似匹配）、反向配对、可负担性、今日优先、跟进漏斗、房源买入成本/月供/同区参考、中英双语、JSON 导出、账号隔离 |
+| 财务口径 | 复用与第 6/7 节一致的公式：SPA 1.6M = **76,630**、贷款 765k = **18,767**、T21 余额 = **656,337.29**、收入 12k/负债 1.2k/65% DSR/90% 贷款/现金 180k = **1,076,000** |
+| 部署 | 未上线；步骤见 [`match-platform/deploy/README.md`](match-platform/deploy/README.md)（systemd + nginx + certbot + 备份 + 上线检查） |
+| 下一步 | WhatsApp Cloud API、团队角色、CSV/门户导入、密码重置；商业路径见 [`docs/SaaS商业方案_Malaysia_v1.md`](docs/SaaS商业方案_Malaysia_v1.md) |
+
+**开发约定**：新增原因码必须同步 `lib/engine.js` 的 `NOTE_CODES` 与 `public/i18n.js` 的 `note.*` 中英文字典（测试会拦）；新增区域/标签改 `lib/taxonomy.js`；改权重同步 README 与产品说明；金额原型用 Number，迁移 PostgreSQL 时改 `NUMERIC(18,2)`。
