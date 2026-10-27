@@ -10,7 +10,7 @@ function fmt(n, rent) {
 
 module.exports = async function runDigest({ pool, sendMail, days, force }) {
   const since = Math.max(1, Number(days) || 1);
-  const agents = await pool.query("SELECT id,name,email FROM lib_agents WHERE status='active' AND email IS NOT NULL AND email <> ''");
+  const agents = await pool.query("SELECT id,name,email,lang FROM lib_agents WHERE status='active' AND email IS NOT NULL AND email <> ''");
   let sent = 0, skipped = 0, failed = 0;
   for (const a of agents.rows) {
     try {
@@ -42,21 +42,39 @@ module.exports = async function runDigest({ pool, sendMail, days, force }) {
         ORDER BY i.created_at DESC LIMIT 10`, [a.id, since]);
       if (!matches.length && !inq.rows.length) { skipped++; continue; }
 
-      const lines = ["你好 " + a.name + "，", ""];
-      lines.push("今天有 " + inq.rows.length + " 条新询盘，" + matches.length + " 位客户有新的匹配房源。", "");
+      const lang = a.lang === "en" ? "en" : (a.lang === "bm" ? "bm" : "zh");
+      const T = {
+        zh: {
+          subj: "PropNet 每日摘要 · 新询盘与匹配", hi: "你好 " + a.name + "，",
+          today: "今天有 " + inq.rows.length + " 条新询盘，" + matches.length + " 位客户有新的匹配房源。",
+          inq: "【新询盘】", match: "【客户匹配】", open: "打开工作台："
+        },
+        en: {
+          subj: "PropNet daily digest · inquiries & matches", hi: "Hi " + a.name + ",",
+          today: "You have " + inq.rows.length + " new inquir" + (inq.rows.length === 1 ? "y" : "ies") + " and new matches for " + matches.length + " client(s).",
+          inq: "New inquiries", match: "Client matches", open: "Open workspace:"
+        },
+        bm: {
+          subj: "Ringkasan harian PropNet · pertanyaan & padanan", hi: "Hai " + a.name + ",",
+          today: "Anda ada " + inq.rows.length + " pertanyaan baru dan padanan baru untuk " + matches.length + " klien.",
+          inq: "Pertanyaan baru", match: "Padanan klien", open: "Buka ruang kerja:"
+        }
+      };
+      const L = T[lang];
+      const lines = [L.hi, "", L.today, ""];
       if (inq.rows.length) {
-        lines.push("【新询盘】");
+        lines.push(L.inq);
         inq.rows.forEach(function (i) {
-          lines.push("· " + i.code + " " + (i.project_title || "") + " — " + (i.client_name || "客户") + " " + (i.client_phone || ""));
+          lines.push("· " + i.code + " " + (i.project_title || "") + " — " + (i.client_name || "—") + " " + (i.client_phone || ""));
         });
         lines.push("");
       }
       if (matches.length) {
-        lines.push("【客户匹配】");
+        lines.push(L.match);
         matches.forEach(function (row) {
           const c = row.client;
-          lines.push("· " + (c.name || "客户") + "（" + (c.intent === "rent" ? "租" : "买") + " " +
-            (c.budget_min ? fmt(c.budget_min) : "—") + " – " + (c.budget_max ? fmt(c.budget_max) : "—") + "）");
+          const intent = c.intent === "rent" ? (lang === "bm" ? "sewa" : (lang === "en" ? "rent" : "租")) : (lang === "bm" ? "beli" : (lang === "en" ? "buy" : "买"));
+          lines.push("· " + (c.name || "—") + " (" + intent + " " + (c.budget_min ? fmt(c.budget_min) : "—") + " – " + (c.budget_max ? fmt(c.budget_max) : "—") + ")");
           row.matches.forEach(function (m) {
             lines.push("    - " + m.code + " " + (m.project_title_zh || m.project_title || m.project_name || "") +
               " · " + fmt(m.intent === "rent" ? m.rent_price : m.asking_price, m.intent === "rent"));
@@ -64,8 +82,8 @@ module.exports = async function runDigest({ pool, sendMail, days, force }) {
         });
         lines.push("");
       }
-      lines.push("打开工作台：https://kwongthye.com/agent/#/matches", "", "— PropNet · KWONG THYE");
-      const r = await sendMail(a.email, "PropNet 每日摘要 · 新询盘与匹配", lines.join("\n"));
+      lines.push(L.open + "https://kwongthye.com/agent/#/matches", "", "— PropNet · KWONG THYE");
+      const r = await sendMail(a.email, L.subj, lines.join("\n"));
       await pool.query("INSERT INTO digest_log(agent_id) VALUES($1) ON CONFLICT DO NOTHING", [a.id]);
       sent++;
       void r;

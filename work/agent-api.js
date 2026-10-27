@@ -49,7 +49,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
     return {
       id: a.id, name: a.name, email: a.email, phone: a.phone, team: a.team, ren_no: a.ren_no,
       slug: a.slug, bio: a.bio, photo_url: a.photo_url, areas: a.areas,
-      verified: !!a.verified_at, emailVerified: !!a.email_verified_at,
+      verified: !!a.verified_at, emailVerified: !!a.email_verified_at, lang: a.lang || "zh",
       review_status: a.review_status || "pending", review_note: a.review_note || null,
       status: a.status, plan: a.plan, created_at: a.created_at
     };
@@ -105,9 +105,13 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
     try {
       const token = await issueToken(agent.id, "verify");
       const link = base + "/agent/?verify=" + token;
-      await sendMail(agent.email, "验证你的 PropNet 邮箱 / Verify your email",
-        ["你好 " + agent.name + "，", "", "请点击下面链接验证邮箱（48 小时内有效）：", link, "",
-          "验证后你的房源会显示「已验证」标记。", "", "PropNet · KWONG THYE"].join("\n"));
+      const lang = agent.lang === "en" ? "en" : (agent.lang === "bm" ? "bm" : "zh");
+      const V = {
+        zh: { sub: "验证你的 PropNet 邮箱", lines: ["你好 " + agent.name + "，", "", "请点击下面链接验证邮箱（48 小时内有效）：", link, "", "验证后你的房源会显示「已验证」标记。", "", "PropNet · KWONG THYE"] },
+        en: { sub: "Verify your PropNet email", lines: ["Hi " + agent.name + ",", "", "Please verify your email within 48 hours:", link, "", "Verified listings show a verified badge.", "", "PropNet · KWONG THYE"] },
+        bm: { sub: "Sahkan e-mel PropNet anda", lines: ["Hai " + agent.name + ",", "", "Sila sahkan e-mel anda dalam 48 jam:", link, "", "Senarai yang disahkan memaparkan lencana.", "", "PropNet · KWONG THYE"] }
+      };
+      await sendMail(agent.email, V[lang].sub, V[lang].lines.join("\n"));
     } catch (e) { console.error("verify mail failed", e.message); }
   }
 
@@ -190,6 +194,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       const b = req.body || {};
       const v = {};
       for (const k of ["name", "phone", "team", "ren_no"]) if (b[k] !== undefined) v[k] = core.str(b[k], 120);
+      if (b.lang !== undefined && ["zh", "en", "bm"].indexOf(b.lang) >= 0) v.lang = b.lang;
       if (b.bio !== undefined) v.bio = core.str(b.bio, 1000);
       if (b.areas !== undefined) v.areas = core.listOfEnums("areas", b.areas, 12);
       if (b.slug !== undefined) {
@@ -588,12 +593,15 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
         "INSERT INTO pool_inquiries(property_id,from_agent_id,to_agent_id,client_name,client_phone,message) VALUES($1,$2,$3,$4,$5,$6) RETURNING *",
         [prop.id, req.agent.id, prop.tenant_id, name, phone, message]);
       if (prop.tenant_id) {
-        const owner = await pool.query("SELECT email,name FROM lib_agents WHERE id=$1", [prop.tenant_id]);
+        const owner = await pool.query("SELECT email,name,lang FROM lib_agents WHERE id=$1", [prop.tenant_id]);
         if (owner.rows[0] && owner.rows[0].email) {
-          sendMail(owner.rows[0].email, "新的带看申请 · " + prop.code,
-            ["你好 " + owner.rows[0].name + "，", "", "有同行想带客看你的房源：" + prop.code, "",
-              "客户：" + name + "（" + phone + "）", message ? "留言：" + message : "",
-              "", "登录查看：https://kwongthye.com/app/#/inquiries"].filter(Boolean).join("\n")).catch(function () {});
+          const o = owner.rows[0], ol = o.lang === "en" ? "en" : (o.lang === "bm" ? "bm" : "zh");
+          const N = {
+            zh: { sub: "新的带看申请 · " + prop.code, lines: ["你好 " + o.name + "，", "", "有同行想带客看你的房源：" + prop.code, "", "客户：" + name + "（" + phone + "）", message ? "留言：" + message : "", "", "登录查看：https://kwongthye.com/agent/#/inquiries"] },
+            en: { sub: "New viewing request · " + prop.code, lines: ["Hi " + o.name + ",", "", "A peer wants to bring a client to your listing: " + prop.code, "", "Client: " + name + " (" + phone + ")", message ? "Message: " + message : "", "", "Open: https://kwongthye.com/agent/#/inquiries"] },
+            bm: { sub: "Permintaan tontonan baru · " + prop.code, lines: ["Hai " + o.name + ",", "", "Rakan ejen ingin bawa klien ke senarai anda: " + prop.code, "", "Klien: " + name + " (" + phone + ")", message ? "Mesej: " + message : "", "", "Buka: https://kwongthye.com/agent/#/inquiries"] }
+          };
+          sendMail(o.email, N[ol].sub, N[ol].lines.filter(Boolean).join("\n")).catch(function () {});
         }
       }
       await audit(req.agent.email, "agent.inquiry", "property", prop.id, { to: prop.tenant_id });

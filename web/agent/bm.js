@@ -116,6 +116,7 @@ window.BM_MAP = {
   "Photos (max 12)": "Foto (maks 12)",
   "JPG/PNG/WebP, max 8MB": "JPG/PNG/WebP, maks 8MB",
   "Max 12 photos": "Maksimum 12 foto",
+  "Email language": "Bahasa e-mel",
   "Loading…": "Memuatkan…",
   "No limits during the free period.": "Tiada had sepanjang tempoh percuma."
 };

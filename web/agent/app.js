@@ -763,6 +763,7 @@
     var h = '<div class="card"><h3>' + t("账号", "Account") + "</h3>" +
       '<div class="grid2">' + field(t("姓名", "Name"), '<input id="pfName" value="' + esc(a.name || "") + '">') +
       field(t("电话 / WhatsApp", "Phone"), '<input id="pfPhone" value="' + esc(a.phone || "") + '">') + "</div>" +
+      field(t("邮件语言", "Email language"), '<select id="pfLang"><option value="zh"' + ((a.lang || "zh") === "zh" ? " selected" : "") + '>中文</option><option value="en"' + (a.lang === "en" ? " selected" : "") + '>English</option><option value="bm"' + (a.lang === "bm" ? " selected" : "") + '>Bahasa Melayu</option></select>') +
       '<div class="grid2">' + field(t("团队 / 公司", "Team"), '<input id="pfTeam" value="' + esc(a.team || "") + '">') +
       field(t("REN 编号", "REN"), '<input id="pfRen" value="' + esc(a.ren_no || "") + '">') + "</div>" +
       field(t("简介", "Bio"), '<textarea id="pfBio">' + esc(a.bio || "") + "</textarea>") +
@@ -786,7 +787,7 @@
       var btn = this; btn.disabled = true;
       var body = {
         name: $("#pfName").value.trim(), phone: $("#pfPhone").value.trim(), team: $("#pfTeam").value.trim(),
-        ren_no: $("#pfRen").value.trim(), bio: $("#pfBio").value.trim(), slug: $("#pfSlug").value.trim(),
+        ren_no: $("#pfRen").value.trim(), bio: $("#pfBio").value.trim(), slug: $("#pfSlug").value.trim(), lang: $("#pfLang").value,
         areas: collectAreas($("#view"))
       };
       api("/me", { method: "PATCH", body: body }).then(function (j) {
