@@ -365,6 +365,12 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
         name = baseName + ".jpg";
         fs.writeFileSync(pathMod.join(UPLOADS, name), main);
         fs.writeFileSync(pathMod.join(UPLOADS, baseName + "_t.jpg"), thumb);
+        try {
+          const webp = await sharp(buf).rotate().resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
+          const webpT = await sharp(buf).rotate().resize({ width: 480, height: 480, fit: "inside", withoutEnlargement: true }).webp({ quality: 74 }).toBuffer();
+          fs.writeFileSync(pathMod.join(UPLOADS, baseName + ".webp"), webp);
+          fs.writeFileSync(pathMod.join(UPLOADS, baseName + "_t.webp"), webpT);
+        } catch (e) { /* webp optional */ }
       } else {
         name = baseName + "." + ext;
         fs.writeFileSync(pathMod.join(UPLOADS, name), buf);
@@ -390,6 +396,8 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
         if (f.indexOf(UPLOADS) === 0 && fs.existsSync(f)) fs.unlinkSync(f);
         const t = f.replace(/\.jpg$/i, "_t.jpg");
         if (t !== f && t.indexOf(UPLOADS) === 0 && fs.existsSync(t)) fs.unlinkSync(t);
+        const w = f.replace(/\.jpg$/i, ".webp"), wt = f.replace(/\.jpg$/i, "_t.webp");
+        [w, wt].forEach(function (x) { try { if (x.indexOf(UPLOADS) === 0 && fs.existsSync(x)) fs.unlinkSync(x); } catch (e) {} });
       }
       res.json({ ok: true, photos: next });
     } catch (e) { next(e); }

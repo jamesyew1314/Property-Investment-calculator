@@ -259,3 +259,5 @@ body.is-free .pool-tier{display:none!important}
 .poolGate h3{font-family:var(--serif);font-size:clamp(20px,2.4vw,28px);margin:6px 0 8px;color:#fff}
 .poolGate p{color:rgba(255,255,255,.75);max-width:620px;margin:0 0 16px;font-size:14px;line-height:1.7}
 .poolGate .row{display:flex;gap:10px;flex-wrap:wrap}
+
+.pcard-media picture{position:absolute;inset:0;display:block}

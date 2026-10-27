@@ -93,7 +93,7 @@
     if (p.property_type) meta.push(label("property_types", p.property_type));
     return '<a class="pcard" href="/properties/?p=' + encodeURIComponent(p.code) + '">' +
       '<div class="pcard-media">' +
-      (p.cover_url ? '<img class="pcard-img" src="' + esc(thumbUrl(p.cover_url)) + '" data-full="' + esc(p.cover_url) + '" onerror="this.onerror=null;this.src=this.dataset.full" alt="" loading="lazy">' : '<div class="ph">' + house + "</div>") +
+      (p.cover_url ? '<picture><source type="image/webp" srcset="' + esc(thumbUrl(p.cover_url).replace(/\.jpg$/i, ".webp")) + '"><img class="pcard-img" src="' + esc(thumbUrl(p.cover_url)) + '" data-full="' + esc(p.cover_url) + '" onerror="this.onerror=null;this.src=this.dataset.full" alt="" loading="lazy"></picture>' : '<div class="ph">' + house + "</div>") +
       '<span class="badge' + (isRent ? " rent" : "") + '">' + (isRent ? (lang === "en" ? "For rent" : "出租") : (lang === "en" ? "For sale" : "出售")) + "</span>" +
       "</div>" +
       '<div class="pcard-body">' +
