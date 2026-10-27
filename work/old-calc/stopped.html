@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>计算器已停用 / Calculator retired</title>
+<style>
+  :root{--navy:#0E2438;--gold:#C6A15B;--cream:#F7F4EE;--ink:#1B2430;--muted:#5D6B7A;--line:#E6E1D6}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+       background:var(--cream);color:var(--ink);font:15px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  .card{max-width:520px;width:100%;background:#fff;border:1px solid var(--line);border-radius:16px;
+        padding:30px 26px;box-shadow:0 14px 40px rgba(14,36,56,.08);text-align:center}
+  .bar{height:4px;background:var(--gold);border-radius:99px;width:64px;margin:0 auto 18px}
+  h1{font-size:19px;margin:0 0 8px;color:var(--navy)}
+  .en{font-size:14px;color:var(--muted);margin:0 0 18px}
+  p{margin:0 0 10px;font-size:13.5px;color:#4A5563}
+  .btn{display:inline-block;margin-top:14px;background:var(--navy);color:#fff;text-decoration:none;
+       padding:12px 22px;border-radius:999px;font-weight:700;font-size:14px}
+  .foot{margin-top:18px;font-size:12px;color:var(--muted);line-height:1.8}
+  .foot a{color:#2E5496}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="bar"></div>
+    <h1>此计算器已停用</h1>
+    <p class="en">This calculator (old copy) has been retired.</p>
+    <p>新版已迁移到 <b>calc.kwongthye.com</b>，功能更完整、数字更准确。</p>
+    <p>The new calculator lives at <b>calc.kwongthye.com</b>.</p>
+    <a class="btn" id="go" href="https://calc.kwongthye.com/">前往新计算器 / Go to new calculator</a>
+    <div class="foot">
+      已发出的分享链接仍可用，点上面按钮会带着你原来的数字继续。<br>
+      Existing share links still work — your numbers are carried over.<br>
+      KWONG THYE 光泰 · <a href="https://kwongthye.com/">kwongthye.com</a>
+    </div>
+  </div>
+<script>
+(function () {
+  try {
+    // 把旧链接里的 ?d= 分享参数带到新站
+    var q = location.search || "";
+    if (q) document.getElementById("go").href = "https://calc.kwongthye.com/" + q;
+    // 清掉旧版可能留下的缓存
+    if (window.caches) caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); });
+    if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); });
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
