@@ -7,6 +7,7 @@ const express = require("express");
 const crypto = require("node:crypto");
 const core = require("./library-core");
 const agentCore = require("./agent-core");
+const matcher = require("./match");
 const tax = require("./library-taxonomy");
 
 const COOKIE = "pn_sid";
@@ -429,35 +430,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
           AND p.tenant_id IS DISTINCT FROM $1
         ORDER BY p.updated_at DESC LIMIT 800`, [req.agent.id]);
 
-      function score(c, p) {
-        const price = p.intent === "rent" ? p.rent_price : p.asking_price;
-        if (!price) return -1;
-        const want = c.intent === "rent" ? "rent" : (c.intent === "buy" ? "sale" : null);
-        if (want && p.intent !== want) return -1;
-        if (c.budget_max && price > Number(c.budget_max) * 1.05) return -1;
-        if (c.budget_min && price < Number(c.budget_min) * 0.9) return -1;
-        const areas = c.area_codes || [];
-        if (areas.length && areas.indexOf(p.area_code) < 0) return -1;
-        const types = c.property_types || [];
-        if (types.length && types.indexOf(p.property_type) < 0) return -1;
-        if (c.bedrooms_min && Number(p.bedrooms || 0) < Number(c.bedrooms_min)) return -1;
-        let sc = 0;
-        if (c.budget_max) sc += 30 - Math.min(30, Math.abs(Number(c.budget_max) - price) / Number(c.budget_max) * 30);
-        if (areas.length) sc += 40;
-        if (types.length) sc += 10;
-        if (c.bedrooms_min && p.bedrooms) sc += 10;
-        sc += Math.min(10, 10 - (Date.now() - new Date(p.updated_at || 0).getTime()) / 864000000);
-        return sc;
-      }
-
-      const out = clients.rows.map(function (c) {
-        const rows = listings.rows.map(function (p) { return { p: p, s: score(c, p) }; })
-          .filter(function (x) { return x.s >= 0; })
-          .sort(function (a, b) { return b.s - a.s; })
-          .slice(0, 6)
-          .map(function (x) { return Object.assign({ score: Math.round(x.s) }, x.p); });
-        return { client: c, matches: rows };
-      });
+      const out = matcher.matchClients(clients.rows, listings.rows, 6);
       res.json({ ok: true, clients: out, listings: listings.rows.length });
     } catch (e) { next(e); }
   });

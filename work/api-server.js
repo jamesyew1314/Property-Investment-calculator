@@ -10,6 +10,7 @@ const createLibraryApi = require("./library-api");
 const createPublicApi = require("./public-api");
 const createAgentApi = require("./agent-api");
 const renderAgentPage = require("./agent-page");
+const runDigest = require("./digest");
 const pathMod = require("node:path");
 const { Pool } = require("pg");
 
@@ -1348,6 +1349,16 @@ app.get("/a/:slug", async function (req, res, next) {
       ORDER BY p.published_at DESC NULLS LAST, p.updated_at DESC LIMIT 60`, [agent.id]);
     res.set("Cache-Control", "public, max-age=300");
     res.type("html").send(renderAgentPage(agent, rows.rows, { en: en }));
+  } catch (e) { next(e); }
+});
+
+// ---------- 每日摘要（cron 调用） ----------
+app.post("/api/cron/digest", async function (req, res, next) {
+  try {
+    const key = process.env.CRON_KEY;
+    if (!key || req.get("x-cron-key") !== key) return res.status(403).json({ ok: false, error: "forbidden" });
+    const r = await runDigest({ pool: pool, sendMail: sendMail, days: req.query.days, force: req.query.force === "1" });
+    res.json(Object.assign({ ok: true }, r));
   } catch (e) { next(e); }
 });
 
