@@ -320,7 +320,7 @@
   function photoBlock(row) {
     var photos = row.photos || [];
     return '<div class="phWrap"><div class="phGrid" data-ph-grid>' + photos.map(function (u) {
-      return '<span class="phItem"><img src="' + esc(u) + '" alt=""><button type="button" data-rm-ph="' + esc(u) + '">×</button></span>';
+      return '<span class="phItem"><img src="' + esc(u.replace(/\.jpg$/i, "_t.jpg")) + '" data-full="' + esc(u) + '" onerror="this.onerror=null;this.src=this.dataset.full" alt=""><button type="button" data-rm-ph="' + esc(u) + '">×</button></span>';
     }).join("") + "</div>" +
       (row.id ? '<input type="file" id="phFile" accept="image/jpeg,image/png,image/webp" multiple>'
         : '<p class="muted" style="margin:6px 0 0">' + t("先保存房源，再上传图片。", "Save the listing first, then upload photos.") + "</p>") + "</div>";
@@ -330,7 +330,7 @@
     var grid = $("[data-ph-grid]", m.root);
     function render(list) {
       grid.innerHTML = (list || []).map(function (u) {
-        return '<span class="phItem"><img src="' + esc(u) + '" alt=""><button type="button" data-rm-ph="' + esc(u) + '">×</button></span>';
+        return '<span class="phItem"><img src="' + esc(u.replace(/\.jpg$/i, "_t.jpg")) + '" data-full="' + esc(u) + '" onerror="this.onerror=null;this.src=this.dataset.full" alt=""><button type="button" data-rm-ph="' + esc(u) + '">×</button></span>';
       }).join("");
     }
     var input = $("#phFile", m.root);
@@ -760,6 +760,9 @@
       field(t("个人页地址", "Your page"), '<div style="display:flex;align-items:center;gap:6px"><span class="muted">kwongthye.com/a/</span><input id="pfSlug" value="' + esc(a.slug || "") + '"></div>') +
       field(t("专长区域（可多选）", "Areas you cover"), areaSel) +
       '<div style="margin-top:6px"><button class="btn gold" id="pfSave">' + t("保存资料", "Save profile") + "</button></div></div>";
+    if (a.review_status === "rejected" && a.review_note) {
+      h += '<div class="card" style="border-left:3px solid #C6A15B"><h3>' + t("审核未通过", "Review not approved") + "</h3><p style='margin:0'>" + esc(a.review_note) + "</p></div>";
+    }
     h += '<div class="card"><h3>' + t("邮箱验证", "Email verification") + "</h3>" +
       (a.emailVerified ? '<p class="muted" style="margin:0">' + t("已验证 ✓", "Verified ✓") + "</p>"
         : '<p class="muted" style="margin:0 0 8px">' + t("未验证。验证后房源显示「已验证」标记。", "Not verified. Verified listings show a badge.") +

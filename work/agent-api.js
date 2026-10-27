@@ -9,6 +9,7 @@ const core = require("./library-core");
 const agentCore = require("./agent-core");
 const matcher = require("./match");
 const billplz = require("./billplz");
+let sharp = null; try { sharp = require("sharp"); } catch (e) { sharp = null; }
 const fs = require("node:fs");
 const pathMod = require("node:path");
 const tax = require("./library-taxonomy");
@@ -49,6 +50,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       id: a.id, name: a.name, email: a.email, phone: a.phone, team: a.team, ren_no: a.ren_no,
       slug: a.slug, bio: a.bio, photo_url: a.photo_url, areas: a.areas,
       verified: !!a.verified_at, emailVerified: !!a.email_verified_at,
+      review_status: a.review_status || "pending", review_note: a.review_note || null,
       status: a.status, plan: a.plan, created_at: a.created_at
     };
   }
@@ -308,8 +310,15 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
 
   r.delete("/listings/:id", requireAgent, async function (req, res, next) {
     try {
-      const out = await pool.query("DELETE FROM lib_properties WHERE id=$1 AND tenant_id=$2 RETURNING code", [req.params.id, req.agent.id]);
+      const out = await pool.query("DELETE FROM lib_properties WHERE id=$1 AND tenant_id=$2 RETURNING code, photos", [req.params.id, req.agent.id]);
       if (!out.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+      (out.rows[0].photos || []).forEach(function (u) {
+        if (!/^\/uploads\/props\/[A-Za-z0-9._-]+$/.test(u)) return;
+        const f = pathMod.join(UPLOADS, pathMod.basename(u));
+        [f, f.replace(/\.jpg$/i, "_t.jpg")].forEach(function (x) {
+          try { if (x.indexOf(UPLOADS) === 0 && fs.existsSync(x)) fs.unlinkSync(x); } catch (e) { /* ignore */ }
+        });
+      });
       await audit(req.agent.email, "agent.delete", "property", Number(req.params.id), { code: out.rows[0].code });
       res.json({ ok: true });
     } catch (e) { next(e); }
@@ -343,9 +352,19 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       const photos = row.photos || [];
       if (photos.length >= 12) return res.status(400).json({ ok: false, error: "too_many_photos" });
       fs.mkdirSync(UPLOADS, { recursive: true });
-      const name = row.id + "-" + Date.now().toString(36) + "-" + crypto.randomBytes(3).toString("hex") + "." + ext;
-      fs.writeFileSync(pathMod.join(UPLOADS, name), buf);
-      const url = "/uploads/props/" + name;
+      const baseName = row.id + "-" + Date.now().toString(36) + "-" + crypto.randomBytes(3).toString("hex");
+      let name, url;
+      if (sharp) {
+        const main = await sharp(buf).rotate().resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 82 }).toBuffer();
+        const thumb = await sharp(buf).rotate().resize({ width: 480, height: 480, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 76 }).toBuffer();
+        name = baseName + ".jpg";
+        fs.writeFileSync(pathMod.join(UPLOADS, name), main);
+        fs.writeFileSync(pathMod.join(UPLOADS, baseName + "_t.jpg"), thumb);
+      } else {
+        name = baseName + "." + ext;
+        fs.writeFileSync(pathMod.join(UPLOADS, name), buf);
+      }
+      url = "/uploads/props/" + name;
       const next = photos.concat([url]);
       await pool.query("UPDATE lib_properties SET photos=$1, cover_url=COALESCE(cover_url,$2), updated_at=now() WHERE id=$3 AND tenant_id=$4",
         [next, url, row.id, req.agent.id]);
@@ -364,6 +383,8 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       if (/^\/uploads\/props\/[A-Za-z0-9._-]+$/.test(url)) {
         const f = pathMod.join(UPLOADS, pathMod.basename(url));
         if (f.indexOf(UPLOADS) === 0 && fs.existsSync(f)) fs.unlinkSync(f);
+        const t = f.replace(/\.jpg$/i, "_t.jpg");
+        if (t !== f && t.indexOf(UPLOADS) === 0 && fs.existsSync(t)) fs.unlinkSync(t);
       }
       res.json({ ok: true, photos: next });
     } catch (e) { next(e); }

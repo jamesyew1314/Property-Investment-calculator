@@ -2,7 +2,7 @@
 
 > **这是项目的“单一上下文文件”。**  
 > 后续正式开发、修改、交接，先读这一份；只有需要细节时，再打开 57 页方案或工作簿。  
-> 最后更新：2026-10-27 · 版本：v2.3（+ M0–M3 + 房源图片 + REN 审核） · 状态：全部完成；平台现阶段全部免费。
+> 最后更新：2026-10-27 · 版本：v2.4（+ 图片压缩/缩略图 + 审核驳回/拉黑） · 状态：全部完成；平台现阶段全部免费；BM 待做。
 
 ---
 
@@ -34,7 +34,8 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | **M3 订阅基础** | ✅ 2026-10-27 上线 | `agent_subscriptions` / `agent_codes`；`GET /api/agent/plan`、`POST /api/agent/redeem`；工作台「套餐」页（当前套餐/到期/兑换/未来定价）；续期顺延；`PLATFORM_FREE=1` 下不做功能门槛 |
 | **M3 支付与降级** | ✅ 2026-10-27 上线 | `agent_payments`；`POST /api/agent/checkout`（配置 Billplz 时自动建账单，否则线下转账+兑换码）；`/api/billing/billplz/callback` 验签开通；`POST /api/cron/maintenance` 到期降级（随每日 cron）；`PLATFORM_FREE` 0/1 切换已演练 |
 | **房源图片** | ✅ 2026-10-27 上线 | `lib_properties.photos`/`cover_url`；`POST/DELETE /api/agent/listings/:id/photos`（JPG/PNG/WebP ≤8MB，最多 12 张，服务端验文件头）；nginx `/uploads/` 静态服务；首页/找房/详情/个人站使用封面，第一张自动封面 |
-| **REN 审核队列** | ✅ 2026-10-27 上线 | `/admin`「中介审核」：全部/待审核、通过/取消验证；`GET /api/admin/agents`、`POST /api/admin/agents/:id/verify`；验证后个人站/房源显示「已验证」 |
+| **图片压缩/缩略图** | ✅ 2026-10-27 上线 | sharp：主图 ≤1600px q82、缩略图 ≤480px q76（`_t.jpg`）；卡片/个人站用缩略图，详情用主图，缺失自动回退；删除图片/房源同时清文件；实测 193KB → 46KB + 6.3KB |
+| **REN 审核队列** | ✅ 2026-10-27 上线 | `/admin`「中介审核」：通过/驳回（原因）/拉黑（踢下线+房源收回）/解除；`POST /api/admin/agents/:id/review`；驳回原因在工作台可见；拉黑后登录 401 |
 | **M3 支付与降级** | ✅ 2026-10-27 上线 | `agent_payments`；`POST /api/agent/checkout`（配置 Billplz 时自动建账单，否则线下转账+兑换码）；`/api/billing/billplz/callback` 验签开通（E2E 已验证：签名通过→paid→订阅→套餐；错签 403）；`POST /api/cron/maintenance` 到期降级；后台发码（一次最多 50 个）；`PLATFORM_FREE` 0/1 切换演练通过 |
 
 **下一步：你打开 `web/index.html` 试用（双击即可）；确认体验后补 4 案例 fixture 与 21 项测试，再进 Phase 1 Web 化。**
@@ -527,6 +528,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-27 | **v0.91** | **M3 收口：回调 E2E + 后台发码**：① `/api/billing/billplz/callback` 用临时密钥端到端验证（签名→paid→订阅 source=billplz→套餐/到期），错误签名 403，密钥已轮换；② 后台「生成开通码」新增「PropNet 中介兑换码」（plan/months/count/note，一次最多 50，`GET/POST /api/admin/agent-codes`）；③ 清理测试数据，生产仅留 Andy Lau；④ M0–M3 全部完成 |
 | 2026-10-27 | **v0.92** | **房源图片上传/展示**：① 迁移 025 `photos text[]`，沿用 `cover_url`；② `POST /api/agent/listings/:id/photos`（raw body，验 JPEG/PNG/WebP 文件头，≤8MB，最多 12 张）、`DELETE` 删图并回退封面；③ nginx `/uploads/` alias + 30 天缓存；④ 工作台编辑房源可上传/删除缩略图；⑤ 首页卡片、找房列表、详情弹窗、中介个人站全部使用封面，无图回退占位；⑥ systemd `ReadWritePaths` 加 uploads 解决 EROFS；⑦ 实测上传→官网显示→详情大图→删除回退 |
 | 2026-10-27 | **v0.93** | **REN 中介审核**：① 后台新增「中介审核」标签（全部/待审核、REN/团队/邮箱验证/房源数、通过/取消）；② `GET /api/admin/agents`、`POST /api/admin/agents/:id/verify`；③ 通过后 `/a/:slug` 与房源显示「已验证中介」；④ 实测审核通过→个人站出现验证标记；后台表格 2 行无报错 |
+| 2026-10-27 | **v0.94** | **图片压缩/缩略图 + 审核驳回/拉黑**：① 服务器安装 sharp，上传自动生成主图（1600/q82）与缩略图（480/q76），卡片用 `_t.jpg`，详情用主图，缺失回退；② 删除图片/房源同时清理主图+缩略图；③ `lib_agents.review_status/review_note`（迁移 026）；④ 后台四动作：通过/驳回（原因）/拉黑（suspended + 踢下线 + 房源收回池内）/解除；⑤ 工作台个人资料显示驳回原因；⑥ 实测 3000×2000 193KB → 46KB + 6.3KB；驳回→agent 可见原因；拉黑→登录 401；解除→200 |
 | 2026-10-25 | — | 新增 `docs/服务器信息.md`：服务器规格、域名/DNS、架构、目录、数据库、环境变量、定时任务、备份恢复、SSL、安全、运维命令、发布流程、风险清单、费用 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 

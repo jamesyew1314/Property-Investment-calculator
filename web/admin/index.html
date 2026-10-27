@@ -838,9 +838,13 @@
         return "<tr><td><b>" + esc(a.name) + "</b><br><span class='muted mono'>" + esc(a.slug || "") + "</span></td><td>" + esc(a.ren_no || "—") +
           "</td><td>" + esc(a.team || "—") + "</td><td>" + esc(a.email) + (a.email_verified_at ? " ✓" : "") +
           "</td><td>" + a.listings + " / " + a.published + "</td><td>" +
-          (a.verified_at ? '<span class="pill green">已验证</span>' : '<span class="pill amber">待审核</span>') +
-          '</td><td><button class="btn ' + (a.verified_at ? "line" : "gold") + ' sm" data-ag="' + a.id + '" data-v="' + (a.verified_at ? "0" : "1") + '">' +
-          (a.verified_at ? "取消验证" : "通过验证") + "</button></td></tr>";
+          (a.review_status === "approved" ? '<span class="pill green">已通过</span>' : a.review_status === "rejected" ? '<span class="pill amber">已驳回</span>' : a.review_status === "blocked" ? '<span class="pill grey">已拉黑</span>' : '<span class="pill amber">待审核</span>') +
+          (a.review_note ? '<div class="muted" style="font-size:11px;max-width:220px">' + esc(a.review_note) + "</div>" : "") +
+          "</td><td>" +
+          '<button class="btn gold sm" data-rv="approved" data-ag="' + a.id + '">通过</button> ' +
+          '<button class="btn line sm" data-rv="rejected" data-ag="' + a.id + '">驳回</button> ' +
+          '<button class="btn danger sm" data-rv="blocked" data-ag="' + a.id + '">拉黑</button> ' +
+          '<button class="btn line sm" data-rv="pending" data-ag="' + a.id + '">解除</button></td></tr>";
       }).join("") + "</tbody></table>";
       $("agTable").innerHTML = h;
     });
@@ -848,9 +852,12 @@
   if ($("agReload")) $("agReload").onclick = loadAgentReview;
   if ($("agFilter")) $("agFilter").onchange = loadAgentReview;
   if ($("agTable")) $("agTable").addEventListener("click", function (e) {
-    var b = e.target.closest("[data-ag]");
+    var b = e.target.closest("[data-rv]");
     if (!b) return;
-    api("/agents/" + b.getAttribute("data-ag") + "/verify", { method: "POST", body: { verified: b.getAttribute("data-v") === "1" } })
+    var st = b.getAttribute("data-rv");
+    var note = st === "approved" ? "" : (prompt(st === "blocked" ? "拉黑原因（会记录）" : "驳回/备注原因") || "");
+    if (st === "blocked" && !note) return;
+    api("/agents/" + b.getAttribute("data-ag") + "/review", { method: "POST", body: { status: st, note: note } })
       .then(function () { loadAgentReview(); });
   });
 

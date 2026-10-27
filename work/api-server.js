@@ -551,6 +551,26 @@ app.get("/api/admin/agents", requireAdmin, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
+app.post("/api/admin/agents/:id/review", requireAdmin, requireWrite, async function (req, res, next) {
+  try {
+    const id = Number(req.params.id);
+    const status = String((req.body || {}).status || "");
+    const note = String((req.body || {}).note || "").slice(0, 300);
+    if (["approved", "rejected", "blocked", "pending"].indexOf(status) < 0) return res.status(400).json({ ok: false, error: "invalid_input" });
+    if (status === "approved") {
+      await pool.query("UPDATE lib_agents SET verified_at=now(), review_status='approved', review_note=$1, status='active' WHERE id=$2", [note || null, id]);
+    } else if (status === "blocked") {
+      await pool.query("UPDATE lib_agents SET verified_at=NULL, review_status='blocked', review_note=$1, status='suspended' WHERE id=$2", [note || null, id]);
+      await pool.query("UPDATE lib_properties SET visibility='pool', published_at=NULL WHERE tenant_id=$1", [id]);
+      await pool.query("DELETE FROM agent_sessions WHERE agent_id=$1", [id]);
+    } else {
+      await pool.query("UPDATE lib_agents SET verified_at=NULL, review_status=$1, review_note=$2, status='active' WHERE id=$3", [status, note || null, id]);
+    }
+    const out = await pool.query("SELECT id, name, review_status, review_note, verified_at, status FROM lib_agents WHERE id=$1", [id]);
+    res.json({ ok: true, row: out.rows[0] });
+  } catch (e) { next(e); }
+});
+
 app.post("/api/admin/agents/:id/verify", requireAdmin, requireWrite, async function (req, res, next) {
   try {
     const ok = !!(req.body || {}).verified;

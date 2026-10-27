@@ -61,6 +61,7 @@
     for (var i = 0; i < arr.length; i++) if (arr[i].key === code) return lang === "en" ? arr[i].en : arr[i].zh;
     return code || "";
   }
+  function thumbUrl(u) { return /\.jpg$/i.test(u || "") ? u.replace(/\.jpg$/i, "_t.jpg") : u; }
   function areaName(code) {
     var arr = tax.areas || [];
     for (var i = 0; i < arr.length; i++) if (arr[i].key === code) return lang === "en" ? arr[i].en : arr[i].zh;
@@ -87,7 +88,7 @@
     if (p.property_type) meta.push(label("property_types", p.property_type));
     return '<a class="pcard" href="/properties/?p=' + encodeURIComponent(p.code) + '">' +
       '<div class="pcard-media">' +
-      (p.cover_url ? '<img class="pcard-img" src="' + esc(p.cover_url) + '" alt="" loading="lazy">' : '<div class="ph">' + house + "</div>") +
+      (p.cover_url ? '<img class="pcard-img" src="' + esc(thumbUrl(p.cover_url)) + '" data-full="' + esc(p.cover_url) + '" onerror="this.onerror=null;this.src=this.dataset.full" alt="" loading="lazy">' : '<div class="ph">' + house + "</div>") +
       '<span class="badge' + (isRent ? " rent" : "") + '">' + (isRent ? (lang === "en" ? "For rent" : "出租") : (lang === "en" ? "For sale" : "出售")) + "</span>" +
       "</div>" +
       '<div class="pcard-body">' +
@@ -142,6 +143,6 @@
     money: money, int: int, date: date, esc: esc, label: label,
     state: stateName, area: areaName, areaShort: areaShort,
     setTax: function (x) { tax = Object.assign({}, tax, x || {}); },
-    listingCard: listingCard, skeletonCards: skeletonCards, fetchJSON: fetchJSON, setFree: setFree
+    thumb: thumbUrl, listingCard: listingCard, skeletonCards: skeletonCards, fetchJSON: fetchJSON, setFree: setFree
   };
 })();
