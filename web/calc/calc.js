@@ -188,23 +188,25 @@
     var mgmtY = (inp.mgmtM || 0) * 12;
     var fixedY = R((inp.quitY || 0) + (inp.assessY || 0) + (inp.repairY || 0) + (inp.insurY || 0) + (inp.rentAgentY || 0));
     var rentY = inp.rentY || 0;
-    // 平均利息口径（老板）：年利息 = 贷款 × 年利率；月均 = ÷12
-    var flatYear = R(inp.loan * rate);
-    var flatMonth = R(flatYear / 12);
+    // 利息口径：等额本息摊还表的真实利息（第 1 年最高，逐年递减）
+    // 这样「月供 = 利息 + 本金」「年末余额 = 年初余额 − 本金」永远对得上
+    var flatYear = R(inp.loan * rate);   // 仅作参考（贷款 × 年利率）
     var years = [];
-    var cumInst = 0, cumNetHold = 0;
+    var cumInst = 0, cumNetHold = 0, cumInterest = 0;
     for (var y = 1; y <= holdY; y++) {
       var am = yearAmort(inp.loan, rate, yearsLoan, y);
       cumInst += am.pmt * 12;
-      var costY = R(mgmtY + fixedY + flatYear);
+      cumInterest += am.interestYear;
+      var costY = R(mgmtY + fixedY + am.interestYear);
       var netY = R(rentY - costY);
       cumNetHold += netY;
       years.push({
         y: y,
         balance: am.balanceEnd,
+        principalYear: am.principalYear,
         principalCum: R(inp.loan - am.balanceEnd),
-        interestYear: flatYear,
-        interestCum: R(flatYear * y),
+        interestYear: am.interestYear,
+        interestCum: R(cumInterest),
         costY: costY,
         netY: netY,
         rentCum: R(rentY * y),
@@ -267,7 +269,13 @@
         initial: initial,
         pmt: pmt
       },
-      part2: { mgmtY: R(mgmtY), fixedY: fixedY, firstYearInterest: flatYear, firstYearMonthlyInterest: flatMonth },
+      part2: {
+        mgmtY: R(mgmtY), fixedY: fixedY,
+        firstYearInterest: years[0].interestYear,
+        firstYearMonthlyInterest: R(years[0].interestYear / 12),
+        totalInterest: R(cumInterest),
+        flatYear: flatYear
+      },
       years: years,
       sale: {
         sellAgent: sellAgent, sellAgentSST: sellAgentSST,

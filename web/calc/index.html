@@ -324,9 +324,9 @@
     <div class="row"><label data-i18n="fRepair">装修费 / 维修费（每年预算）</label><input class="manual money" id="repair" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
     <div class="row"><label data-i18n="fInsur">保险（每年，可选）</label><input class="manual money" id="insur" type="text" min="0" step="10" inputmode="decimal"><span class="unit">RM</span></div>
     <div class="row"><label data-i18n="fRentAgent">出租中介费（每年）</label><input class="manual money" id="rentAgent" type="text" min="0" step="100" inputmode="decimal"><span class="unit">RM</span></div>
-    <div class="row"><label data-i18n="fMInt">每个月银行利息（平均，自动）</label><input class="auto" id="mInt" readonly><span class="unit">RM</span></div>
+    <div class="row"><label data-i18n="fMInt">每月银行利息（第 1 年，自动）</label><input class="auto" id="mInt" readonly><span class="unit">RM</span></div>
     <div class="row"><label data-i18n="fYCost">每年总费用（第 1 年，自动）</label><input class="auto" id="yCost" readonly><span class="unit">RM</span></div>
-    <div class="legend" data-i18n="p2Note">说明：每月利息会随着贷款余额递减；卖出时还会自动加上律师费与 RPGT（见 Part 3 结果）。</div>
+    <div class="legend" data-i18n="p2Note">说明：利息按等额本息摊还表计算——第 1 年最高、逐年递减；因此「12 × 月供 = 利息 + 本金偿还」，与 Part 3 的「年末余额」完全对得上。卖出时还会自动加上律师费与 RPGT。</div>
   </section>
 
   <!-- Part 3 -->
@@ -373,7 +373,7 @@
 
     </div>
     <table id="yearTable">
-      <thead><tr><th data-i18n="thYear">年</th><th data-i18n="thBal">年末余额</th><th data-i18n="thInt">当年利息</th><th data-i18n="thCost">当年费用</th><th data-i18n="thNet">当年净利润</th><th data-i18n="thRpgt">RPGT</th></tr></thead>
+      <thead><tr><th data-i18n="thYear">年</th><th data-i18n="thBal">年末余额</th><th data-i18n="thPrinc">本金偿还</th><th data-i18n="thInt">当年利息</th><th data-i18n="thCost">当年费用</th><th data-i18n="thNet">当年净利润</th><th data-i18n="thRpgt">RPGT</th></tr></thead>
       <tbody></tbody>
     </table>
     <button class="btn" id="demo" data-i18n="btnDemo">填入示例（SPA 1M / 实价 800k / 贷 800k / 一年后卖 900k）</button>
@@ -627,8 +627,8 @@
       fSellLegal: "Legal Fee（律师费 + 印花税 + 杂费 + 8% SST，默认 5,000）", fSellMisc: "Selling Miscellaneous Expenses 售出杂费",
       lSellCostHead: "Selling related cost 出售相关费用：", lTotalSellCosts: "Total Selling Costs 出售总费用（中介 + 律师 + 杂费 + RPGT）", lSellingProfit: "Selling Profit 出售利润（出售资本收益 − 出售总费用）", lSellingReturn: "Selling Return 出售回报率（出售利润 ÷ 购房所需现金总额 ÷ 年数）",
       lNetInvProfit: "Net Investment Profit 投资净利润 ① + ②（总年租金净利润 + 出售利润）", lTotalRoi: "Total ROI 总投资回报率（投资净利润 ÷ 购房所需现金总额 ÷ 年数）", lTotalCost: "Total Cost 总成本（实际成交价 + 总购置费用 + 出售总费用）", lRotc: "Return on Total Cost 总成本回报率（投资净利润 ÷ 总成本 ÷ 年数）",
-      fMInt: "每个月银行利息（平均，自动）", fYCost: "每年总费用（第 1 年，自动）",
-      p2Note: "说明：利息是平均口径（贷款 × 年利率 ÷ 12）；真实等额本息每月利息会随余额略减，以银行账单为准。卖出时还会自动加上律师费与 RPGT（见 Part 3 结果）。",
+      fMInt: "每月银行利息（第 1 年，自动）", fYCost: "每年总费用（第 1 年，自动）",
+      p2Note: "说明：利息按等额本息摊还表计算——第 1 年最高、逐年递减；因此「12 × 月供 = 利息 + 本金偿还」，与 Part 3 的「年末余额」完全对得上。卖出时还会自动加上律师费与 RPGT。",
       p3Title: "Part 3 · Investment Returns（投资回报分析）", p3aTitle: "① Keep & Rent 持有出租回报", p3bTitle: "② Sell Property 出售房产回报",
       fRent: "Annual Rental Income 年租金收入", fSell: "Expected Selling Price 预计卖出价格", fHold: "Holding Period 持有年限",
       lSellPriceShow: "Expected Selling Price 预计卖出价格", lCashIn: "Total Upfront Cash Required 购房所需现金总额", lLessHead: "Less (扣除）：", lLessActual: "Actual Purchase Price 实际成交价", lLessAcq: "Total Acquisition Costs 总购置费用", lGrossGain: "Gross Capital Gain 出售资本收益（扣出售相关费用前）", lQuick: "年利润（净赚 ÷ 自己现金 ÷ 年数）",
@@ -638,7 +638,7 @@
       lProfit: "Net Cash Profit 现金净利润（完整口径）", lBal: "卖出时贷款余额",
       lSellCosts: "卖出总费用（中介 + 律师 + RPGT）", rpgtLine: "RPGT（持有 {y} 年 = {p}%）", rpgtEmpty: "RPGT（请先选持有年限）",
       lCoc: "现金回报率（完整口径）", lTcr: "Net Cash Return on Capital 现金总成本回报率", lXirr: "年利率（XIRR，完整口径）",
-      thYear: "年", thBal: "年末余额", thInt: "当年利息", thCost: "当年费用", thNet: "当年净利润", thRpgt: "RPGT",
+      thYear: "年", thBal: "年末余额", thPrinc: "本金偿还", thInt: "当年利息", thCost: "当年费用", thNet: "当年净利润", thRpgt: "RPGT",
       yearRow: "第 {y} 年", xirrNA: "无法计算",
       btnDemo: "填入示例（SPA 1M / 实价 800k / 贷 800k / 一年后卖 900k）", btnReset: "清空",
       exportTitle: "导出 / 分享",
@@ -773,8 +773,8 @@
       fSellLegal: "Legal Fee (legal + stamp duty + misc + 8% SST, default 5,000)", fSellMisc: "Selling Miscellaneous Expenses",
       lSellCostHead: "Selling related cost:", lTotalSellCosts: "Total Selling Costs (agent + legal + misc + RPGT)", lSellingProfit: "Selling Profit (gross capital gain − total selling costs)", lSellingReturn: "Selling Return (selling profit ÷ upfront cash ÷ years)",
       lNetInvProfit: "Net Investment Profit ① + ② (total rental profit + selling profit)", lTotalRoi: "Total ROI (net investment profit ÷ upfront cash ÷ years)", lTotalCost: "Total Cost (actual price + acquisition costs + selling costs)", lRotc: "Return on Total Cost (net investment profit ÷ total cost ÷ years)",
-      fMInt: "Monthly Bank Interest (average, auto)", fYCost: "Total Annual Cost (Yr 1, auto)",
-      p2Note: "Note: interest uses the average method (loan × rate ÷ 12); actual equal-instalment interest decreases slightly with balance — bank statement prevails. Selling legal fee and RPGT are added automatically at sale (see Part 3).",
+      fMInt: "Monthly Bank Interest (Yr 1, auto)", fYCost: "Total Annual Cost (Yr 1, auto)",
+      p2Note: "Note: interest follows the reducing-balance schedule (highest in year 1, declining). So 12 × instalment = interest + principal repaid, which reconciles exactly with the year-end balance in Part 3. Selling legal fee and RPGT are added automatically at sale.",
       p3Title: "Part 3 · Investment Returns", p3aTitle: "① Keep & Rent", p3bTitle: "② Sell Property",
       fRent: "Annual Rental Income", fSell: "Expected Selling Price", fHold: "Holding Period",
       lSellPriceShow: "Expected Selling Price", lCashIn: "Total Upfront Cash Required", lLessHead: "Less (deduct):", lLessActual: "Actual Purchase Price", lLessAcq: "Total Acquisition Costs", lGrossGain: "Gross Capital Gain (before selling costs)", lQuick: "Annual Profit (gross ÷ cash ÷ years)",
@@ -784,7 +784,7 @@
       lProfit: "Net Cash Profit (full basis)", lBal: "Loan Balance at Sale",
       lSellCosts: "Total Selling Costs (agent + legal + RPGT)", rpgtLine: "RPGT (hold {y} yr = {p}%)", rpgtEmpty: "RPGT (select holding period first)",
       lCoc: "Cash-on-Cash (full)", lTcr: "Net Cash Return on Capital", lXirr: "Annual Rate (XIRR, full)",
-      thYear: "Year", thBal: "Balance", thInt: "Interest", thCost: "Costs", thNet: "Net Profit", thRpgt: "RPGT",
+      thYear: "Year", thBal: "Balance", thPrinc: "Principal repaid", thInt: "Interest", thCost: "Costs", thNet: "Net Profit", thRpgt: "RPGT",
       yearRow: "Year {y}", xirrNA: "n/a",
       btnDemo: "Fill Example (SPA 1M / actual 800k / loan 800k / sell 900k after 1 yr)", btnReset: "Clear",
       exportTitle: "Export / Share",
@@ -1115,8 +1115,8 @@
     tb.innerHTML = "";
     r.years.forEach(function (row) {
       var tr = document.createElement("tr");
-      tr.innerHTML = "<td>" + fmt("yearRow", { y: row.y }) + "</td><td>" + fmtRM(row.balance) + "</td><td>" + fmtRM(row.interestYear) +
-        "</td><td>" + fmtRM(row.costY) + "</td><td>" + fmtRM(row.netY) + "</td><td>" +
+      tr.innerHTML = "<td>" + fmt("yearRow", { y: row.y }) + "</td><td>" + fmtRM(row.balance) + "</td><td>" + fmtRM(row.principalYear) +
+        "</td><td>" + fmtRM(row.interestYear) + "</td><td>" + fmtRM(row.costY) + "</td><td>" + fmtRM(row.netY) + "</td><td>" +
         Math.round(row.rpgtPct * 100) + "%</td>";
       tb.appendChild(tr);
     });

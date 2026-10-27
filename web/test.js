@@ -46,7 +46,7 @@ a(boss.out.quickAnnual, 0.5235, "老板例：年利润 ≈ 52.35%");
 a(boss.sale.sellCosts, 22908, "出售总费用 = 中介 18,000 + RPGT 4,908");
 a(boss.out.sellingProfit, 11452, "出售利润 = 资本收益 34,360 − 出售总费用 22,908");
 a(boss.out.sellingReturn, 0.1745, "出售回报率 ≈ 17.45%");
-a(boss.out.netInvestmentProfit, 35452, "投资净利润 = 24,000（总租金净利润）+ 11,452（出售利润）");
+a(boss.out.netInvestmentProfit, 35716.02, "投资净利润 = 24,264.02（总租金净利润）+ 11,452（出售利润）");
 a(boss.out.totalROI, 0.5401, "总投资回报率 ≈ 54.01%");
 a(boss.out.totalCost, 888548, "总成本 = 实价 800,000 + 购置 65,640 + 出售 22,908");
 a(boss.out.returnOnTotalCost, 0.0399, "总成本回报率 ≈ 3.99%");
@@ -56,7 +56,7 @@ const h0 = C.compute({spa:1000000, actual:800000, loan:800000, ratePct:4.5, year
   agentFee:0, consentFee:0, other:0, mgmtM:0, quitY:0, assessY:0, repairY:0, insurY:0,
   sellAgentPct:2, rentY:60000, sellPrice:900000, holdYears:0});
 a(h0.years.length, 1, "持有 0 年 → 计算按 1 年兜底（不再 ×5）");
-a(h0.out.totalRentalProfit, 24000, "持有 0 年 → 总年租金净利润按 1 年 = 24,000");
+a(h0.out.totalRentalProfit, 24264.02, "持有 0 年 → 总年租金净利润按 1 年 = 24,264.02");
 
 // 卖出中介费直接输入金额
 const sa = C.compute({spa:1000000, actual:800000, loan:800000, ratePct:4.5, yearsLoan:30,
@@ -77,8 +77,8 @@ eq(dec.d["备注"], "测试中文", "分享链接 encode/decode 往返（中文�
 eq(dec.o.spaFee, true, "分享链接 encode/decode 往返（覆盖标记）");
 eq(C.decodeState("%%%broken"), null, "非法分享参数返回 null");
 eq(C.decodeState(""), null, "空分享参数返回 null");
-a(boss.part2.firstYearMonthlyInterest, 3000, "平均月利息 = 800k×4.5%/12 = 3,000");
-a(boss.out.holdingProfit, 24000, "老板例：持有年净利润 = 60,000 − 36,000（平均利息）");
+a(boss.part2.firstYearMonthlyInterest, 2978, "第 1 年平均月利息 = 35,735.98/12 ≈ 2,978");
+a(boss.out.holdingProfit, 24264.02, "持有年净利润 = 60,000 − 35,735.98（第 1 年真实利息）");
 a(boss.out.holdingAnnual, 0.3656, "老板例：持有年利润 ≈ 36.56%");
 
 // 律师费/估价费手动覆盖
@@ -100,13 +100,13 @@ const ra = C.compute({spa:1000000, actual:800000, loan:800000, ratePct:4.5, year
   agentFee:0, consentFee:0, other:0, mgmtM:0, quitY:0, assessY:0, repairY:0, insurY:0, rentAgentY:3000,
   sellAgentPct:2, rentY:60000, sellPrice:900000, holdYears:1});
 a(ra.part2.fixedY, 3000, "出租中介费 3,000 进年度费用");
-a(ra.out.holdingProfit, 21000, "持有年净利润 = 60,000 − 36,000 利息 − 3,000 出租中介费");
+a(ra.out.holdingProfit, 21264.02, "持有年净利润 = 60,000 − 35,735.98 利息 − 3,000 出租中介费");
 
 // 总年租金净利润 = 年租金净利润 × 年数
 const tp3 = C.compute({spa:1000000, actual:800000, loan:800000, ratePct:4.5, yearsLoan:30,
   agentFee:0, consentFee:0, other:0, mgmtM:0, quitY:0, assessY:0, repairY:0, insurY:0,
   sellAgentPct:3, rentY:60000, sellPrice:900000, holdYears:3});
-a(tp3.out.totalRentalProfit, 72000, "总年租金净利润 = 24,000 × 3 年");
+a(tp3.out.totalRentalProfit, 72792.06, "总年租金净利润 = 24,264.02 × 3 年");
 // ---- v0.78：RPGT 按卖家身份 ----
 a(C.rpgtRate(3, "citizen"), 0.30, "公民 3 年 = 30%");
 a(C.rpgtRate(6, "citizen"), 0.00, "公民 6 年 = 0%");
@@ -139,6 +139,21 @@ a(det.part1.valDetail.fee + det.part1.valDetail.misc, det.part1.valDetail.total,
   "估价明细相加 = 合计");
 a(det.part1.spa.legal, 11250, "SPA 律师费 1,000,000 → 11,250（500k×1.25% + 500k×1%）");
 a(det.part1.spa.duty, 24000, "MOT 印花税 1,000,000 → 24,000（1k+8k+15k）");
+
+// ---- 摊还对账：月供 = 利息 + 本金；余额减少 = 本金 ----
+const rec = C.compute({spa:1000000, actual:800000, loan:800000, ratePct:4.5, yearsLoan:30,
+  agentFee:0, consentFee:0, other:0, mgmtM:0, quitY:0, assessY:0, repairY:0, insurY:0,
+  sellAgentPct:2, rentY:60000, sellPrice:900000, holdYears:1});
+a(rec.years[0].interestYear, 35735.98, "第 1 年真实利息 = 35,735.98（摊还表）");
+a(rec.years[0].principalYear, 12905.78, "第 1 年本金偿还 = 12,905.78");
+a(Math.round((rec.years[0].interestYear + rec.years[0].principalYear) * 100) / 100, Math.round(rec.part1.pmt * 12 * 100) / 100, "利息 + 本金 = 12 × 月供");
+a(Math.round((800000 - rec.years[0].balance) * 100) / 100, rec.years[0].principalYear, "余额减少 = 本金偿还（对账一致）");
+a(rec.sale.balance, 787094.22, "卖出时贷款余额 = 787,094.22");
+const rec3 = C.compute({spa:1000000, actual:800000, loan:800000, ratePct:4.5, yearsLoan:30,
+  agentFee:0, consentFee:0, other:0, mgmtM:0, quitY:0, assessY:0, repairY:0, insurY:0,
+  sellAgentPct:2, rentY:60000, sellPrice:900000, holdYears:3});
+a(rec3.years[1].interestYear < rec3.years[0].interestYear, true, "利息逐年递减");
+a(rec3.years[2].interestCum > rec3.years[1].interestCum, true, "累计利息递增");
 
 console.log("\n" + pass + " pass, " + fail + " fail");
 process.exit(fail === 0 ? 0 : 1);

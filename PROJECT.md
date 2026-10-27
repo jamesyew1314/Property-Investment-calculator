@@ -227,7 +227,7 @@ LA 律师费合计   = Loan legal + Loan stamp duty + Loan 杂费 + 8%×Loan leg
 **第一页的 3 个 Part（你定的结构，Simple Mode 就按这个顺序排）：**
 
 1. **Part 1 · 买入（第一次要出的费用）**：SPA 价、实际买价、贷款额、利率（年限默认 30 年可改）→ 月供自动；SPA 律师费（自动跟 SPA 价）、Loan Agreement 律师费（自动跟贷款额）；agent fee、consent fee、其他费用（手填）→ **Total Acquisition Costs 总购置费用**（5 项费用相加）→ **Down Payment 首付款** → **Less: Cashback** → **Total Upfront Cash Required 购房所需现金总额**。
-2. **Part 2 · Annual Holding Costs（每年持有费用，全部自己填，只有一个自动）**：管理费、地税、门牌税、装修/维修、**出租中介费（手填 RM/年）**；每月银行利息（自动，平均口径）；展开里：保险（手填可选）→ 每年总费用（自动）。卖出中介费 %、卖出律师费、RPGT 归 Part 3 ②。
+2. **Part 2 · Annual Holding Costs（每年持有费用，全部自己填，只有一个自动）**：管理费、地税、门牌税、装修/维修、**出租中介费（手填 RM/年）**；每月银行利息（自动，**第 1 年摊还表口径**）；展开里：保险（手填可选）→ 每年总费用（自动，第 1 年）。卖出中介费 %、卖出律师费、RPGT 归 Part 3 ②。
 3. **Part 3 · Investment Returns（投资回报分析）**：
    - ① Keep & Rent 持有出租回报：Annual Rental Income 年租金收入（手填）→ Annual Rental Profit 年租金净利润 = 租金 − 年度费用（含利息）→ **Annual Rental Return 年租金回报率 = 年租金净利润 ÷ 购房所需现金总额** → **Total Rental Profit 总年租金净利润 = 年租金净利润 × 年数**（自动）。
    - ② Sell Property 出售房产回报：Expected Selling Price、Holding Period、Agent Fee（金额格：默认 = 卖价 × 2%，可改金额）、Legal Fee（默认 5,000，可改）、Selling Miscellaneous Expenses（手填）；**RPGT 行放在售出杂费下面**，公式 = MAX(0, 卖价 − 实价 − 总购置费用 − 卖出中介费 − 卖出律师费 − 售出杂费) × 年限税率（≤3年 30% / 4年 20% / 5年 15% / 6年起 0%）；Less (扣除)：Actual Purchase Price、Total Acquisition Costs → **Gross Capital Gain = 卖价 − 实价 − 总购置费用** → **Total Selling Costs = Agent Fee + Legal Fee + 杂费 + RPGT** → **Selling Profit = Gross Capital Gain − Total Selling Costs** → **Selling Return = Selling Profit ÷ 购房现金 ÷ 年数**；再往下：**Net Investment Profit = Total Rental Profit + Selling Profit**、**Total ROI = 投资净利润 ÷ 购房现金 ÷ 年数**、**Total Cost = 实价 + 购置费用 + 出售总费用**、**Return on Total Cost = 投资净利润 ÷ Total Cost ÷ 年数**（原「完整口径」整块已删）。
@@ -401,6 +401,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-19 | v0.8 | 所有输入格不再预填数字：年利率/卖出中介费清空，贷款年限与持有年限默认「—」；年利率必填（为空时清空结果）；持有年限未选时②卖出输出显示「—」并提示；清空按钮清掉所有结果 |
 | 2026-10-19 | v0.9 | 贷款年限改为自由填写（数字格，1–50 年，不限制 20/25/30/35）；为空时结果清空（必填） |
 | 2026-10-19 | v0.10 | 持有年限同样改为自由填写（数字格，1–30 年）；超 5 年 RPGT 自动按 0% 档；27 项测试保持全过 |
+| 2026-10-27 | v0.79 | **利息口径修正（老板 10/27 指出）**：原来 Part 2/Part 3 用「平均利息 = 贷款 × 年利率」，但「卖出时贷款余额」来自等额本息摊还表 → 两者差 264.02（800k/4.5%/30y 第 1 年）。改为**全部用摊还表真实利息**：月供 4,053.48 × 12 = 利息 35,735.98 + 本金偿还 12,905.78，且 `余额减少 = 本金偿还`，逐项对平；Part 2 改显示「每月银行利息（第 1 年，自动）= 2,978.00」，年表新增「本金偿还」列，PDF 同步加列；测试扩到 **76 项**（含对账断言）。注意口径影响：持有年净利 24,000 → 24,264.02，Total ROI 54.41%（原 54.0% 左右） |
 | 2026-10-19 | v0.11 | Part 2 利息改为**平均口径**（老板算法）：年利息 = 贷款 × 年利率，月均 = ÷12（100 万 × 4% = 40,000/年 → 3,333.33/月）；①持有与逐年表同步用平均口径；贷款余额仍按等额本息摊销；test.js 扩到 28 项 |
 | 2026-10-19 | v0.12 | SPA 律师费 / LA 律师费 / 估价费支持**手动覆盖**：默认自动，改格子里的数字即覆盖（变橙色、计入总费用），清空恢复自动；test.js 扩到 29 项 |
 | 2026-10-19 | v0.13 | 金额输入全部改西式格式 **500,000.00**：输入实时加千分位、失焦补两位小数；输出与自动格同步格式化；% / 年限保持纯数字 |

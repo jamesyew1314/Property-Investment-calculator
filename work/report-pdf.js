@@ -66,7 +66,7 @@ const L = {
     p3: "Part 3 · 投资回报", rentY: "年租金收入", netY: "年净利润（租金 − 年度费用）",
     annualReturn: "年回报率（净利润 ÷ 首次现金）", holdYears: "持有年限",
     totalRentProfit: "总租金净利润（年净利润 × 年限）",
-    p3a: "持有期间逐年明细", thYear: "年", thBal: "年末贷款余额", thInt: "当年利息",
+    p3a: "持有期间逐年明细", thYear: "年", thBal: "年末贷款余额", thPrinc: "本金偿还", thInt: "当年利息",
     thCost: "当年费用", thNet: "当年净利润", thRpgt: "RPGT 税率",
     p3b: "卖出与总回报", sellPrice: "预算卖价", grossGain: "毛资本利得（卖价 − 实价 − 购置费）",
     rpgt: "RPGT（产业盈利税）", sellAgentFee: "卖出中介费", sellLegalFee: "卖出律师费",
@@ -75,7 +75,7 @@ const L = {
     totalRoi: "Total ROI（年化）", totalCost: "Total Cost（实价 + 购置 + 出售）",
     rotc: "Return on Total Cost（年化）",
     note: "备注", disclaimer:
-      "律师费、印花税按法定费率自动估算，RPGT 按 30/20/15/0 估算，银行利息为等额本息与平均口径并用——" +
+      "律师费、印花税按法定费率自动估算，RPGT 按 30/20/15/0 估算，银行利息按等额本息摊还表计算——" +
       "实际金额以律师报价、银行结算单与 LHDN 为准。本报告为投资估算，不构成法律或税务意见。",
     generated: "由 kwongthye.com 计算器生成", page: "第", pageOf: "页 / 共", pages: "页",
     years: "年", noData: "（未填写）"
@@ -99,7 +99,7 @@ const L = {
     netY: "Annual net profit (rent − annual cost)",
     annualReturn: "Annual return (net profit ÷ upfront cash)", holdYears: "Holding period",
     totalRentProfit: "Total rental profit (annual net × years)",
-    p3a: "Year-by-year while holding", thYear: "Year", thBal: "Loan balance (year end)",
+    p3a: "Year-by-year while holding", thYear: "Year", thBal: "Loan balance (year end)", thPrinc: "Principal repaid",
     thInt: "Interest", thCost: "Costs", thNet: "Net profit", thRpgt: "RPGT rate",
     p3b: "Sale and total return", sellPrice: "Planned selling price",
     grossGain: "Gross capital gain (price − purchase − costs)",
@@ -193,6 +193,7 @@ function buildReportPdf(payload) {
       // signed=true 时以零轴居中（负数向左），否则从左侧起画（全部为正）
       function hbars(title, items, yy, signed) {
         if (!items || !items.length) return yy;
+        if (signed && !items.some(function (it) { return (num(it.v) || 0) < 0; })) signed = false;
         if (yy > PAGE_H - 130) { doc.addPage(); yy = M; }
         doc.font(FB).fontSize(9).fillColor(C.navy).text(title, M, yy); yy += 15;
         const labelW = 110, valW = 78, barW = CW - labelW - valW - 10;
@@ -266,7 +267,7 @@ function buildReportPdf(payload) {
       const mgmtY = num(p2.mgmtY), fixedY = num(p2.fixedY), flatInt = num(p2.firstYearInterest);
       y = row(T("mgmt"), money(mgmtY), y);
       y = row(T("quit") + " + " + T("assess") + " + " + T("repair") + " + " + T("insur") + " + " + T("rentAgent"), money(fixedY), y);
-      y = row(T("interest"), money(flatInt), y);
+      y = row(T("interest") + " · " + pick("第 1 年（摊还表）", "Yr 1 (schedule)"), money(flatInt), y);
       y = boxed(T("annualCost"), money(mgmtY + fixedY + flatInt), y, "#EEF4F0");
 
       // ---------- Part 3 ----------
@@ -284,9 +285,9 @@ function buildReportPdf(payload) {
       if (years.length) {
         if (y > PAGE_H - 140 - years.length * 16) { doc.addPage(); y = M; }
         y = sectionTitle(T("p3a"), y);
-        const cols = [0, 0.34, 0.56, 0.74, 0.89];
-        const widths = [0.30, 0.18, 0.16, 0.13, 0.11];
-        const heads = [T("thYear"), T("thBal"), T("thInt"), T("thNet"), T("thRpgt")];
+        const cols = [0, 0.09, 0.28, 0.46, 0.63, 0.80];
+        const widths = [0.09, 0.19, 0.18, 0.17, 0.17, 0.12];
+        const heads = [T("thYear"), T("thBal"), T("thPrinc"), T("thInt"), T("thNet"), T("thRpgt")];
         doc.rect(M, y, CW, 18).fill("#F8FAFD");
         heads.forEach(function (h, i) {
           doc.font(FB).fontSize(8).fillColor(C.navy).text(h,
@@ -295,11 +296,12 @@ function buildReportPdf(payload) {
         });
         y += 18;
         years.forEach(function (yr) {
-          doc.font(FR).fontSize(8).fillColor(C.ink).text(String(yr.y), M + 6, y + 3, { width: 30 });
-          doc.text(money(num(yr.balance)), M + cols[1] * CW, y + 3, { width: 0.18 * CW, align: "right" });
-          doc.text(money(num(yr.interestYear)), M + cols[2] * CW, y + 3, { width: 0.16 * CW, align: "right" });
-          doc.text(money(num(yr.netY)), M + cols[3] * CW, y + 3, { width: 0.14 * CW, align: "right" });
-          doc.text(Math.round(num(yr.rpgtPct) * 100) + "%", M + cols[4] * CW, y + 3, { width: 0.11 * CW, align: "right" });
+          doc.font(FR).fontSize(7.6).fillColor(C.ink).text(String(yr.y), M + 6, y + 3, { width: 26 });
+          doc.text(money(num(yr.balance)), M + cols[1] * CW, y + 3, { width: widths[1] * CW - 4, align: "right", lineBreak: false });
+          doc.text(money(num(yr.principalYear)), M + cols[2] * CW, y + 3, { width: widths[2] * CW - 4, align: "right", lineBreak: false });
+          doc.text(money(num(yr.interestYear)), M + cols[3] * CW, y + 3, { width: widths[3] * CW - 4, align: "right", lineBreak: false });
+          doc.text(money(num(yr.netY)), M + cols[4] * CW, y + 3, { width: widths[4] * CW - 4, align: "right", lineBreak: false });
+          doc.text(Math.round(num(yr.rpgtPct) * 100) + "%", M + cols[5] * CW, y + 3, { width: widths[5] * CW, align: "right", lineBreak: false });
           hr(y + 14, "#F4F1EA");
           y += 16;
         });
