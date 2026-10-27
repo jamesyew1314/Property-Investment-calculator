@@ -1,6 +1,7 @@
 /* PropNet /app — 中介工作台（零依赖） */
 (function () {
   "use strict";
+  var SHOW_PLAN = false; // 套餐/收费 UI：后期上线时改 true
   var S = {
     me: null, stats: null, meta: null, lang: localStorage.getItem("kt_lang") || "zh",
     authMode: "login", route: ""
@@ -194,7 +195,7 @@
   ];
   function renderNav() {
     var r = S.route || "";
-    $("#nav").innerHTML = NAV.map(function (n) {
+    $("#nav").innerHTML = NAV.filter(function (n) { return SHOW_PLAN || n.key !== "plan"; }).map(function (n) {
       var badge = n.badge && S.stats && S.stats.new_inquiries > 0 ? '<span class="n">' + S.stats.new_inquiries + "</span>" : "";
       return '<a href="#/' + n.key + '" class="' + (r === n.key ? "on" : "") + '"><span>' + n.ico + "</span><span>" +
         esc(t(n.zh, n.en)) + "</span>" + badge + "</a>";
@@ -228,6 +229,7 @@
   function route() {
     if (!S.me) { showAuth(); return; }
     var p = parseHash();
+    if (!SHOW_PLAN && p.path === "plan") { location.hash = "#/"; return; }
     S.route = p.path;
     renderNav();
     $("#view").innerHTML = '<div class="card">' + t("加载中…", "Loading…") + "</div>";
