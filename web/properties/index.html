@@ -47,7 +47,7 @@
         </div>
         <div class="f">
           <label for="fQ" data-i18n="list.keyword">关键词</label>
-          <input id="fQ" type="search" placeholder="Sutera / 公寓 / 12-03">
+          <input id="fQ" type="search" data-i18n-ph="ph.keyword" placeholder="Sutera / 公寓 / 12-03">
         </div>
         <div class="f">
           <label for="fArea" data-i18n="search.area">区域</label>
@@ -59,11 +59,11 @@
         </div>
         <div class="f">
           <label for="fMin" data-i18n="list.min">最低价</label>
-          <input id="fMin" type="number" min="0" step="1000" placeholder="不限">
+          <input id="fMin" type="number" min="0" step="1000" placeholder="">
         </div>
         <div class="f">
           <label for="fMax" data-i18n="list.max">最高价</label>
-          <input id="fMax" type="number" min="0" step="1000" placeholder="不限">
+          <input id="fMax" type="number" min="0" step="1000" placeholder="">
         </div>
         <button class="btn gold" type="submit" data-i18n="list.filter">筛选</button>
       </form>
@@ -104,6 +104,7 @@ window.PAGE_I18N = {
   "list.title": ["找房", "Find a home"],
   "list.sub": ["按区域、预算、房型筛选。点开房源看货源中介。", "Filter by area, budget and type. Open a listing to see the agent behind it."],
   "list.keyword": ["关键词", "Keyword"],
+  "ph.keyword": ["Sutera / 公寓 / 12-03", "Sutera / condo / 12-03"],
   "list.min": ["最低价", "Min price"],
   "list.max": ["最高价", "Max price"],
   "list.filter": ["筛选", "Filter"],

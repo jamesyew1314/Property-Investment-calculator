@@ -194,6 +194,14 @@ window.PAGE_I18N = {
 };
 </script>
 <script src="/site.js"></script>
-<script>KT.init(window.PAGE_I18N);</script>
+<script>
+KT.init(window.PAGE_I18N);
+function syncTag() {
+  var hot = document.querySelector(".tier.hot");
+  if (hot) hot.setAttribute("data-tag", KT.lang === "en" ? "Most popular" : "最受欢迎");
+}
+syncTag();
+document.addEventListener("kt:lang", syncTag);
+</script>
 </body>
 </html>

@@ -26,6 +26,10 @@
       if (attr) el.setAttribute(attr, lang === "en" ? v[1] : v[0]);
       else el.innerHTML = lang === "en" ? v[1] : v[0];
     });
+    $$("[data-i18n-ph]").forEach(function (el) {
+      var v = dict[el.getAttribute("data-i18n-ph")];
+      if (v) el.placeholder = lang === "en" ? v[1] : v[0];
+    });
     document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
     $$(".lang-toggle").forEach(function (b) { b.textContent = lang === "en" ? "中文" : "EN"; });
     document.dispatchEvent(new CustomEvent("kt:lang", { detail: lang }));
