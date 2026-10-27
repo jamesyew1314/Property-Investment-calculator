@@ -12,3 +12,4 @@
 
 10. **PropMatch 所有页面必须中英双语（强制）。** 登录、工作台、客户需求、房源、配对、设置、表单、弹窗、空状态、错误、加载、手机端、PWA、页面标题，以及 WhatsApp/邮件文案，全部要有 `zh` + `en`；禁止只写中文或只写英文。新文案统一加在 `match-platform/public/i18n.js` 的 `S(zh, en)` 表，新增服务端错误同步 `match-platform/lib/error-i18n.js`。规范与验收清单见 `match-platform/docs/双语规范.md`；每次发布前跑 `cd match-platform && npm test`，并在中/英两种语言下逐页验收。
 
+11. **房产资料库 PropBase（`web/library/` + `work/library-api.js`）**：所有页面、表单、弹窗、空状态、错误必须中英双语（前端统一用 `T(zh, en)`）；字典只维护 `work/library-taxonomy.js` 一份，前端从 `/api/library/meta` 取，**禁止再写第二份区域/状态表**。金额 `NUMERIC(18,2)`、日期 `DATE`。改校验/CSV/佣金后必须跑 `node work/test-library.js`（62 项）和 `node web/test.js`（69 项）。新增实体要同步五处：迁移 SQL、`library-api.js` 的 `ALLOWED` 白名单、`library-core.js` 的 `normalize*` + `CSV_COLUMNS`、前端页面/表单、`docs/资料库说明.md`。发布用 `bash deploy/deploy.sh`（已包含资料库文件与两套测试）。

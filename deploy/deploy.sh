@@ -15,6 +15,7 @@ RSYNC="rsync -az -e \"ssh -i $KEY -o StrictHostKeyChecking=no\""
 
 echo "▸ 1/5 回归测试"
 node web/test.js | tail -1
+node work/test-library.js | tail -1
 
 echo "▸ 2/5 上传静态站点"
 rsync -az -e "ssh -i $KEY -o StrictHostKeyChecking=no" \
@@ -23,7 +24,8 @@ rsync -az -e "ssh -i $KEY -o StrictHostKeyChecking=no" \
 
 echo "▸ 3/5 上传后端"
 $SCP work/api-server.js "$USER_@$HOST:/srv/fangchan/api/server.js"
-for f in mail-layout.js receipt-pdf.js report-pdf.js admin.js send-reminders.js send-monthly.js; do
+for f in mail-layout.js receipt-pdf.js report-pdf.js admin.js send-reminders.js send-monthly.js \
+         library-api.js library-core.js library-taxonomy.js; do
   [ -f "work/$f" ] && $SCP "work/$f" "$USER_@$HOST:/srv/fangchan/api/$f"
 done
 

@@ -2,7 +2,7 @@
 
 > **这是项目的“单一上下文文件”。**  
 > 后续正式开发、修改、交接，先读这一份；只有需要细节时，再打开 57 页方案或工作簿。  
-> 最后更新：2026-10-27 · 版本：v1.1（+ match-platform v0.1） · 状态：投资计算器已上线；智能房源配对已上线 <https://match.kwongthye.com/>。
+> 最后更新：2026-10-27 · 版本：v1.2（+ match-platform v0.1 + 资料库 v1.0） · 状态：投资计算器、智能房源配对、房产资料库均已上线。
 
 ---
 
@@ -25,6 +25,7 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | Phase 0 | ✅ 已完成 | **正式站：<https://kwongthye.com/>**（阿里云吉隆坡 47.254.235.22，`/srv/fangchan/web/`，Let's Encrypt HTTPS 自动续期）；旧站 <https://laoyeshu.cn/static/fangchan/> 保留作备份；`web/test.js` 48 项测试全过 |
 | Phase 1–4 | ⏳ 未开始 | Web 快速计算器（自己用）→ 团队内测 → SaaS（RM50/年） |
 | **智能房源配对** | ✅ v0.1 已上线 | 独立 `match-platform/`：需求×房源可解释配对、可负担性、反向匹配、跟进漏斗、中英双语；**51 项测试全过**；线上 <https://match.kwongthye.com/> |
+| **房产资料库 PropBase** | ✅ v1.0 已上线 | `web/library/` + `/api/library/*`：楼盘/房源/业主/客户/带看/成交/改价/审计 9 张表、10 个页面、CSV 导入导出、中英双语；**62 项单测**；线上 <https://kwongthye.com/library/> |
 
 **下一步：你打开 `web/index.html` 试用（双击即可）；确认体验后补 4 案例 fixture 与 21 项测试，再进 Phase 1 Web 化。**
 
@@ -61,6 +62,13 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | `web/calc/calc.js` | 核心公式库：等额本息/法定费用/RPGT/逐年投影/XIRR/分享编解码 |
 | `web/test.js` | 53 项回归（`node web/test.js`，必须全过） |
 | `web/pricing/` `web/privacy/` `web/terms/` `web/receipt/` `web/admin/` `web/card/` | 价格页 / 隐私政策 / 使用条款 / 收据页 / 后台 / 电子名片 |
+| `work/library-api.js` | 资料库 API（`/api/library/*`：CRUD、统计、批量、导入导出、审计） |
+| `work/library-core.js` | 资料库纯函数（校验、金额/日期解析、CSV、佣金），单测覆盖 |
+| `work/library-taxonomy.js` | 资料库字典（25 个新山区域、房型、产权、状态、来源、标签），前端从 `/api/library/meta` 取 |
+| `web/library/` | **房产资料库 PropBase**（概览/房源/楼盘/业主/客户/带看/成交/导入导出/日志），部署在 `/library/` |
+| `work/test-library.js` | 资料库 62 项回归（`node work/test-library.js`） |
+| `work/migrations/017_library.sql` | 资料库 9 张表 + 索引 + `fangchan_app` 权限 |
+| `docs/资料库说明.md` | 资料库产品 / 技术 / 运维说明 |
 | `work/api-server.js` | Express API（部署时改名 **`server.js`**，否则 systemd 跑的是旧文件） |
 | `work/admin.js` | 后台 CLI：开通码、优惠码、用户、日志、OTP 兜底 |
 | `work/mail-layout.js` | 品牌邮件 HTML 模板（API、提醒、月度、运维通知共用） |
@@ -481,6 +489,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-26 | v0.76 | **修复「AI 填数点了没反应」**：① 空输入原来直接 `return` 无任何反馈 → 现在弹出示例提示并聚焦输入框；② 新增「示例」按钮，一键填入可识别的句子；③ 解析器重写为**按分句解析**（原来先把逗号全删再匹配，导致英文句子变成一整句、租金/贷款互相串），支持「买了 80 万的房子」「三年后卖 75 万」「Condo 800k, 90% loan at 4.3%, sell for 1M after 5 years」「3000 rent」等写法；④ 中文数字（一~十/两）用于持有年限；⑤ 贷款成数只接受 10%–100%，不会把 4.3% 利率误当 LTV；⑥ 识别失败提示带完整示例。实测 6 类句子全部正确 |
 | 2026-10-26 | v0.77 | **AI 填数补默认值**：原来只填薪资类字段、`贷款年限` 空着 → `recalc()` 早退清空结果（用户仍然觉得「没反应」）。现在缺关键字段时补常见值（贷款 90% / 利率 4.3% / 年限 30 年 / 持有 5 年），并在提示里列出「哪些是估算的」，填完直接出「首次现金」等结果。实测 4 类句子（只给房价租金 / 完整中文 / 完整英文 / 只给房价）全部出结果 RM 134,856 |
 | 2026-10-26 | v0.78 | **P2 + P3 第一批**：① **RPGT 按卖家身份**（公民/PR 30-20-15-0、外国人 30-30-30-30-30-10、公司 30-20-15-10），Part 3 新增「卖家身份」下拉，逐年表税率跟随；② **费用分档明细**（SPA/LA/估价/卖出律师费可展开看 律师费+印花税+杂费+SST 逐项），公式层新增 `valDetail` 与 `sellLegalTotal` 导出；③ **口径说明弹窗**（19 条：法定费用分档、等额本息、回报口径、三种身份 RPGT、免责），中英双语；④ **断网提示条** + 断网时拦截云端保存；⑤ **免费期注册引导**（本机保存后出现「免费注册可云端同步」，可永久关闭）；⑥ **转化埋点**：新增 `events` 表 + `/api/track` 支持 event + 后台「近 7 天事件漏斗」；⑦ **方案对比扩到 4 个**（＋方案，A/B/C/D 四列，与 A 列对比 ▲▼）；⑧ **手机端分段折叠**（点标题收起，桌面不受影响）；⑨ **PDF 报告加图**：逐年净现金流（零轴居中条形）+「钱花在哪里」成本构成条形；⑩ 测试增至 **69 项**（含三种身份税率、明细自洽） |
+| 2026-10-27 | **v0.79** | **房产资料库 PropBase v1.0**：① 新增 9 张表（`lib_projects/lib_properties/lib_owners/lib_clients/lib_viewings/lib_deals/lib_price_events/lib_audit/lib_agents`），金额 NUMERIC(18,2)、日期 DATE、单位号唯一索引防重复录入；② 新模块 `work/library-api.js`（`/api/library/*` 25 个接口：CRUD、概览统计、批量改状态/中介、CSV 导入导出、审计、示例数据）；③ 新前端 `web/library/`（概览 / 房源 / 楼盘 / 业主 / 客户 / 带看 / 成交 / 导入导出 / 操作日志，中英双语，手机卡片视图，登录沿用后台账号 + 记住 7 天）；④ 房源详情「算回报」一键带房价/贷款/利率/年限跳计算器（`?d=` 只读分享格式），「复制资料」生成 WhatsApp 文本；⑤ 改价自动留历史、成交自动推进房源状态、佣金按成交价×费率自动算；⑥ `work/test-library.js` 62 项、`node web/test.js` 69 项全过；⑦ `deploy/deploy.sh` 纳入资料库文件；⑧ 生产库已载入示例数据（5 楼盘/9 房源/3 业主/3 客户/2 带看/1 成交，可一键清除） |
 | 2026-10-25 | — | 新增 `docs/服务器信息.md`：服务器规格、域名/DNS、架构、目录、数据库、环境变量、定时任务、备份恢复、SSL、安全、运维命令、发布流程、风险清单、费用 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 
@@ -523,3 +532,24 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 下一步 | WhatsApp Cloud API、团队角色、CSV/门户导入、密码重置；商业路径见 [`docs/SaaS商业方案_Malaysia_v1.md`](docs/SaaS商业方案_Malaysia_v1.md) |
 
 **开发约定**：**所有页面必须中英双语**（登录、工作台、需求、房源、配对、设置、表单、弹窗、空状态、错误、手机端、PWA、页面标题、WhatsApp/邮件文案）；新文案统一进 `public/i18n.js`，服务端错误同步 `lib/error-i18n.js`；规范/验收清单见 [`match-platform/docs/双语规范.md`](match-platform/docs/双语规范.md)。新增原因码必须同步 `lib/engine.js` 的 `NOTE_CODES` 与 `public/i18n.js` 的 `note.*` 中英文字典（测试会拦）；新增区域/标签改 `lib/taxonomy.js`；改权重同步 README 与产品说明；金额原型用 Number，迁移 PostgreSQL 时改 `NUMERIC(18,2)`。
+
+
+---
+
+## 17. 房产资料库 PropBase（v1.0 · 2026-10-27）
+
+> 公司的房源/楼盘/业主/客户台账。与投资计算器、PropMatch 并列，共用 PostgreSQL 与后台账号。
+
+| 项 | 内容 |
+| :--- | :--- |
+| 入口 | <https://kwongthye.com/library/>（后台页头也有「资料库 Library」链接） |
+| 说明 | [`docs/资料库说明.md`](docs/资料库说明.md)（功能地图、数据模型、API、运维、验收） |
+| 登录 | 管理后台账号（邮箱+密码+邮件验证码，可记住 7 天）；`owner/admin` 可写，`viewer` 只读 |
+| 页面 | 概览 · 房源 · 楼盘 · 业主 · 客户 · 带看 · 成交 · 导入/导出 · 操作日志 |
+| 表 | `lib_projects` `lib_properties` `lib_owners` `lib_clients` `lib_viewings` `lib_deals` `lib_price_events` `lib_audit` `lib_agents` |
+| 关键规则 | 编号 `KT-0001` 自动生成；同一楼盘+座+单位号唯一；区域/房型/产权随楼盘带出；改价自动留历史；成交自动把房源改为已售/已租；所有写操作进审计 |
+| 联动 | 房源「算回报」→ `calc.kwongthye.com/?d=…` 预填 SPA/贷款/利率/年限；「复制资料」→ WhatsApp 文本；导出 CSV 带 BOM，Excel 直开 |
+| 测试 | `node work/test-library.js` — **62 项**；发布脚本会自动跑 |
+| 部署 | 迁移 `017_library.sql` 手动执行一次；之后 `bash deploy/deploy.sh` |
+| 示例数据 | 当前生产库为示例数据（全部 `is_demo=true`），「导入 / 导出」页可一键清除 |
+| 下一步 | 房源图片/附件（OSS）、公开房源页与分享卡片、与 PropMatch 数据互通、团队分账号、月度报表 |

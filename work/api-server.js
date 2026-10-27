@@ -6,6 +6,7 @@ const nodemailer = require("nodemailer");
 const { buildReceiptPdf } = require("./receipt-pdf");
 const mailLayout = require("./mail-layout");
 const { buildReportPdf } = require("./report-pdf");
+const createLibraryApi = require("./library-api");
 const pathMod = require("node:path");
 const { Pool } = require("pg");
 
@@ -24,7 +25,7 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
 const app = express();
 app.set("trust proxy", 1);
 app.disable("x-powered-by");
-app.use(express.json({ limit: "200kb" }));
+app.use(express.json({ limit: "1mb" }));
 
 // ---------- helpers ----------
 function sha256(s) { return crypto.createHash("sha256").update(s).digest("hex"); }
@@ -772,11 +773,14 @@ app.post("/api/admin/verify", rateLimit(10, 600000), async function (req, res) {
   await pool.query("DELETE FROM admin_otps WHERE expires_at < now() - interval '1 day'");
   const a = await pool.query("SELECT id,email,role FROM admins WHERE email=$1", [r.rows[0].email]);
   const admin = a.rows[0] || { id: null, email: r.rows[0].email, role: "owner" };
+  const remember = !!(req.body || {}).remember;
+  const ttl = remember ? "7 days" : "2 hours";
+  const maxAge = remember ? 7 * 86400 : 7200;
   const token = crypto.randomBytes(32).toString("hex");
-  await pool.query("INSERT INTO admin_sessions(token_hash,admin_id,email,role,expires_at) VALUES($1,$2,$3,$4, now() + interval '2 hours')",
-    [sha256(token), admin.id, admin.email, admin.role]);
+  await pool.query("INSERT INTO admin_sessions(token_hash,admin_id,email,role,expires_at) VALUES($1,$2,$3,$4, now() + ($5)::interval)",
+    [sha256(token), admin.id, admin.email, admin.role, ttl]);
   if (admin.id) await pool.query("UPDATE admins SET last_login_at=now() WHERE id=$1", [admin.id]);
-  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=" + token + "; HttpOnly; Secure; SameSite=Strict; Path=" + COOKIE_PATH + "; Max-Age=7200");
+  res.setHeader("Set-Cookie", ADMIN_COOKIE + "=" + token + "; HttpOnly; Secure; SameSite=Strict; Path=" + COOKIE_PATH + "; Max-Age=" + maxAge);
   await adminLog("login.ok", admin.email + " (" + admin.role + ")", req);
   res.json({ ok: true, email: admin.email, role: admin.role });
 });
@@ -1278,6 +1282,9 @@ app.post("/api/subscription/redeem", requireAuth, requireVerified, rateLimit(10,
     client.release();
   }
 });
+
+// ---------- 房产资料库（PropBase） ----------
+app.use("/api/library", createLibraryApi({ pool, requireAdmin, requireWrite }));
 
 // ---------- fallbacks ----------
 app.use("/api", function (req, res) { res.status(404).json({ ok: false, error: "not_found" }); });

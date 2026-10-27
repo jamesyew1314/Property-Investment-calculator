@@ -1,0 +1,11 @@
+{
+  "name": "PropBase · 房产资料库",
+  "short_name": "PropBase",
+  "start_url": "/library/",
+  "display": "standalone",
+  "background_color": "#0E2438",
+  "theme_color": "#0E2438",
+  "icons": [
+    {"src": "/icon-256.png", "sizes": "256x256", "type": "image/png", "purpose": "any"}
+  ]
+}
