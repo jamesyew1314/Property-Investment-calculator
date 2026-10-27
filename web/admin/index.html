@@ -131,6 +131,7 @@
         <button data-tab="list" data-i18n="tabList">码列表</button>
         <button data-tab="users" data-i18n="tabUsers">用户</button>
         <button data-tab="msgs" data-i18n="tabMsgs">留言</button>
+        <button data-tab="leads" data-i18n="tabLeads">加入申请</button>
         <button data-tab="views" data-i18n="tabViews">访问量</button>
         <button data-tab="refunds" data-i18n="tabRefunds">退款</button>
         <button data-tab="logs" data-i18n="tabLogs">操作日志</button>
@@ -207,6 +208,16 @@
           <table><thead><tr>
             <th data-i18n="thTime">时间</th><th data-i18n="thName">姓名</th><th data-i18n="thContact">联系</th><th data-i18n="thMessage">留言</th>
           </tr></thead><tbody id="msgBody"></tbody></table>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-leads">
+        <div class="card" style="padding:0;overflow:auto;max-height:70vh">
+          <table><thead><tr>
+            <th data-i18n="thTime">时间</th><th data-i18n="thName">姓名</th><th data-i18n="thContact">联系</th>
+            <th data-i18n="thRen">REN</th><th data-i18n="thTeam">团队</th><th data-i18n="thMessage">留言</th>
+            <th data-i18n="thStatus">状态</th>
+          </tr></thead><tbody id="leadBody"></tbody></table>
         </div>
       </section>
 
@@ -305,7 +316,9 @@
       chTotal: "累计", chConv: "付费转化率",
       exportLbl: "导出 CSV：", expUsers: "用户", expCodes: "开通码", expPayments: "收据",
       tabCodes: "生成开通码", tabPromo: "优惠码", tabList: "码列表", tabUsers: "用户",
-      tabMsgs: "留言", tabViews: "访问量", tabRefunds: "退款", tabLogs: "操作日志", tabAdmins: "管理员",
+      tabMsgs: "留言", tabLeads: "加入申请", tabViews: "访问量", tabRefunds: "退款", tabLogs: "操作日志", tabAdmins: "管理员",
+      thRen: "REN", thTeam: "团队",
+      lead_new: "新申请", lead_contacted: "已联系", lead_joined: "已加入", lead_dropped: "已放弃",
       thReceipt: "收据", thReason: "原因",
       rfPending: "待处理", rfApproved: "已退款", rfRejected: "已拒绝", rfApprove: "批准退款", rfDecline: "拒绝",
       rfNoteApprove: "批准退款（会立即停用该用户专业版，可写备注）：", rfNoteReject: "拒绝退款（可写原因，用户会收到邮件）：",
@@ -360,7 +373,9 @@
       chTotal: "Total", chConv: "Paid conversion",
       exportLbl: "Export CSV:", expUsers: "Users", expCodes: "Activation codes", expPayments: "Receipts",
       tabCodes: "Create codes", tabPromo: "Promo codes", tabList: "All codes", tabUsers: "Users",
-      tabMsgs: "Enquiries", tabViews: "Traffic", tabRefunds: "Refunds", tabLogs: "Audit log", tabAdmins: "Admins",
+      tabMsgs: "Enquiries", tabLeads: "Join requests", tabViews: "Traffic", tabRefunds: "Refunds", tabLogs: "Audit log", tabAdmins: "Admins",
+      thRen: "REN", thTeam: "Team",
+      lead_new: "New", lead_contacted: "Contacted", lead_joined: "Joined", lead_dropped: "Dropped",
       thReceipt: "Receipt", thReason: "Reason",
       rfPending: "Pending", rfApproved: "Refunded", rfRejected: "Declined", rfApprove: "Approve", rfDecline: "Decline",
       rfNoteApprove: "Approve refund (Pro will be switched off immediately; optional note):", rfNoteReject: "Decline refund (reason is emailed to the user):",
@@ -538,6 +553,29 @@
       }).join("") || "<tr><td colspan=4 class='muted'>" + t("empty") + "</td></tr>";
     });
   }
+
+  function loadLeads() {
+    api("/leads?days=365").then(function (j) {
+      if (!j.ok) return;
+      var rows = j.rows || [];
+      $("leadBody").innerHTML = rows.map(function (r) {
+        var opts = ["new", "contacted", "joined", "dropped"].map(function (st) {
+          return '<option value="' + st + '"' + (r.status === st ? " selected" : "") + ">" + t("lead_" + st) + "</option>";
+        }).join("");
+        return "<tr><td class='muted'>" + String(r.created_at).slice(0, 16).replace("T", " ") + "</td><td>" + esc(r.name) +
+          "</td><td>" + esc(r.phone || "") + (r.email ? "<br>" + esc(r.email) : "") + "</td><td>" + esc(r.ren_no || "—") +
+          "</td><td>" + esc(r.team || "—") + "</td><td style='max-width:280px'>" + esc(r.message || "") +
+          "</td><td><select onchange=\"setLeadStatus(" + r.id + ",this.value)\">" + opts + "</select></td></tr>";
+      }).join("") || "<tr><td colspan=7 class='muted'>" + t("empty") + "</td></tr>";
+    });
+  }
+
+  function setLeadStatus(id, status) {
+    api("/leads/" + id, { method: "PATCH", body: { status: status } }).then(function (j) {
+      if (j.ok) loadLeads();
+    });
+  }
+  window.setLeadStatus = setLeadStatus;
 
   function loadEvents() {
     api("/events?days=7").then(function (j) {
@@ -752,6 +790,7 @@
       b.classList.add("on"); $("tab-" + b.getAttribute("data-tab")).classList.add("on");
       if (b.getAttribute("data-tab") === "list") loadList();
       if (b.getAttribute("data-tab") === "msgs") loadMsgs();
+      if (b.getAttribute("data-tab") === "leads") loadLeads();
       if (b.getAttribute("data-tab") === "views") loadViews();
       if (b.getAttribute("data-tab") === "logs") loadLogs();
       if (b.getAttribute("data-tab") === "admins") loadAdmins();

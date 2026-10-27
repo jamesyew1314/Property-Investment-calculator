@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>找中介 | PropNet 新山房产中介目录</title>
+<meta name="description" content="PropNet 新山认证房产中介目录：查看中介的 REN、专长区域与在售房源，直接联系。">
+<link rel="canonical" href="https://kwongthye.com/agents/">
+<meta property="og:title" content="找中介 | PropNet">
+<meta property="og:description" content="新山认证房产中介目录：REN、专长区域与在售房源。">
+<meta property="og:url" content="https://kwongthye.com/agents/">
+<link rel="icon" type="image/png" href="/icon-256.png">
+<link rel="stylesheet" href="/site.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap bar">
+    <a class="brand" href="/"><img src="/logo-white.png" alt="KWONG THYE 光泰"><span>PROPNET</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <nav class="site-nav">
+      <a href="/properties/" data-i18n="nav.find">找房</a>
+      <a href="/agents/" class="on" data-i18n="nav.agents">找中介</a>
+      <a href="/join/" data-i18n="nav.join">给中介</a>
+      <a href="/about/" data-i18n="nav.about">关于</a>
+      <a href="https://calc.kwongthye.com/" data-i18n="nav.calc">计算器</a>
+      <a class="login" href="/library/" data-i18n="nav.login">中介登录</a>
+      <button class="lang-toggle">EN</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="sec" style="padding-bottom:26px">
+    <div class="wrap">
+      <div class="eyebrow" data-i18n="ag.kicker">认证中介</div>
+      <h1 style="font-size:clamp(28px,3.4vw,40px)" data-i18n="ag.title">找一位懂这个区的人</h1>
+      <p class="lead" data-i18n="ag.sub">每位中介都有 REN 编号与专长区域；点进去看他的在售房源。</p>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="grid-4" id="grid"></div>
+      <div id="emptyBox" hidden></div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap inner">
+      <div>
+        <div class="eyebrow" style="color:var(--gold2)" data-i18n="ag.bandK">你是中介吗？</div>
+        <h2 data-i18n="ag.bandT">把你的名片放进目录</h2>
+        <p data-i18n="ag.bandS">个人站 + 房源池，客户搜区域时就能找到你。</p>
+      </div>
+      <a class="btn gold" href="/join/" data-i18n="ag.bandC">加入 PropNet</a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><b>KWONG THYE · PROPNET</b><p data-i18n="foot.tag">新山房源与中介网络。</p></div>
+      <div><b data-i18n="foot.platform">平台</b><p><a href="/properties/" data-i18n="nav.find">找房</a><br><a href="/agents/" data-i18n="nav.agents">找中介</a><br><a href="/join/" data-i18n="nav.join">给中介</a></p></div>
+      <div><b data-i18n="foot.company">公司</b><p><a href="/about/" data-i18n="nav.about">关于</a><br><a href="/pricing/" data-i18n="foot.pricing">价格</a><br><a href="/privacy/" data-i18n="foot.privacy">隐私政策</a></p></div>
+    </div>
+    <div class="legal"><span>© 2026 KWONG THYE.</span><span>THE ROOF REALTY SDN BHD · E(1)1605/1</span><span>Andy Lau REN 32839</span></div>
+  </div>
+</footer>
+
+<script>
+window.PAGE_I18N = {
+  "nav.find": ["找房", "Find a home"], "nav.agents": ["找中介", "Agents"], "nav.join": ["给中介", "For agents"],
+  "nav.about": ["关于", "About"], "nav.calc": ["计算器", "Calculator"], "nav.login": ["中介登录", "Agent login"],
+  "ag.kicker": ["认证中介", "Verified agents"],
+  "ag.title": ["找一位懂这个区的人", "Find someone who knows the area"],
+  "ag.sub": ["每位中介都有 REN 编号与专长区域；点进去看他的在售房源。", "Every agent has a REN and an area of focus. Open a profile to see their listings."],
+  "ag.listings": ["套房源", "listings"],
+  "ag.view": ["看房源 →", "View listings →"],
+  "ag.empty": ["首批认证中介正在上线", "The first verified agents are onboarding"],
+  "ag.emptySub": ["PropNet 正在招募首批 80 位中介。现在加入，你会是目录里的第一批。", "We are onboarding the first 80 agents. Join now and be among the first in the directory."],
+  "ag.join": ["申请加入", "Apply to join"],
+  "ag.bandK": ["你是中介吗？", "Are you an agent?"],
+  "ag.bandT": ["把你的名片放进目录", "Put your card in the directory"],
+  "ag.bandS": ["个人站 + 房源池，客户搜区域时就能找到你。", "Your page plus the listing pool, so clients find you when they search the area."],
+  "ag.bandC": ["加入 PropNet", "Join PropNet"],
+  "foot.tag": ["新山房源与中介网络。", "Johor Bahru listings and agent network."],
+  "foot.platform": ["平台", "Platform"], "foot.company": ["公司", "Company"], "foot.pricing": ["价格", "Pricing"],
+  "foot.privacy": ["隐私政策", "Privacy"]
+};
+</script>
+<script src="/site.js"></script>
+<script>
+(function () {
+  "use strict";
+  KT.init(window.PAGE_I18N);
+  var state = { rows: [], tax: null };
+
+  function render() {
+    var grid = document.getElementById("grid");
+    var empty = document.getElementById("emptyBox");
+    if (!state.rows.length) {
+      grid.innerHTML = "";
+      empty.hidden = false;
+      empty.innerHTML = '<div class="empty"><b>' + KT.t("ag.empty") + "</b><p>" + KT.t("ag.emptySub") + "</p>" +
+        '<a class="btn dark" href="/join/">' + KT.t("ag.join") + "</a></div>";
+      return;
+    }
+    empty.hidden = true;
+    grid.innerHTML = state.rows.map(function (a) {
+      var initials = (a.name || "A").replace(/[^A-Za-z\u4e00-\u9fa5]/g, "").slice(0, 2).toUpperCase();
+      return '<div class="agent-card"><div class="avatar">' + KT.esc(initials) + "</div>" +
+        "<b>" + KT.esc(a.name) + "</b><small>" + KT.esc(a.ren_no || "KWONG THYE") + "</small>" +
+        '<div style="margin-top:6px"><span class="tag">' + a.listings + " " + KT.t("ag.listings") + "</span></div>" +
+        '<a class="btn line sm" style="margin-top:12px" href="/properties/?agent=' + encodeURIComponent(a.name) + '">' + KT.t("ag.view") + "</a></div>";
+    }).join("");
+  }
+
+  KT.fetchJSON("/api/public/agents").then(function (j) {
+    state.rows = j.rows || [];
+    render();
+  }).catch(function () { render(); });
+  document.addEventListener("kt:lang", render);
+})();
+</script>
+</body>
+</html>

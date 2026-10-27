@@ -7,6 +7,7 @@ const { buildReceiptPdf } = require("./receipt-pdf");
 const mailLayout = require("./mail-layout");
 const { buildReportPdf } = require("./report-pdf");
 const createLibraryApi = require("./library-api");
+const createPublicApi = require("./public-api");
 const pathMod = require("node:path");
 const { Pool } = require("pg");
 
@@ -1282,6 +1283,42 @@ app.post("/api/subscription/redeem", requireAuth, requireVerified, rateLimit(10,
     client.release();
   }
 });
+
+// ---------- 官网加入申请（PropNet） ----------
+app.get("/api/admin/leads", requireAdmin, async function (req, res, next) {
+  try {
+    const days = Math.max(1, Math.min(365, Number(req.query.days) || 90));
+    const out = await pool.query(
+      "SELECT id,name,phone,email,ren_no,team,message,source,status,created_at FROM agent_leads " +
+      "WHERE created_at > now() - ($1 || ' days')::interval ORDER BY created_at DESC LIMIT 500", [days]);
+    res.json({ ok: true, rows: out.rows });
+  } catch (e) { next(e); }
+});
+app.patch("/api/admin/leads/:id", requireAdmin, requireWrite, async function (req, res, next) {
+  try {
+    const status = String((req.body || {}).status || "");
+    if (["new", "contacted", "joined", "dropped"].indexOf(status) < 0) {
+      return res.status(400).json({ ok: false, error: "invalid_input" });
+    }
+    const out = await pool.query("UPDATE agent_leads SET status=$1 WHERE id=$2 RETURNING id,status", [status, req.params.id]);
+    if (!out.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    res.json({ ok: true, row: out.rows[0] });
+  } catch (e) { next(e); }
+});
+
+// ---------- 官网公开接口（无需登录） ----------
+app.use("/api/public", createPublicApi({
+  pool: pool,
+  rateLimit: rateLimit,
+  ipSalt: process.env.IP_SALT,
+  notify: async function (lead) {
+    const to = process.env.ADMIN_EMAIL || "andylau.theroof@gmail.com";
+    const text = ["新的 PropNet 加入申请", "", "姓名：" + lead.name, "电话：" + lead.phone,
+      "邮箱：" + (lead.email || "—"), "REN：" + (lead.ren || "—"), "团队：" + (lead.team || "—"),
+      "留言：" + (lead.message || "—"), "", "后台查看：https://kwongthye.com/admin/"].join("\n");
+    await sendMail(to, "PropNet 加入申请 — " + lead.name, text, null, [], null);
+  }
+}));
 
 // ---------- 房产资料库（PropBase） ----------
 app.use("/api/library", createLibraryApi({ pool, requireAdmin, requireWrite }));

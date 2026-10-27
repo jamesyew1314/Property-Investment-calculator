@@ -2,4 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /receipt
+Disallow: /library
+Disallow: /app
 Sitemap: https://kwongthye.com/sitemap.xml

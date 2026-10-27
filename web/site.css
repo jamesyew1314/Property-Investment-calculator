@@ -1,0 +1,240 @@
+/* PropNet · site.css — 平台官网共用样式（首页 / 房源 / 中介 / 加入 / 价格） */
+:root{
+  --navy:#0E2438;--navy2:#15344F;--gold:#C6A15B;--gold2:#E2C88F;
+  --cream:#F7F4EE;--ink:#1B2430;--muted:#5D6B7A;--line:#E4DED2;--white:#fff;
+  --green:#166E52;--amber:#9A6A12;--radius:14px;
+  --serif:Georgia,"Times New Roman","Songti SC","Noto Serif SC",serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--white);color:var(--ink);font-size:16px;line-height:1.7;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(1180px,92vw);margin:0 auto}
+
+/* ---------- 通用 ---------- */
+.eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:10px}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.25;margin:0}
+h1{font-size:clamp(32px,4.2vw,52px);letter-spacing:-.01em}
+h2{font-size:clamp(24px,3vw,34px);letter-spacing:-.01em}
+h3{font-size:18px}
+p{margin:0 0 12px}
+.lead{color:var(--muted);font-size:17px;max-width:62ch}
+.muted{color:var(--muted)}
+.sec{padding:64px 0}
+.sec.alt{background:var(--cream);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sec-head{max-width:720px;margin-bottom:32px}
+.sec-head p{color:var(--muted);margin-top:10px}
+.sec-head.row{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;max-width:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;padding:12px 22px;
+  font-size:14.5px;font-weight:600;border:1px solid transparent;cursor:pointer;font-family:inherit;transition:.15s}
+.btn.gold{background:var(--gold);color:#1B2430}
+.btn.gold:hover{background:#D3B173}
+.btn.dark{background:var(--navy);color:#fff}
+.btn.dark:hover{background:var(--navy2)}
+.btn.ghost{background:transparent;border-color:rgba(255,255,255,.35);color:#fff}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold2)}
+.btn.line{background:#fff;border-color:var(--line);color:var(--navy)}
+.btn.line:hover{border-color:var(--gold)}
+.btn.sm{padding:8px 16px;font-size:13px}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+
+/* ---------- 顶栏 ---------- */
+.site-head{background:var(--navy);color:#fff;position:sticky;top:0;z-index:60;border-bottom:1px solid rgba(255,255,255,.07)}
+.site-head .bar{display:flex;align-items:center;gap:22px;height:70px}
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.brand img{height:30px;width:auto}
+.brand span{font-family:var(--serif);font-size:15px;letter-spacing:.16em;color:var(--gold2);border-left:1px solid rgba(255,255,255,.2);padding-left:10px;line-height:1}
+.site-nav{display:flex;align-items:center;gap:22px;margin-left:auto}
+.site-nav a{font-size:14.5px;color:rgba(255,255,255,.78);white-space:nowrap}
+.site-nav a:hover{color:#fff}
+.site-nav a.on{color:var(--gold2)}
+.site-nav .lang-toggle,.site-nav .login{background:none;border:1px solid rgba(255,255,255,.28);color:#fff;
+  border-radius:999px;padding:6px 13px;font-size:12.5px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.site-nav .login{border-color:var(--gold);color:var(--gold2)}
+.site-nav .lang-toggle:hover,.site-nav .login:hover{border-color:var(--gold2)}
+.menu-btn{display:none;margin-left:auto;background:none;border:1px solid rgba(255,255,255,.3);color:#fff;
+  border-radius:9px;padding:6px 11px;font-size:17px;cursor:pointer}
+
+/* ---------- Hero ---------- */
+.hero{background:
+    radial-gradient(900px 420px at 78% -10%,rgba(198,161,91,.28),transparent 60%),
+    radial-gradient(700px 380px at 10% 110%,rgba(46,84,150,.35),transparent 60%),
+    linear-gradient(160deg,#0B1F31 0%,var(--navy) 55%,#0A1927 100%);
+  color:#fff;padding:74px 0 86px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;inset:0;background-image:
+  linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:64px 64px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 75%);pointer-events:none}
+.hero .wrap{position:relative;z-index:1}
+.hero .eyebrow{color:var(--gold2)}
+.hero h1{max-width:16ch}
+.hero .lead{color:rgba(255,255,255,.72);margin-top:16px;font-size:17.5px}
+.hero-stats{display:flex;gap:44px;margin-top:34px;flex-wrap:wrap}
+.hero-stats b{display:block;font-family:var(--serif);font-size:30px;color:var(--gold2);line-height:1.1}
+.hero-stats span{font-size:12.5px;color:rgba(255,255,255,.62);letter-spacing:.04em}
+
+/* ---------- 搜索卡 ---------- */
+.searchbar{background:#fff;border-radius:16px;padding:14px;box-shadow:0 26px 60px rgba(0,0,0,.28);
+  display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr auto;gap:10px;align-items:end;margin-top:38px;color:var(--ink)}
+.searchbar .f label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-weight:700}
+.searchbar select,.searchbar input{width:100%;padding:10px 11px;border:1px solid #DCD6C8;border-radius:9px;
+  font:inherit;font-size:14px;background:#FDFCF8;color:var(--ink)}
+.searchbar select:focus,.searchbar input:focus{outline:2px solid rgba(198,161,91,.4);border-color:var(--gold)}
+.searchbar .btn{height:43px;white-space:nowrap}
+
+/* ---------- 房源卡 ---------- */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.pcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+  display:flex;flex-direction:column;transition:.18s;position:relative}
+.pcard:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(14,36,56,.12);border-color:#D8CFBC}
+.pcard-media{aspect-ratio:4/3;background:linear-gradient(135deg,#16395A,#0E2438);position:relative;overflow:hidden}
+.pcard-media .ph{position:absolute;inset:0;display:grid;place-items:center}
+.pcard-media .ph svg{width:54px;height:54px}
+.pcard-media .badge{position:absolute;left:12px;top:12px;background:rgba(255,255,255,.92);color:var(--navy);
+  border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700}
+.pcard-media .badge.rent{background:rgba(198,161,91,.95);color:#1B2430}
+.pcard-body{padding:15px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pcard-title{font-size:15.5px;font-weight:700;color:var(--navy);line-height:1.35}
+.pcard-sub{font-size:12.5px;color:var(--muted)}
+.pcard-meta{font-size:12.5px;color:#475467;margin-top:2px}
+.pcard-price{font-family:var(--serif);font-size:20px;color:var(--navy);margin-top:auto;padding-top:8px}
+.pcard-price small{font-size:12px;color:var(--muted);font-family:inherit}
+.pcard-agent{font-size:11.5px;color:var(--muted);border-top:1px dashed #E9E3D6;padding-top:8px;margin-top:4px;
+  display:flex;justify-content:space-between;gap:8px}
+.pcard-agent b{color:#8A6A2F;font-weight:600}
+
+/* ---------- 区域 / 中介 / 价值卡 ---------- */
+.area-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;
+  display:flex;flex-direction:column;gap:4px;transition:.15s}
+.area-card:hover{border-color:var(--gold);background:#FFFDF7}
+.area-card b{font-size:14.5px;color:var(--navy)}
+.area-card span{font-size:12px;color:var(--muted)}
+.area-card em{margin-top:auto;font-style:normal;font-family:var(--serif);color:var(--gold);font-size:13px}
+.vcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px}
+.vcard .ic{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#173B5B,#0E2438);
+  color:var(--gold2);display:grid;place-items:center;font-family:var(--serif);font-size:18px;margin-bottom:14px}
+.vcard h3{margin-bottom:6px;color:var(--navy)}
+.vcard p{color:var(--muted);font-size:14px;margin:0}
+.agent-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px;text-align:center}
+.avatar{width:64px;height:64px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,#1B4166,#0E2438);
+  color:var(--gold2);display:grid;place-items:center;font-family:var(--serif);font-size:22px}
+.agent-card b{display:block;color:var(--navy);font-size:15px}
+.agent-card small{color:var(--muted);font-size:12px}
+.agent-card .n{display:inline-block;margin-top:8px;font-size:12px;color:var(--gold);font-weight:700}
+
+/* ---------- 计算器 / CTA 带 ---------- */
+.band{background:linear-gradient(150deg,#0B1F31,var(--navy) 60%,#102E48);color:#fff;padding:54px 0}
+.band .inner{display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap}
+.band h2{color:#fff}
+.band p{color:rgba(255,255,255,.7);margin:8px 0 0}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap}
+
+/* ---------- 页脚 ---------- */
+.site-foot{background:#0A1927;color:rgba(255,255,255,.62);padding:46px 0 30px;font-size:13px}
+.site-foot .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:30px;margin-bottom:26px}
+.site-foot b{color:#fff;font-family:var(--serif);font-size:15px;letter-spacing:.06em;display:block;margin-bottom:8px}
+.site-foot a{color:rgba(255,255,255,.62)}
+.site-foot a:hover{color:var(--gold2)}
+.site-foot .legal{border-top:1px solid rgba(255,255,255,.1);padding-top:18px;display:flex;gap:14px;flex-wrap:wrap;font-size:12px}
+.site-foot .reg{margin-top:10px;font-size:11.5px;color:rgba(255,255,255,.4);line-height:1.8}
+
+/* ---------- 表单 ---------- */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:12.5px;font-weight:600;color:var(--muted)}
+.field input,.field select,.field textarea{padding:11px 12px;border:1px solid #DCD6C8;border-radius:9px;
+  font:inherit;font-size:14.5px;background:#FDFCF8;color:var(--ink);width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid rgba(198,161,91,.4);border-color:var(--gold)}
+.field textarea{min-height:90px;resize:vertical}
+.field .err{font-size:12px;color:#B23B3B}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.form-note{font-size:12px;color:var(--muted);line-height:1.6}
+.msg{font-size:13.5px;margin-top:12px;min-height:20px}
+.msg.ok{color:var(--green)}
+.msg.err{color:#B23B3B}
+
+/* ---------- 价格表 ---------- */
+.tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:stretch}
+.tier{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column}
+.tier.hot{border:2px solid var(--gold);position:relative;box-shadow:0 18px 40px rgba(198,161,91,.16)}
+.tier.hot:before{content:attr(data-tag);position:absolute;top:-11px;left:20px;background:var(--gold);color:#1B2430;
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
+.tier h3{color:var(--navy);margin-bottom:2px}
+.tier .price{font-family:var(--serif);font-size:30px;color:var(--navy);margin:10px 0 2px}
+.tier .price small{font-family:inherit;font-size:12.5px;color:var(--muted)}
+.tier ul{list-style:none;padding:0;margin:14px 0 18px;font-size:13.5px;color:#475467}
+.tier li{padding-left:18px;position:relative;margin-bottom:7px}
+.tier li:before{content:"✓";position:absolute;left:0;color:var(--gold);font-weight:700}
+.tier li.no{color:#9AA4AF}
+.tier li.no:before{content:"—";color:#C9D2DC}
+.tier .btn{margin-top:auto;width:100%}
+.tier .tagline{font-size:12.5px;color:var(--muted);min-height:38px}
+
+/* ---------- 空状态 ---------- */
+.empty{background:var(--cream);border:1px dashed #D8CFBC;border-radius:var(--radius);padding:42px 24px;text-align:center}
+.empty b{display:block;font-family:var(--serif);font-size:20px;color:var(--navy);margin-bottom:6px}
+.empty p{color:var(--muted);max-width:52ch;margin:0 auto 16px}
+
+/* ---------- 工具 ---------- */
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.spread{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.tag{display:inline-block;background:#F3EFE6;border-radius:6px;padding:2px 8px;font-size:11.5px;color:#6B5A36}
+.skel{background:linear-gradient(90deg,#F1EDE4 25%,#F8F5EE 37%,#F1EDE4 63%);background-size:400% 100%;
+  animation:sk 1.3s ease infinite;border-radius:8px}
+@keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+
+/* ---------- 手机 ---------- */
+@media (max-width:980px){
+  .grid-4{grid-template-columns:1fr 1fr}
+  .grid-3{grid-template-columns:1fr 1fr}
+  .tiers{grid-template-columns:1fr 1fr}
+  .searchbar{grid-template-columns:1fr 1fr}
+  .searchbar .btn{grid-column:1/-1}
+}
+@media (max-width:760px){
+  .sec{padding:44px 0}
+  .hero{padding:48px 0 56px}
+  .menu-btn{display:block}
+  .site-nav{position:fixed;left:0;right:0;top:70px;background:var(--navy);flex-direction:column;
+    align-items:stretch;gap:0;padding:10px 6vw 18px;display:none;box-shadow:0 20px 40px rgba(0,0,0,.35)}
+  .site-nav.open{display:flex}
+  .site-nav a{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:15px}
+  .site-nav .lang-toggle,.site-nav .login{margin-top:12px;text-align:center}
+  .grid-3,.grid-2,.grid-4,.tiers{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .hero-stats{gap:26px}
+  .searchbar{grid-template-columns:1fr}
+  .site-foot .cols{grid-template-columns:1fr}
+  .band .inner{flex-direction:column;align-items:flex-start}
+}
+
+/* ---------- 买/租 切换 ---------- */
+.seg{display:inline-flex;background:#F1EDE4;border-radius:999px;padding:3px;gap:2px}
+.seg button{border:none;background:none;border-radius:999px;padding:7px 18px;font-size:13px;font-weight:600;
+  color:var(--muted);cursor:pointer;font-family:inherit}
+.seg button.on{background:var(--navy);color:#fff}
+.hero .seg{background:rgba(255,255,255,.12)}
+.hero .seg button{color:rgba(255,255,255,.7)}
+.hero .seg button.on{background:var(--gold);color:#1B2430}
+
+/* ---------- 房源筛选条 ---------- */
+.filterbar{background:var(--cream);border:1px solid var(--line);border-radius:16px;padding:14px;
+  display:grid;grid-template-columns:1.05fr 1.5fr 1fr 1fr .8fr .8fr auto;gap:10px;align-items:end;margin-top:24px}
+.filterbar .f label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-weight:700}
+.filterbar input,.filterbar select{width:100%;padding:10px 11px;border:1px solid #DCD6C8;border-radius:9px;
+  font:inherit;font-size:14px;background:#FDFCF8;color:var(--ink)}
+.filterbar input:focus,.filterbar select:focus{outline:2px solid rgba(198,161,91,.4);border-color:var(--gold)}
+.filterbar .btn{height:43px}
+@media (max-width:1100px){.filterbar{grid-template-columns:1fr 1fr 1fr}}
+@media (max-width:760px){.filterbar{grid-template-columns:1fr}.filterbar .btn{width:100%}}
+
+/* 手机：首页只显示 3 张精选房源，避免页面过长 */
+@media (max-width:760px){
+  .feat-grid .pcard:nth-child(n+4){display:none}
+  .detailGrid{grid-template-columns:1fr 1fr!important}
+}

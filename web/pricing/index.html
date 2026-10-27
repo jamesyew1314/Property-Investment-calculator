@@ -2,262 +2,198 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>价格 | Pricing — KWONG THYE 光泰</title>
-<meta name="description" content="KWONG THYE 房地产投资计算器价格：免费版可存 3 个方案；Pro RM9.90/月 或 RM99/年，方案不限，含到期提醒与优先支持。">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>价格 | PropNet 平台与免费计算器</title>
+<meta name="description" content="PropNet 价格：投资计算器永久免费；平台免费档可看池并发布 5 条；个人版 RM89/月（早鸟 RM59 锁 12 个月）；团队 5 席 RM299/月。">
 <link rel="canonical" href="https://kwongthye.com/pricing/">
-<link rel="icon" type="image/png" href="/icon-256.png">
-<style>
-  :root{--navy:#0E2438;--gold:#C6A15B;--cream:#F7F4EE;--ink:#1B2430;--muted:#5D6B7A;--line:#E4DED2}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-  header{background:var(--navy);color:#fff}
-  .wrap{width:min(980px,92vw);margin:0 auto}
-  .bar{display:flex;align-items:center;gap:14px;height:76px}
-  .bar img{height:44px}
-  .bar a.home{margin-left:auto;color:#D7E0EA;font-size:13px;text-decoration:none}
-  .bar button{background:none;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer}
-  main{padding:46px 0 70px}
-  h1{font-family:Georgia,"Songti SC",serif;color:var(--navy);font-size:clamp(28px,4vw,40px);margin:0 0 8px}
-  .lead{color:var(--muted);max-width:720px;margin:0 0 30px}
-  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  .plan{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column}
-  .plan.pro{border-color:var(--gold);box-shadow:0 18px 40px rgba(14,36,56,.08)}
-  .plan h2{font-family:Georgia,"Songti SC",serif;color:var(--navy);font-size:22px;margin:0 0 4px}
-  .price{font-family:Georgia,serif;font-size:32px;color:var(--navy);margin:10px 0 2px}
-  .price small{font-size:13px;color:var(--muted);font-family:-apple-system,sans-serif}
-  .plan ul{padding-left:18px;margin:14px 0 18px;color:#3B4652;font-size:13.5px;flex:1}
-  .plan li{margin-bottom:7px}
-  .btn{display:inline-block;background:var(--navy);color:#fff;border-radius:999px;padding:11px 20px;font-size:14px;text-decoration:none;font-weight:600}
-  .btn.gold{background:var(--gold);color:#1B2430}
-  .btn.ghost{background:none;color:var(--navy);border:1px solid var(--line)}
-  .badge{display:inline-block;background:rgba(198,161,91,.16);color:#8A6A2A;border-radius:999px;padding:2px 10px;font-size:11px;letter-spacing:.06em;margin-left:6px;vertical-align:3px}
-  h2.sec{font-family:Georgia,"Songti SC",serif;color:var(--navy);font-size:20px;margin:38px 0 12px}
-  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px}
-  th,td{padding:12px 14px;border-bottom:1px solid #EFEAE0;text-align:left}
-  th{background:#FBF8F2;color:var(--navy);font-size:13px}
-  td:last-child,th:last-child{text-align:center;width:110px}
-  tr:last-child td{border-bottom:none}
-  .faq{background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 24px}
-  .faq details{padding:14px 0;border-bottom:1px solid #EFEAE0}
-  .faq details:last-child{border-bottom:none}
-  .faq summary{cursor:pointer;font-weight:600;color:var(--navy);font-size:14.5px}
-  .faq p{color:#4A5563;font-size:13.5px;margin:8px 0 0}
-  .note{font-size:12px;color:var(--muted);margin-top:22px}
-  footer{border-top:1px solid var(--line);padding:20px 0 36px;color:var(--muted);font-size:12px}
-  footer a{color:var(--muted);margin-right:14px;text-decoration:none}
-  @media(max-width:820px){.plans{grid-template-columns:1fr}}
-  .freeNotice{max-width:760px;margin:0 auto 22px;background:#E7F4EC;border:1px solid #C8E6D5;color:#166E52;
-    border-radius:12px;padding:14px 18px;font-size:13.5px;line-height:1.7;text-align:center}
-  .plansNote{max-width:760px;margin:0 auto 14px;text-align:center;font-size:12.5px;color:#6B7787}
-</style>
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="KWONG THYE 光泰">
-<meta property="og:title" content="价格 | KWONG THYE 投资计算器">
-<meta property="og:description" content="免费版永久免费计算；专业版 RM9.90/月 或 RM99/年，解锁云端存档、PDF 报告、分享与方案对比。">
+<meta property="og:title" content="价格 | PropNet">
+<meta property="og:description" content="计算器免费；个人版 RM89/月，早鸟 RM59 锁 12 个月；团队 5 席 RM299/月。">
 <meta property="og:url" content="https://kwongthye.com/pricing/">
-<meta property="og:image" content="https://kwongthye.com/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:locale" content="zh_MY">
-<meta property="og:locale:alternate" content="en_MY">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="价格 | KWONG THYE 投资计算器">
-<meta name="twitter:description" content="免费版永久免费计算；专业版 RM9.90/月 或 RM99/年，解锁云端存档、PDF 报告、分享与方案对比。">
-<meta name="twitter:image" content="https://kwongthye.com/og-image.png">
+<link rel="icon" type="image/png" href="/icon-256.png">
+<link rel="stylesheet" href="/site.css">
 </head>
 <body>
-<header>
+
+<header class="site-head">
   <div class="wrap bar">
-    <a href="/"><img src="/logo-white.png" alt="KWONG THYE 光泰"></a>
-    <a class="home" href="/" data-i18n="back">← 返回公司网站</a>
-    <button id="langBtn">EN</button>
+    <a class="brand" href="/"><img src="/logo-white.png" alt="KWONG THYE 光泰"><span>PROPNET</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <nav class="site-nav">
+      <a href="/properties/" data-i18n="nav.find">找房</a>
+      <a href="/agents/" data-i18n="nav.agents">找中介</a>
+      <a href="/join/" data-i18n="nav.join">给中介</a>
+      <a href="/about/" data-i18n="nav.about">关于</a>
+      <a href="https://calc.kwongthye.com/" data-i18n="nav.calc">计算器</a>
+      <a class="login" href="/library/" data-i18n="nav.login">中介登录</a>
+      <button class="lang-toggle">EN</button>
+    </nav>
   </div>
 </header>
+
 <main>
-  <div class="wrap">
-    <div class="freeNotice" data-i18n="freeNotice">🎁 现阶段全部功能免费开放：云端存档不限数量、完整 PDF 报告、方案对比、分享导出。正式收费前会提前通知，已购买的专业版权益不受影响。</div>
-    <h1 data-i18n="title">价格</h1>
-    <p class="lead" data-i18n="lead">计算器全部功能免费使用。需要保存更多方案时，月付 RM9.90 或年付 RM99（年付更省）。</p>
-
-    <p class="plansNote" data-i18n="plansNote">以下为正式收费后的方案与价格（现阶段全部免费，无需购买）</p>
-    <div class="plans">
-      <div class="plan">
-        <h2 data-i18n="free.title">免费版</h2>
-        <div class="price">RM 0 <small data-i18n="free.per">永久免费</small></div>
-        <ul>
-          <li data-i18n="free.a">全部计算功能（买入 / 持有 / 出租 / 出售）</li>
-          <li data-i18n="free.b">云端存档：不支持</li>
-          <li data-i18n="free.c">不支持 PDF / 打印 / 分享</li>
-          <li data-i18n="free.d">不支持本机存档</li>
-        </ul>
-        <a class="btn ghost" href="/calc/" data-i18n="free.cta">免费开始 →</a>
-      </div>
-      <div class="plan">
-        <h2 data-i18n="m.title">专业版 · 月付</h2>
-        <div class="price">RM 9.90 <small data-i18n="m.per">／月</small></div>
-        <ul>
-          <li data-i18n="pro.a">云端方案</li>
-          <li data-i18n="pro.pdf">PDF / 打印 / 分享链接</li>
-          <li data-i18n="pro.local">本机存档不限</li>
-          <li data-i18n="pro.b">包含免费版全部功能</li>
-          <li data-i18n="pro.c">到期前邮件提醒</li>
-          <li data-i18n="pro.d">优先 WhatsApp 支持</li>
-        </ul>
-        <a class="btn ghost buy" data-plan="month" href="#" data-i18n="m.cta">购买月付</a>
-      </div>
-      <div class="plan pro">
-        <h2 data-i18n="y.title">专业版 · 年付 <span class="badge" data-i18n="y.badge">推荐</span></h2>
-        <div class="price">RM 99 <small data-i18n="y.per">／年</small></div>
-        <ul>
-          <li data-i18n="pro.a">云端方案 · 不限个数</li>
-          <li data-i18n="pro.pdf">PDF / 打印 / 分享链接</li>
-          <li data-i18n="pro.local">本机存档不限</li>
-          <li data-i18n="pro.b">包含免费版全部功能</li>
-          <li data-i18n="pro.c">到期前邮件提醒</li>
-          <li data-i18n="pro.d">优先 WhatsApp 支持</li>
-          <li data-i18n="y.save">相当于 RM8.25／月，比月付省 RM19.80</li>
-        </ul>
-        <a class="btn gold buy" data-plan="year" href="#" data-i18n="y.cta">购买年付</a>
-        <p class="note" data-i18n="pro.note">已有开通码或优惠码？登录后到「账号 → 开通码」兑换。</p>
+  <section class="sec" style="padding-bottom:26px">
+    <div class="wrap">
+      <div class="eyebrow" data-i18n="pr.kicker">价格</div>
+      <h1 style="font-size:clamp(28px,3.6vw,42px)" data-i18n="pr.title">计算器永久免费，平台按席位收费</h1>
+      <p class="lead" data-i18n="pr.sub">先用免费计算器，再把房源放进网络。随时可取消，数据可以导出带走。</p>
+      <div style="display:inline-flex;align-items:center;gap:10px;background:#FFF8E8;border:1px solid #EBD9AE;border-radius:999px;padding:8px 16px;font-size:13px;margin-top:8px">
+        <b style="color:#8A6A2F" data-i18n="pr.bird">早鸟</b>
+        <span data-i18n="pr.birdText">前 80 位中介 RM 59/月，锁定 12 个月（原价 RM 89）</span>
       </div>
     </div>
+  </section>
 
-    <h2 class="sec" data-i18n="cmp.title">对比</h2>
-    <table>
-      <thead><tr><th data-i18n="cmp.f">功能</th><th data-i18n="cmp.free">免费</th><th data-i18n="cmp.m">月付 RM9.90</th><th data-i18n="cmp.y">年付 RM99</th></tr></thead>
-      <tbody>
-        <tr><td data-i18n="cmp.r1">计算器全部功能</td><td>✓</td><td>✓</td><td>✓</td></tr>
-        <tr><td data-i18n="cmp.r2">PDF / 打印 / 分享</td><td>—</td><td>✓</td><td>✓</td></tr>
-        <tr><td data-i18n="cmp.local">本机存档</td><td>—</td><td>✓</td><td>✓</td></tr>
-        <tr><td data-i18n="cmp.r3">云端方案数量</td><td>0</td><td data-i18n="cmp.unlimited">不限</td><td data-i18n="cmp.unlimited2">不限</td></tr>
-        <tr><td data-i18n="cmp.r4">到期邮件提醒</td><td>—</td><td>✓</td><td>✓</td></tr>
-        <tr><td data-i18n="cmp.r5">支持</td><td data-i18n="cmp.standard">标准</td><td data-i18n="cmp.priority">优先</td><td data-i18n="cmp.priority2">优先</td></tr>
-      </tbody>
-    </table>
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="tiers">
+        <div class="tier">
+          <h3 data-i18n="t1.n">计算器</h3>
+          <div class="tagline" data-i18n="t1.t">所有人，永久免费</div>
+          <div class="price">RM 0</div>
+          <ul>
+            <li data-i18n="t1.f1">3 Part 自动计算</li>
+            <li data-i18n="t1.f2">买入成本 / 月供 / 逐年现金流</li>
+            <li data-i18n="t1.f3">RPGT 三种身份</li>
+            <li data-i18n="t1.f4">PDF 报告 / 方案对比</li>
+            <li class="no" data-i18n="t1.f5">云保存仅 3 个方案</li>
+          </ul>
+          <a class="btn line" href="https://calc.kwongthye.com/" data-i18n="t1.cta">打开计算器</a>
+        </div>
 
-    <h2 class="sec" data-i18n="faq.title">常见问题</h2>
-    <div class="faq">
-      <details><summary data-i18n="faq.q1">怎么付款？</summary><p data-i18n="faq.a1">目前通过 WhatsApp 或银行转账付款，确认后我们会发一组开通码给你。</p></details>
-      <details><summary data-i18n="faq.q2">开通码怎么用？</summary><p data-i18n="faq.a2">登录后打开右上角账号 → 输入开通码 → 开通 / 续费。续费会在现有到期日上顺延。</p></details>
-      <details><summary data-i18n="faq.q3">到期后我的方案会被删除吗？</summary><p data-i18n="faq.a3">不会。已保存的方案仍可查看、导出；只是新增云端方案会回到免费版 3 个的限制。</p></details>
-      <details><summary data-i18n="faq.q4">有收据吗？</summary><p data-i18n="faq.a4">有。每次兑换后系统自动生成收据，在「账号 → 付款记录 / 收据」查看并打印或保存 PDF。</p></details>
-      <details><summary data-i18n="faq.q5">可以退款吗？</summary><p data-i18n="faq.a5">除法律另有规定，已支付费用不予退还，详见使用条款。</p></details>
+        <div class="tier">
+          <h3 data-i18n="t2.n">Pool 免费</h3>
+          <div class="tagline" data-i18n="t2.t">观望、兼职中介</div>
+          <div class="price">RM 0</div>
+          <ul>
+            <li data-i18n="t2.f1">浏览中心房源池</li>
+            <li data-i18n="t2.f2">发布最多 5 条在售</li>
+            <li data-i18n="t2.f3">看中介联系方式</li>
+            <li class="no" data-i18n="t2.f4">无个人库 / 无个人站</li>
+            <li class="no" data-i18n="t2.f5">无数据导出</li>
+          </ul>
+          <a class="btn line" href="/join/" data-i18n="t2.cta">免费开始</a>
+        </div>
+
+        <div class="tier hot" data-tag="最受欢迎">
+          <h3 data-i18n="t3.n">个人 Pro</h3>
+          <div class="tagline" data-i18n="t3.t">全职中介的主力方案</div>
+          <div class="price">RM 89 <small>/ <span data-i18n="pr.mo">月</span></small></div>
+          <div class="muted" style="font-size:12px" data-i18n="t3.year">年付 RM 890（省 2 个月）</div>
+          <ul>
+            <li data-i18n="t3.f1">房源 / 客户不限量</li>
+            <li data-i18n="t3.f2">个人站 kwongthye.com/a/你</li>
+            <li data-i18n="t3.f3">分享卡片 + 询盘通知</li>
+            <li data-i18n="t3.f4">完整计算器 + PDF</li>
+            <li data-i18n="t3.f5">导出 200 条 / 月</li>
+          </ul>
+          <a class="btn gold" href="/join/" data-i18n="t3.cta">申请开通</a>
+        </div>
+
+        <div class="tier">
+          <h3 data-i18n="t4.n">团队 Agency</h3>
+          <div class="tagline" data-i18n="t4.t">小团队 / 公司</div>
+          <div class="price">RM 299 <small>/ <span data-i18n="pr.mo">月</span></small></div>
+          <div class="muted" style="font-size:12px" data-i18n="t4.seat">含 5 席，加席 RM 55</div>
+          <ul>
+            <li data-i18n="t4.f1">Pro 全部功能</li>
+            <li data-i18n="t4.f2">团队看板与分配</li>
+            <li data-i18n="t4.f3">品牌定制（logo / 色）</li>
+            <li data-i18n="t4.f4">无限导出</li>
+            <li data-i18n="t4.f5">优先支持</li>
+          </ul>
+          <a class="btn dark" href="/join/" data-i18n="t4.cta">联系我们</a>
+        </div>
+      </div>
+      <p class="form-note" style="margin-top:16px" data-i18n="pr.note">价格为马来西亚令吉（RM），未含 SST（如适用）。计算器与平台账号是两个产品，计算器不因平台订阅到期而停用。</p>
     </div>
+  </section>
 
-    <p class="note">
-      <a href="/terms/" data-i18n="terms">使用条款</a> ·
-      <a href="/privacy/" data-i18n="privacy">隐私政策</a> ·
-      <a href="/calc/" data-i18n="calc">投资计算器</a>
-    </p>
-  </div>
+  <section class="sec alt">
+    <div class="wrap">
+      <div class="sec-head"><div class="eyebrow" data-i18n="faq.kicker">常见问题</div><h2 data-i18n="faq.title">关于价格</h2></div>
+      <div class="grid-2">
+        <div class="vcard"><h3 data-i18n="faq.q1">计算器要钱吗？</h3><p data-i18n="faq.a1">不要。投资计算器永久免费，含 PDF 报告与方案对比；只有云端保存方案限制 3 个。</p></div>
+        <div class="vcard"><h3 data-i18n="faq.q2">早鸟价到什么时候？</h3><p data-i18n="faq.a2">前 80 位中介，RM 59/月锁定 12 个月；第 13 个月起按当时标准价续费，可随时取消。</p></div>
+        <div class="vcard"><h3 data-i18n="faq.q3">免费档能做什么？</h3><p data-i18n="faq.a3">看中心房源池、发布最多 5 条在售房源、查看中介联系方式。个人库、个人站、导出属于付费功能。</p></div>
+        <div class="vcard"><h3 data-i18n="faq.q4">数据归谁？</h3><p data-i18n="faq.a4">归你。可随时导出 CSV；取消订阅后账号降级为免费档，数据保留 90 天，可导出后删除。</p></div>
+      </div>
+      <div class="row" style="margin-top:26px">
+        <a class="btn gold" href="/join/" data-i18n="pr.cta">申请开通</a>
+        <a class="btn line" href="https://wa.me/60165280918" target="_blank" rel="noopener" data-i18n="pr.wa">WhatsApp 咨询</a>
+      </div>
+    </div>
+  </section>
 </main>
-<footer>
-  <div class="wrap">© 2026 KWONG THYE 光泰 · Johor Bahru, Malaysia</div>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><b>KWONG THYE · PROPNET</b><p data-i18n="foot.tag">新山房源与中介网络。</p></div>
+      <div><b data-i18n="foot.platform">平台</b><p><a href="/properties/" data-i18n="nav.find">找房</a><br><a href="/agents/" data-i18n="nav.agents">找中介</a><br><a href="/join/" data-i18n="nav.join">给中介</a></p></div>
+      <div><b data-i18n="foot.company">公司</b><p><a href="/about/" data-i18n="nav.about">关于</a><br><a href="/privacy/" data-i18n="foot.privacy">隐私政策</a><br><a href="/terms/" data-i18n="foot.terms">使用条款</a></p></div>
+    </div>
+    <div class="legal"><span>© 2026 KWONG THYE.</span><span>THE ROOF REALTY SDN BHD · E(1)1605/1</span><span>Andy Lau REN 32839</span></div>
+  </div>
 </footer>
 
 <script>
-(function () {
-  var I18N = {
-    zh: {
-      ckTitle:"Cookie 使用",ckText:"必要 Cookie 用于登录与安全；分析 Cookie 帮助我们改进网站。您可以自由选择。",ckMore:"了解详情",ckNec:"仅必要",ckAll:"全部接受",
-      back: "← 返回公司网站", title: "价格",
-      freeNotice: "🎁 现阶段全部功能免费开放：云端存档不限数量、完整 PDF 报告、方案对比、分享导出。正式收费前会提前通知，已购买的专业版权益不受影响。",
-      plansNote: "以下为正式收费后的方案与价格（现阶段全部免费，无需购买）",
-      lead: "计算器全部功能免费使用。需要保存更多方案时，月付 RM9.90 或年付 RM99（年付更省）。",
-      "free.title": "免费版", "free.per": "永久免费",
-      "m.title": "专业版 · 月付", "m.per": "／月", "m.cta": "购买月付",
-      "y.title": "专业版 · 年付", "y.badge": "推荐", "y.per": "／年", "y.cta": "购买年付",
-      "y.save": "相当于 RM8.25／月，比月付省 RM19.80",
-      "free.a": "全部计算功能（买入 / 持有 / 出租 / 出售）", "free.b": "云端存档：不支持",
-      "free.c": "不支持 PDF / 打印 / 分享", "free.d": "不支持本机存档", "free.cta": "免费开始 →",
-      "pro.pdf": "PDF / 打印 / 分享链接", "pro.local": "本机存档不限",
-      "pro.title": "专业版 Pro", "pro.badge": "推荐", "pro.per": "／年",
-      "pro.a": "云端方案", "pro.unlimited": "不限个数", "pro.b": "包含免费版全部功能",
-      "pro.c": "到期前邮件提醒", "pro.d": "优先 WhatsApp 支持", "pro.cta": "购买 / 续费",
-      "pro.note": "已有开通码或优惠码？登录后到「账号 → 开通码」兑换。",
-      "cmp.title": "对比", "cmp.f": "功能", "cmp.free": "免费", "cmp.m": "月付 RM9.90", "cmp.y": "年付 RM99",
-      "cmp.r1": "计算器全部功能", "cmp.r2": "PDF / 打印 / 分享", "cmp.local": "本机存档", "cmp.r3": "云端方案数量",
-      "cmp.unlimited": "不限", "cmp.unlimited2": "不限", "cmp.r4": "到期邮件提醒", "cmp.r5": "支持",
-      "cmp.standard": "标准", "cmp.priority": "优先", "cmp.priority2": "优先",
-      "faq.title": "常见问题",
-      "faq.q1": "怎么付款？", "faq.a1": "月付 RM9.90、年付 RM99。通过 WhatsApp 或银行转账付款，确认后我们会发开通码给你。",
-      "faq.q2": "开通码怎么用？", "faq.a2": "登录后打开右上角账号 → 输入开通码 → 开通 / 续费。续费会在现有到期日上顺延。",
-      "faq.q3": "到期后我的方案会被删除吗？", "faq.a3": "不会。已保存的方案仍可查看、导出；只是新增云端方案会回到免费版 3 个的限制。",
-      "faq.q4": "有收据吗？", "faq.a4": "有。每次兑换后系统自动生成收据，在「账号 → 付款记录 / 收据」查看并打印或保存 PDF。",
-      "faq.q5": "可以退款吗？", "faq.a5": "除法律另有规定，已支付费用不予退还，详见使用条款。",
-      terms: "使用条款", privacy: "隐私政策", calc: "投资计算器"
-    },
-    en: {
-      ckTitle:"Cookies",ckText:"Essential cookies keep you signed in and secure; analytics cookies help us improve the site. You choose.",ckMore:"Details",ckNec:"Essential only",ckAll:"Accept all",
-      back: "← Back to company site", title: "Pricing",
-      freeNotice: "🎁 Everything is free right now: unlimited cloud plans, full PDF reports, scenario comparison, sharing and export. We will announce before charging; existing Pro benefits stay unchanged.",
-      plansNote: "The plans and prices below apply once billing starts — everything is free today, no purchase needed.",
-      lead: "Every calculator feature is free. Upgrade for RM9.90/month or RM99/year when you need more saved plans.",
-      "free.title": "Free", "free.per": "forever",
-      "m.title": "Pro · Monthly", "m.per": "/ month", "m.cta": "Buy monthly",
-      "y.title": "Pro · Yearly", "y.badge": "Recommended", "y.per": "/ year", "y.cta": "Buy yearly",
-      "y.save": "Works out to RM8.25/month — save RM19.80 vs monthly",
-      "free.a": "All calculations (buy / hold / rent / sell)", "free.b": "No cloud plans",
-      "free.c": "No PDF / print / share", "free.d": "No local saves", "free.cta": "Start free →",
-      "pro.pdf": "PDF / print / share links", "pro.local": "Unlimited local saves",
-      "pro.title": "Pro", "pro.badge": "Recommended", "pro.per": "/ year",
-      "pro.a": "Cloud plans", "pro.unlimited": "unlimited", "pro.b": "Everything in Free",
-      "pro.c": "Expiry email reminders", "pro.d": "Priority WhatsApp support", "pro.cta": "Buy / renew",
-      "pro.note": "Have an activation or promo code? Sign in and redeem it under Account → Code.",
-      "cmp.title": "Compare", "cmp.f": "Feature", "cmp.free": "Free", "cmp.m": "Monthly RM9.90", "cmp.y": "Yearly RM99",
-      "cmp.r1": "All calculator features", "cmp.r2": "PDF / print / share", "cmp.local": "Local saves", "cmp.r3": "Cloud plans",
-      "cmp.unlimited": "Unlimited", "cmp.unlimited2": "Unlimited", "cmp.r4": "Expiry reminders", "cmp.r5": "Support",
-      "cmp.standard": "Standard", "cmp.priority": "Priority", "cmp.priority2": "Priority",
-      "faq.title": "FAQ",
-      "faq.q1": "How do I pay?", "faq.a1": "RM9.90/month or RM99/year, paid via WhatsApp or bank transfer; we send an activation code after payment.",
-      "faq.q2": "How do I use the code?", "faq.a2": "Sign in, open Account, enter the code and activate/renew. Renewals extend your existing expiry date.",
-      "faq.q3": "Will my plans be deleted when Pro expires?", "faq.a3": "No. Saved plans remain viewable and exportable; only new cloud plans return to the free limit of 3.",
-      "faq.q4": "Do I get a receipt?", "faq.a4": "Yes. A receipt is generated automatically after redemption under Account → Payments / receipts, printable or saveable as PDF.",
-      "faq.q5": "Can I get a refund?", "faq.a5": "Except where required by law, fees are non-refundable. See the Terms of Use.",
-      terms: "Terms of Use", privacy: "Privacy Policy", calc: "Calculator"
-    }
-  };
-  var lang = "zh";
-  try { lang = localStorage.getItem("kwongthye_lang") || "zh"; } catch (e) {}
-  function apply() {
-    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-    document.querySelectorAll("[data-i18n]").forEach(function (el) {
-      var v = I18N[lang][el.getAttribute("data-i18n")];
-      if (v != null) el.textContent = v;
-    });
-    document.getElementById("langBtn").textContent = lang === "zh" ? "EN" : "中文";
-    document.title = lang === "zh" ? "价格 | Pricing — KWONG THYE 光泰" : "Pricing — KWONG THYE";
-    try { localStorage.setItem("kwongthye_lang", lang); } catch (e) {}
-  }
-  document.getElementById("langBtn").addEventListener("click", function () {
-    lang = lang === "zh" ? "en" : "zh";
-    apply();
-  });
-  document.querySelectorAll(".buy").forEach(function (b) {
-    b.addEventListener("click", function (e) {
-      e.preventDefault();
-      var plan = b.getAttribute("data-plan");
-      var msg = lang === "zh"
-        ? (plan === "year" ? "你好，我想购买 KWONG THYE Pro 年付（RM99/年），邮箱：" : "你好，我想购买 KWONG THYE Pro 月付（RM9.90/月），邮箱：")
-        : (plan === "year" ? "Hi, I'd like KWONG THYE Pro yearly (RM99/year). My email: " : "Hi, I'd like KWONG THYE Pro monthly (RM9.90/month). My email: ");
-      window.open("https://wa.me/60165280918?text=" + encodeURIComponent(msg), "_blank");
-    });
-  });
-  apply();
-})();
+window.PAGE_I18N = {
+  "nav.find": ["找房", "Find a home"], "nav.agents": ["找中介", "Agents"], "nav.join": ["给中介", "For agents"],
+  "nav.about": ["关于", "About"], "nav.calc": ["计算器", "Calculator"], "nav.login": ["中介登录", "Agent login"],
+  "pr.kicker": ["价格", "Pricing"],
+  "pr.title": ["计算器永久免费，平台按席位收费", "The calculator is free. The platform is priced per seat."],
+  "pr.sub": ["先用免费计算器，再把房源放进网络。随时可取消，数据可以导出带走。", "Start with the free calculator, then put your listings into the network. Cancel anytime; export your data."],
+  "pr.bird": ["早鸟", "Early bird"],
+  "pr.birdText": ["前 80 位中介 RM 59/月，锁定 12 个月（原价 RM 89）", "First 80 agents: RM59/mo locked for 12 months (usual RM89)"],
+  "pr.mo": ["月", "mo"],
+  "pr.note": ["价格为马来西亚令吉（RM），未含 SST（如适用）。计算器与平台账号是两个产品，计算器不因平台订阅到期而停用。",
+    "Prices in Malaysian Ringgit (RM), excluding SST where applicable. The calculator and platform are separate products; the calculator never expires with your platform plan."],
+  "pr.cta": ["申请开通", "Apply to join"], "pr.wa": ["WhatsApp 咨询", "WhatsApp us"],
+  "t1.n": ["计算器", "Calculator"], "t1.t": ["所有人，永久免费", "Free forever"],
+  "t1.f1": ["3 Part 自动计算", "3-part automatic calculation"],
+  "t1.f2": ["买入成本 / 月供 / 逐年现金流", "Purchase cost / instalment / yearly cash flow"],
+  "t1.f3": ["RPGT 三种身份", "RPGT for three owner types"],
+  "t1.f4": ["PDF 报告 / 方案对比", "PDF report / plan comparison"],
+  "t1.f5": ["云保存仅 3 个方案", "Cloud saves limited to 3 plans"],
+  "t1.cta": ["打开计算器", "Open calculator"],
+  "t2.n": ["Pool 免费", "Pool Free"], "t2.t": ["观望、兼职中介", "Exploring / part-time"],
+  "t2.f1": ["浏览中心房源池", "Browse the central listing pool"],
+  "t2.f2": ["发布最多 5 条在售", "Publish up to 5 listings"],
+  "t2.f3": ["看中介联系方式", "See agent contact details"],
+  "t2.f4": ["无个人库 / 无个人站", "No private database / no agent page"],
+  "t2.f5": ["无数据导出", "No data export"],
+  "t2.cta": ["免费开始", "Start free"],
+  "t3.n": ["个人 Pro", "Pro"], "t3.t": ["全职中介的主力方案", "For full-time agents"],
+  "t3.year": ["年付 RM 890（省 2 个月）", "RM890/year (2 months free)"],
+  "t3.f1": ["房源 / 客户不限量", "Unlimited listings and clients"],
+  "t3.f2": ["个人站 kwongthye.com/a/你", "Your page: kwongthye.com/a/you"],
+  "t3.f3": ["分享卡片 + 询盘通知", "Share cards + inquiry alerts"],
+  "t3.f4": ["完整计算器 + PDF", "Full calculator + PDF"],
+  "t3.f5": ["导出 200 条 / 月", "Export 200 rows / month"],
+  "t3.cta": ["申请开通", "Apply"],
+  "t4.n": ["团队 Agency", "Agency"], "t4.t": ["小团队 / 公司", "Small teams / companies"],
+  "t4.seat": ["含 5 席，加席 RM 55", "5 seats included; extra RM55"],
+  "t4.f1": ["Pro 全部功能", "Everything in Pro"],
+  "t4.f2": ["团队看板与分配", "Team dashboard and assignment"],
+  "t4.f3": ["品牌定制（logo / 色）", "Branding (logo / colours)"],
+  "t4.f4": ["无限导出", "Unlimited export"],
+  "t4.f5": ["优先支持", "Priority support"],
+  "t4.cta": ["联系我们", "Contact us"],
+  "faq.kicker": ["常见问题", "FAQ"], "faq.title": ["关于价格", "About pricing"],
+  "faq.q1": ["计算器要钱吗？", "Does the calculator cost anything?"],
+  "faq.a1": ["不要。投资计算器永久免费，含 PDF 报告与方案对比；只有云端保存方案限制 3 个。", "No. The calculator is free forever, including PDF reports and comparisons; only cloud saves are limited to 3 plans."],
+  "faq.q2": ["早鸟价到什么时候？", "How long does the early-bird price last?"],
+  "faq.a2": ["前 80 位中介，RM 59/月锁定 12 个月；第 13 个月起按当时标准价续费，可随时取消。", "For the first 80 agents, RM59/mo is locked for 12 months. From month 13 the standard price applies. Cancel anytime."],
+  "faq.q3": ["免费档能做什么？", "What can the free tier do?"],
+  "faq.a3": ["看中心房源池、发布最多 5 条在售房源、查看中介联系方式。个人库、个人站、导出属于付费功能。", "Browse the pool, publish up to 5 listings, and see agent contacts. Private database, agent page and exports are paid features."],
+  "faq.q4": ["数据归谁？", "Who owns the data?"],
+  "faq.a4": ["归你。可随时导出 CSV；取消订阅后账号降级为免费档，数据保留 90 天，可导出后删除。", "You do. Export to CSV anytime. After cancelling, the account drops to the free tier and data is kept for 90 days for export, then deleted."],
+  "foot.tag": ["新山房源与中介网络。", "Johor Bahru listings and agent network."],
+  "foot.platform": ["平台", "Platform"], "foot.company": ["公司", "Company"],
+  "foot.privacy": ["隐私政策", "Privacy"], "foot.terms": ["使用条款", "Terms"]
+};
 </script>
-<script>
-(function () {
-  try {
-    var payload = JSON.stringify({ path: location.pathname, ref: document.referrer || "" });
-    if (navigator.sendBeacon) {
-      try { navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" })); }
-      catch (e) { navigator.sendBeacon("/api/track", payload); }
-    }
-  } catch (e) {}
-})();
-</script>
-<script src="/cookie-consent.js" defer></script>
+<script src="/site.js"></script>
+<script>KT.init(window.PAGE_I18N);</script>
 </body>
 </html>
