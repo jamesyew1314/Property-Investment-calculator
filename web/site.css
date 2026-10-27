@@ -253,3 +253,9 @@ body.is-free .free-banner{display:flex}
 .strike{text-decoration:line-through;color:#9AA4AF;font-size:14px;font-family:inherit}
 
 body.is-free .pool-tier{display:none!important}
+
+/* 仅限中介的池入口 */
+.poolGate{background:linear-gradient(135deg,#0E2438,#16395A);color:#fff;border-radius:16px;padding:30px;border-top:3px solid var(--gold)}
+.poolGate h3{font-family:var(--serif);font-size:clamp(20px,2.4vw,28px);margin:6px 0 8px;color:#fff}
+.poolGate p{color:rgba(255,255,255,.75);max-width:620px;margin:0 0 16px;font-size:14px;line-height:1.7}
+.poolGate .row{display:flex;gap:10px;flex-wrap:wrap}

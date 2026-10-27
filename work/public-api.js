@@ -41,6 +41,26 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
   }
 
   // ---------- 站点配置 / 统计 ----------
+
+  function sha256(v) { return crypto.createHash("sha256").update(String(v)).digest("hex"); }
+
+  async function agentFromReq(req) {
+    const m = String(req.headers.cookie || "").match(/(?:^|;\s*)pn_sid=([^;]+)/);
+    if (!m) return null;
+    try {
+      const out = await pool.query(
+        "SELECT a.id, a.name, a.slug FROM agent_sessions s JOIN lib_agents a ON a.id = s.agent_id " +
+        "WHERE s.token_hash=$1 AND s.expires_at > now() AND a.status='active'", [sha256(decodeURIComponent(m[1]))]);
+      return out.rows[0] || null;
+    } catch (e) { return null; }
+  }
+  async function requireAgent(req, res, next) {
+    const a = await agentFromReq(req);
+    if (!a) return res.status(401).json({ ok: false, error: "agents_only" });
+    req.agent = a;
+    next();
+  }
+
   r.get("/config", async function (req, res, next) {
     try {
       const counts = await pool.query(`
@@ -91,7 +111,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
   });
 
   // ---------- 房源列表 ----------
-  r.get("/properties", async function (req, res, next) {
+  r.get("/properties", requireAgent, async function (req, res, next) {
     try {
       const page = Math.max(1, Math.min(500, Number(req.query.page) || 1));
       const pageSize = Math.max(1, Math.min(24, Number(req.query.pageSize) || 12));
@@ -123,7 +143,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
   });
 
   // ---------- 房源详情 ----------
-  r.get("/properties/:code", async function (req, res, next) {
+  r.get("/properties/:code", requireAgent, async function (req, res, next) {
     try {
       const code = String(req.params.code || "").slice(0, 20).toUpperCase();
       const out = await pool.query(`${PUBLIC_SELECT} AND p.code = $1`, [code]);
@@ -138,7 +158,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
   });
 
   // ---------- 中介目录 ----------
-  r.get("/agents", async function (req, res, next) {
+  r.get("/agents", requireAgent, async function (req, res, next) {
     try {
       const out = await pool.query(`
         SELECT a.id, a.name, a.slug, a.ren_no, a.phone, a.email, a.bio, a.photo_url, a.areas, a.verified_at,

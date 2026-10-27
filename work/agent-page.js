@@ -38,11 +38,11 @@ module.exports = function renderAgentPage(agent, listings, opts) {
   opts = opts || {};
   const en = !!opts.en;
   const L = en
-    ? { home: "Home", find: "Find a home", agents: "Agents", join: "For agents", calc: "Calculator", login: "Agent login",
+    ? { home: "Home", find: "Listing pool", agents: "Agents", join: "For agents", calc: "Calculator", login: "Agent login",
         listings: "Listings", verified: "Verified agent", contact: "Contact", call: "Call", wa: "WhatsApp",
         none: "No public listings yet.", areas: "Areas covered", about: "About", back: "Back to PropNet",
         view: "View listing", license: "REN" }
-    : { home: "首页", find: "找房", agents: "找中介", join: "给中介", calc: "计算器", login: "中介登录",
+    : { home: "首页", find: "房源池", agents: "找中介", join: "给中介", calc: "计算器", login: "中介登录",
         listings: "在售房源", verified: "已验证中介", contact: "联系", call: "打电话", wa: "WhatsApp",
         none: "暂时没有公开房源。", areas: "专长区域", about: "关于", back: "返回 PropNet",
         view: "查看房源", license: "REN" };

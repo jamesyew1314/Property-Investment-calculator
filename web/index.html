@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PropNet 柔佛房源平台 | KWONG THYE 光泰</title>
+<title>PropNet 柔佛中介货源网络 | KWONG THYE 光泰</title>
 <meta name="description" content="PropNet by KWONG THYE — 柔佛房源与中介网络。按区域、预算、房型找房；每一套房源标明货源中介；中介可发布房源、管理客户，并免费使用投资计算器。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PropNet by KWONG THYE">
@@ -71,7 +71,7 @@
     <a class="brand" href="/"><img src="/logo-white.png" alt="KWONG THYE 光泰"><span>PROPNET</span></a>
     <button class="menu-btn" aria-label="Menu">☰</button>
     <nav class="site-nav">
-      <a href="/properties/" data-i18n="nav.find">找房</a>
+      <a href="/properties/" data-i18n="nav.find">房源池</a>
       <a href="/agents/" data-i18n="nav.agents">找中介</a>
       <a href="/join/" data-i18n="nav.join">给中介</a>
       <a href="/about/" data-i18n="nav.about">关于</a>
@@ -86,8 +86,8 @@
   <section class="hero">
     <div class="wrap">
       <div class="eyebrow" data-i18n="hero.kicker">PROPNET · BY KWONG THYE 光泰</div>
-      <h1 data-i18n="hero.title">柔佛房源，<br>一个网络</h1>
-      <p class="lead" data-i18n="hero.lead">从新山到麻坡、峇株巴辖、居銮、笨珍——买家在这里找到房，中介在这里找到货。每一套房源都标明货源中介，每一次带看都留记录。</p>
+      <h1 data-i18n="hero.title">柔佛中介的<br>货源网络</h1>
+      <p class="lead" data-i18n="hero.lead">只给地产中介使用：登录后看中心池、发自己的盘、申请带看。房源永远标明货源中介，合作有记录；买家不进平台。</p>
 
       <form class="searchbar" id="searchForm" role="search">
         <div class="f">
@@ -131,8 +131,14 @@
         </div>
         <a class="btn line sm" href="/properties/" data-i18n="feat.all">全部房源 →</a>
       </div>
-      <div class="grid-3 feat-grid" id="featGrid"></div>
-      <div id="featEmpty" hidden></div>
+      <div class="poolGate">
+        <div>
+          <div class="eyebrow" style="color:var(--gold)">房源池 · 仅限中介</div>
+          <h3>中心池只对认证中介开放</h3>
+          <p>登录后查看全柔佛同行房源、发布自己的盘、申请带看。买家不进平台，货源与客源只在同行之间流转。</p>
+          <div class="row"><a class="btn gold" href="/agent/">登录工作台</a><a class="btn line" href="/join/">免费加入</a></div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -256,7 +262,7 @@
       </div>
       <div>
         <b data-i18n="foot.platform">平台</b>
-        <p><a href="/properties/" data-i18n="nav.find">找房</a><br>
+        <p><a href="/properties/" data-i18n="nav.find">房源池</a><br>
            <a href="/agents/" data-i18n="nav.agents">找中介</a><br>
            <a href="/join/" data-i18n="nav.join">给中介</a><br>
            <a href="https://calc.kwongthye.com/" data-i18n="nav.calc">投资计算器</a></p>
@@ -280,16 +286,16 @@
 
 <script>
 window.PAGE_I18N = {
-  "nav.find": ["找房", "Find a home"],
+  "nav.find": ["房源池", "Listing pool"],
   "nav.agents": ["找中介", "Agents"],
   "nav.join": ["给中介", "For agents"],
   "nav.about": ["关于", "About"],
   "nav.calc": ["计算器", "Calculator"],
   "nav.login": ["中介登录", "Agent login"],
   "hero.kicker": ["PROPNET · BY KWONG THYE 光泰", "PROPNET · BY KWONG THYE"],
-  "hero.title": ["柔佛房源，<br>一个网络", "Johor listings,<br>one network"],
-  "hero.lead": ["从新山到麻坡、峇株巴辖、居銮、笨珍——买家在这里找到房，中介在这里找到货。每一套房源都标明货源中介，每一次带看都留记录。",
-    "Across Johor — from JB to Muar, Batu Pahat, Kluang and Pontian — buyers find homes, agents find stock. Every listing names the agent behind it."],
+  "hero.title": ["柔佛中介的<br>货源网络", "The Johor agent<br>listing network"],
+  "hero.lead": ["只给地产中介使用：登录后看中心池、发自己的盘、申请带看。房源永远标明货源中介，合作有记录；买家不进平台。",
+    "For property agents only. Sign in to browse the pool, list your stock and request viewings. Every listing names its source agent; buyers stay off the platform."],
   "search.intent": ["买 / 租", "Buy / Rent"],
   "search.sale": ["买", "Buy"],
   "search.rent": ["租", "Rent"],
@@ -442,7 +448,7 @@ window.PAGE_I18N = {
     }).join("");
   }
 
-  function renderAll() { fillSelects(); renderFeatured(); renderAreas(); renderAgents(); }
+  function renderAll() { fillSelects(); renderAreas(); renderAgents(); }
 
   KT.fetchJSON("/api/public/config").then(function (cfg) {
     state.cfg = cfg;
@@ -451,11 +457,6 @@ window.PAGE_I18N = {
     if (cfg.counts && cfg.counts.listings > 0) document.getElementById("statLive").textContent = cfg.counts.listings;
     renderAll();
   }).catch(function () { renderAll(); });
-
-  KT.fetchJSON("/api/public/properties?pageSize=6").then(function (j) {
-    state.listings = j.rows || [];
-    renderFeatured();
-  }).catch(function () {});
 
   KT.fetchJSON("/api/public/agents").then(function (j) {
     state.agents = j.rows || [];

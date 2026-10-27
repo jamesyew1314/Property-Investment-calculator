@@ -19,7 +19,7 @@
     <a class="brand" href="/"><img src="/logo-white.png" alt="KWONG THYE 光泰"><span>PROPNET</span></a>
     <button class="menu-btn" aria-label="Menu">☰</button>
     <nav class="site-nav">
-      <a href="/properties/" class="on" data-i18n="nav.find">找房</a>
+      <a href="/properties/" class="on" data-i18n="nav.find">房源池</a>
       <a href="/agents/" data-i18n="nav.agents">找中介</a>
       <a href="/join/" data-i18n="nav.join">给中介</a>
       <a href="/about/" data-i18n="nav.about">关于</a>
@@ -34,7 +34,7 @@
   <section class="sec" style="padding-bottom:34px">
     <div class="wrap">
       <div class="eyebrow" data-i18n="list.kicker">房源</div>
-      <h1 style="font-size:clamp(28px,3.4vw,40px)" id="pageHead" data-i18n="list.title">找房</h1>
+      <h1 style="font-size:clamp(28px,3.4vw,40px)" id="pageHead" data-i18n="list.title">房源池</h1>
       <p class="lead" id="pageSub" data-i18n="list.sub">按区域、预算、房型筛选。点开房源看货源中介。</p>
 
       <form class="filterbar" id="filterForm">
@@ -87,7 +87,7 @@
   <div class="wrap">
     <div class="cols">
       <div><b>KWONG THYE · PROPNET</b><p data-i18n="foot.tag">新山房源与中介网络。房源被看见，合作有记录。</p></div>
-      <div><b data-i18n="foot.platform">平台</b><p><a href="/properties/" data-i18n="nav.find">找房</a><br><a href="/agents/" data-i18n="nav.agents">找中介</a><br><a href="/join/" data-i18n="nav.join">给中介</a></p></div>
+      <div><b data-i18n="foot.platform">平台</b><p><a href="/properties/" data-i18n="nav.find">房源池</a><br><a href="/agents/" data-i18n="nav.agents">找中介</a><br><a href="/join/" data-i18n="nav.join">给中介</a></p></div>
       <div><b data-i18n="foot.company">公司</b><p><a href="/about/" data-i18n="nav.about">关于</a><br><a href="/pricing/" data-i18n="foot.pricing">价格</a><br><a href="/privacy/" data-i18n="foot.privacy">隐私政策</a><br><a href="/terms/" data-i18n="foot.terms">使用条款</a></p></div>
     </div>
     <div class="legal"><span>© 2026 KWONG THYE.</span><span>THE ROOF REALTY SDN BHD · E(1)1605/1</span><span>Andy Lau REN 32839</span></div>
@@ -98,7 +98,7 @@
 
 <script>
 window.PAGE_I18N = {
-  "nav.find": ["找房", "Find a home"], "nav.agents": ["找中介", "Agents"], "nav.join": ["给中介", "For agents"],
+  "nav.find": ["房源池", "Listing pool"], "nav.agents": ["找中介", "Agents"], "nav.join": ["给中介", "For agents"],
   "nav.about": ["关于", "About"], "nav.calc": ["计算器", "Calculator"], "nav.login": ["中介登录", "Agent login"],
   "list.kicker": ["房源", "Listings"],
   "list.title": ["找房", "Find a home"],
@@ -236,13 +236,13 @@ window.PAGE_I18N = {
       state.rows = j.rows || [];
       state.total = j.total || 0;
       renderList();
-    }).catch(function () { state.rows = []; state.total = 0; renderList(); });
+    }).catch(function () { location.replace("/agent/"); });
   }
 
   // 详情
   function renderDetail(code) {
     var root = document.getElementById("detailRoot");
-    KT.fetchJSON("/api/public/properties/" + encodeURIComponent(code)).then(function (j) {
+    KT.fetchJSON("/api/public/properties/" + encodeURIComponent(code)).catch(function () { location.replace("/agent/"); throw new Error("agents_only"); }).then(function (j) {
       var p = j.row, a = j.agent;
       var isRent = p.intent === "rent";
       var price = isRent ? p.rent_price : p.asking_price;
