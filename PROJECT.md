@@ -2,7 +2,7 @@
 
 > **这是项目的“单一上下文文件”。**  
 > 后续正式开发、修改、交接，先读这一份；只有需要细节时，再打开 57 页方案或工作簿。  
-> 最后更新：2026-10-27 · 版本：v2.0（+ 工作台 M1/M2 + M3 订阅/兑换码/支付适配） · 状态：M0–M2 完成；M3 代码完成，Billplz 需密钥才能真实收款；平台现阶段全部免费。
+> 最后更新：2026-10-27 · 版本：v2.1（+ 工作台 M1/M2 + M3 支付完整） · 状态：M0–M3 全部完成；Billplz 已代码级验证，真实收款只差商户密钥；平台现阶段全部免费。
 
 ---
 
@@ -33,6 +33,7 @@ v1 **不做投资人分账、不做电子签、不做 App**：先出 Web 快速�
 | **M2 个人站/匹配/分享卡/摘要** | ✅ 2026-10-27 上线 | `/a/:slug` 服务端渲染（SEO+JSON-LD，中英）；WTB 自动匹配（预算/区域/房型/房间数打分）；分享卡 PNG（canvas 1080×1350 下载）；每日摘要（08:00 邮件：新询盘 + 每位客户 3 个新匹配，`digest_log` 去重） |
 | **M3 订阅基础** | ✅ 2026-10-27 上线 | `agent_subscriptions` / `agent_codes`；`GET /api/agent/plan`、`POST /api/agent/redeem`；工作台「套餐」页（当前套餐/到期/兑换/未来定价）；续期顺延；`PLATFORM_FREE=1` 下不做功能门槛 |
 | **M3 支付与降级** | ✅ 2026-10-27 上线 | `agent_payments`；`POST /api/agent/checkout`（配置 Billplz 时自动建账单，否则线下转账+兑换码）；`/api/billing/billplz/callback` 验签开通；`POST /api/cron/maintenance` 到期降级（随每日 cron）；`PLATFORM_FREE` 0/1 切换已演练 |
+| **M3 支付与降级** | ✅ 2026-10-27 上线 | `agent_payments`；`POST /api/agent/checkout`（配置 Billplz 时自动建账单，否则线下转账+兑换码）；`/api/billing/billplz/callback` 验签开通（E2E 已验证：签名通过→paid→订阅→套餐；错签 403）；`POST /api/cron/maintenance` 到期降级；后台发码（一次最多 50 个）；`PLATFORM_FREE` 0/1 切换演练通过 |
 
 **下一步：你打开 `web/index.html` 试用（双击即可）；确认体验后补 4 案例 fixture 与 21 项测试，再进 Phase 1 Web 化。**
 
@@ -521,6 +522,7 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 2026-10-27 | **v0.88** | **M2 完成：每日摘要**：① 抽出 `work/match.js` 共用匹配打分（工作台与摘要一致）；② `POST /api/cron/digest`（`x-cron-key` 保护）：新询盘 + 每位客户最多 3 个新匹配，无内容不发，`digest_log(agent_id, day)` 去重；③ systemd `propnet-digest.timer` 每天 08:00 Asia/Kuala_Lumpur，`digest.sh` 从 `.env` 取 `CRON_KEY`；④ 迁移 022 `digest_log`；⑤ 实测 `sent:1 / skipped:1 / failed:0`，`digest_log` 落库 |
 | 2026-10-27 | **v0.89** | **M3 收费基础：订阅 + 兑换码 + 套餐页**：① 迁移 023 `agent_subscriptions` / `agent_codes`；② `GET /api/agent/plan`（套餐/到期/价格）、`POST /api/agent/redeem`（一次性码，12 个月续期顺延，写审计）；③ 工作台新增「套餐」页：当前套餐、到期日、兑换码、未来定价；④ 兑换实测：free → pro，到期 2027-10-27；⑤ 免费期不做功能门槛，支付网关（Billplz）与到期降级待接 |
 | 2026-10-27 | **v0.90** | **M3 完成度：Billplz 支付 + 到期降级**：① 迁移 024 `agent_payments`；② `work/billplz.js`（HMAC 验签、金额、建账单）；③ `POST /api/agent/checkout`：有密钥走 Billplz，无密钥降级线下转账（实测 RM1068/12 个月）；④ `/api/billing/billplz/callback` 验签→幂等开通；⑤ `POST /api/cron/maintenance` 过期降级，已并入 `cron.sh` 每日执行（实测 pro→free、到期清空）；⑥ `PLATFORM_FREE` 0→1 演练通过；⑦ 单测 `test-billing.js` 8 项 |
+| 2026-10-27 | **v0.91** | **M3 收口：回调 E2E + 后台发码**：① `/api/billing/billplz/callback` 用临时密钥端到端验证（签名→paid→订阅 source=billplz→套餐/到期），错误签名 403，密钥已轮换；② 后台「生成开通码」新增「PropNet 中介兑换码」（plan/months/count/note，一次最多 50，`GET/POST /api/admin/agent-codes`）；③ 清理测试数据，生产仅留 Andy Lau；④ M0–M3 全部完成 |
 | 2026-10-25 | — | 新增 `docs/服务器信息.md`：服务器规格、域名/DNS、架构、目录、数据库、环境变量、定时任务、备份恢复、SSL、安全、运维命令、发布流程、风险清单、费用 |
 | 2026-10-25 | v0.42 | 计算器正式上线：移除页头「v0.1 内测」标签与标题版本号，`<title>` 改为中英双名 + meta description；英文标题追加 | Kwong Thye |
 
@@ -598,6 +600,6 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 官网 | **已上线（全马）**：`/` 平台首页（16 州 / 110 区）、`/properties`、`/agents`、`/join`、`/pricing`、`/about`；个人站 `/a/:slug` 与工作台 `/app` 待 M1/M2 |
 | 定价 | **现阶段全部免费**（`PLATFORM_FREE=1`，不设功能限制）；未来：Pro RM89/月、团队 RM299/5 席、早鸟 RM59 锁 12 个月；计算器始终免费 |
 | 成本 | 基础设施 RM170–320/月；人力 RM4,300–5,500/月；外包建设 RM45k–70k，自己做 6 周 |
-| 里程碑 | **M0 ✅ → M1 ✅ → M2 ✅ → M3 ✅（代码完成，Billplz 真实收款需密钥）** |
+| 里程碑 | **M0 ✅ → M1 ✅ → M2 ✅ → M3 ✅（2026-10-27 全部完成；Billplz 真实收款需商户密钥）** |
 | 验收 | 见 v2 文档 §12：M0/M1/M2/M3 逐条可测（首页 5 秒认知、90 秒发布、3 秒搜索、1 分钟通知、订阅升降级等） |
 | 待拍板 | ① 早鸟 80→300 ② 马来语（建议 M2） ③ 城市合伙人 ④ 三波开城 ⑤ 州 SEO 页（M1） |

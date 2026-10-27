@@ -162,6 +162,20 @@
           <div class="codes" id="genOut"></div>
           <div class="msg" id="genMsg"></div>
         </div>
+
+        <div class="card" style="margin-top:16px">
+          <h3 data-i18n="agentCodeTitle">PropNet 中介兑换码</h3>
+          <p class="muted" style="margin:0 0 12px;font-size:12px" data-i18n="agentCodeHint">生成后发给中介，在工作台「套餐」页兑换；每次兑换顺延到期日。</p>
+          <div class="grid3">
+            <div><label data-i18n="agentPlan">套餐</label><select id="acPlan"><option value="pro">Pro</option><option value="team">Team</option></select></div>
+            <div><label data-i18n="agentMonths">月数</label><input id="acMonths" type="number" min="1" max="24" value="12"></div>
+            <div><label data-i18n="agentCount">数量</label><input id="acCount" type="number" min="1" max="50" value="1"></div>
+          </div>
+          <div style="margin-top:12px"><label data-i18n="lblNoteOpt">备注（可选）</label><input id="acNote" maxlength="120" placeholder="例：10 月早鸟"></div>
+          <button class="btn gold" id="acGen" style="margin-top:14px" data-i18n="agentGen">生成中介码</button>
+          <div class="codes" id="acOut"></div>
+          <div class="msg" id="acMsg"></div>
+        </div>
       </section>
 
       <section class="tab" id="tab-promo">
@@ -812,6 +826,21 @@
         b.onclick = function () { navigator.clipboard.writeText(b.getAttribute("data-c")); b.textContent = t("copied"); };
       });
       loadList(); loadStats();
+    });
+  };
+
+  $("acGen").onclick = function () {
+    var body = { plan: $("acPlan").value, months: $("acMonths").value, count: $("acCount").value, note: $("acNote").value };
+    api("/agent-codes", { method: "POST", body: body }).then(function (j) {
+      if (!j.ok) { $("acMsg").className = "msg err"; $("acMsg").textContent = j.error || "failed"; return; }
+      $("acMsg").className = "msg ok";
+      $("acMsg").textContent = j.codes.length + " × " + j.plan + " · " + j.months + " 个月";
+      $("acOut").innerHTML = j.codes.map(function (c) {
+        return '<span class="code"><b>' + esc(c) + '</b><button data-c="' + esc(c) + '">' + t("copy") + "</button></span>";
+      }).join("");
+      $("acOut").querySelectorAll("button").forEach(function (b) {
+        b.onclick = function () { navigator.clipboard.writeText(b.getAttribute("data-c")); b.textContent = t("copied"); };
+      });
     });
   };
 

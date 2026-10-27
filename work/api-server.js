@@ -535,6 +535,43 @@ app.get("/api/refunds", requireAuth, async function (req, res, next) {
 });
 
 // 后台：退款列表 + 审批
+// ---------- PropNet 中介兑换码（admin） ----------
+app.get("/api/admin/agent-codes", requireAdmin, async function (req, res, next) {
+  try {
+    const out = await pool.query(`
+      SELECT c.code, c.plan, c.months, c.note, c.used_at, c.created_at, a.email AS used_by
+      FROM agent_codes c LEFT JOIN lib_agents a ON a.id=c.used_by
+      ORDER BY c.created_at DESC LIMIT 100`);
+    res.json({ ok: true, rows: out.rows });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/admin/agent-codes", requireAdmin, requireWrite, async function (req, res, next) {
+  try {
+    const b = req.body || {};
+    const plan = b.plan === "team" ? "team" : "pro";
+    const months = Math.min(24, Math.max(1, Number(b.months) || 1));
+    const count = Math.min(50, Math.max(1, Number(b.count) || 1));
+    const note = String(b.note || "").slice(0, 120);
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const codes = [];
+    for (let i = 0; i < count; i++) {
+      let code;
+      for (let attempt = 0; attempt < 6; attempt++) {
+        code = "PN-";
+        for (let k = 0; k < 4; k++) code += alphabet[Math.floor(Math.random() * alphabet.length)];
+        code += "-";
+        for (let k = 0; k < 4; k++) code += alphabet[Math.floor(Math.random() * alphabet.length)];
+        const ins = await pool.query(
+          "INSERT INTO agent_codes(code,plan,months,note,created_by) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING RETURNING code",
+          [code, plan, months, note, req.admin.email]);
+        if (ins.rows[0]) { codes.push(code); break; }
+      }
+    }
+    res.status(201).json({ ok: true, codes: codes, plan: plan, months: months });
+  } catch (e) { next(e); }
+});
+
 app.get("/api/admin/refunds", requireAdmin, async function (req, res, next) {
   try {
     const r = await pool.query(
