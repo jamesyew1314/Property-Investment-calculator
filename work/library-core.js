@@ -2,7 +2,7 @@
 // library-core.js — 资料库的纯函数层（无数据库、无网络），便于单测与复用。
 // 输入一律先清洗：去控制字符、限长、数字解析（支持 "RM 1,200,000"）、日期归一。
 
-const { keysOf, isValid } = require("./library-taxonomy");
+const { keysOf, isValid, stateOfArea } = require("./library-taxonomy");
 
 const CONTROL = /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g;
 
@@ -128,6 +128,7 @@ function normalizeProject(input, { partial = false } = {}) {
   b.text("name_zh", 120);
   b.text("developer", 120);
   b.choice("area_code", "areas");
+  b.choice("state", "states");
   b.text("address", 300);
   b.choice("tenure", "tenures");
   b.choice("property_type", "property_types");
@@ -139,7 +140,12 @@ function normalizeProject(input, { partial = false } = {}) {
   b.numField("lng", decimal, { min: -180, max: 180 });
   b.text("remarks", 2000);
   if (b.has("archived")) b.put("archived", boolOf(input.archived));
-  return finish(b.errors, b.values);
+  const out = finish(b.errors, b.values);
+  if (out.values.area_code) {
+    const st = stateOfArea(out.values.area_code);
+    if (st) out.values.state = st;
+  }
+  return out;
 }
 
 function normalizeOwner(input, { partial = false } = {}) {
@@ -181,6 +187,7 @@ function normalizeProperty(input, { partial = false } = {}) {
   const b = builder(input || {}, partial);
   b.text("project_name", 160);
   b.choice("area_code", "areas");
+  b.choice("state", "states");
   b.choice("property_type", "property_types");
   b.choice("tenure", "tenures");
   b.text("address", 300);
@@ -210,6 +217,10 @@ function normalizeProperty(input, { partial = false } = {}) {
   if (b.has("tags")) b.put("tags", listOfEnums("tags", input.tags, 24));
 
   const out = finish(b.errors, b.values);
+  if (out.values.area_code) {
+    const st = stateOfArea(out.values.area_code);
+    if (st) out.values.state = st;
+  }
   if (out.values.built_up != null && out.values.land_area != null &&
       out.values.land_area > out.values.built_up * 20) {
     out.errors.land_area = "range_order";

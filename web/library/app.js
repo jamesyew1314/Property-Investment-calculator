@@ -121,9 +121,21 @@
   }
   function options(name, selected, blankLabel) {
     var h = blankLabel === false ? "" : '<option value="">' + esc(blankLabel || T("全部", "All")) + "</option>";
-    list(name).forEach(function (r) {
-      h += '<option value="' + esc(r.key) + '"' + (r.key === selected ? " selected" : "") + ">" + esc(S.lang === "en" ? r.en : r.zh) + "</option>";
-    });
+    function opt(r) {
+      return '<option value="' + esc(r.key) + '"' + (r.key === selected ? " selected" : "") + ">" + esc(S.lang === "en" ? r.en : r.zh) + "</option>";
+    }
+    if (name === "areas") {
+      var groups = {};
+      list("areas").forEach(function (a) { var k = a.state || ""; (groups[k] = groups[k] || []).push(a); });
+      list("states").forEach(function (st) {
+        var items = groups[st.key] || [];
+        if (!items.length) return;
+        h += '<optgroup label="' + esc(S.lang === "en" ? st.en : st.zh) + '">' + items.map(opt).join("") + "</optgroup>";
+      });
+      (groups[""] || []).forEach(function (a) { h += opt(a); });
+      return h;
+    }
+    list(name).forEach(function (r) { h += opt(r); });
     return h;
   }
 

@@ -8,7 +8,7 @@ const core = require("./library-core");
 const tax = require("./library-taxonomy");
 
 const PUBLIC_SELECT = `
-  SELECT p.code, p.project_id, p.project_name, p.area_code, p.property_type, p.tenure,
+  SELECT p.code, p.project_id, p.project_name, p.area_code, p.state, p.property_type, p.tenure,
          p.block, p.unit_no, p.floor, p.built_up::float8 AS built_up, p.land_area::float8 AS land_area,
          p.bedrooms, p.bathrooms, p.carparks, p.facing, p.furnishing, p.condition, p.intent,
          p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
@@ -47,21 +47,33 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt }) {
         SELECT
           (SELECT count(*) FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved'))::int AS listings,
           (SELECT count(*) FROM lib_agents WHERE public=true AND active=true)::int AS agents,
-          (SELECT count(DISTINCT area_code) FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved'))::int AS areas`);
+          (SELECT count(DISTINCT area_code) FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved'))::int AS areas,
+          (SELECT count(DISTINCT state) FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved'))::int AS states`);
       const areaRows = await pool.query(`
         SELECT area_code, count(*)::int AS n
         FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved') AND area_code IS NOT NULL
         GROUP BY area_code`);
       const nOf = {};
       areaRows.rows.forEach(function (x) { nOf[x.area_code] = x.n; });
+      const stateRows = await pool.query(`
+        SELECT state, count(*)::int AS n
+        FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved') AND state IS NOT NULL
+        GROUP BY state`);
+      const sOf = {};
+      stateRows.rows.forEach(function (x) { sOf[x.state] = x.n; });
+      const states = tax.STATES.map(function (s) {
+        return { key: s.key, zh: s.zh, en: s.en, n: sOf[s.key] || 0 };
+      });
       const areas = tax.AREAS.map(function (a) {
-        return { key: a.key, zh: a.zh, en: a.en, n: nOf[a.key] || 0 };
+        return { key: a.key, zh: a.zh, en: a.en, state: a.state, n: nOf[a.key] || 0 };
       });
       res.json({
         ok: true,
         counts: counts.rows[0],
+        states: states,
         areas: areas,
         taxonomy: {
+          states: tax.STATES,
           property_types: tax.PROPERTY_TYPES,
           tenures: tax.TENURES,
           furnishings: tax.FURNISHINGS,
@@ -84,6 +96,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt }) {
       };
       const q = core.likeOf(req.query.q);
       if (q) add("(p.project_name ILIKE ? OR pr.name ILIKE ? OR pr.name_zh ILIKE ? OR p.unit_no ILIKE ?)", [q, q, q, q]);
+      if (req.query.state) add("p.state = ?", [String(req.query.state).slice(0, 40)]);
       if (req.query.area) add("p.area_code = ?", [String(req.query.area).slice(0, 40)]);
       if (req.query.type && tax.isValid("property_types", req.query.type)) add("p.property_type = ?", [req.query.type]);
       if (req.query.intent && tax.isValid("listing_intents", req.query.intent)) add("p.intent = ?", [req.query.intent]);

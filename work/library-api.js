@@ -38,12 +38,12 @@ function pickCols(allowed, values) {
 }
 
 const ALLOWED = {
-  lib_projects: ["name", "name_zh", "developer", "area_code", "address", "tenure", "property_type",
+  lib_projects: ["name", "name_zh", "developer", "area_code", "state", "address", "tenure", "property_type",
     "total_units", "blocks", "completion_year", "facilities", "lat", "lng", "remarks", "archived"],
   lib_owners: ["name", "phone", "phone2", "email", "id_last4", "address", "source", "remarks"],
   lib_clients: ["name", "phone", "email", "intent", "budget_min", "budget_max", "area_codes",
     "property_types", "bedrooms_min", "timeline", "source", "status", "agent", "remarks"],
-  lib_properties: ["code", "project_id", "project_name", "area_code", "property_type", "tenure", "address",
+  lib_properties: ["code", "project_id", "project_name", "area_code", "state", "property_type", "tenure", "address",
     "block", "unit_no", "floor", "built_up", "land_area", "bedrooms", "bathrooms", "carparks", "facing",
     "furnishing", "condition", "intent", "asking_price", "rent_price", "maintenance_fee", "status",
     "owner_id", "agent", "exclusive", "listed_on", "title_type", "tags", "remarks", "is_demo", "created_by"],
@@ -190,6 +190,7 @@ module.exports = function createLibraryApi({ pool, requireAdmin, requireWrite })
       if (req.query.intent) b.add("p.intent = ?", [req.query.intent]);
       const areas = csvList(req.query.area);
       if (areas.length) b.add("p.area_code = ANY(?)", [areas]);
+      if (req.query.state) b.add("p.state = ?", [req.query.state]);
       if (req.query.type) b.add("p.property_type = ?", [req.query.type]);
       if (req.query.agent) b.add("p.agent = ?", [req.query.agent]);
       if (req.query.project_id) b.add("p.project_id = ?", [Number(req.query.project_id)]);
@@ -221,6 +222,7 @@ module.exports = function createLibraryApi({ pool, requireAdmin, requireWrite })
     if (!p) return values;
     const out = { ...values };
     if (!out.area_code) out.area_code = p.area_code;
+    if (!out.state) out.state = p.state;
     if (!out.property_type) out.property_type = p.property_type;
     if (!out.tenure) out.tenure = p.tenure;
     if (!out.address) out.address = p.address;
@@ -345,6 +347,7 @@ module.exports = function createLibraryApi({ pool, requireAdmin, requireWrite })
       if (like) b.add("(pr.name ILIKE ? OR pr.name_zh ILIKE ? OR pr.developer ILIKE ? OR pr.address ILIKE ?)",
         [like, like, like, like]);
       if (req.query.area) b.add("pr.area_code = ?", [req.query.area]);
+      if (req.query.state) b.add("pr.state = ?", [req.query.state]);
       if (req.query.type) b.add("pr.property_type = ?", [req.query.type]);
       if (req.query.archived !== "1") b.add("pr.archived = false", []);
       const where = b.where();

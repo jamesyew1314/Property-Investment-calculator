@@ -56,6 +56,11 @@
     for (var i = 0; i < arr.length; i++) if (arr[i].key === key) return lang === "en" ? arr[i].en : arr[i].zh;
     return key || "";
   }
+  function stateName(code) {
+    var arr = tax.states || [];
+    for (var i = 0; i < arr.length; i++) if (arr[i].key === code) return lang === "en" ? arr[i].en : arr[i].zh;
+    return code || "";
+  }
   function areaName(code) {
     var arr = tax.areas || [];
     for (var i = 0; i < arr.length; i++) if (arr[i].key === code) return lang === "en" ? arr[i].en : arr[i].zh;
@@ -131,7 +136,7 @@
   window.KT = {
     init: init, apply: apply, t: t, setLang: setLang, get lang() { return lang; },
     money: money, int: int, date: date, esc: esc, label: label,
-    area: areaName, areaShort: areaShort,
+    state: stateName, area: areaName, areaShort: areaShort,
     setTax: function (x) { tax = Object.assign({}, tax, x || {}); },
     listingCard: listingCard, skeletonCards: skeletonCards, fetchJSON: fetchJSON
   };

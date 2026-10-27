@@ -45,6 +45,7 @@ eq(core.listOfEnums("areas", "sutera_utama, skudai ,bogus"), ["sutera_utama", "s
   const n = core.normalizeProject({ name: "Sutera Utama Residence", area_code: "sutera_utama", total_units: "480" }, { partial: false });
   eq(n.errors, {}, "楼盘合法无错误");
   eq(n.values.total_units, 480, "楼盘单位数转数字");
+  eq(n.values.state, "johor", "楼盘按区域自动带出州");
 }
 {
   const n = core.normalizeProject({ area_code: "nowhere" }, { partial: true });
@@ -63,6 +64,7 @@ eq(core.listOfEnums("areas", "sutera_utama, skudai ,bogus"), ["sutera_utama", "s
   eq(n.values.asking_price, 780000, "房源价格解析");
   eq(n.values.built_up, 1200, "房源面积解析");
   eq(n.values.tags, ["gated", "high_floor"], "房源标签数组");
+  eq(n.values.state, "johor", "房源按区域自动带出州");
   eq(n.values.listed_on, "2026-10-01", "房源日期归一");
 }
 {
@@ -74,6 +76,15 @@ eq(core.listOfEnums("areas", "sutera_utama, skudai ,bogus"), ["sutera_utama", "s
 {
   const n = core.normalizeProperty({ built_up: 1000, land_area: 30000 }, { partial: true });
   eq(n.errors.land_area, "range_order", "土地面积大于建筑面积 20 倍时拦截");
+}
+
+{
+  const n = core.normalizeProperty({ area_code: "mont_kiara", state: "selangor" }, { partial: true });
+  eq(n.values.state, "kl", "区域与州冲突时以区域为准");
+}
+{
+  const n = core.normalizeProperty({ state: "atlantis" }, { partial: true });
+  eq(n.errors.state, "invalid_choice", "非法州被拦截");
 }
 
 // ---------- 客户 ----------
@@ -131,7 +142,10 @@ eq(core.sortOf({ sort: "asking_price", dir: "asc" }, { asking_price: "p.asking_p
 eq(core.sortOf({ sort: "drop table", dir: "asc" }, { asking_price: "p.asking_price" }, "p.id DESC"), "p.id DESC", "排序拒绝注入");
 
 // ---------- 字典 ----------
-eq(tax.AREAS.length, 25, "区域 25 个");
+eq(tax.AREAS.length, 110, "全国区域 110 个");
+eq(tax.STATES.length, 16, "16 个州 / 直辖区");
+eq(tax.stateOfArea("mont_kiara"), "kl", "区域反查州（KL）");
+eq(tax.stateOfArea("sutera_utama"), "johor", "区域反查州（柔佛）");
 eq(tax.labelOf("listing_statuses", "available", "zh"), "在售 / 在租", "状态中文标签");
 eq(tax.labelOf("listing_statuses", "available", "en"), "Available", "状态英文标签");
 ok(tax.keysOf("property_types").indexOf("condo") >= 0, "房型含 condo");
