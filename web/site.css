@@ -95,6 +95,7 @@ p{margin:0 0 12px}
 .pcard:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(14,36,56,.12);border-color:#D8CFBC}
 .pcard-media{aspect-ratio:4/3;background:linear-gradient(135deg,#16395A,#0E2438);position:relative;overflow:hidden}
 .pcard-media .ph{position:absolute;inset:0;display:grid;place-items:center}
+.pcard-media .pcard-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pcard-media .ph svg{width:54px;height:54px}
 .pcard-media .badge{position:absolute;left:12px;top:12px;background:rgba(255,255,255,.92);color:var(--navy);
   border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700}

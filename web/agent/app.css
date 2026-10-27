@@ -132,3 +132,11 @@ img{max-width:100%}
 .areaPick .chip button{border:none;background:none;color:#8A6A2F;font-size:14px;line-height:1;cursor:pointer;padding:0}
 .areaPick .row{display:flex;gap:6px;align-items:center}
 .areaPick .row select{flex:1;min-width:0;padding:7px 9px;border:1px solid #D6DCE7;border-radius:8px;font:inherit;font-size:12.5px;background:#fff}
+
+/* 房源图片 */
+.phWrap{margin-top:2px}
+.phGrid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.phItem{position:relative;width:86px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:#F3F5F9}
+.phItem img{width:100%;height:100%;object-fit:cover;display:block}
+.phItem button{position:absolute;right:2px;top:2px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(14,36,56,.75);color:#fff;font-size:13px;line-height:1;cursor:pointer}
+.phWrap input[type=file]{font-size:12px}

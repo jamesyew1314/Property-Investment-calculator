@@ -1,0 +1,3 @@
+BEGIN;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS photos text[] NOT NULL DEFAULT '{}';
+COMMIT;

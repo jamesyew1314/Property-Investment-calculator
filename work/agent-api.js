@@ -9,6 +9,8 @@ const core = require("./library-core");
 const agentCore = require("./agent-core");
 const matcher = require("./match");
 const billplz = require("./billplz");
+const fs = require("node:fs");
+const pathMod = require("node:path");
 const tax = require("./library-taxonomy");
 
 const COOKIE = "pn_sid";
@@ -32,6 +34,15 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
   const r = express.Router();
   const limit = rateLimit || function (req, res, next) { next(); };
   const base = siteUrl || "https://kwongthye.com";
+  const UPLOADS = process.env.UPLOAD_DIR || "/srv/fangchan/uploads/props";
+
+  function sniffImage(buf) {
+    if (!buf || buf.length < 12) return null;
+    if (buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) return "jpg";
+    if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47) return "png";
+    if (buf.slice(0, 4).toString() === "RIFF" && buf.slice(8, 12).toString() === "WEBP") return "webp";
+    return null;
+  }
 
   function publicAgent(a) {
     return {
@@ -317,6 +328,44 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
         [pub ? "public" : "pool", pub ? new Date() : null, req.params.id, req.agent.id]);
       await audit(req.agent.email, pub ? "agent.publish" : "agent.unpublish", "property", Number(req.params.id), {});
       res.json({ ok: true, row: out.rows[0] });
+    } catch (e) { next(e); }
+  });
+
+
+  // ---------- 房源图片 ----------
+  r.post("/listings/:id/photos", requireAgent, express.raw({ type: ["image/jpeg", "image/png", "image/webp"], limit: "8mb" }), async function (req, res, next) {
+    try {
+      const row = await ownListing(req.params.id, req.agent.id);
+      if (!row) return res.status(404).json({ ok: false, error: "not_found" });
+      const buf = req.body;
+      const ext = sniffImage(buf);
+      if (!ext) return res.status(415).json({ ok: false, error: "unsupported_image" });
+      const photos = row.photos || [];
+      if (photos.length >= 12) return res.status(400).json({ ok: false, error: "too_many_photos" });
+      fs.mkdirSync(UPLOADS, { recursive: true });
+      const name = row.id + "-" + Date.now().toString(36) + "-" + crypto.randomBytes(3).toString("hex") + "." + ext;
+      fs.writeFileSync(pathMod.join(UPLOADS, name), buf);
+      const url = "/uploads/props/" + name;
+      const next = photos.concat([url]);
+      await pool.query("UPDATE lib_properties SET photos=$1, cover_url=COALESCE(cover_url,$2), updated_at=now() WHERE id=$3 AND tenant_id=$4",
+        [next, url, row.id, req.agent.id]);
+      res.status(201).json({ ok: true, url: url, photos: next });
+    } catch (e) { next(e); }
+  });
+
+  r.delete("/listings/:id/photos", requireAgent, async function (req, res, next) {
+    try {
+      const row = await ownListing(req.params.id, req.agent.id);
+      if (!row) return res.status(404).json({ ok: false, error: "not_found" });
+      const url = core.str((req.body || {}).url, 200);
+      const next = (row.photos || []).filter(function (x) { return x !== url; });
+      await pool.query("UPDATE lib_properties SET photos=$1, cover_url=$2, updated_at=now() WHERE id=$3 AND tenant_id=$4",
+        [next, next[0] || null, row.id, req.agent.id]);
+      if (/^\/uploads\/props\/[A-Za-z0-9._-]+$/.test(url)) {
+        const f = pathMod.join(UPLOADS, pathMod.basename(url));
+        if (f.indexOf(UPLOADS) === 0 && fs.existsSync(f)) fs.unlinkSync(f);
+      }
+      res.json({ ok: true, photos: next });
     } catch (e) { next(e); }
   });
 

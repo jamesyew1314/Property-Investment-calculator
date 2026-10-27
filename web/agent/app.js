@@ -317,6 +317,54 @@
     var a = ((S.meta && S.meta.areas) || []).filter(function (x) { return x.key === code; })[0];
     return a ? (S.lang === "en" ? a.en : a.zh) : (code || "—");
   }
+  function photoBlock(row) {
+    var photos = row.photos || [];
+    return '<div class="phWrap"><div class="phGrid" data-ph-grid>' + photos.map(function (u) {
+      return '<span class="phItem"><img src="' + esc(u) + '" alt=""><button type="button" data-rm-ph="' + esc(u) + '">×</button></span>';
+    }).join("") + "</div>" +
+      (row.id ? '<input type="file" id="phFile" accept="image/jpeg,image/png,image/webp" multiple>'
+        : '<p class="muted" style="margin:6px 0 0">' + t("先保存房源，再上传图片。", "Save the listing first, then upload photos.") + "</p>") + "</div>";
+  }
+  function bindPhotos(m, row) {
+    if (!row.id) return;
+    var grid = $("[data-ph-grid]", m.root);
+    function render(list) {
+      grid.innerHTML = (list || []).map(function (u) {
+        return '<span class="phItem"><img src="' + esc(u) + '" alt=""><button type="button" data-rm-ph="' + esc(u) + '">×</button></span>';
+      }).join("");
+    }
+    var input = $("#phFile", m.root);
+    input.addEventListener("change", function () {
+      var files = Array.prototype.slice.call(input.files || []);
+      input.value = "";
+      if (!files.length) return;
+      var chain = Promise.resolve();
+      files.forEach(function (f) {
+        chain = chain.then(function () {
+          if (!/^image\/(jpeg|png|webp)$/.test(f.type) || f.size > 8 * 1024 * 1024) {
+            toast(t("只支持 JPG/PNG/WebP，单张 ≤ 8MB", "JPG/PNG/WebP, max 8MB"), true);
+            return;
+          }
+          return fetch("/api/agent/listings/" + row.id + "/photos", {
+            method: "POST", credentials: "same-origin", headers: { "Content-Type": f.type }, body: f
+          }).then(function (r) { return r.json(); }).then(function (j) {
+            if (!j.ok) toast(j.error === "too_many_photos" ? t("最多 12 张", "Max 12 photos") : (j.error || "upload failed"), true);
+          });
+        });
+      });
+      chain.then(function () {
+        return api("/listings/" + row.id).then(function (j) { row.photos = j.row.photos || []; render(row.photos); setCover(j.row.cover_url); });
+      });
+    });
+    grid.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-rm-ph]");
+      if (!b) return;
+      api("/listings/" + row.id + "/photos", { method: "DELETE", body: { url: b.getAttribute("data-rm-ph") } })
+        .then(function (j) { row.photos = j.photos || []; render(row.photos); });
+    });
+    function setCover(u) { var r = row; if (u) r.cover_url = u; }
+  }
+
   function listingForm(row) {
     row = row || {};
     var body = '<form id="lf">' +
@@ -333,6 +381,7 @@
       '<div class="grid2">' + field(t("建筑面积 (sqft)", "Built-up"), '<input name="built_up" inputmode="numeric" value="' + esc(row.built_up || "") + '">') +
       field(t("产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") + "</div>" +
       field(t("备注（不公开）", "Notes (private)"), '<textarea name="remarks">' + esc(row.remarks || "") + "</textarea>") +
+      field(t("房源图片（最多 12 张）", "Photos (max 12)"), photoBlock(row)) +
       "</form>";
     var m = modal({
       title: row.id ? t("编辑房源", "Edit listing") : t("新增房源", "New listing"),
@@ -341,6 +390,7 @@
         (row.id ? '<button class="btn danger" id="del">' + t("删除", "Delete") + "</button>" : "") +
         '<button class="btn gold" id="save">' + t("保存", "Save") + "</button>"
     });
+    bindPhotos(m, row);
     if (row.id) {
       $("#del", m.root).addEventListener("click", function () {
         confirmBox(t("删除这条房源？", "Delete this listing?"), function () {

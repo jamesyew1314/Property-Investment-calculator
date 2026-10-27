@@ -8,7 +8,7 @@ const core = require("./library-core");
 const tax = require("./library-taxonomy");
 
 const PUBLIC_SELECT = `
-  SELECT p.code, p.project_id, p.project_name, p.area_code, p.state, p.property_type, p.tenure,
+  SELECT p.code, p.project_id, p.project_name, p.area_code, p.state, p.property_type, p.tenure, p.photos, p.cover_url,
          p.block, p.unit_no, p.floor, p.built_up::float8 AS built_up, p.land_area::float8 AS land_area,
          p.bedrooms, p.bathrooms, p.carparks, p.facing, p.furnishing, p.condition, p.intent,
          p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,

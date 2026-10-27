@@ -1378,7 +1378,7 @@ app.get("/a/:slug", async function (req, res, next) {
       return res.status(404).type("html").send('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>404 | PropNet</title><link rel="stylesheet" href="/site.css"></head><body style="padding:60px;font-family:system-ui"><h1>找不到这个中介页</h1><p><a href="/agents/">看全部中介 →</a></p></body></html>');
     }
     const rows = await pool.query(`
-      SELECT p.code, p.project_name, p.area_code, p.intent,
+      SELECT p.code, p.project_name, p.area_code, p.intent, p.cover_url,
              p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
              p.block, p.unit_no, p.bedrooms, p.bathrooms, p.built_up::float8 AS built_up,
              pr.name AS project_title, pr.name_zh AS project_title_zh
