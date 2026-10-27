@@ -180,6 +180,7 @@
     { key: "clients", zh: "我的客户", en: "Clients", ico: "👤" },
     { key: "matches", zh: "自动匹配", en: "Matches", ico: "⇄" },
     { key: "inquiries", zh: "带看询盘", en: "Inquiries", ico: "✉", badge: true },
+    { key: "plan", zh: "套餐", en: "Plan", ico: "◆" },
     { key: "profile", zh: "个人资料", en: "Profile", ico: "⚙" }
   ];
   function renderNav() {
@@ -221,7 +222,7 @@
     S.route = p.path;
     renderNav();
     $("#view").innerHTML = '<div class="card">' + t("加载中…", "Loading…") + "</div>";
-    var fn = ({ "": dash, listings: listings, pool: pool, clients: clients, matches: matches, inquiries: inquiries, profile: profile })[p.path];
+    var fn = ({ "": dash, listings: listings, pool: pool, clients: clients, matches: matches, inquiries: inquiries, plan: plan, profile: profile })[p.path];
     if (!fn) { location.hash = "#/"; return; }
     fn(p.q).catch(function (e) { if (e.message !== "auth_required") toast(e.message, true); });
   }
@@ -649,6 +650,48 @@
       $("#view").innerHTML = h;
       $$("[data-box]", $("#view")).forEach(function (b) {
         b.addEventListener("click", function () { location.hash = "#/inquiries" + (b.dataset.box === "out" ? "?box=out" : ""); });
+      });
+    });
+  }
+
+  // ---------- 套餐 ----------
+  function plan() {
+    setTitle(t("套餐", "Plan"), t("现阶段全部功能免费；收费与支付稍后推出", "Everything is free for now; billing comes later"));
+    return api("/plan").then(function (d) {
+      var until = d.expires_at ? String(d.expires_at).slice(0, 10) : "—";
+      var isFree = !d.plan || d.plan === "free";
+      var h = '<div class="card"><h3>' + t("当前套餐", "Current plan") + "</h3>" +
+        '<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">' +
+        '<b style="font-family:Georgia,serif;font-size:30px;color:var(--navy)">' + esc(isFree ? t("免费", "Free") : d.plan.toUpperCase()) + "</b>" +
+        '<span class="pill ' + (isFree ? "grey" : "green") + '">' + (isFree ? t("免费开放期", "Free period") : t("已开通", "Active")) + "</span>" +
+        '<span class="muted">' + t("到期", "Expires") + "：" + esc(until) + "</span></div>" +
+        '<p class="muted" style="margin:10px 0 0">' + t("免费期内所有功能不限制；开始收费前至少提前 30 天通知。", "No limits during the free period. We will give 30 days' notice before charging.") + "</p></div>";
+
+      h += '<div class="card"><h3>' + t("兑换码开通", "Redeem a code") + "</h3>" +
+        '<p class="muted" style="margin:0 0 10px">' + t("如果已经通过转账/线下付款，输入我们给你的兑换码即可开通。", "If you paid by transfer, enter the code we sent you.") + "</p>" +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="codeIn" placeholder="PN-XXXX-XXXX" style="flex:1;min-width:200px;padding:9px 10px;border:1px solid #D6DCE7;border-radius:8px;font:inherit">' +
+        '<button class="btn dark" id="redeemBtn">' + t("兑换", "Redeem") + '</button></div><div class="msg" id="redeemMsg"></div></div>';
+
+      h += '<div class="card"><h3>' + t("未来定价", "Future pricing") + "</h3>" +
+        '<div class="grid3" style="grid-template-columns:1fr 1fr;gap:12px">' +
+        '<div><b style="font-family:Georgia,serif;font-size:22px;color:var(--navy)">RM ' + d.prices.pro + "</b><span class='muted'> /月 · " + t("个人版", "Pro") + "</span></div>" +
+        '<div><b style="font-family:Georgia,serif;font-size:22px;color:var(--navy)">RM ' + d.prices.team + "</b><span class='muted'> /月 · " + t("团队 5 席", "Team 5 seats") + "</span></div></div>" +
+        '<p style="margin:12px 0 0"><a class="btn line sm" href="/pricing/">' + t("查看完整价格与功能", "See full pricing") + "</a></p></div>";
+
+      $("#view").innerHTML = h;
+      $("#redeemBtn").addEventListener("click", function () {
+        var btn = this; btn.disabled = true;
+        var msg = $("#redeemMsg"); msg.className = "msg";
+        api("/redeem", { method: "POST", body: { code: $("#codeIn").value.trim() } })
+          .then(function (j) {
+            msg.className = "msg ok";
+            msg.textContent = t("已开通：" + j.plan + "，有效期至 " + String(j.expires_at).slice(0, 10), "Activated: " + j.plan + " until " + String(j.expires_at).slice(0, 10));
+            setTimeout(route, 1200);
+          })
+          .catch(function (e) {
+            btn.disabled = false;
+            msg.textContent = e.message === "bad_code" ? t("兑换码无效或已使用", "Invalid or used code") : e.message;
+          });
       });
     });
   }

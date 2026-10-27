@@ -411,6 +411,41 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
   });
 
 
+
+  // ---------- 套餐 / 兑换码（M3 收费基础） ----------
+  r.get("/plan", requireAgent, async function (req, res, next) {
+    try {
+      const sub = await pool.query(
+        "SELECT plan, started_at, expires_at, source FROM agent_subscriptions WHERE agent_id=$1 AND (expires_at IS NULL OR expires_at > now()) ORDER BY expires_at DESC NULLS FIRST LIMIT 1",
+        [req.agent.id]);
+      const cur = sub.rows[0] || { plan: "free", expires_at: null, source: "free" };
+      res.json({ ok: true, plan: cur.plan, expires_at: cur.expires_at, source: cur.source,
+        freeMode: true, prices: { pro: 89, team: 299, early: 59 } });
+    } catch (e) { next(e); }
+  });
+
+  r.post("/redeem", requireAgent, limit(10, 600000), async function (req, res, next) {
+    try {
+      const code = core.str((req.body || {}).code, 40).toUpperCase();
+      if (!code) return res.status(400).json({ ok: false, error: "invalid_input" });
+      const out = await pool.query(
+        "UPDATE agent_codes SET used_by=$1, used_at=now() WHERE upper(code)=$2 AND used_at IS NULL RETURNING plan, months, note",
+        [req.agent.id, code]);
+      const c = out.rows[0];
+      if (!c) return res.status(400).json({ ok: false, error: "bad_code" });
+      const base = await pool.query(
+        "SELECT max(expires_at) AS e FROM agent_subscriptions WHERE agent_id=$1 AND expires_at > now()", [req.agent.id]);
+      const from = (base.rows[0] && base.rows[0].e) ? new Date(base.rows[0].e) : new Date();
+      const months = Math.max(1, Number(c.months) || 1);
+      const until = new Date(from); until.setMonth(until.getMonth() + months);
+      await pool.query(
+        "INSERT INTO agent_subscriptions(agent_id,plan,status,started_at,expires_at,source,note) VALUES($1,$2,'active',now(),$3,'code',$4)",
+        [req.agent.id, c.plan, until, code]);
+      await pool.query("UPDATE lib_agents SET plan=$1, plan_expires_at=$2 WHERE id=$3", [c.plan, until, req.agent.id]);
+      await audit(req.agent.email, "agent.redeem", "agent", req.agent.id, { plan: c.plan, months: months });
+      res.json({ ok: true, plan: c.plan, expires_at: until });
+    } catch (e) { next(e); }
+  });
   // ---------- WTB 自动匹配 ----------
   r.get("/matches", requireAgent, async function (req, res, next) {
     try {
