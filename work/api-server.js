@@ -535,6 +535,32 @@ app.get("/api/refunds", requireAuth, async function (req, res, next) {
 });
 
 // 后台：退款列表 + 审批
+// ---------- 中介审核（admin） ----------
+app.get("/api/admin/agents", requireAdmin, async function (req, res, next) {
+  try {
+    const pending = req.query.filter === "pending";
+    const out = await pool.query(`
+      SELECT a.id, a.name, a.email, a.phone, a.team, a.ren_no, a.slug, a.verified_at, a.status, a.plan,
+             a.email_verified_at, a.created_at,
+             (SELECT count(*) FROM lib_properties p WHERE p.tenant_id=a.id)::int AS listings,
+             (SELECT count(*) FROM lib_properties p WHERE p.tenant_id=a.id AND p.visibility='public')::int AS published
+      FROM lib_agents a
+      ${pending ? "WHERE a.verified_at IS NULL" : ""}
+      ORDER BY a.verified_at NULLS FIRST, a.created_at DESC LIMIT 200`);
+    res.json({ ok: true, rows: out.rows });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/admin/agents/:id/verify", requireAdmin, requireWrite, async function (req, res, next) {
+  try {
+    const ok = !!(req.body || {}).verified;
+    const out = await pool.query("UPDATE lib_agents SET verified_at=$1 WHERE id=$2 RETURNING id, name, verified_at",
+      [ok ? new Date() : null, Number(req.params.id)]);
+    if (!out.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    res.json({ ok: true, row: out.rows[0] });
+  } catch (e) { next(e); }
+});
+
 // ---------- PropNet 中介兑换码（admin） ----------
 app.get("/api/admin/agent-codes", requireAdmin, async function (req, res, next) {
   try {

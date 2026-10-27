@@ -132,6 +132,7 @@
         <button data-tab="users" data-i18n="tabUsers">用户</button>
         <button data-tab="msgs" data-i18n="tabMsgs">留言</button>
         <button data-tab="leads" data-i18n="tabLeads">加入申请</button>
+        <button data-tab="agents" data-i18n="tabAgents">中介审核</button>
         <button data-tab="views" data-i18n="tabViews">访问量</button>
         <button data-tab="refunds" data-i18n="tabRefunds">退款</button>
         <button data-tab="logs" data-i18n="tabLogs">操作日志</button>
@@ -272,6 +273,20 @@
           <table><thead><tr>
             <th data-i18n="thTime">时间</th><th data-i18n="thAction">动作</th><th data-i18n="thDetail">详情</th>
           </tr></thead><tbody id="logBody"></tbody></table>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-agents">
+        <div class="card">
+          <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
+            <h3 style="margin:0" data-i18n="agentReviewTitle">PropNet 中介审核</h3>
+            <select id="agFilter" style="margin-left:auto">
+              <option value="" data-i18n="agAll">全部</option>
+              <option value="pending" data-i18n="agPending">待审核</option>
+            </select>
+            <button class="btn line" id="agReload" data-i18n="agReload">刷新</button>
+          </div>
+          <div id="agTable"><p class="muted">…</p></div>
         </div>
       </section>
 
@@ -809,7 +824,34 @@
       if (b.getAttribute("data-tab") === "logs") loadLogs();
       if (b.getAttribute("data-tab") === "admins") loadAdmins();
       if (b.getAttribute("data-tab") === "refunds") loadRefunds();
+      if (b.getAttribute("data-tab") === "agents") loadAgentReview();
     };
+  });
+
+  function loadAgentReview() {
+    var f = $("agFilter") ? $("agFilter").value : "";
+    api("/agents" + (f ? "?filter=" + f : "")).then(function (j) {
+      if (!j.ok) { $("agTable").innerHTML = '<p class="muted">' + esc(j.error || "failed") + "</p>"; return; }
+      if (!j.rows.length) { $("agTable").innerHTML = '<p class="muted">' + t("empty") + "</p>"; return; }
+      var h = '<table class="table"><thead><tr><th>Name</th><th>REN</th><th>Team</th><th>Email</th><th>Listings</th><th>Status</th><th></th></tr></thead><tbody>';
+      h += j.rows.map(function (a) {
+        return "<tr><td><b>" + esc(a.name) + "</b><br><span class='muted mono'>" + esc(a.slug || "") + "</span></td><td>" + esc(a.ren_no || "—") +
+          "</td><td>" + esc(a.team || "—") + "</td><td>" + esc(a.email) + (a.email_verified_at ? " ✓" : "") +
+          "</td><td>" + a.listings + " / " + a.published + "</td><td>" +
+          (a.verified_at ? '<span class="pill green">已验证</span>' : '<span class="pill amber">待审核</span>') +
+          '</td><td><button class="btn ' + (a.verified_at ? "line" : "gold") + ' sm" data-ag="' + a.id + '" data-v="' + (a.verified_at ? "0" : "1") + '">' +
+          (a.verified_at ? "取消验证" : "通过验证") + "</button></td></tr>";
+      }).join("") + "</tbody></table>";
+      $("agTable").innerHTML = h;
+    });
+  }
+  if ($("agReload")) $("agReload").onclick = loadAgentReview;
+  if ($("agFilter")) $("agFilter").onchange = loadAgentReview;
+  if ($("agTable")) $("agTable").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-ag]");
+    if (!b) return;
+    api("/agents/" + b.getAttribute("data-ag") + "/verify", { method: "POST", body: { verified: b.getAttribute("data-v") === "1" } })
+      .then(function () { loadAgentReview(); });
   });
 
   $("genBtn").onclick = function () {
