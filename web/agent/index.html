@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>PropNet 工作台 | 中介登录</title>
+<link rel="icon" type="image/png" href="/icon-256.png">
+<link rel="stylesheet" href="/agent/app.css">
+</head>
+<body>
+
+<div id="auth">
+  <form class="authCard" id="authForm" novalidate>
+    <div class="brand">
+      <img src="/icon-256.png" alt="PropNet">
+      <div><b>KWONG THYE</b><span>PropNet · 中介工作台</span></div>
+    </div>
+    <h1 id="authTitle">登录工作台</h1>
+    <p class="sub" id="authSub">管理你的房源、客户与带看；发布一次，全团队帮你找买家。</p>
+
+    <div class="tabs" id="authTabs">
+      <button type="button" class="on" data-mode="login" id="tabLogin">登录</button>
+      <button type="button" data-mode="register" id="tabRegister">免费注册</button>
+    </div>
+
+    <div id="regFields" hidden>
+      <div class="grid2">
+        <div class="field"><label for="rName">姓名 *</label><input id="rName" autocomplete="name" placeholder="Andy Lau"></div>
+        <div class="field"><label for="rPhone">电话 / WhatsApp</label><input id="rPhone" inputmode="tel" autocomplete="tel" placeholder="012-345 6789"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label for="rTeam">团队 / 公司</label><input id="rTeam" placeholder="THE ROOF REALTY"></div>
+        <div class="field"><label for="rRen">REN 编号</label><input id="rRen" placeholder="REN 12345"></div>
+      </div>
+    </div>
+
+    <div class="field"><label for="aEmail">邮箱 *</label><input id="aEmail" type="email" autocomplete="username" placeholder="you@example.com"></div>
+    <div class="field"><label for="aPass">密码 *</label><input id="aPass" type="password" autocomplete="current-password" placeholder="至少 8 位"></div>
+
+    <button class="btn gold" id="authBtn" type="submit" style="width:100%;margin-top:6px">登录</button>
+    <div class="msg" id="authMsg"></div>
+    <p class="sub" id="authNote" style="font-size:11.5px;margin-top:10px">注册后即可发布房源；邮箱验证后显示「已验证」。</p>
+
+    <div class="authFoot">
+      <span>© KWONG THYE · PROPNET</span>
+      <span><button type="button" id="authLang">EN</button> · <a href="/">返回官网</a></span>
+    </div>
+  </form>
+</div>
+
+<div id="app" hidden>
+  <aside id="side">
+    <div class="brand">
+      <img src="/icon-256.png" alt="">
+      <div><b>KWONG THYE</b><span>PropNet</span></div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="sideFoot">
+      <b id="whoName">—</b>
+      <span id="whoMeta">—</span>
+      <div class="row">
+        <button id="langBtn" type="button">EN</button>
+        <button id="logoutBtn" type="button">退出</button>
+      </div>
+    </div>
+  </aside>
+  <div id="main">
+    <header id="top">
+      <button id="burger" type="button" aria-label="menu">☰</button>
+      <div><h1 id="pageTitle">概览</h1><div class="sub" id="pageSub"></div></div>
+      <div class="sp"></div>
+      <div id="topActs" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </header>
+    <section id="view"></section>
+  </div>
+</div>
+
+<div id="modal"></div>
+<div id="toast"></div>
+<script src="/agent/app.js"></script>
+</body>
+</html>

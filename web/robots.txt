@@ -4,4 +4,5 @@ Disallow: /admin
 Disallow: /receipt
 Disallow: /library
 Disallow: /app
+Disallow: /agent
 Sitemap: https://kwongthye.com/sitemap.xml

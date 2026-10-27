@@ -21,7 +21,7 @@ const PUBLIC_SELECT = `
   LEFT JOIN lib_agents a ON lower(a.name) = lower(p.agent)
   WHERE p.visibility = 'public' AND p.status IN ('available', 'reserved')`;
 
-module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt }) {
+module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, freeMode, plans }) {
   const r = express.Router();
   r.use(function (req, res, next) {
     res.setHeader("Cache-Control", "public, max-age=30");
@@ -69,6 +69,8 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt }) {
       });
       res.json({
         ok: true,
+        platformFree: !!freeMode,
+        plans: plans || null,
         counts: counts.rows[0],
         states: states,
         areas: areas,

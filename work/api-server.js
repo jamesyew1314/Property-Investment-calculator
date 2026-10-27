@@ -8,6 +8,7 @@ const mailLayout = require("./mail-layout");
 const { buildReportPdf } = require("./report-pdf");
 const createLibraryApi = require("./library-api");
 const createPublicApi = require("./public-api");
+const createAgentApi = require("./agent-api");
 const pathMod = require("node:path");
 const { Pool } = require("pg");
 
@@ -21,6 +22,8 @@ const COOKIE_PATH = process.env.SESSION_COOKIE_PATH || "/";
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || "";
 // 免费开放期：默认 true（所有 Pro 功能免费）；正式收费时把 .env 改成 FREE_MODE=0 即可恢复
 const FREE_MODE = process.env.FREE_MODE !== "0";
+// 平台阶段开关：默认全部免费；正式收费时 .env 改 PLATFORM_FREE=0
+const PLATFORM_FREE = process.env.PLATFORM_FREE !== "0";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
 const app = express();
@@ -1310,6 +1313,8 @@ app.patch("/api/admin/leads/:id", requireAdmin, requireWrite, async function (re
 app.use("/api/public", createPublicApi({
   pool: pool,
   rateLimit: rateLimit,
+  freeMode: PLATFORM_FREE,
+  plans: { pro: 89, early: 59, team: 299 },
   ipSalt: process.env.IP_SALT,
   notify: async function (lead) {
     const to = process.env.ADMIN_EMAIL || "andylau.theroof@gmail.com";
@@ -1318,6 +1323,14 @@ app.use("/api/public", createPublicApi({
       "留言：" + (lead.message || "—"), "", "后台查看：https://kwongthye.com/admin/"].join("\n");
     await sendMail(to, "PropNet 加入申请 — " + lead.name, text, null, [], null);
   }
+}));
+
+// ---------- 中介工作台（PropNet /app） ----------
+app.use("/api/agent", createAgentApi({
+  pool: pool,
+  sendMail: sendMail,
+  rateLimit: rateLimit,
+  siteUrl: "https://kwongthye.com"
 }));
 
 // ---------- 房产资料库（PropBase） ----------
