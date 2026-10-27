@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>找房 | PropNet 全马房源</title>
-<meta name="description" content="按州属、区域、预算、房型搜索全马在售与在租房源；每套房源标明货源中介。Find property listings across Malaysia by state, area, budget and type.">
+<title>找房 | PropNet 柔佛房源</title>
+<meta name="description" content="按区域、预算、房型搜索柔佛在售与在租房源；每套房源标明货源中介。Find property listings across Johor by area, budget and type.">
 <link rel="canonical" href="https://kwongthye.com/properties/">
-<meta property="og:title" content="找房 | PropNet 全马房源">
-<meta property="og:description" content="按州属、区域、预算、房型搜索全马房源。">
+<meta property="og:title" content="找房 | PropNet 柔佛房源">
+<meta property="og:description" content="按区域、预算、房型搜索柔佛房源。">
 <meta property="og:url" content="https://kwongthye.com/properties/">
 <link rel="icon" type="image/png" href="/icon-256.png">
 <link rel="stylesheet" href="/site.css">
@@ -48,10 +48,6 @@
         <div class="f">
           <label for="fQ" data-i18n="list.keyword">关键词</label>
           <input id="fQ" type="search" data-i18n-ph="ph.keyword" placeholder="Sutera / 公寓 / 12-03">
-        </div>
-        <div class="f">
-          <label for="fState" data-i18n="search.state">州属</label>
-          <select id="fState"></select>
         </div>
         <div class="f">
           <label for="fArea" data-i18n="search.area">区域</label>
@@ -156,7 +152,7 @@ window.PAGE_I18N = {
   function parseQuery() {
     var u = new URLSearchParams(location.search);
     var q = {};
-    ["q", "state", "area", "type", "intent", "min", "max", "beds", "agent", "page"].forEach(function (k) {
+    ["q", "area", "type", "intent", "min", "max", "beds", "agent", "page"].forEach(function (k) {
       if (u.get(k)) q[k] = u.get(k);
     });
     if (!q.intent) q.intent = "sale";
@@ -170,12 +166,7 @@ window.PAGE_I18N = {
   }
 
   function fillSelects() {
-    var se = document.getElementById("fState");
     var t = document.getElementById("fType");
-    var states = (state.cfg && state.cfg.states) || [];
-    se.innerHTML = '<option value="">' + KT.t("list.anyState") + "</option>" + states.map(function (x) {
-      return '<option value="' + x.key + '">' + KT.esc(KT.lang === "en" ? x.en : x.zh) + "</option>";
-    }).join("");
     fillAreaSelect();
     var types = (state.cfg && state.cfg.taxonomy && state.cfg.taxonomy.property_types) || [];
     t.innerHTML = '<option value="">' + KT.t("list.anyType") + "</option>" + types.map(function (x) {
@@ -184,10 +175,8 @@ window.PAGE_I18N = {
   }
 
   function fillAreaSelect() {
-    var se = document.getElementById("fState");
     var a = document.getElementById("fArea");
-    var chosen = se ? se.value : "";
-    var areas = ((state.cfg && state.cfg.areas) || []).filter(function (x) { return !chosen || x.state === chosen; });
+    var areas = (state.cfg && state.cfg.areas) || [];
     a.innerHTML = '<option value="">' + KT.t("list.anyArea") + "</option>" + areas.map(function (x) {
       var name = x.key === "other" ? (KT.lang === "en" ? "Other area" : "其他区域") : (KT.lang === "en" ? x.en : x.zh);
       return '<option value="' + x.key + '">' + KT.esc(name) + "</option>";
@@ -196,7 +185,6 @@ window.PAGE_I18N = {
 
   function syncForm() {
     document.getElementById("fQ").value = state.q.q || "";
-    document.getElementById("fState").value = state.q.state || "";
     fillAreaSelect();
     document.getElementById("fArea").value = state.q.area || "";
     document.getElementById("fType").value = state.q.type || "";
@@ -238,7 +226,7 @@ window.PAGE_I18N = {
     state.page = Number(state.q.page) || 1;
     syncForm();
     var u = new URLSearchParams();
-    ["q", "state", "area", "type", "intent", "min", "max", "beds", "agent"].forEach(function (k) {
+    ["q", "area", "type", "intent", "min", "max", "beds", "agent"].forEach(function (k) {
       if (state.q[k]) u.set(k, state.q[k]);
     });
     u.set("page", state.page);
@@ -325,7 +313,6 @@ window.PAGE_I18N = {
     state.q = {
       intent: onBtn ? onBtn.getAttribute("data-intent") : "sale",
       q: document.getElementById("fQ").value.trim(),
-      state: document.getElementById("fState").value,
       area: document.getElementById("fArea").value,
       type: document.getElementById("fType").value,
       min: document.getElementById("fMin").value,
@@ -334,7 +321,6 @@ window.PAGE_I18N = {
     pushQuery(state.q);
     load();
   });
-  document.getElementById("fState").addEventListener("change", fillAreaSelect);
   document.getElementById("intentSeg").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-intent]");
     if (!b) return;

@@ -61,15 +61,19 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
         GROUP BY state`);
       const sOf = {};
       stateRows.rows.forEach(function (x) { sOf[x.state] = x.n; });
-      const states = tax.STATES.map(function (s) {
+      // 公开范围：默认只开柔佛（全国数据保留，后期 PUBLIC_SCOPE=all 即可放开）
+      const scope = process.env.PUBLIC_SCOPE || "johor";
+      const inScope = function (st) { return scope === "all" || st === scope; };
+      const states = tax.STATES.filter(function (s) { return inScope(s.key); }).map(function (s) {
         return { key: s.key, zh: s.zh, en: s.en, n: sOf[s.key] || 0 };
       });
-      const areas = tax.AREAS.map(function (a) {
+      const areas = tax.AREAS.filter(function (a) { return inScope(a.state); }).map(function (a) {
         return { key: a.key, zh: a.zh, en: a.en, state: a.state, n: nOf[a.key] || 0 };
       });
       res.json({
         ok: true,
         platformFree: !!freeMode,
+        scope: (process.env.PUBLIC_SCOPE || "johor"),
         plans: plans || null,
         counts: counts.rows[0],
         states: states,

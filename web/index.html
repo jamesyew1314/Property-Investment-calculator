@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PropNet 全马房源平台 | KWONG THYE 光泰</title>
-<meta name="description" content="PropNet by KWONG THYE — 全马房源与中介网络。按州属、区域、预算、房型找房；每一套房源标明货源中介；中介可发布房源、管理客户，并免费使用投资计算器。">
+<title>PropNet 柔佛房源平台 | KWONG THYE 光泰</title>
+<meta name="description" content="PropNet by KWONG THYE — 柔佛房源与中介网络。按区域、预算、房型找房；每一套房源标明货源中介；中介可发布房源、管理客户，并免费使用投资计算器。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PropNet by KWONG THYE">
-<meta property="og:title" content="PropNet 全马房源平台 | KWONG THYE 光泰">
-<meta property="og:description" content="全马房源，一个网络。每一套房源标明货源中介；中介发布一次，全团队帮你找买家。">
+<meta property="og:title" content="PropNet 柔佛房源平台 | KWONG THYE 光泰">
+<meta property="og:description" content="柔佛房源，一个网络。每一套房源标明货源中介；中介发布一次，全团队帮你找买家。">
 <meta property="og:url" content="https://kwongthye.com/">
 <meta property="og:image" content="https://kwongthye.com/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -16,8 +16,8 @@
 <meta property="og:locale" content="zh_MY">
 <meta property="og:locale:alternate" content="en_MY">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PropNet 全马房源平台 | KWONG THYE 光泰">
-<meta name="twitter:description" content="全马房源，一个网络。每一套房源标明货源中介。">
+<meta name="twitter:title" content="PropNet 柔佛房源平台 | KWONG THYE 光泰">
+<meta name="twitter:description" content="柔佛房源，一个网络。每一套房源标明货源中介。">
 <meta name="twitter:image" content="https://kwongthye.com/og-image.png">
 <link rel="icon" type="image/png" href="/icon-256.png">
 <link rel="apple-touch-icon" href="/icon-256.png">
@@ -44,7 +44,7 @@
         "postalCode": "81300",
         "addressCountry": "MY"
       },
-      "areaServed": ["Malaysia", "Kuala Lumpur", "Selangor", "Johor", "Penang"],
+      "areaServed": "Johor, Malaysia",
       "parentOrganization": { "@type": "Organization", "name": "THE ROOF REALTY SDN BHD" }
     },
     {
@@ -86,8 +86,8 @@
   <section class="hero">
     <div class="wrap">
       <div class="eyebrow" data-i18n="hero.kicker">PROPNET · BY KWONG THYE 光泰</div>
-      <h1 data-i18n="hero.title">全马房源，<br>一个网络</h1>
-      <p class="lead" data-i18n="hero.lead">从新山到吉隆坡、槟城、沙巴——买家在这里找到房，中介在这里找到货。每一套房源都标明货源中介，每一次带看都留记录。</p>
+      <h1 data-i18n="hero.title">柔佛房源，<br>一个网络</h1>
+      <p class="lead" data-i18n="hero.lead">从新山到麻坡、峇株巴辖、居銮、笨珍——买家在这里找到房，中介在这里找到货。每一套房源都标明货源中介，每一次带看都留记录。</p>
 
       <form class="searchbar" id="searchForm" role="search">
         <div class="f">
@@ -96,10 +96,6 @@
             <button type="button" class="on" data-intent="sale" data-i18n="search.sale">买</button>
             <button type="button" data-intent="rent" data-i18n="search.rent">租</button>
           </div>
-        </div>
-        <div class="f">
-          <label for="fState" data-i18n="search.state">州属</label>
-          <select id="fState"><option value="">全部州属</option></select>
         </div>
         <div class="f">
           <label for="fArea" data-i18n="search.area">区域</label>
@@ -119,7 +115,7 @@
       <div class="hero-stats">
         <div><b>2021</b><span data-i18n="stat.since">光泰成立</span></div>
         <div><b>80+</b><span data-i18n="stat.team">团队中介</span></div>
-        <div><b>16</b><span data-i18n="stat.areas">覆盖州属</span></div>
+        <div><b>29</b><span data-i18n="stat.areas">覆盖区域</span></div>
         <div><b id="statLive">—</b><span data-i18n="stat.live">平台房源</span></div>
       </div>
     </div>
@@ -143,8 +139,8 @@
   <section class="sec alt">
     <div class="wrap">
       <div class="sec-head">
-        <div class="eyebrow" data-i18n="areas.kicker">按州属找房</div>
-        <h2 data-i18n="areas.title">全马 16 个州属</h2>
+        <div class="eyebrow" data-i18n="areas.kicker">按区域找房</div>
+        <h2 data-i18n="areas.title">柔佛 29 个区域</h2>
         <p data-i18n="areas.sub">先选你熟悉的区域，再看有哪些房源与货源中介。</p>
       </div>
       <div class="grid-4" id="areaGrid"></div>
@@ -218,7 +214,7 @@
       <div>
         <div class="eyebrow" data-i18n="about.kicker">关于我们</div>
         <h2 data-i18n="about.title">光泰 · 从新山出发</h2>
-        <p data-i18n="about.p1">KWONG THYE 光泰立足柔佛新山，业务覆盖房地产投资、买卖顾问与房地产科技。PropNet 是我们为全马中介同行做的房源与客源网络。</p>
+        <p data-i18n="about.p1">KWONG THYE 光泰立足柔佛新山，业务覆盖房地产投资、买卖顾问与房地产科技。PropNet 是我们为柔佛中介同行做的房源与客源网络。</p>
         <p data-i18n="about.p2">我们相信：房源应该被看见，客户应该被认真对待，合作应该有记录。</p>
         <a class="btn line" href="/about/" data-i18n="about.cta">了解公司 →</a>
       </div>
@@ -234,7 +230,7 @@
   <section class="band" style="background:linear-gradient(150deg,#12314B,#0E2438 60%,#0A1927)">
     <div class="wrap inner">
       <div class="paid-only">
-        <div class="eyebrow" style="color:var(--gold2)" data-i18n="join.kicker">全马首批招募</div>
+        <div class="eyebrow" style="color:var(--gold2)" data-i18n="join.kicker">柔佛首批招募</div>
         <h2 data-i18n="join.title">首批中介，早鸟价锁定 12 个月</h2>
         <p data-i18n="join.sub">个人站 + 房源池 + 客户池 + 合作成交，RM 59/月（原价 RM 89）。</p>
       </div>
@@ -256,7 +252,7 @@
     <div class="cols">
       <div>
         <b>KWONG THYE · PROPNET</b>
-        <p data-i18n="foot.tag">全马房源与中介网络。房源被看见，合作有记录。</p>
+        <p data-i18n="foot.tag">柔佛房源与中介网络。房源被看见，合作有记录。</p>
       </div>
       <div>
         <b data-i18n="foot.platform">平台</b>
@@ -291,9 +287,9 @@ window.PAGE_I18N = {
   "nav.calc": ["计算器", "Calculator"],
   "nav.login": ["中介登录", "Agent login"],
   "hero.kicker": ["PROPNET · BY KWONG THYE 光泰", "PROPNET · BY KWONG THYE"],
-  "hero.title": ["全马房源，<br>一个网络", "Malaysia listings,<br>one network"],
-  "hero.lead": ["从新山到吉隆坡、槟城、沙巴——买家在这里找到房，中介在这里找到货。每一套房源都标明货源中介，每一次带看都留记录。",
-    "From Johor Bahru to Kuala Lumpur, Penang and Sabah — buyers find homes, agents find stock. Every listing names the agent behind it."],
+  "hero.title": ["柔佛房源，<br>一个网络", "Johor listings,<br>one network"],
+  "hero.lead": ["从新山到麻坡、峇株巴辖、居銮、笨珍——买家在这里找到房，中介在这里找到货。每一套房源都标明货源中介，每一次带看都留记录。",
+    "Across Johor — from JB to Muar, Batu Pahat, Kluang and Pontian — buyers find homes, agents find stock. Every listing names the agent behind it."],
   "search.intent": ["买 / 租", "Buy / Rent"],
   "search.sale": ["买", "Buy"],
   "search.rent": ["租", "Rent"],
@@ -308,15 +304,15 @@ window.PAGE_I18N = {
   "search.go": ["搜索房源", "Search"],
   "stat.since": ["光泰成立", "Established"],
   "stat.team": ["团队中介", "Agents"],
-  "stat.areas": ["覆盖州属", "States"],
+  "stat.areas": ["覆盖区域", "Areas"],
   "stat.live": ["平台房源", "Listings live"],
   "feat.kicker": ["最新房源", "Latest listings"],
   "feat.title": ["刚刚上架", "Just listed"],
   "feat.sub": ["按区域、预算、房型筛选；点进去看货源中介和完整资料。", "Filter by area, budget and type. Open a listing to see the agent behind it."],
   "feat.all": ["全部房源 →", "All listings →"],
-  "areas.kicker": ["按州属找房", "Browse by state"],
-  "areas.title": ["全马 16 个州属", "16 states across Malaysia"],
-  "areas.sub": ["吉隆坡、雪兰莪、柔佛、槟城……先选州属，再看城市与货源中介。", "Kuala Lumpur, Selangor, Johor, Penang and more — pick a state, then a city."],
+  "areas.kicker": ["按区域找房", "Browse by area"],
+  "areas.title": ["柔佛 29 个区域", "29 areas across Johor"],
+  "areas.sub": ["新山、依斯干达、麻坡、峇株巴辖……先选区域，再看房源与货源中介。", "JB, Iskandar, Muar, Batu Pahat and more — pick an area, then browse."],
   "agents.kicker": ["给中介", "For agents"],
   "agents.title": ["发一次，全团队帮你找买家", "List once. The whole team helps you find a buyer."],
   "agents.sub": ["你的房源、你的客户、你的个人站；货源永远标你的名字。", "Your listings, your clients, your own page — and your name always stays on the listing."],
@@ -339,14 +335,14 @@ window.PAGE_I18N = {
   "dir.all": ["全部中介 →", "All agents →"],
   "about.kicker": ["关于我们", "About us"],
   "about.title": ["光泰 · 从新山出发", "KWONG THYE · from Johor Bahru"],
-  "about.p1": ["KWONG THYE 光泰立足柔佛新山，业务覆盖房地产投资、买卖顾问与房地产科技。PropNet 是我们为全马中介同行做的房源与客源网络。", "Based in Johor Bahru, KWONG THYE covers property investment, agency and proptech. PropNet is the listing and buyer network we built for agents across Malaysia."],
+  "about.p1": ["KWONG THYE 光泰立足柔佛新山，业务覆盖房地产投资、买卖顾问与房地产科技。PropNet 是我们为柔佛中介同行做的房源与客源网络。", "Based in Johor Bahru, KWONG THYE covers property investment, agency and proptech. PropNet is the listing and buyer network we built for agents across Johor."],
   "about.p2": ["我们相信：房源应该被看见，客户应该被认真对待，合作应该有记录。", "Our belief: listings should be seen, clients should be taken seriously, and collaborations should be on record."],
   "about.cta": ["了解公司 →", "About the company →"],
   "about.n1d": ["THE ROOF REALTY SDN BHD · 注册地产代理", "THE ROOF REALTY SDN BHD · registered estate agency"],
   "about.n2d": ["Andy Lau 刘泌光 · 创办人", "Andy Lau · founder"],
   "about.n3d": ["成立年份", "Founded"],
   "about.n4d": ["柔佛新山 · Taman Sutera Utama", "Johor Bahru · Taman Sutera Utama"],
-  "join.kicker": ["首批招募", "Founding members"],
+  "join.kicker": ["柔佛首批招募", "Johor founding members"],
   "join.freeKicker": ["现阶段 · 全部免费", "Now · free for all"],
   "join.freeTitle": ["平台全部功能，免费开放", "Every feature is free for now"],
   "join.freeSub": ["个人站 + 房源池 + 客户池 + 合作成交，现阶段全部免费。", "Your page + listing pool + buyer pool + co-broke records — all free for now."],
@@ -354,7 +350,7 @@ window.PAGE_I18N = {
   "join.sub": ["个人站 + 房源池 + 客户池 + 合作成交，RM 59/月（原价 RM 89）。", "Your page + listing pool + buyer pool + co-broke records. RM59/mo (usual RM89)."],
   "join.cta": ["申请加入", "Apply to join"],
   "join.wa": ["WhatsApp 咨询", "WhatsApp us"],
-  "foot.tag": ["全马房源与中介网络。房源被看见，合作有记录。", "Malaysia listings and agent network. Seen listings, recorded deals."],
+  "foot.tag": ["柔佛房源与中介网络。房源被看见，合作有记录。", "Johor listings and agent network. Seen listings, recorded deals."],
   "foot.platform": ["平台", "Platform"],
   "foot.company": ["公司", "Company"],
   "foot.pricing": ["价格", "Pricing"],
@@ -375,12 +371,7 @@ window.PAGE_I18N = {
   };
 
   function fillSelects() {
-    var se = document.getElementById("fState");
     var t = document.getElementById("fType");
-    var states = (state.cfg && state.cfg.states) || [];
-    se.innerHTML = '<option value="">' + KT.t("search.anyState") + "</option>" + states.map(function (x) {
-      return '<option value="' + x.key + '">' + KT.esc(KT.lang === "en" ? x.en : x.zh) + "</option>";
-    }).join("");
     fillAreaSelect();
     var types = (state.cfg && state.cfg.taxonomy && state.cfg.taxonomy.property_types) || [];
     t.innerHTML = '<option value="">' + KT.t("search.anyType") + "</option>" + types.map(function (x) {
@@ -390,12 +381,8 @@ window.PAGE_I18N = {
   }
 
   function fillAreaSelect() {
-    var se = document.getElementById("fState");
     var a = document.getElementById("fArea");
-    var chosen = se ? se.value : "";
-    var areas = ((state.cfg && state.cfg.areas) || []).filter(function (x) {
-      return !chosen || x.state === chosen;
-    });
+    var areas = (state.cfg && state.cfg.areas) || [];
     a.innerHTML = '<option value="">' + KT.t("search.anyArea") + "</option>" + areas.map(function (x) {
       var name = x.key === "other" ? (KT.lang === "en" ? "Other area" : "其他区域") : (KT.lang === "en" ? x.en : x.zh);
       return '<option value="' + x.key + '">' + KT.esc(name) + "</option>";
@@ -433,11 +420,11 @@ window.PAGE_I18N = {
 
   function renderAreas() {
     var grid = document.getElementById("areaGrid");
-    var states = (state.cfg && state.cfg.states) || [];
-    grid.innerHTML = states.map(function (s) {
-      var name = KT.lang === "en" ? s.en : s.zh;
-      return '<a class="area-card" href="/properties/?state=' + s.key + '"><b>' + KT.esc(name) + "</b>" +
-        '<span>' + (s.n ? s.n + (KT.lang === "en" ? " listings" : " 套在售") : (KT.lang === "en" ? "Coming soon" : "即将开放")) + "</span>" +
+    var areas = ((state.cfg && state.cfg.areas) || []).slice(0, 12);
+    grid.innerHTML = areas.map(function (a) {
+      var name = KT.lang === "en" ? a.en : a.zh;
+      return '<a class="area-card" href="/properties/?area=' + a.key + '"><b>' + KT.esc(name) + "</b>" +
+        '<span>' + (a.n ? a.n + (KT.lang === "en" ? " listings" : " 套在售") : (KT.lang === "en" ? "Coming soon" : "即将开放")) + "</span>" +
         '<em>' + (KT.lang === "en" ? "Browse →" : "查看房源 →") + "</em></a>";
     }).join("");
   }
@@ -475,8 +462,6 @@ window.PAGE_I18N = {
     renderAgents();
   }).catch(function () {});
 
-  document.getElementById("fState").addEventListener("change", fillAreaSelect);
-
   document.getElementById("intentSeg").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-intent]");
     if (!b) return;
@@ -489,11 +474,9 @@ window.PAGE_I18N = {
     e.preventDefault();
     var q = new URLSearchParams();
     q.set("intent", state.intent);
-    var st = document.getElementById("fState").value;
     var area = document.getElementById("fArea").value;
     var type = document.getElementById("fType").value;
     var budget = document.getElementById("fBudget").value;
-    if (st) q.set("state", st);
     if (area) q.set("area", area);
     if (type) q.set("type", type);
     if (budget) {

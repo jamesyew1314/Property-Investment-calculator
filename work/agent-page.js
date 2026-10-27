@@ -51,7 +51,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
   const areas = (agent.areas || []).map(function (a) { return areaName(a, en); }).filter(Boolean);
   const wa = String(agent.phone || "").replace(/[^0-9]/g, "").replace(/^0/, "60");
   const title = esc(name + (agent.ren_no ? " · " + agent.ren_no : "") + " | PropNet");
-  const desc = esc((agent.bio || (en ? "Property agent on PropNet" : "PropNet 认证房产中介")) + " — " + (areas.slice(0, 4).join("、") || (en ? "Malaysia" : "全马")));
+  const desc = esc((agent.bio || (en ? "Property agent on PropNet" : "PropNet 认证房产中介")) + " — " + (areas.slice(0, 4).join("、") || (en ? "Johor" : "柔佛")));
 
   const ld = {
     "@context": "https://schema.org",
@@ -59,7 +59,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     name: name,
     url: "https://kwongthye.com/a/" + encodeURIComponent(agent.slug || ""),
     telephone: agent.phone || undefined,
-    areaServed: areas.length ? areas : "Malaysia",
+    areaServed: areas.length ? areas : "Johor, Malaysia",
     worksFor: agent.team ? { "@type": "Organization", name: agent.team } : undefined
   };
 

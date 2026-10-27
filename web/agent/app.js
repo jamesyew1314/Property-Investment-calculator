@@ -429,7 +429,7 @@
     ctx.fillStyle = "#E2C88F"; ctx.font = "600 26px Georgia, serif";
     ctx.fillText("KWONG THYE  ·  PROPNET", 86, 132);
     ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "20px -apple-system, system-ui";
-    ctx.fillText(t("全马房源网络", "Malaysia listings network"), 86, 168);
+    ctx.fillText(t("柔佛房源网络", "Johor listings network"), 86, 168);
     ctx.strokeStyle = "rgba(198,161,91,.35)"; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(86, 200); ctx.lineTo(W - 86, 200); ctx.stroke();
 
@@ -491,7 +491,7 @@
 
   // ---------- 中心池 ----------
   function pool(q) {
-    setTitle(t("中心池", "Pool"), t("全马同行发布的货源；联系对方带客看房", "Listings from agents across Malaysia"));
+    setTitle(t("中心池", "Pool"), t("柔佛同行发布的货源；联系对方带客看房", "Listings from agents across Johor"));
     var qs = new URLSearchParams();
     ["q", "state", "area", "type", "intent"].forEach(function (k) { if (q[k]) qs.set(k, q[k]); });
     return api("/pool?" + qs.toString()).then(function (d) {
