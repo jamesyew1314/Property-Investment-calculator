@@ -18,28 +18,33 @@
     if (!v) return key;
     return lang === "en" ? v[1] : v[0];
   }
+  function pick(v) {
+    if (lang === "bm") return (window.BM_MAP || {})[v[1]] || v[1];
+    return lang === "en" ? v[1] : v[0];
+  }
+  function langLabel() { return lang === "zh" ? "EN" : (lang === "en" ? "BM" : "中文"); }
   function apply() {
     $$("[data-i18n]").forEach(function (el) {
       var v = dict[el.getAttribute("data-i18n")];
       if (!v) return;
       var attr = el.getAttribute("data-i18n-attr");
-      if (attr) el.setAttribute(attr, lang === "en" ? v[1] : v[0]);
-      else el.innerHTML = lang === "en" ? v[1] : v[0];
+      if (attr) el.setAttribute(attr, pick(v));
+      else el.innerHTML = pick(v);
     });
     $$("[data-i18n-ph]").forEach(function (el) {
       var v = dict[el.getAttribute("data-i18n-ph")];
-      if (v) el.placeholder = lang === "en" ? v[1] : v[0];
+      if (v) el.placeholder = pick(v);
     });
-    document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
-    $$(".lang-toggle").forEach(function (b) { b.textContent = lang === "en" ? "中文" : "EN"; });
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : (lang === "bm" ? "ms" : "en");
+    $$(".lang-toggle").forEach(function (b) { b.textContent = langLabel(); });
     document.dispatchEvent(new CustomEvent("kt:lang", { detail: lang }));
   }
   function setLang(next) {
-    lang = next === "en" ? "en" : "zh";
+    lang = ["zh", "en", "bm"].indexOf(next) >= 0 ? next : "zh";
     localStorage.setItem(LANG_KEY, lang);
     apply();
   }
-  function toggle() { setLang(lang === "en" ? "zh" : "en"); }
+  function toggle() { setLang(lang === "zh" ? "en" : (lang === "en" ? "bm" : "zh")); }
 
   function money(n, opts) {
     opts = opts || {};

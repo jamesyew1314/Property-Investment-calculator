@@ -133,10 +133,10 @@
       </div>
       <div class="poolGate">
         <div>
-          <div class="eyebrow" style="color:var(--gold)">房源池 · 仅限中介</div>
-          <h3>中心池只对认证中介开放</h3>
-          <p>登录后查看全柔佛同行房源、发布自己的盘、申请带看。买家不进平台，货源与客源只在同行之间流转。</p>
-          <div class="row"><a class="btn gold" href="/agent/">登录工作台</a><a class="btn line" href="/join/">免费加入</a></div>
+          <div class="eyebrow" style="color:var(--gold)" data-i18n="gate.kicker">房源池 · 仅限中介</div>
+          <h3 data-i18n="gate.title">中心池只对认证中介开放</h3>
+          <p data-i18n="gate.sub">登录后查看全柔佛同行房源、发布自己的盘、申请带看。买家不进平台，货源与客源只在同行之间流转。</p>
+          <div class="row"><a class="btn gold" href="/agent/" data-i18n="gate.login">登录工作台</a><a class="btn line" href="/join/" data-i18n="gate.join">免费加入</a></div>
         </div>
       </div>
     </div>
@@ -299,6 +299,11 @@ window.PAGE_I18N = {
   "search.intent": ["买 / 租", "Buy / Rent"],
   "search.sale": ["买", "Buy"],
   "search.rent": ["租", "Rent"],
+  "gate.kicker": ["房源池 · 仅限中介", "Listing pool · agents only"],
+  "gate.title": ["中心池只对认证中介开放", "The pool is open to verified agents only"],
+  "gate.sub": ["登录后查看全柔佛同行房源、发布自己的盘、申请带看。买家不进平台，货源与客源只在同行之间流转。", "Sign in to see peers' listings across Johor, publish your own stock and request viewings. Buyers stay off the platform."],
+  "gate.login": ["登录工作台", "Sign in"],
+  "gate.join": ["免费加入", "Join free"],
   "search.state": ["州属", "State"],
   "search.anyState": ["全部州属", "All states"],
   "search.area": ["区域", "Area"],
@@ -364,6 +369,7 @@ window.PAGE_I18N = {
   "foot.terms": ["使用条款", "Terms"]
 };
 </script>
+<script src="/bm-public.js"></script>
 <script src="/site.js"></script>
 <script>
 (function () {
