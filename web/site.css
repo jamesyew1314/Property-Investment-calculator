@@ -159,7 +159,7 @@ p{margin:0 0 12px}
 .msg.err{color:#B23B3B}
 
 /* ---------- 价格表 ---------- */
-.tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:stretch}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;align-items:stretch}
 .tier{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column}
 .tier.hot{border:2px solid var(--gold);position:relative;box-shadow:0 18px 40px rgba(198,161,91,.16)}
 .tier.hot:before{content:attr(data-tag);position:absolute;top:-11px;left:20px;background:var(--gold);color:#1B2430;
@@ -238,3 +238,17 @@ p{margin:0 0 12px}
   .feat-grid .pcard:nth-child(n+4){display:none}
   .detailGrid{grid-template-columns:1fr 1fr!important}
 }
+
+/* ---------- 免费开放期 ---------- */
+.free-only{display:none!important}
+body.is-free .paid-only{display:none!important}
+body.is-free .free-only{display:block!important}
+body.is-free .free-only.inline{display:inline!important}
+.free-banner{display:none;background:linear-gradient(135deg,#12314B,#0E2438);color:#fff;border-radius:14px;
+  padding:16px 20px;margin-bottom:22px;align-items:center;gap:14px;flex-wrap:wrap}
+body.is-free .free-banner{display:flex}
+.free-banner b{color:var(--gold2);font-family:var(--serif);font-size:18px}
+.free-banner span{color:rgba(255,255,255,.75);font-size:13px}
+.strike{text-decoration:line-through;color:#9AA4AF;font-size:14px;font-family:inherit}
+
+body.is-free .pool-tier{display:none!important}

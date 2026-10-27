@@ -233,10 +233,15 @@
 
   <section class="band" style="background:linear-gradient(150deg,#12314B,#0E2438 60%,#0A1927)">
     <div class="wrap inner">
-      <div>
+      <div class="paid-only">
         <div class="eyebrow" style="color:var(--gold2)" data-i18n="join.kicker">全马首批招募</div>
         <h2 data-i18n="join.title">首批中介，早鸟价锁定 12 个月</h2>
         <p data-i18n="join.sub">个人站 + 房源池 + 客户池 + 合作成交，RM 59/月（原价 RM 89）。</p>
+      </div>
+      <div class="free-only">
+        <div class="eyebrow" style="color:var(--gold2)" data-i18n="join.freeKicker">现阶段 · 全部免费</div>
+        <h2 data-i18n="join.freeTitle">平台全部功能，免费开放</h2>
+        <p data-i18n="join.freeSub">个人站 + 房源池 + 客户池 + 合作成交，现阶段全部免费；开始收费前会提前通知。</p>
       </div>
       <div class="cta-row">
         <a class="btn gold" href="/join/" data-i18n="join.cta">申请加入</a>
@@ -451,6 +456,7 @@ window.PAGE_I18N = {
 
   KT.fetchJSON("/api/public/config").then(function (cfg) {
     state.cfg = cfg;
+    KT.setFree(!!cfg.platformFree);
     KT.setTax(Object.assign({ areas: cfg.areas }, cfg.taxonomy || {}));
     if (cfg.counts && cfg.counts.listings > 0) document.getElementById("statLive").textContent = cfg.counts.listings;
     renderAll();

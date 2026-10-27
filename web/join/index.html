@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>给中介：加入 PropNet | KWONG THYE 光泰</title>
-<meta name="description" content="PropNet 中介网络：个人站、房源池、客户池、合作成交留痕。前 80 位中介早鸟价 RM59/月锁定 12 个月。加入全马房源网络。">
+<meta name="description" content="PropNet 中介网络：个人站、房源池、客户池、合作成交留痕。现阶段全部免费开放，加入全马房源网络。">
 <link rel="canonical" href="https://kwongthye.com/join/">
 <meta property="og:title" content="给中介：加入 PropNet">
-<meta property="og:description" content="个人站 + 房源池 + 客户池 + 合作成交。前 80 位早鸟价 RM59/月。">
+<meta property="og:description" content="个人站 + 房源池 + 客户池 + 合作成交。现阶段全部免费。">
 <meta property="og:url" content="https://kwongthye.com/join/">
 <link rel="icon" type="image/png" href="/icon-256.png">
 <link rel="stylesheet" href="/site.css">
@@ -33,12 +33,16 @@
 <main>
   <section class="hero" style="padding:56px 0 64px">
     <div class="wrap">
-      <div class="eyebrow" data-i18n="join.kicker">给中介 · 首批 80 位</div>
+      <div class="eyebrow" data-i18n="join.kicker">给中介 · 全马首批</div>
       <h1 data-i18n="join.title" style="max-width:22ch">把你的房源，放进一个网络</h1>
       <p class="lead" data-i18n="join.lead">发一次，同行搜得到、带得了客；房源永远标你的名字。个人站、客户池、合作成交记录，一套搞定。</p>
+      <div class="free-banner" style="margin-top:22px;margin-bottom:0">
+        <b data-i18n="free.banner">🎁 免费开放期</b>
+        <span data-i18n="free.joinSub">现阶段加入，全部功能免费；开始收费前至少提前 30 天通知。</span>
+      </div>
       <div class="row" style="margin-top:24px">
-        <a class="btn gold" href="#apply" data-i18n="join.cta">申请加入</a>
-        <a class="btn ghost" href="/pricing/" data-i18n="join.price">看价格</a>
+        <a class="btn gold" href="#apply" data-i18n="join.cta">免费申请加入</a>
+        <a class="btn ghost" href="/pricing/" data-i18n="join.price">看未来价格</a>
       </div>
     </div>
   </section>
@@ -68,9 +72,10 @@
             <li data-i18n="apply.g4">合作带看与成交记录</li>
           </ul>
         </div>
-        <div class="vcard" style="margin-top:14px">
+        <div class="vcard" id="pricing" style="margin-top:14px">
           <h3 data-i18n="apply.price">价格</h3>
-          <p data-i18n="apply.priceD">早鸟 RM 59/月（锁 12 个月，原价 RM 89）；团队 5 席 RM 299/月。免费档可看池并发布 5 条。</p>
+          <p class="free-only" data-i18n="apply.freeD">现阶段全部免费：个人站、房源池、客户池、合作成交都不收费。开始收费前会提前 30 天通知。</p>
+          <p class="paid-only" data-i18n="apply.priceD">早鸟 RM 59/月（锁 12 个月，原价 RM 89）；团队 5 席 RM 299/月。</p>
           <a class="btn line sm" href="/pricing/" data-i18n="apply.priceCta">查看完整价格 →</a>
         </div>
       </div>
@@ -117,12 +122,15 @@
 window.PAGE_I18N = {
   "nav.find": ["找房", "Find a home"], "nav.agents": ["找中介", "Agents"], "nav.join": ["给中介", "For agents"],
   "nav.about": ["关于", "About"], "nav.calc": ["计算器", "Calculator"], "nav.login": ["中介登录", "Agent login"],
-  "join.kicker": ["给中介 · 首批 80 位", "For agents · first 80"],
+  "join.kicker": ["给中介 · 全马首批", "For agents · founding members"],
   "join.title": ["把你的房源，放进一个网络", "Put your listings into a network"],
   "join.lead": ["发一次，同行搜得到、带得了客；房源永远标你的名字。个人站、客户池、合作成交记录，一套搞定。",
     "Publish once. Peers can find it and bring buyers — and the listing always credits you. Your page, buyer pool and co-broke records in one place."],
-  "join.cta": ["申请加入", "Apply to join"],
-  "join.price": ["看价格", "See pricing"],
+  "join.cta": ["免费申请加入", "Apply — free"],
+  "join.price": ["看未来价格", "Future pricing"],
+  "free.banner": ["🎁 免费开放期", "🎁 Free launch period"],
+  "free.joinSub": ["现阶段加入，全部功能免费；开始收费前至少提前 30 天通知。",
+    "Join now — every feature is free. We will give at least 30 days' notice before charging."],
   "j1.t": ["个人站", "Your own page"], "j1.d": ["kwongthye.com/a/你的名字，一个链接就是你的品牌页。", "kwongthye.com/a/your-name — one link that is your brand."],
   "j2.t": ["房源池", "Listing pool"], "j2.d": ["发布一次，全团队帮你找买家；货源标注不可篡改。", "Publish once; the whole team helps find buyers. The credit stays yours."],
   "j3.t": ["合作有据", "On record"], "j3.d": ["带看申请、成交记录、分佣比例，系统留痕。", "Viewing requests, deals and splits — recorded."],
@@ -135,8 +143,9 @@ window.PAGE_I18N = {
   "apply.g3": ["中心房源池 + 客户池", "Central listing pool + buyer pool"],
   "apply.g4": ["合作带看与成交记录", "Co-broke viewings and deal records"],
   "apply.price": ["价格", "Pricing"],
-  "apply.priceD": ["早鸟 RM 59/月（锁 12 个月，原价 RM 89）；团队 5 席 RM 299/月。免费档可看池并发布 5 条。",
-    "Early bird RM59/mo (locked 12 months; usual RM89). Team RM299/mo for 5 seats. Free tier can browse and post up to 5 listings."],
+  "apply.freeD": ["现阶段全部免费：个人站、房源池、客户池、合作成交都不收费。开始收费前会提前 30 天通知。",
+    "Everything is free for now — your page, listing pool, buyer pool and co-broke records. We will give 30 days' notice before charging."],
+  "apply.priceD": ["未来定价：个人版 RM 89/月，团队 5 席 RM 299/月。", "Future pricing: Pro RM89/mo, Team RM299/mo for 5 seats."],
   "apply.priceCta": ["查看完整价格 →", "Full pricing →"],
   "f.name": ["姓名 *", "Name *"], "f.phone": ["电话 / WhatsApp *", "Phone / WhatsApp *"],
   "f.email": ["邮箱", "Email"], "f.ren": ["REN 编号", "REN number"], "f.team": ["团队 / 公司", "Team / company"],
@@ -159,6 +168,7 @@ window.PAGE_I18N = {
 (function () {
   "use strict";
   KT.init(window.PAGE_I18N);
+  KT.fetchJSON("/api/public/config").then(function (cfg) { KT.setFree(!!cfg.platformFree); }).catch(function () {});
   var form = document.getElementById("leadForm");
   form.addEventListener("submit", function (e) {
     e.preventDefault();

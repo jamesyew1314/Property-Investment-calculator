@@ -121,6 +121,10 @@
     });
   }
 
+  function setFree(on) {
+    document.body.classList.toggle("is-free", !!on);
+  }
+
   function init(d) {
     dict = d || {};
     apply();
@@ -138,6 +142,6 @@
     money: money, int: int, date: date, esc: esc, label: label,
     state: stateName, area: areaName, areaShort: areaShort,
     setTax: function (x) { tax = Object.assign({}, tax, x || {}); },
-    listingCard: listingCard, skeletonCards: skeletonCards, fetchJSON: fetchJSON
+    listingCard: listingCard, skeletonCards: skeletonCards, fetchJSON: fetchJSON, setFree: setFree
   };
 })();

@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>价格 | PropNet 平台与免费计算器</title>
-<meta name="description" content="PropNet 价格：投资计算器永久免费；平台免费档可看池并发布 5 条；个人版 RM89/月（早鸟 RM59 锁 12 个月）；团队 5 席 RM299/月。">
+<meta name="description" content="PropNet 现阶段全部免费开放：房源池、个人站、客户池、合作成交全部免费使用。未来定价：个人版 RM89/月、团队 RM299/月。">
 <link rel="canonical" href="https://kwongthye.com/pricing/">
 <meta property="og:title" content="价格 | PropNet">
-<meta property="og:description" content="计算器免费；个人版 RM89/月，早鸟 RM59 锁 12 个月；团队 5 席 RM299/月。">
+<meta property="og:description" content="现阶段全部免费开放；未来定价个人版 RM89/月、团队 RM299/月。">
 <meta property="og:url" content="https://kwongthye.com/pricing/">
 <link rel="icon" type="image/png" href="/icon-256.png">
 <link rel="stylesheet" href="/site.css">
@@ -34,11 +34,15 @@
   <section class="sec" style="padding-bottom:26px">
     <div class="wrap">
       <div class="eyebrow" data-i18n="pr.kicker">价格</div>
-      <h1 style="font-size:clamp(28px,3.6vw,42px)" data-i18n="pr.title">计算器永久免费，平台按席位收费</h1>
-      <p class="lead" data-i18n="pr.sub">先用免费计算器，再把房源放进网络。随时可取消，数据可以导出带走。</p>
-      <div style="display:inline-flex;align-items:center;gap:10px;background:#FFF8E8;border:1px solid #EBD9AE;border-radius:999px;padding:8px 16px;font-size:13px;margin-top:8px">
+      <h1 style="font-size:clamp(28px,3.6vw,42px)" data-i18n="pr.freeTitle">现阶段，全部免费开放</h1>
+      <p class="lead" data-i18n="pr.freeSub">房源池、个人站、客户池、合作成交——所有功能免费用。收费与支付会在之后推出，开始收费前至少提前 30 天通知。</p>
+      <div class="free-banner">
+        <b data-i18n="free.banner">🎁 免费开放期</b>
+        <span data-i18n="free.bannerSub">已录入的房源与客户资料不受影响；开始收费后可自由选择是否继续。</span>
+      </div>
+      <div class="paid-only" style="display:inline-flex;align-items:center;gap:10px;background:#FFF8E8;border:1px solid #EBD9AE;border-radius:999px;padding:8px 16px;font-size:13px;margin-top:8px">
         <b style="color:#8A6A2F" data-i18n="pr.bird">早鸟</b>
-        <span data-i18n="pr.birdText">前 80 位中介 RM 59/月，锁定 12 个月（原价 RM 89）</span>
+        <span data-i18n="pr.birdText">首批中介 RM 59/月，锁定 12 个月（原价 RM 89）</span>
       </div>
     </div>
   </section>
@@ -55,12 +59,12 @@
             <li data-i18n="t1.f2">买入成本 / 月供 / 逐年现金流</li>
             <li data-i18n="t1.f3">RPGT 三种身份</li>
             <li data-i18n="t1.f4">PDF 报告 / 方案对比</li>
-            <li class="no" data-i18n="t1.f5">云保存仅 3 个方案</li>
+            <li data-i18n="t1.f5">云端保存方案</li>
           </ul>
           <a class="btn line" href="https://calc.kwongthye.com/" data-i18n="t1.cta">打开计算器</a>
         </div>
 
-        <div class="tier">
+        <div class="tier pool-tier">
           <h3 data-i18n="t2.n">Pool 免费</h3>
           <div class="tagline" data-i18n="t2.t">观望、兼职中介</div>
           <div class="price">RM 0</div>
@@ -77,8 +81,10 @@
         <div class="tier hot" data-tag="最受欢迎">
           <h3 data-i18n="t3.n">个人 Pro</h3>
           <div class="tagline" data-i18n="t3.t">全职中介的主力方案</div>
-          <div class="price">RM 89 <small>/ <span data-i18n="pr.mo">月</span></small></div>
-          <div class="muted" style="font-size:12px" data-i18n="t3.year">年付 RM 890（省 2 个月）</div>
+          <div class="price paid-only">RM 89 <small>/ <span data-i18n="pr.mo">月</span></small></div>
+          <div class="price free-only" data-i18n="free.price">免费</div>
+          <div class="muted paid-only" style="font-size:12px" data-i18n="t3.year">年付 RM 890（省 2 个月）</div>
+          <div class="muted free-only" style="font-size:12px" data-i18n="free.now">现在加入，全功能免费</div>
           <ul>
             <li data-i18n="t3.f1">房源 / 客户不限量</li>
             <li data-i18n="t3.f2">个人站 kwongthye.com/a/你</li>
@@ -86,14 +92,16 @@
             <li data-i18n="t3.f4">完整计算器 + PDF</li>
             <li data-i18n="t3.f5">导出 200 条 / 月</li>
           </ul>
-          <a class="btn gold" href="/join/" data-i18n="t3.cta">申请开通</a>
+          <a class="btn gold" href="/join/"><span class="paid-only" data-i18n="t3.cta">申请开通</span><span class="free-only inline" data-i18n="free.cta">免费加入</span></a>
         </div>
 
         <div class="tier">
           <h3 data-i18n="t4.n">团队 Agency</h3>
           <div class="tagline" data-i18n="t4.t">小团队 / 公司</div>
-          <div class="price">RM 299 <small>/ <span data-i18n="pr.mo">月</span></small></div>
-          <div class="muted" style="font-size:12px" data-i18n="t4.seat">含 5 席，加席 RM 55</div>
+          <div class="price paid-only">RM 299 <small>/ <span data-i18n="pr.mo">月</span></small></div>
+          <div class="price free-only" data-i18n="free.price">免费</div>
+          <div class="muted paid-only" style="font-size:12px" data-i18n="t4.seat">含 5 席，加席 RM 55</div>
+          <div class="muted free-only" style="font-size:12px" data-i18n="free.now">现在加入，全功能免费</div>
           <ul>
             <li data-i18n="t4.f1">Pro 全部功能</li>
             <li data-i18n="t4.f2">团队看板与分配</li>
@@ -104,7 +112,7 @@
           <a class="btn dark" href="/join/" data-i18n="t4.cta">联系我们</a>
         </div>
       </div>
-      <p class="form-note" style="margin-top:16px" data-i18n="pr.note">价格为马来西亚令吉（RM），未含 SST（如适用）。计算器与平台账号是两个产品，计算器不因平台订阅到期而停用。</p>
+      <p class="form-note" style="margin-top:16px" data-i18n="pr.note">以上为未来定价（马来西亚令吉，未含 SST），现阶段不收费。计算器与平台账号是两个产品，计算器始终免费。</p>
     </div>
   </section>
 
@@ -112,13 +120,13 @@
     <div class="wrap">
       <div class="sec-head"><div class="eyebrow" data-i18n="faq.kicker">常见问题</div><h2 data-i18n="faq.title">关于价格</h2></div>
       <div class="grid-2">
-        <div class="vcard"><h3 data-i18n="faq.q1">计算器要钱吗？</h3><p data-i18n="faq.a1">不要。投资计算器永久免费，含 PDF 报告与方案对比；只有云端保存方案限制 3 个。</p></div>
-        <div class="vcard"><h3 data-i18n="faq.q2">早鸟价到什么时候？</h3><p data-i18n="faq.a2">前 80 位中介，RM 59/月锁定 12 个月；第 13 个月起按当时标准价续费，可随时取消。</p></div>
-        <div class="vcard"><h3 data-i18n="faq.q3">免费档能做什么？</h3><p data-i18n="faq.a3">看中心房源池、发布最多 5 条在售房源、查看中介联系方式。个人库、个人站、导出属于付费功能。</p></div>
+        <div class="vcard"><h3 data-i18n="faq.q1">计算器要钱吗？</h3><p data-i18n="faq.a1">不要。投资计算器永久免费，含 PDF 报告、方案对比与云端保存。</p></div>
+        <div class="vcard"><h3 data-i18n="faq.q2">现在要收费吗？</h3><p data-i18n="faq.a2">不用。现阶段平台全部功能免费；开始收费前至少提前 30 天通知，你可以自由选择是否继续。</p></div>
+        <div class="vcard"><h3 data-i18n="faq.q3">免费期有多久？</h3><p data-i18n="faq.a3">暂未定。开始收费前至少提前 30 天通知；届时你可以自由选择继续或导出数据离开。</p></div>
         <div class="vcard"><h3 data-i18n="faq.q4">数据归谁？</h3><p data-i18n="faq.a4">归你。可随时导出 CSV；取消订阅后账号降级为免费档，数据保留 90 天，可导出后删除。</p></div>
       </div>
       <div class="row" style="margin-top:26px">
-        <a class="btn gold" href="/join/" data-i18n="pr.cta">申请开通</a>
+        <a class="btn gold" href="/join/" data-i18n="pr.cta">免费加入</a>
         <a class="btn line" href="https://wa.me/60165280918" target="_blank" rel="noopener" data-i18n="pr.wa">WhatsApp 咨询</a>
       </div>
     </div>
@@ -128,7 +136,7 @@
 <footer class="site-foot">
   <div class="wrap">
     <div class="cols">
-      <div><b>KWONG THYE · PROPNET</b><p data-i18n="foot.tag">新山房源与中介网络。</p></div>
+      <div><b>KWONG THYE · PROPNET</b><p data-i18n="foot.tag">全马房源与中介网络。</p></div>
       <div><b data-i18n="foot.platform">平台</b><p><a href="/properties/" data-i18n="nav.find">找房</a><br><a href="/agents/" data-i18n="nav.agents">找中介</a><br><a href="/join/" data-i18n="nav.join">给中介</a></p></div>
       <div><b data-i18n="foot.company">公司</b><p><a href="/about/" data-i18n="nav.about">关于</a><br><a href="/privacy/" data-i18n="foot.privacy">隐私政策</a><br><a href="/terms/" data-i18n="foot.terms">使用条款</a></p></div>
     </div>
@@ -141,20 +149,27 @@ window.PAGE_I18N = {
   "nav.find": ["找房", "Find a home"], "nav.agents": ["找中介", "Agents"], "nav.join": ["给中介", "For agents"],
   "nav.about": ["关于", "About"], "nav.calc": ["计算器", "Calculator"], "nav.login": ["中介登录", "Agent login"],
   "pr.kicker": ["价格", "Pricing"],
-  "pr.title": ["计算器永久免费，平台按席位收费", "The calculator is free. The platform is priced per seat."],
-  "pr.sub": ["先用免费计算器，再把房源放进网络。随时可取消，数据可以导出带走。", "Start with the free calculator, then put your listings into the network. Cancel anytime; export your data."],
+  "pr.freeTitle": ["现阶段，全部免费开放", "Free for everyone, for now"],
+  "pr.freeSub": ["房源池、个人站、客户池、合作成交——所有功能免费用。收费与支付会在之后推出，开始收费前至少提前 30 天通知。",
+    "Listing pool, your own page, buyer pool and co-broke records — all free. Billing comes later, and we will give at least 30 days' notice before charging."],
+  "free.banner": ["🎁 免费开放期", "🎁 Free launch period"],
+  "free.bannerSub": ["已录入的房源与客户资料不受影响；开始收费后可自由选择是否继续。",
+    "Your listings and client records stay yours. When billing starts you choose whether to continue."],
+  "free.price": ["免费", "Free"],
+  "free.now": ["现在加入，全功能免费", "Join now — every feature free"],
+  "free.cta": ["免费加入", "Join free"],
   "pr.bird": ["早鸟", "Early bird"],
-  "pr.birdText": ["前 80 位中介 RM 59/月，锁定 12 个月（原价 RM 89）", "First 80 agents: RM59/mo locked for 12 months (usual RM89)"],
+  "pr.birdText": ["首批中介 RM 59/月，锁定 12 个月（原价 RM 89）", "Founding agents: RM59/mo locked for 12 months (usual RM89)"],
   "pr.mo": ["月", "mo"],
-  "pr.note": ["价格为马来西亚令吉（RM），未含 SST（如适用）。计算器与平台账号是两个产品，计算器不因平台订阅到期而停用。",
-    "Prices in Malaysian Ringgit (RM), excluding SST where applicable. The calculator and platform are separate products; the calculator never expires with your platform plan."],
-  "pr.cta": ["申请开通", "Apply to join"], "pr.wa": ["WhatsApp 咨询", "WhatsApp us"],
+  "pr.note": ["以上为未来定价（马来西亚令吉，未含 SST），现阶段不收费。计算器与平台账号是两个产品，计算器始终免费。",
+    "Prices shown are future pricing in Malaysian Ringgit (excluding SST). Nothing is charged now. The calculator is always free."],
+  "pr.cta": ["免费加入", "Join free"], "pr.wa": ["WhatsApp 咨询", "WhatsApp us"],
   "t1.n": ["计算器", "Calculator"], "t1.t": ["所有人，永久免费", "Free forever"],
   "t1.f1": ["3 Part 自动计算", "3-part automatic calculation"],
   "t1.f2": ["买入成本 / 月供 / 逐年现金流", "Purchase cost / instalment / yearly cash flow"],
   "t1.f3": ["RPGT 三种身份", "RPGT for three owner types"],
   "t1.f4": ["PDF 报告 / 方案对比", "PDF report / plan comparison"],
-  "t1.f5": ["云保存仅 3 个方案", "Cloud saves limited to 3 plans"],
+  "t1.f5": ["云端保存方案", "Cloud plan storage"],
   "t1.cta": ["打开计算器", "Open calculator"],
   "t2.n": ["Pool 免费", "Pool Free"], "t2.t": ["观望、兼职中介", "Exploring / part-time"],
   "t2.f1": ["浏览中心房源池", "Browse the central listing pool"],
@@ -181,14 +196,14 @@ window.PAGE_I18N = {
   "t4.cta": ["联系我们", "Contact us"],
   "faq.kicker": ["常见问题", "FAQ"], "faq.title": ["关于价格", "About pricing"],
   "faq.q1": ["计算器要钱吗？", "Does the calculator cost anything?"],
-  "faq.a1": ["不要。投资计算器永久免费，含 PDF 报告与方案对比；只有云端保存方案限制 3 个。", "No. The calculator is free forever, including PDF reports and comparisons; only cloud saves are limited to 3 plans."],
-  "faq.q2": ["早鸟价到什么时候？", "How long does the early-bird price last?"],
-  "faq.a2": ["前 80 位中介，RM 59/月锁定 12 个月；第 13 个月起按当时标准价续费，可随时取消。", "For the first 80 agents, RM59/mo is locked for 12 months. From month 13 the standard price applies. Cancel anytime."],
-  "faq.q3": ["免费档能做什么？", "What can the free tier do?"],
-  "faq.a3": ["看中心房源池、发布最多 5 条在售房源、查看中介联系方式。个人库、个人站、导出属于付费功能。", "Browse the pool, publish up to 5 listings, and see agent contacts. Private database, agent page and exports are paid features."],
+  "faq.a1": ["不要。投资计算器永久免费，含 PDF 报告、方案对比与云端保存。", "No. The calculator is free forever, including PDF reports, comparisons and cloud saves."],
+  "faq.q2": ["现在要收费吗？", "Do I have to pay now?"],
+  "faq.a2": ["不用。现阶段平台全部功能免费；开始收费前至少提前 30 天通知，你可以自由选择是否继续。", "No. Every feature is free for now. We will give at least 30 days' notice before charging, and you decide whether to continue."],
+  "faq.q3": ["免费期有多久？", "How long is it free?"],
+  "faq.a3": ["暂未定。开始收费前至少提前 30 天通知；届时你可以自由选择继续或导出数据离开。", "Not decided yet. We will give at least 30 days' notice before charging; you can then continue or export your data and leave."],
   "faq.q4": ["数据归谁？", "Who owns the data?"],
   "faq.a4": ["归你。可随时导出 CSV；取消订阅后账号降级为免费档，数据保留 90 天，可导出后删除。", "You do. Export to CSV anytime. After cancelling, the account drops to the free tier and data is kept for 90 days for export, then deleted."],
-  "foot.tag": ["新山房源与中介网络。", "Johor Bahru listings and agent network."],
+  "foot.tag": ["全马房源与中介网络。", "Malaysia listings and agent network."],
   "foot.platform": ["平台", "Platform"], "foot.company": ["公司", "Company"],
   "foot.privacy": ["隐私政策", "Privacy"], "foot.terms": ["使用条款", "Terms"]
 };
@@ -196,9 +211,18 @@ window.PAGE_I18N = {
 <script src="/site.js"></script>
 <script>
 KT.init(window.PAGE_I18N);
+KT.fetchJSON("/api/public/config").then(function (cfg) {
+  KT.setFree(!!cfg.platformFree);
+  window.__platformFree = !!cfg.platformFree;
+  syncTag();
+}).catch(function () {});
 function syncTag() {
   var hot = document.querySelector(".tier.hot");
-  if (hot) hot.setAttribute("data-tag", KT.lang === "en" ? "Most popular" : "最受欢迎");
+  if (!hot) return;
+  var free = document.body.classList.contains("is-free");
+  hot.setAttribute("data-tag", free
+    ? (KT.lang === "en" ? "Free now" : "现在免费")
+    : (KT.lang === "en" ? "Most popular" : "最受欢迎"));
 }
 syncTag();
 document.addEventListener("kt:lang", syncTag);
