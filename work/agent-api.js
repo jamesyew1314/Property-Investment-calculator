@@ -409,6 +409,58 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
     } catch (e) { next(e); }
   });
 
+
+  // ---------- WTB 自动匹配 ----------
+  r.get("/matches", requireAgent, async function (req, res, next) {
+    try {
+      const clients = await pool.query(
+        "SELECT * FROM lib_clients WHERE tenant_id=$1 AND status NOT IN ('won','lost') ORDER BY updated_at DESC LIMIT 40",
+        [req.agent.id]);
+      if (!clients.rows.length) return res.json({ ok: true, clients: [], listings: 0 });
+      const listings = await pool.query(`
+        SELECT p.code, p.project_name, p.area_code, p.state, p.property_type, p.intent,
+               p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
+               p.bedrooms, p.bathrooms, p.built_up::float8 AS built_up, p.tenant_id, p.updated_at,
+               pr.name AS project_title, pr.name_zh AS project_title_zh, a.name AS owner_name
+        FROM lib_properties p
+        LEFT JOIN lib_projects pr ON pr.id=p.project_id
+        LEFT JOIN lib_agents a ON a.id=p.tenant_id
+        WHERE p.visibility IN ('pool','public') AND p.status IN ('available','reserved')
+          AND p.tenant_id IS DISTINCT FROM $1
+        ORDER BY p.updated_at DESC LIMIT 800`, [req.agent.id]);
+
+      function score(c, p) {
+        const price = p.intent === "rent" ? p.rent_price : p.asking_price;
+        if (!price) return -1;
+        const want = c.intent === "rent" ? "rent" : (c.intent === "buy" ? "sale" : null);
+        if (want && p.intent !== want) return -1;
+        if (c.budget_max && price > Number(c.budget_max) * 1.05) return -1;
+        if (c.budget_min && price < Number(c.budget_min) * 0.9) return -1;
+        const areas = c.area_codes || [];
+        if (areas.length && areas.indexOf(p.area_code) < 0) return -1;
+        const types = c.property_types || [];
+        if (types.length && types.indexOf(p.property_type) < 0) return -1;
+        if (c.bedrooms_min && Number(p.bedrooms || 0) < Number(c.bedrooms_min)) return -1;
+        let sc = 0;
+        if (c.budget_max) sc += 30 - Math.min(30, Math.abs(Number(c.budget_max) - price) / Number(c.budget_max) * 30);
+        if (areas.length) sc += 40;
+        if (types.length) sc += 10;
+        if (c.bedrooms_min && p.bedrooms) sc += 10;
+        sc += Math.min(10, 10 - (Date.now() - new Date(p.updated_at || 0).getTime()) / 864000000);
+        return sc;
+      }
+
+      const out = clients.rows.map(function (c) {
+        const rows = listings.rows.map(function (p) { return { p: p, s: score(c, p) }; })
+          .filter(function (x) { return x.s >= 0; })
+          .sort(function (a, b) { return b.s - a.s; })
+          .slice(0, 6)
+          .map(function (x) { return Object.assign({ score: Math.round(x.s) }, x.p); });
+        return { client: c, matches: rows };
+      });
+      res.json({ ok: true, clients: out, listings: listings.rows.length });
+    } catch (e) { next(e); }
+  });
   // ---------- 带看询盘 ----------
   r.post("/inquiries", requireAgent, limit(20, 600000), async function (req, res, next) {
     try {

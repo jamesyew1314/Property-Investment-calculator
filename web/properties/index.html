@@ -289,7 +289,7 @@ window.PAGE_I18N = {
         '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">' +
         '<div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#1B4166,#0E2438);color:var(--gold2);display:grid;place-items:center;font-family:var(--serif)">' +
         KT.esc(((a && a.name) || p.agent_raw || "KT").slice(0, 2).toUpperCase()) + "</div>" +
-        "<div><b>" + KT.esc((a && a.name) || p.agent_raw || "KWONG THYE") + "</b>" + (a && a.ren_no ? '<div class="muted" style="font-size:12px">' + KT.esc(a.ren_no) + "</div>" : "") + "</div>" +
+        "<div><b>" + KT.esc((a && a.name) || p.agent_raw || "KWONG THYE") + "</b>" + (p.agent_slug ? ' <a href="/a/' + encodeURIComponent(p.agent_slug) + '" style="color:var(--gold2);font-size:12px">个人主页 →</a>' : "") + (a && a.ren_no ? '<div class="muted" style="font-size:12px">' + KT.esc(a.ren_no) + "</div>" : "") + "</div>" +
         (a && a.phone ? '<div class="row" style="margin-left:auto"><a class="btn dark sm" href="tel:' + KT.esc(a.phone) + '">' + KT.t("detail.call") + "</a>" +
           (wa ? '<a class="btn gold sm" href="' + wa + '" target="_blank" rel="noopener">' + KT.t("detail.wa") + "</a>" : "") + "</div>" : "") +
         "</div></div>" +

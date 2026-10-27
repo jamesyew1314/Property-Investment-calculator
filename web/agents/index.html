@@ -113,7 +113,8 @@ window.PAGE_I18N = {
       return '<div class="agent-card"><div class="avatar">' + KT.esc(initials) + "</div>" +
         "<b>" + KT.esc(a.name) + "</b><small>" + KT.esc(a.ren_no || "KWONG THYE") + "</small>" +
         '<div style="margin-top:6px"><span class="tag">' + a.listings + " " + KT.t("ag.listings") + "</span></div>" +
-        '<a class="btn line sm" style="margin-top:12px" href="/properties/?agent=' + encodeURIComponent(a.name) + '">' + KT.t("ag.view") + "</a></div>";
+        '(a.slug ? '<a class="btn line sm" style="margin-top:12px" href="/a/' + encodeURIComponent(a.slug) + '">' + KT.t("ag.page") + "</a>" : "") +
+        '<a class="btn gold sm" style="margin-top:8px" href="/properties/?agent=' + encodeURIComponent(a.name) + '">' + KT.t("ag.view") + "</a></div>";
     }).join("");
   }
 

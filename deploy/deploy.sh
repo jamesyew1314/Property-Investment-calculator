@@ -25,7 +25,7 @@ rsync -az -e "ssh -i $KEY -o StrictHostKeyChecking=no" \
 echo "▸ 3/5 上传后端"
 $SCP work/api-server.js "$USER_@$HOST:/srv/fangchan/api/server.js"
 for f in mail-layout.js receipt-pdf.js report-pdf.js admin.js send-reminders.js send-monthly.js \
-         library-api.js library-core.js library-taxonomy.js public-api.js agent-api.js agent-core.js; do
+         library-api.js library-core.js library-taxonomy.js public-api.js agent-api.js agent-core.js agent-page.js; do
   [ -f "work/$f" ] && $SCP "work/$f" "$USER_@$HOST:/srv/fangchan/api/$f"
 done
 

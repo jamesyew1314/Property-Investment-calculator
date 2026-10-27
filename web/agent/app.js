@@ -178,6 +178,7 @@
     { key: "listings", zh: "我的房源", en: "My listings", ico: "🏠" },
     { key: "pool", zh: "中心池", en: "Pool", ico: "◈" },
     { key: "clients", zh: "我的客户", en: "Clients", ico: "👤" },
+    { key: "matches", zh: "自动匹配", en: "Matches", ico: "⇄" },
     { key: "inquiries", zh: "带看询盘", en: "Inquiries", ico: "✉", badge: true },
     { key: "profile", zh: "个人资料", en: "Profile", ico: "⚙" }
   ];
@@ -220,7 +221,7 @@
     S.route = p.path;
     renderNav();
     $("#view").innerHTML = '<div class="card">' + t("加载中…", "Loading…") + "</div>";
-    var fn = ({ "": dash, listings: listings, pool: pool, clients: clients, inquiries: inquiries, profile: profile })[p.path];
+    var fn = ({ "": dash, listings: listings, pool: pool, clients: clients, matches: matches, inquiries: inquiries, profile: profile })[p.path];
     if (!fn) { location.hash = "#/"; return; }
     fn(p.q).catch(function (e) { if (e.message !== "auth_required") toast(e.message, true); });
   }
@@ -250,6 +251,7 @@
       h += '<div class="card"><h3>' + t("快速开始", "Quick start") + "</h3><div style='display:flex;gap:8px;flex-wrap:wrap'>" +
         '<a class="btn dark sm" href="#/listings">' + t("管理房源", "Manage listings") + "</a>" +
         '<a class="btn line sm" href="#/pool">' + t("逛中心池", "Browse pool") + "</a>" +
+        '<a class="btn line sm" href="#/matches">' + t("自动匹配", "Matches") + "</a>" +
         '<a class="btn line sm" href="https://calc.kwongthye.com/" target="_blank" rel="noopener">' + t("投资计算器", "Calculator") + "</a></div></div>";
       $("#view").innerHTML = h;
     });
@@ -290,6 +292,7 @@
             "</td><td>" + esc(areaName(r.area_code)) + "</td><td class='num'>" + money(price, r.intent === "rent") + "</td><td>" + pill(r.status) +
             "</td><td>" + visPill(r.visibility) + "</td><td class='num'>" + (r.inquiries || 0) + "</td>" +
             '<td><button class="btn line sm" data-act="edit-listing" data-id="' + r.id + '">' + t("编辑", "Edit") + "</button> " +
+            '<button class="btn line sm" data-act="share" data-id="' + r.id + '">' + t("分享卡", "Share") + "</button> " +
             '<button class="btn ' + (r.visibility === "public" ? "line" : "gold") + ' sm" data-act="toggle-publish" data-id="' + r.id + '" data-pub="' + (r.visibility === "public" ? "0" : "1") + '">' +
             (r.visibility === "public" ? t("取消公开", "Unpublish") : t("公开官网", "Publish")) + "</button></td></tr>";
         }).join("") + "</tbody></table></div>";
@@ -355,6 +358,84 @@
           m.msg(e.data && e.data.fields ? Object.keys(e.data.fields).map(function (k) { return k + ": " + e.data.fields[k]; }).join(", ") : e.message);
         });
     });
+  }
+
+  // ---------- 分享卡（浏览器 canvas 生成 PNG） ----------
+  function shareCard(row) {
+    var m = modal({
+      title: t("分享卡", "Share card"),
+      body: '<p class="muted" style="margin:0 0 10px">' + t("下载后可直接发 WhatsApp / 朋友圈。", "Download and post to WhatsApp.") + "</p>" +
+        '<canvas id="shareCanvas" width="1080" height="1350" style="width:100%;max-width:420px;border-radius:12px;border:1px solid var(--line)"></canvas>',
+      footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button><button class=\"btn gold\" id=\"dl\">" + t("下载 PNG", "Download PNG") + "</button>"
+    });
+    var cv = $("#shareCanvas", m.root), ctx = cv.getContext("2d");
+    var W = 1080, H = 1350;
+    var g = ctx.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, "#0B1F31"); g.addColorStop(.55, "#0E2438"); g.addColorStop(1, "#0A1927");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = "rgba(198,161,91,.55)"; ctx.lineWidth = 3;
+    ctx.strokeRect(44, 44, W - 88, H - 88);
+    ctx.fillStyle = "#E2C88F"; ctx.font = "600 26px Georgia, serif";
+    ctx.fillText("KWONG THYE  ·  PROPNET", 86, 132);
+    ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "20px -apple-system, system-ui";
+    ctx.fillText(t("全马房源网络", "Malaysia listings network"), 86, 168);
+    ctx.strokeStyle = "rgba(198,161,91,.35)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(86, 200); ctx.lineTo(W - 86, 200); ctx.stroke();
+
+    var title = (row.project_title_zh || row.project_title || row.project_name || "—");
+    ctx.fillStyle = "#fff"; ctx.font = "700 66px Georgia, 'Songti SC', serif";
+    var lines = wrapText(ctx, title, W - 172, 2);
+    lines.forEach(function (ln, i) { ctx.fillText(ln, 86, 300 + i * 82); });
+
+    ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.font = "28px -apple-system, system-ui";
+    var sub = [areaName(row.area_code), [row.block, row.unit_no].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
+    ctx.fillText(sub, 86, 300 + lines.length * 82 + 30);
+
+    var price = row.intent === "rent" ? row.rent_price : row.asking_price;
+    ctx.fillStyle = "#E2C88F"; ctx.font = "700 92px Georgia, serif";
+    ctx.fillText(money(price, row.intent === "rent"), 80, 300 + lines.length * 82 + 180);
+
+    ctx.fillStyle = "rgba(255,255,255,.82)"; ctx.font = "30px -apple-system, system-ui";
+    var bits = [];
+    if (row.bedrooms) bits.push(row.bedrooms + " " + t("房", "beds"));
+    if (row.bathrooms) bits.push(row.bathrooms + " " + t("卫", "baths"));
+    if (row.built_up) bits.push(int(row.built_up) + " sqft");
+    ctx.fillText(bits.join("   ·   "), 86, 300 + lines.length * 82 + 250);
+
+    ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.beginPath(); ctx.moveTo(86, H - 300); ctx.lineTo(W - 86, H - 300); ctx.stroke();
+    ctx.fillStyle = "#fff"; ctx.font = "600 36px -apple-system, system-ui";
+    ctx.fillText(S.me.name, 86, H - 220);
+    ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.font = "24px -apple-system, system-ui";
+    ctx.fillText([S.me.ren_no, S.me.team].filter(Boolean).join(" · "), 86, H - 176);
+    ctx.fillStyle = "#E2C88F"; ctx.font = "24px -apple-system, system-ui";
+    ctx.fillText("kwongthye.com/properties/?p=" + row.code, 86, H - 124);
+    ctx.fillStyle = "rgba(255,255,255,.45)"; ctx.font = "20px -apple-system, system-ui";
+    ctx.fillText(t("资料由货源中介提供，以现场与正式文件为准。", "Information provided by the listing agent."), 86, H - 84);
+
+    $("#dl", m.root).addEventListener("click", function () {
+      cv.toBlob(function (blob) {
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "propnet-" + row.code + ".png";
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 3000);
+        toast(t("已下载", "Downloaded"));
+      }, "image/png");
+    });
+  }
+  function wrapText(ctx, text, max, maxLines) {
+    var out = [], line = "";
+    for (var i = 0; i < text.length; i++) {
+      var test = line + text[i];
+      if (ctx.measureText(test).width > max && line) { out.push(line); line = text[i]; if (out.length === maxLines - 1) break; }
+      else line = test;
+    }
+    if (line) out.push(line);
+    if (out.length === maxLines) {
+      var last = out[maxLines - 1];
+      if (text.length > out.join("").length) out[maxLines - 1] = last.slice(0, Math.max(0, last.length - 1)) + "…";
+    }
+    return out;
   }
 
   // ---------- 中心池 ----------
@@ -501,6 +582,45 @@
     });
   }
 
+  // ---------- 自动匹配 ----------
+  function matches() {
+    setTitle(t("自动匹配", "Matches"), t("按客户的预算、区域与房型，从中心池自动找房", "Listings from the pool that fit each client's brief"));
+    $("#topActs").innerHTML = '<button class="btn line sm" data-act="new-client">+ ' + t("新增客户", "New client") + "</button>";
+    return api("/matches").then(function (d) {
+      if (!d.clients.length) {
+        $("#view").innerHTML = '<div class="empty"><b>' + t("还没有客户", "No clients yet") + "</b>" +
+          t("先把买家需求录进来，系统会自动从中心池匹配。", "Add a buyer brief and we will match the pool automatically.") +
+          '<div style="margin-top:12px"><button class="btn gold" data-act="new-client">+ ' + t("新增客户", "New client") + "</button></div></div>";
+        return;
+      }
+      var h = "";
+      d.clients.forEach(function (row) {
+        var c = row.client;
+        h += '<div class="card"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">' +
+          '<b style="font-size:15px;color:var(--navy)">' + esc(c.name) + "</b>" +
+          '<span class="muted">' + esc(c.phone || "") + "</span>" +
+          '<span class="pill blue">' + esc(c.intent === "rent" ? t("租房", "Rent") : t("买房", "Buy")) + "</span>" +
+          (c.budget_min || c.budget_max ? '<span class="muted">' + int(c.budget_min) + " – " + int(c.budget_max) + "</span>" : "") +
+          '<span class="muted">' + esc((c.area_codes || []).map(areaName).join("、") || t("不限区域", "Any area")) + "</span>" +
+          '<span style="margin-left:auto" class="muted">' + row.matches.length + t(" 个匹配", " matches") + "</span></div>";
+        if (!row.matches.length) {
+          h += '<p class="muted" style="margin:10px 0 0">' + t("暂无匹配。可以放宽预算或区域。", "No matches yet. Try widening budget or area.") + "</p>";
+        } else {
+          h += '<div class="table" style="margin-top:10px"><table class="table"><thead><tr><th>' + t("房源", "Listing") + "</th><th>" + t("区域", "Area") +
+            "</th><th class='num'>" + t("价格", "Price") + "</th><th>" + t("货源", "Owner") + "</th><th>" + t("操作", "Action") + "</th></tr></thead><tbody>" +
+            row.matches.map(function (m) {
+              var price = m.intent === "rent" ? m.rent_price : m.asking_price;
+              return "<tr><td><b>" + esc(m.project_title_zh || m.project_title || m.project_name || "—") + "</b> <span class='mono muted'>" + esc(m.code) + "</span></td><td>" +
+                esc(areaName(m.area_code)) + "</td><td class='num'>" + money(price, m.intent === "rent") + "</td><td>" + esc(m.owner_name || "—") +
+                "</td><td><button class='btn gold sm' data-act='inquiry' data-code='" + esc(m.code) + "'>" + t("申请带看", "Request") + "</button></td></tr>";
+            }).join("") + "</tbody></table></div>";
+        }
+        h += "</div>";
+      });
+      $("#view").innerHTML = h;
+    });
+  }
+
   // ---------- 询盘 ----------
   function inquiries(q) {
     setTitle(t("带看询盘", "Inquiries"), t("同行想带客看你的房源", "Peers requesting viewings"));
@@ -589,6 +709,7 @@
         toast(pub ? t("已公开到官网", "Published to site") : t("已收回，仅池内可见", "Unpublished")); route();
       }).catch(function (e) { toast(e.message === "need_price" ? t("先填写价格再公开", "Add a price first") : e.message, true); });
     }
+    if (act === "share") api("/listings/" + id).then(function (j) { shareCard(j.row); });
     if (act === "inquiry") inquiryForm(el.dataset.code);
     if (act === "new-client") clientForm(null);
     if (act === "edit-client") {

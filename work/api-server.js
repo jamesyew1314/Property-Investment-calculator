@@ -9,6 +9,7 @@ const { buildReportPdf } = require("./report-pdf");
 const createLibraryApi = require("./library-api");
 const createPublicApi = require("./public-api");
 const createAgentApi = require("./agent-api");
+const renderAgentPage = require("./agent-page");
 const pathMod = require("node:path");
 const { Pool } = require("pg");
 
@@ -1324,6 +1325,31 @@ app.use("/api/public", createPublicApi({
     await sendMail(to, "PropNet 加入申请 — " + lead.name, text, null, [], null);
   }
 }));
+
+// ---------- 中介个人站 /a/:slug（服务端渲染，SEO） ----------
+app.get("/a", function (req, res) { res.redirect(301, "/agents/"); });
+app.get("/a/:slug", async function (req, res, next) {
+  try {
+    const en = req.query.lang === "en";
+    const slug = String(req.params.slug || "").slice(0, 60);
+    const out = await pool.query(
+      "SELECT * FROM lib_agents WHERE lower(slug)=lower($1) AND status='active' AND public=true", [slug]);
+    const agent = out.rows[0];
+    if (!agent) {
+      return res.status(404).type("html").send('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>404 | PropNet</title><link rel="stylesheet" href="/site.css"></head><body style="padding:60px;font-family:system-ui"><h1>找不到这个中介页</h1><p><a href="/agents/">看全部中介 →</a></p></body></html>');
+    }
+    const rows = await pool.query(`
+      SELECT p.code, p.project_name, p.area_code, p.intent,
+             p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
+             p.block, p.unit_no, p.bedrooms, p.bathrooms, p.built_up::float8 AS built_up,
+             pr.name AS project_title, pr.name_zh AS project_title_zh
+      FROM lib_properties p LEFT JOIN lib_projects pr ON pr.id = p.project_id
+      WHERE p.tenant_id=$1 AND p.visibility='public' AND p.status IN ('available','reserved')
+      ORDER BY p.published_at DESC NULLS LAST, p.updated_at DESC LIMIT 60`, [agent.id]);
+    res.set("Cache-Control", "public, max-age=300");
+    res.type("html").send(renderAgentPage(agent, rows.rows, { en: en }));
+  } catch (e) { next(e); }
+});
 
 // ---------- 中介工作台（PropNet /app） ----------
 app.use("/api/agent", createAgentApi({
