@@ -17,12 +17,13 @@ function cookieFrom(res) {
   return raw.split(';')[0];
 }
 
-async function call(pathname, {method = 'GET', body, cookie} = {}) {
+async function call(pathname, {method = 'GET', body, cookie, headers = {}} = {}) {
   const res = await fetch(`${base}${pathname}`, {
     method,
     headers: {
       ...(body !== undefined ? {'Content-Type': 'application/json'} : {}),
-      ...(cookie ? {Cookie: cookie} : {})
+      ...(cookie ? {Cookie: cookie} : {}),
+      ...headers
     },
     body: body !== undefined ? JSON.stringify(body) : undefined
   });
@@ -66,6 +67,14 @@ test('健康检查与演示登录', async () => {
   assert.equal(login.data.user.email, DEMO_EMAIL);
   assert.ok(login.cookie.startsWith('pm_session='));
   demoCookie = login.cookie;
+
+  const bad = await call('/api/auth/login', {
+    method: 'POST',
+    body: {email: DEMO_EMAIL, password: 'wrong-password'},
+    headers: {'Accept-Language': 'en'}
+  });
+  assert.equal(bad.res.status, 401);
+  assert.match(bad.data.error.message, /Incorrect email or password/);
 });
 
 test('未登录返回 401', async () => {
@@ -130,6 +139,16 @@ test('校验失败返回字段级错误', async () => {
   assert.equal(res.status, 400);
   assert.equal(data.error.code, 'validation');
   assert.ok(data.error.fields.title);
+
+  const en = await call('/api/listings', {
+    method: 'POST',
+    cookie: demoCookie,
+    headers: {'Accept-Language': 'en'},
+    body: {intent: 'sale', type: 'terrace', area: 'Kulai', price: 300000}
+  });
+  assert.equal(en.res.status, 400);
+  assert.match(en.data.error.message, /Check the listing details/);
+  assert.match(en.data.error.fields.title, /listing title/);
 });
 
 test('创建需求 + 房源 → 自动配对 → 跟进动作 → 删除动作', async () => {

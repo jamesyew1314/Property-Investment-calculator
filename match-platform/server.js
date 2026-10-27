@@ -24,6 +24,7 @@ import {
   scorePair
 } from './lib/engine.js';
 import {DEMO_EMAIL, DEMO_PASSWORD, resetDemo, seedDemo} from './lib/seed.js';
+import {localizeError} from './lib/error-i18n.js';
 
 const VERSION = '0.1.0';
 const PUBLIC_DIR = path.join(APP_ROOT, 'public');
@@ -54,7 +55,8 @@ const SECURITY_HEADERS = {
 };
 
 function sendJson(res, status, data, headers = {}) {
-  const body = JSON.stringify(data);
+  const payload = data?.error ? {...data, error: localizeError(data.error, res._lang)} : data;
+  const body = JSON.stringify(payload);
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
@@ -219,6 +221,7 @@ function makeApp({dataDir, secureCookies = false, seed = true} = {}) {
   const demoEnabled = process.env.SHOW_DEMO !== '0';
 
   async function handle(req, res) {
+    res._lang = /(^|,)\s*en\b/i.test(String(req.headers['accept-language'] || '')) ? 'en' : 'zh';
     const url = new URL(req.url || '/', 'http://localhost');
     const pathname = decodeURIComponent(url.pathname);
     const method = req.method || 'GET';

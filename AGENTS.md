@@ -9,3 +9,6 @@
 7. **贷款默认等额本息（和中国银行一样）：** `r = annual/12; pmt = P*r/(1-(1+r)^-n)`；利息 = 剩余本金 × r；daily rest 仅作后续可选。持有年限输入 1/2/3/4/5，逐年输出租金累计、贷款余额、RPGT（30%/20%/15%/0%）、净利润。
 8. **Phase 0 优先：** 先做公式引擎（法定费用 + 10 步计算 + 等额本息 + 1–5 年投影）+ 4 案例回归 + 21 项测试，不碰 UI、不做登录。
 9. **`web/` 是自动计算系统（v0.1）：** `index.html` = 3 个 Part 页面（手填黄底 / 自动蓝底，**中/英切换：所有文案在 index.html 的 I18N 字典 zh/en，新加字段必须两语都加 key**）；`calc.js` = 公式库（UMD，node 可 require）；改公式后必须跑 `node web/test.js`（13 项全过）。金额只在显示时四舍五入到分，内部计算不提前取整（余额公式除外，按文档口径）。**结果置顶 = 老板口径年利润**：`gross_profit = 卖价 − (实价 + 买入费用)`；`年利润 = gross_profit ÷ 自己现金 ÷ 持有年数`；其下并排“扣所有费用”完整口径（利息/卖出费/RPGT/租金）与 XIRR。线上地址 https://laoyeshu.cn/static/fangchan/ ，更新 = scp index.html/calc.js → `/opt/laoyeshu/static/fangchan/` 后 chmod 644（注意 /static/ 有 7 天缓存，改版后需强刷）。
+
+10. **PropMatch 所有页面必须中英双语（强制）。** 登录、工作台、客户需求、房源、配对、设置、表单、弹窗、空状态、错误、加载、手机端、PWA、页面标题，以及 WhatsApp/邮件文案，全部要有 `zh` + `en`；禁止只写中文或只写英文。新文案统一加在 `match-platform/public/i18n.js` 的 `S(zh, en)` 表，新增服务端错误同步 `match-platform/lib/error-i18n.js`。规范与验收清单见 `match-platform/docs/双语规范.md`；每次发布前跑 `cd match-platform && npm test`，并在中/英两种语言下逐页验收。
+

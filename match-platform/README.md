@@ -118,6 +118,8 @@ DATA_DIR=./data npm run seed
 | **客户沟通** | 一键生成双语 WhatsApp 文案（房源摘要 + 匹配点 + 注意事项 + REN/公司签名 + 免责声明），复制或打开 `wa.me` |
 | **数据** | 一键导出 JSON（房源/需求/跟进/动态），演示数据重置 |
 | **体验** | 中/英切换（全站 587 个词条，双字典同步）、手机底部导航、响应式、评分明细弹窗、图片查看器 |
+
+> **双语是强制要求，不是可选项。** 所有页面/状态/表单/弹窗/错误/手机端/页面标题/WhatsApp 文案都必须中英双语；规范、例外与验收清单见 [`docs/双语规范.md`](docs/双语规范.md)。服务端错误通过 `Accept-Language` 返回对应语言。
 | **账号** | 邮箱 + 密码注册/登录/退出；scrypt 哈希；HMAC 会话；改密即时撤销旧会话；账号数据隔离 |
 
 ---
@@ -477,6 +479,7 @@ match-platform/
 │   ├── store.js              # JSON 原子存储、序号、动态
 │   ├── auth.js               # scrypt、HMAC 会话、session_version、限流
 │   ├── seed.js               # 演示数据（19 房源 / 10 需求 / 8 跟进）
+│   ├── error-i18n.js         # 服务端错误中英映射
 │   └── http-error.js         # 统一错误
 ├── public/
 │   ├── index.html            # SPA 壳
@@ -488,6 +491,7 @@ match-platform/
 │   ├── i18n.js               # 中英双字典（587 键）
 │   ├── style.css             # 设计系统（navy/gold/cream）
 │   └── demo/                 # 演示房源照片
+├── docs/双语规范.md          # 双语强制规范与验收清单
 ├── test/                     # 51 项测试
 ├── scripts/reset-demo.js     # 命令行重置演示数据
 ├── deploy/                   # systemd / nginx / 备份 / 上线说明
@@ -502,7 +506,8 @@ match-platform/
 - 调整权重：改 `WEIGHTS`，并在 README/产品说明同步；测试会锁定排序行为；
 - 新增引擎原因码：必须同时加 `NOTE_CODES`、`i18n.js` 的 `note.*` 中英文案（`test/i18n.test.js` 会拦截缺键）；
 - 金额/日期：沿用 `YYYY-MM-DD` 与 RM；迁移数据库时按 `NUMERIC(18,2)` / `DATE`；
-- 发布：`npm test` 全过 → 浏览器 QA（桌面 + 手机 + 双语）→ 部署 → 健康检查 → 备份验证。
+- 双语：**所有页面必须中英双语**；新文案进 `public/i18n.js`，服务端错误进 `lib/error-i18n.js`；新增页面按 [`docs/双语规范.md`](docs/双语规范.md) 逐项验收；
+- 发布：`npm test` 全过 → 浏览器 QA（桌面 + 手机 + 中/英逐页）→ 部署 → 健康检查 → 备份验证。
 
 ---
 

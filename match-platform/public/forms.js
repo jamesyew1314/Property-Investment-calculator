@@ -1,4 +1,10 @@
 // forms.js — 新增/编辑表单、跟进弹窗、评分明细、WhatsApp 文案、账号设置
+const tr = (zh, en) => (document.documentElement.lang === 'en' ? en : zh);
+const FALLBACK = {
+  checkForm: () => tr('请检查表单', 'Check the form'),
+  saving: () => tr('保存中…', 'Saving…'),
+  saveFailed: () => tr('保存失败', 'Save failed')
+};
 
 import {affordability, rentAffordability} from './lib/finance.js';
 import {
@@ -244,7 +250,7 @@ async function submitForm(form, build, onSubmit) {
   clearErrors(form);
   const payload = build();
   if (payload.__error) {
-    showError(form, payload.__error.message || '请检查表单', payload.__error.fields);
+    showError(form, payload.__error.message || FALLBACK.checkForm(), payload.__error.fields);
     return;
   }
   const modal = form.closest('.modal');
@@ -252,14 +258,14 @@ async function submitForm(form, build, onSubmit) {
   const original = btn ? btn.innerHTML : '';
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = `${icon('refresh', 15)} ${form.dataset.saving || '保存中…'}`;
+    btn.innerHTML = `${icon('refresh', 15)} ${form.dataset.saving || FALLBACK.saving()}`;
   }
   try {
     await onSubmit(payload);
   } catch (err) {
     if (err && err.fields) showError(form, err.message, err.fields);
-    else showError(form, (err && err.message) || '保存失败');
-    toast((err && err.message) || '保存失败', 'error');
+    else showError(form, (err && err.message) || FALLBACK.saveFailed());
+    toast((err && err.message) || FALLBACK.saveFailed(), 'error');
   } finally {
     if (btn) {
       btn.disabled = false;

@@ -522,4 +522,4 @@ RPGT_y = 30%（≤3 年）/ 20%（第 4 年）/ 15%（第 5 年）/ 0%（6 年+�
 | 名片信息 | Andy Lau 刘泌光 · REN 32839 · +60 16-528 0918 · andylau.theroof@gmail.com · THE ROOF REALTY SDN BHD · E(1)1605/1 · No 10A, Jalan Sutera Tanjung 8/4, Taman Sutera Utama, 81300 Skudai, Johor · kwongthye.com |
 | 下一步 | WhatsApp Cloud API、团队角色、CSV/门户导入、密码重置；商业路径见 [`docs/SaaS商业方案_Malaysia_v1.md`](docs/SaaS商业方案_Malaysia_v1.md) |
 
-**开发约定**：新增原因码必须同步 `lib/engine.js` 的 `NOTE_CODES` 与 `public/i18n.js` 的 `note.*` 中英文字典（测试会拦）；新增区域/标签改 `lib/taxonomy.js`；改权重同步 README 与产品说明；金额原型用 Number，迁移 PostgreSQL 时改 `NUMERIC(18,2)`。
+**开发约定**：**所有页面必须中英双语**（登录、工作台、需求、房源、配对、设置、表单、弹窗、空状态、错误、手机端、PWA、页面标题、WhatsApp/邮件文案）；新文案统一进 `public/i18n.js`，服务端错误同步 `lib/error-i18n.js`；规范/验收清单见 [`match-platform/docs/双语规范.md`](match-platform/docs/双语规范.md)。新增原因码必须同步 `lib/engine.js` 的 `NOTE_CODES` 与 `public/i18n.js` 的 `note.*` 中英文字典（测试会拦）；新增区域/标签改 `lib/taxonomy.js`；改权重同步 README 与产品说明；金额原型用 Number，迁移 PostgreSQL 时改 `NUMERIC(18,2)`。

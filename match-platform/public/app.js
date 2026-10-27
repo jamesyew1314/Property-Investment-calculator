@@ -105,7 +105,10 @@ async function api(path, {method = 'GET', body} = {}) {
   const res = await fetch(`${BASE_PATH}${path}`, {
     method,
     credentials: 'same-origin',
-    headers: body !== undefined ? {'Content-Type': 'application/json'} : {},
+    headers: {
+      'Accept-Language': state.lang === 'en' ? 'en' : 'zh',
+      ...(body !== undefined ? {'Content-Type': 'application/json'} : {})
+    },
     body: body !== undefined ? JSON.stringify(body) : undefined
   });
   let data = null;
@@ -323,7 +326,10 @@ function render() {
   if (!state.user) {
     document.body.className = 'login-body';
     app.innerHTML = loginView(state, ctx);
-    document.title = 'PropMatch · KWONG THYE 光泰 智能配对';
+    document.title =
+      state.lang === 'en'
+        ? 'PropMatch · KWONG THYE · Smart Matching'
+        : 'PropMatch · KWONG THYE 光泰 智能配对';
     return;
   }
   document.body.className = 'app-body';
@@ -346,7 +352,11 @@ function render() {
     matches: ctx.t('nav.matches'),
     settings: ctx.t('nav.settings')
   };
-  document.title = `${titles[r.name] || 'PropMatch'} · PropMatch · KWONG THYE 光泰`;
+  const brand =
+    state.lang === 'en'
+      ? 'PropMatch · KWONG THYE · Smart Matching'
+      : 'PropMatch · KWONG THYE 光泰 智能配对';
+  document.title = `${titles[r.name] || 'PropMatch'} · ${brand}`;
 }
 
 function contentFor(r, ctx) {
