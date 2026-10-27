@@ -11,6 +11,7 @@ const createPublicApi = require("./public-api");
 const createAgentApi = require("./agent-api");
 const renderAgentPage = require("./agent-page");
 const runDigest = require("./digest");
+const billplz = require("./billplz");
 const pathMod = require("node:path");
 const { Pool } = require("pg");
 
@@ -1349,6 +1350,41 @@ app.get("/a/:slug", async function (req, res, next) {
       ORDER BY p.published_at DESC NULLS LAST, p.updated_at DESC LIMIT 60`, [agent.id]);
     res.set("Cache-Control", "public, max-age=300");
     res.type("html").send(renderAgentPage(agent, rows.rows, { en: en }));
+  } catch (e) { next(e); }
+});
+
+// ---------- Billplz 支付回调 ----------
+app.post("/api/billing/billplz/callback", express.urlencoded({ extended: false }), async function (req, res, next) {
+  try {
+    const key = process.env.BILLPLZ_X_SIGNATURE;
+    if (!key) return res.status(503).send("not_configured");
+    if (billplz.signature(req.body || {}, key) !== (req.body || {}).x_signature) return res.status(403).send("bad_signature");
+    if (String((req.body || {}).paid) !== "true") return res.send("ok");
+    const paymentId = Number((req.body || {}).reference_1);
+    const p = await pool.query("SELECT * FROM agent_payments WHERE id=$1", [paymentId]);
+    const pay = p.rows[0];
+    if (!pay) return res.status(404).send("not_found");
+    if (pay.status === "paid") return res.send("ok");
+    await pool.query("UPDATE agent_payments SET status='paid', paid_at=now() WHERE id=$1", [paymentId]);
+    const base = await pool.query("SELECT max(expires_at) AS e FROM agent_subscriptions WHERE agent_id=$1 AND expires_at > now()", [pay.agent_id]);
+    const from = (base.rows[0] && base.rows[0].e) ? new Date(base.rows[0].e) : new Date();
+    const until = new Date(from); until.setMonth(until.getMonth() + Number(pay.months || 1));
+    await pool.query("INSERT INTO agent_subscriptions(agent_id,plan,status,started_at,expires_at,source,note) VALUES($1,$2,'active',now(),$3,'billplz',$4)",
+      [pay.agent_id, pay.plan, until, pay.provider_ref]);
+    await pool.query("UPDATE lib_agents SET plan=$1, plan_expires_at=$2 WHERE id=$3", [pay.plan, until, pay.agent_id]);
+    res.send("ok");
+  } catch (e) { next(e); }
+});
+
+// ---------- 到期降级（cron 调用） ----------
+app.post("/api/cron/maintenance", async function (req, res, next) {
+  try {
+    const key = process.env.CRON_KEY;
+    if (!key || req.get("x-cron-key") !== key) return res.status(403).json({ ok: false, error: "forbidden" });
+    const expired = await pool.query(
+      "UPDATE lib_agents SET plan='free', plan_expires_at=NULL WHERE plan <> 'free' AND plan_expires_at IS NOT NULL AND plan_expires_at < now() RETURNING id");
+    await pool.query("UPDATE agent_subscriptions SET status='expired' WHERE status='active' AND expires_at IS NOT NULL AND expires_at < now()");
+    res.json({ ok: true, downgraded: expired.rowCount });
   } catch (e) { next(e); }
 });
 

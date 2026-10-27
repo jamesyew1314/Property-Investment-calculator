@@ -8,6 +8,7 @@ const crypto = require("node:crypto");
 const core = require("./library-core");
 const agentCore = require("./agent-core");
 const matcher = require("./match");
+const billplz = require("./billplz");
 const tax = require("./library-taxonomy");
 
 const COOKIE = "pn_sid";
@@ -412,6 +413,36 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
 
 
 
+
+  // ---------- 支付（Billplz；未配置时走线下转账 + 兑换码） ----------
+  r.post("/checkout", requireAgent, limit(10, 600000), async function (req, res, next) {
+    try {
+      const plan = (req.body || {}).plan === "team" ? "team" : "pro";
+      const months = Math.min(24, Math.max(1, Number((req.body || {}).months) || 1));
+      const amount = billplz.amountFor(plan, months);
+      const ins = await pool.query(
+        "INSERT INTO agent_payments(agent_id,plan,months,amount) VALUES($1,$2,$3,$4) RETURNING id",
+        [req.agent.id, plan, months, amount]);
+      const id = ins.rows[0].id;
+      const key = process.env.BILLPLZ_API_KEY, coll = process.env.BILLPLZ_COLLECTION_ID;
+      if (!key || !coll) return res.json({ ok: true, manual: true, payment_id: id, plan, months, amount });
+      try {
+        const bill = await billplz.createBill({
+          secretKey: key, collectionId: coll, sandbox: process.env.BILLPLZ_SANDBOX === "1",
+          bill: {
+            collection_id: coll, email: req.agent.email, name: req.agent.name, amount: Math.round(amount * 100),
+            description: "PropNet " + plan + " " + months + " month(s)",
+            callback_url: base + "/api/billing/billplz/callback",
+            redirect_url: base + "/agent/?paid=1#/plan", reference_1: String(id)
+          }
+        });
+        await pool.query("UPDATE agent_payments SET provider_ref=$1, bill_url=$2 WHERE id=$3", [bill.id, bill.url, id]);
+        res.json({ ok: true, url: bill.url, payment_id: id });
+      } catch (e) {
+        res.status(502).json({ ok: false, error: "payment_unavailable", payment_id: id });
+      }
+    } catch (e) { next(e); }
+  });
   // ---------- 套餐 / 兑换码（M3 收费基础） ----------
   r.get("/plan", requireAgent, async function (req, res, next) {
     try {
