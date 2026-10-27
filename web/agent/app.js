@@ -7,7 +7,16 @@
   };
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
-  function t(zh, en) { return S.lang === "en" ? en : zh; }
+  function t(zh, en) {
+    if (S.lang === "bm") return (window.BM_MAP || {})[en] || en;
+    return S.lang === "en" ? en : zh;
+  }
+  function langLabel() { return S.lang === "zh" ? "EN" : (S.lang === "en" ? "BM" : "中文"); }
+  function cycleLang() {
+    S.lang = S.lang === "zh" ? "en" : (S.lang === "en" ? "bm" : "zh");
+    localStorage.setItem("kt_lang", S.lang);
+    document.documentElement.lang = S.lang === "zh" ? "zh-CN" : (S.lang === "bm" ? "ms" : "en");
+  }
   function esc(v) {
     return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -122,7 +131,7 @@
   function showAuth(tab) {
     $("#app").hidden = true; $("#auth").hidden = false;
     setAuthMode(tab || S.authMode);
-    $("#authLang").textContent = S.lang === "en" ? "中文" : "EN";
+    $("#authLang").textContent = langLabel();
   }
   function setAuthMode(mode) {
     S.authMode = mode;
@@ -192,7 +201,7 @@
     }).join("");
     $("#whoName").textContent = S.me ? S.me.name : "—";
     $("#whoMeta").textContent = S.me ? ((S.me.ren_no || "PropNet") + (S.me.verified ? " · ✓已验证" : "")) : "";
-    $("#langBtn").textContent = S.lang === "en" ? "中文" : "EN";
+    $("#langBtn").textContent = langLabel();
   }
   function boot() {
     $("#auth").hidden = true; $("#app").hidden = false;
@@ -830,12 +839,10 @@
     b.addEventListener("click", function () { setAuthMode(b.dataset.mode); });
   });
   $("#authLang").addEventListener("click", function () {
-    S.lang = S.lang === "en" ? "zh" : "en"; localStorage.setItem("kt_lang", S.lang);
-    setAuthMode(S.authMode);
+    cycleLang(); $("#authLang").textContent = langLabel(); setAuthMode(S.authMode);
   });
   $("#langBtn").addEventListener("click", function () {
-    S.lang = S.lang === "en" ? "zh" : "en"; localStorage.setItem("kt_lang", S.lang);
-    renderNav(); route();
+    cycleLang(); renderNav(); route();
   });
   $("#logoutBtn").addEventListener("click", function () {
     api("/logout", { method: "POST" }).then(function () { S.me = null; showAuth("login"); }).catch(function () { showAuth("login"); });
