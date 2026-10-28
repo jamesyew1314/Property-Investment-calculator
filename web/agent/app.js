@@ -829,6 +829,20 @@
     if (a.review_status === "rejected" && a.review_note) {
       h += '<div class="card" style="border-left:3px solid #C6A15B"><h3>' + t("审核未通过", "Review not approved") + "</h3><p style='margin:0'>" + esc(a.review_note) + "</p></div>";
     }
+    h += '<div class="card"><h3>' + t("账号安全", "Account security") + "</h3>" +
+      '<p class="muted" style="margin:0 0 10px">' + t("当前邮箱：", "Email: ") + esc(a.email || "") + " " + (a.emailVerified ? "✓" : "· " + t("未验证", "unverified")) +
+      " · " + t("注册", "Joined") + " " + dt(a.created_at) + (a.last_login_at ? " · " + t("最后登录", "Last login") + " " + dt(a.last_login_at) : "") + "</p>" +
+      '<div class="grid2">' +
+      field(t("更换邮箱", "New email"), '<input id="acEmail" placeholder="you@example.com">') +
+      field(t("当前密码", "Current password"), '<input id="acEmailPw" type="password">') + "</div>" +
+      '<button class="btn line" id="acEmailBtn">' + t("更换邮箱（需重新验证）", "Change email (re-verify)") + "</button>" +
+      '<div class="hr"></div>' +
+      '<div class="grid3">' +
+      field(t("当前密码", "Current password"), '<input id="acPw0" type="password">') +
+      field(t("新密码", "New password"), '<input id="acPw1" type="password">') +
+      field(t("确认新密码", "Confirm"), '<input id="acPw2" type="password">') + "</div>" +
+      '<button class="btn dark" id="acPwBtn">' + t("修改密码", "Change password") + "</button></div>";
+
     h += '<div class="card"><h3>' + t("邮箱验证", "Email verification") + "</h3>" +
       (a.emailVerified ? '<p class="muted" style="margin:0">' + t("已验证 ✓", "Verified ✓") + "</p>"
         : '<p class="muted" style="margin:0 0 8px">' + t("未验证。验证后房源显示「已验证」标记。", "Not verified. Verified listings show a badge.") +
@@ -854,6 +868,24 @@
     if (rs) rs.addEventListener("click", function () {
       api("/resend-verify", { method: "POST" }).then(function () { toast(t("验证邮件已发送", "Verification email sent")); })
         .catch(function () { toast(t("发送失败，稍后再试", "Failed, try later"), true); });
+    });
+    $("#acEmailBtn", $("#view")).addEventListener("click", function () {
+      var btn = this; btn.disabled = true;
+      api("/email", { method: "POST", body: { email: $("#acEmail").value.trim(), password: $("#acEmailPw").value } })
+        .then(function (j) { toast(t("邮箱已更换，请查收验证邮件", "Email changed — check your inbox")); route(); })
+        .catch(function (e) {
+          btn.disabled = false;
+          toast(e.message === "bad_password" ? t("密码不正确", "Wrong password") : e.message === "email_exists" ? t("邮箱已被使用", "Email already used") : t("邮箱格式不对", "Invalid email"), true);
+        });
+    });
+    $("#acPwBtn", $("#view")).addEventListener("click", function () {
+      var p0 = $("#acPw0").value, p1 = $("#acPw1").value, p2 = $("#acPw2").value;
+      if (p1.length < 8) return toast(t("新密码至少 8 位", "At least 8 characters"), true);
+      if (p1 !== p2) return toast(t("两次密码不一致", "Passwords do not match"), true);
+      var btn = this; btn.disabled = true;
+      api("/password", { method: "POST", body: { current: p0, next: p1 } })
+        .then(function () { toast(t("密码已修改", "Password changed")); route(); })
+        .catch(function (e) { btn.disabled = false; toast(e.message === "bad_password" ? t("当前密码不正确", "Wrong current password") : e.message, true); });
     });
     return Promise.resolve();
   }

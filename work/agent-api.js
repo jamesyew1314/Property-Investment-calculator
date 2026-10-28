@@ -52,7 +52,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       slug: a.slug, bio: a.bio, photo_url: a.photo_url, areas: a.areas,
       verified: !!a.verified_at, emailVerified: !!a.email_verified_at, lang: a.lang || "zh",
       review_status: a.review_status || "pending", review_note: a.review_note || null,
-      status: a.status, plan: a.plan, created_at: a.created_at
+      status: a.status, plan: a.plan, created_at: a.created_at, last_login_at: a.last_login_at
     };
   }
 
@@ -240,6 +240,36 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       if (!text || text.length < 8) return res.status(400).json({ ok: false, error: "invalid_input" });
       const fields = importer.parseListing(text);
       res.json({ ok: true, fields: fields });
+    } catch (e) { next(e); }
+  });
+
+  // ---------- 账号安全：改密码 / 换邮箱 ----------
+  r.post("/password", requireAgent, limit(5, 600000), async function (req, res, next) {
+    try {
+      const cur = String((req.body || {}).current || "");
+      const nextPw = String((req.body || {}).next || "");
+      if (nextPw.length < 8) return res.status(400).json({ ok: false, error: "weak_password" });
+      if (!verifyPw(cur, req.agent.password_hash)) return res.status(400).json({ ok: false, error: "bad_password" });
+      await pool.query("UPDATE lib_agents SET password_hash=$1 WHERE id=$2", [hashPw(nextPw), req.agent.id]);
+      const token = parseCookies(req)[COOKIE];
+      await pool.query("DELETE FROM agent_sessions WHERE agent_id=$1 AND token_hash<>$2", [req.agent.id, sha256(token || "")]);
+      await audit(req.agent.email, "agent.password", "agent", req.agent.id, {});
+      res.json({ ok: true });
+    } catch (e) { next(e); }
+  });
+
+  r.post("/email", requireAgent, limit(5, 600000), async function (req, res, next) {
+    try {
+      const email = core.str((req.body || {}).email, 120);
+      const pw = String((req.body || {}).password || "");
+      if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ ok: false, error: "invalid_email" });
+      if (!verifyPw(pw, req.agent.password_hash)) return res.status(400).json({ ok: false, error: "bad_password" });
+      const dup = await pool.query("SELECT id FROM lib_agents WHERE lower(email)=lower($1) AND id<>$2", [email, req.agent.id]);
+      if (dup.rows[0]) return res.status(409).json({ ok: false, error: "email_exists" });
+      const out = await pool.query("UPDATE lib_agents SET email=$1, email_verified_at=NULL WHERE id=$2 RETURNING *", [email, req.agent.id]);
+      sendVerify(out.rows[0]);
+      await audit(req.agent.email, "agent.email", "agent", req.agent.id, { email: email });
+      res.json({ ok: true, email: email });
     } catch (e) { next(e); }
   });
   // ---------- 我的房源 ----------
