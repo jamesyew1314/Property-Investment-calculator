@@ -304,7 +304,7 @@
             "</td><td>" + esc(areaName(r.area_code)) + "</td><td class='num'>" + money(price, r.intent === "rent") + "</td><td>" + pill(r.status) +
             "</td><td>" + visPill(r.visibility) + "</td><td class='num'>" + (r.inquiries || 0) + "</td>" +
             '<td><button class="btn line sm" data-act="edit-listing" data-id="' + r.id + '">' + t("编辑", "Edit") + "</button> " +
-            '<button class="btn line sm" data-act="share" data-id="' + r.id + '">' + t("分享卡", "Share") + "</button> " +
+            '<button class="btn line sm" data-act="share" data-id="' + r.id + '">' + t("分享到群", "Share") + "</button> " +
             '<button class="btn ' + (r.visibility === "public" ? "line" : "gold") + ' sm" data-act="toggle-publish" data-id="' + r.id + '" data-pub="' + (r.visibility === "public" ? "0" : "1") + '">' +
             (r.visibility === "public" ? t("取消公开", "Unpublish") : t("公开官网", "Publish")) + "</button></td></tr>";
         }).join("") + "</tbody></table></div>";
@@ -423,12 +423,36 @@
   }
 
   // ---------- 分享卡（浏览器 canvas 生成 PNG） ----------
+  function shareText(row) {
+    var price = row.intent === "rent" ? row.rent_price : row.asking_price;
+    var title = row.project_title_zh || row.project_title || row.project_name || "—";
+    var bits = [];
+    if (row.bedrooms) bits.push(row.bedrooms + (S.lang === "en" ? " bed" : "房"));
+    if (row.bathrooms) bits.push(row.bathrooms + (S.lang === "en" ? " bath" : "卫"));
+    if (row.built_up) bits.push(int(row.built_up) + " sqft");
+    var who = S.me.name + (S.me.ren_no ? " (" + S.me.ren_no + ")" : "") + (S.me.phone ? " " + S.me.phone : "");
+    var lines = [
+      (row.intent === "rent" ? "【出租】" : "【出售】") + title,
+      areaName(row.area_code) + " · " + money(price, row.intent === "rent") + (bits.length ? " · " + bits.join(" ") : ""),
+      (S.lang === "en" ? "Agent: " : "中介：") + who,
+      "https://kwongthye.com/properties/?p=" + row.code,
+      S.lang === "en" ? "Co-broke welcome · PropNet" : "同行可带看 · 成交有记录 · PropNet"
+    ];
+    return lines.join("\n");
+  }
+
   function shareCard(row) {
+    var text = shareText(row);
     var m = modal({
-      title: t("分享卡", "Share card"),
-      body: '<p class="muted" style="margin:0 0 10px">' + t("下载后可直接发 WhatsApp / 朋友圈。", "Download and post to WhatsApp.") + "</p>" +
-        '<canvas id="shareCanvas" width="1080" height="1350" style="width:100%;max-width:420px;border-radius:12px;border:1px solid var(--line)"></canvas>',
-      footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button><button class=\"btn gold\" id=\"dl\">" + t("下载 PNG", "Download PNG") + "</button>"
+      title: t("分享到群", "Share to group"),
+      body: '<p class="muted" style="margin:0 0 8px">' + t("复制文案，或直接打开 WhatsApp 选群；图片可先下载再一起发。", "Copy the text or open WhatsApp to pick a group; download the image to attach.") + "</p>" +
+        '<textarea id="shareText" readonly style="width:100%;min-height:120px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE">' + esc(text) + "</textarea>" +
+        '<div style="margin:12px 0 6px;font-size:12px;color:var(--muted)">' + t("分享卡（可下载发群）", "Share card (download)") + "</div>" +
+        '<canvas id="shareCanvas" width="1080" height="1350" style="width:100%;max-width:360px;border-radius:12px;border:1px solid var(--line)"></canvas>',
+      footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button>" +
+        '<button class="btn line" id="copyText">' + t("复制文案", "Copy text") + "</button>" +
+        '<button class="btn gold" id="openWa">' + t("打开 WhatsApp", "Open WhatsApp") + "</button>" +
+        '<button class="btn dark" id="dl">' + t("下载图片", "Download image") + "</button>"
     });
     var cv = $("#shareCanvas", m.root), ctx = cv.getContext("2d");
     var W = 1080, H = 1350;
@@ -474,6 +498,18 @@
     ctx.fillStyle = "rgba(255,255,255,.45)"; ctx.font = "20px -apple-system, system-ui";
     ctx.fillText(t("资料由货源中介提供，以现场与正式文件为准。", "Information provided by the listing agent."), 86, H - 84);
 
+    function markShared() {
+      api("/listings/" + row.id + "/shared", { method: "POST" }).catch(function () {});
+    }
+    $("#copyText", m.root).addEventListener("click", function () {
+      var ta = $("#shareText", m.root); ta.select();
+      navigator.clipboard.writeText(ta.value).then(function () { toast(t("已复制文案", "Text copied")); markShared(); })
+        .catch(function () { document.execCommand("copy"); toast(t("已复制", "Copied")); markShared(); });
+    });
+    $("#openWa", m.root).addEventListener("click", function () {
+      markShared();
+      window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+    });
     $("#dl", m.root).addEventListener("click", function () {
       cv.toBlob(function (blob) {
         var a = document.createElement("a");

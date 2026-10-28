@@ -346,6 +346,16 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
   });
 
 
+
+  r.post("/listings/:id/shared", requireAgent, async function (req, res, next) {
+    try {
+      const out = await pool.query(
+        "UPDATE lib_properties SET share_count=share_count+1, last_shared_at=now() WHERE id=$1 AND tenant_id=$2 RETURNING share_count",
+        [req.params.id, req.agent.id]);
+      if (!out.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+      res.json({ ok: true, share_count: out.rows[0].share_count });
+    } catch (e) { next(e); }
+  });
   // ---------- 房源图片 ----------
   r.post("/listings/:id/photos", requireAgent, express.raw({ type: ["image/jpeg", "image/png", "image/webp"], limit: "8mb" }), async function (req, res, next) {
     try {
