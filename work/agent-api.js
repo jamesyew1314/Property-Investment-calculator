@@ -272,6 +272,47 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       res.json({ ok: true, email: email });
     } catch (e) { next(e); }
   });
+
+  // ---------- 注销账号（不可恢复） ----------
+  r.post("/delete", requireAgent, limit(3, 600000), async function (req, res, next) {
+    const client = await pool.connect();
+    try {
+      const b = req.body || {};
+      const pw = String(b.password || "");
+      const confirm = core.str(b.confirm, 20);
+      if (confirm !== "注销" && confirm.toUpperCase() !== "DELETE") { client.release(); return res.status(400).json({ ok: false, error: "confirm_required" }); }
+      if (!verifyPw(pw, req.agent.password_hash)) { client.release(); return res.status(400).json({ ok: false, error: "bad_password" }); }
+      const id = req.agent.id;
+      const props = await client.query("SELECT photos FROM lib_properties WHERE tenant_id=$1", [id]);
+      await client.query("BEGIN");
+      await client.query("DELETE FROM agent_payments WHERE agent_id=$1", [id]);
+      await client.query("DELETE FROM agent_subscriptions WHERE agent_id=$1", [id]);
+      await client.query("DELETE FROM agent_tokens WHERE agent_id=$1", [id]);
+      await client.query("DELETE FROM pool_inquiries WHERE from_agent_id=$1 OR to_agent_id=$1", [id]);
+      await client.query("DELETE FROM lib_clients WHERE tenant_id=$1", [id]);
+      await client.query("DELETE FROM lib_properties WHERE tenant_id=$1", [id]);
+      await client.query("DELETE FROM lib_agents WHERE id=$1", [id]);
+      await client.query("COMMIT");
+      props.rows.forEach(function (r) {
+        (r.photos || []).forEach(function (u) {
+          if (!/^\/uploads\/props\/[A-Za-z0-9._-]+$/.test(u)) return;
+          const f = pathMod.join(UPLOADS, pathMod.basename(u));
+          [f, f.replace(/\.jpg$/i, "_t.jpg"), f.replace(/\.jpg$/i, ".webp"), f.replace(/\.jpg$/i, "_t.webp")].forEach(function (x) {
+            try { if (x.indexOf(UPLOADS) === 0 && fs.existsSync(x)) fs.unlinkSync(x); } catch (e) {}
+          });
+        });
+      });
+      await audit(req.agent.email, "agent.delete_account", "agent", id, {});
+      clearCookie(res);
+      res.json({ ok: true });
+    } catch (e) {
+      try { await client.query("ROLLBACK"); } catch (x) {}
+      next(e);
+    } finally {
+      client.release();
+    }
+  });
+
   // ---------- 我的房源 ----------
   const OWN_SELECT = `
     SELECT p.*, p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
