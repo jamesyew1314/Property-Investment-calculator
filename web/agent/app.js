@@ -279,7 +279,7 @@
   // ---------- 我的房源 ----------
   function listings(q) {
     setTitle(t("我的房源", "My listings"), t("发布、公开到官网、管理询盘", "Publish, expose to the site, track inquiries"));
-    $("#topActs").innerHTML = '<button class="btn gold sm" data-act="new-listing">+ ' + t("新增房源", "New listing") + "</button>";
+    $("#topActs").innerHTML = '<button class="btn line sm" data-act="import">' + t("一键导入", "Import") + '</button> <button class="btn gold sm" data-act="new-listing">+ ' + t("新增房源", "New listing") + "</button>";
     var qs = new URLSearchParams(); ["q", "status"].forEach(function (k) { if (q[k]) qs.set(k, q[k]); });
     return api("/listings?" + qs.toString()).then(function (d) {
       var h = '<div class="toolbar"><input id="lq" type="search" placeholder="' + t("搜索编号 / 楼盘", "Search code / project") + '" value="' + esc(q.q || "") + '">' +
@@ -376,7 +376,25 @@
     function setCover(u) { var r = row; if (u) r.cover_url = u; }
   }
 
-  function listingForm(row) {
+  function importModal() {
+    var m = modal({
+      title: t("一键导入房源", "Import a listing"),
+      body: '<p class="muted" style="margin:0 0 8px">' + t("把 WhatsApp 群文案或网页上复制的文字粘进来，系统自动识别楼盘、区域、价格、房型、面积、单位。", "Paste WhatsApp text or copied web text; we extract project, area, price, type, size and unit.") + "</p>" +
+        '<textarea id="impText" placeholder="【出售】Sutera Utama 五福城&#10;3房2卫 1150sqft&#10;RM 728,000&#10;A-12-03" style="width:100%;min-height:160px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace"></textarea>',
+      footer: '<button class="btn line" data-close>' + t("取消", "Cancel") + "</button>" +
+        '<button class="btn gold" id="impGo">' + t("识别并填入", "Parse & fill") + "</button>"
+    });
+    $("#impGo", m.root).addEventListener("click", function () {
+      var btn = this; btn.disabled = true;
+      api("/import/parse", { method: "POST", body: { text: $("#impText", m.root).value } }).then(function (j) {
+        m.close();
+        listingForm(j.fields, true);
+        toast(t("已识别 " + (j.fields.confidence || 0) + " 项，请核对", "Extracted " + (j.fields.confidence || 0) + " fields — please check"));
+      }).catch(function (e) { btn.disabled = false; m.msg(e.message === "invalid_input" ? t("请先粘贴内容", "Paste something first") : e.message); });
+    });
+  }
+
+  function listingForm(row, imported) {
     row = row || {};
     var body = '<form id="lf">' +
       '<div class="grid2">' + field(t("楼盘 / 项目名 *", "Project *"), '<input name="project_name" value="' + esc(row.project_name || "") + '">') +
@@ -395,7 +413,7 @@
       field(t("房源图片（最多 12 张）", "Photos (max 12)"), photoBlock(row)) +
       "</form>";
     var m = modal({
-      title: row.id ? t("编辑房源", "Edit listing") : t("新增房源", "New listing"),
+      title: row.id ? t("编辑房源", "Edit listing") : (imported ? t("导入预览（可修改）", "Imported — review") : t("新增房源", "New listing")),
       body: body,
       footer: '<button class="btn line" data-close>' + t("取消", "Cancel") + "</button>" +
         (row.id ? '<button class="btn danger" id="del">' + t("删除", "Delete") + "</button>" : "") +
@@ -846,6 +864,7 @@
     if (!el) return;
     var act = el.dataset.act, id = Number(el.dataset.id);
     if (act === "new-listing") listingForm(null);
+    if (act === "import") importModal();
     if (act === "edit-listing") api("/listings/" + id).then(function (j) { listingForm(j.row); });
     if (act === "toggle-publish") {
       var pub = el.dataset.pub === "1";

@@ -9,6 +9,7 @@ const core = require("./library-core");
 const agentCore = require("./agent-core");
 const matcher = require("./match");
 const billplz = require("./billplz");
+const importer = require("./import-core");
 let sharp = null; try { sharp = require("sharp"); } catch (e) { sharp = null; }
 const fs = require("node:fs");
 const pathMod = require("node:path");
@@ -231,6 +232,16 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
     res.json({ ok: true });
   });
 
+
+  // ---------- 一键导入（粘贴文案识别） ----------
+  r.post("/import/parse", requireAgent, limit(30, 600000), async function (req, res, next) {
+    try {
+      const text = core.str((req.body || {}).text, 6000);
+      if (!text || text.length < 8) return res.status(400).json({ ok: false, error: "invalid_input" });
+      const fields = importer.parseListing(text);
+      res.json({ ok: true, fields: fields });
+    } catch (e) { next(e); }
+  });
   // ---------- 我的房源 ----------
   const OWN_SELECT = `
     SELECT p.*, p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
