@@ -25,7 +25,7 @@ window.BM_MAP = {
   "Just listed": "Baru disenaraikan",
   "Filter by area, budget and type. Open a listing to see the agent behind it.": "Tapis ikut kawasan, bajet dan jenis. Buka senarai untuk lihat ejen di belakangnya.",
   "All listings →": "Semua senarai →",
-  "Browse by area": "Ikut kawasan",
+  "Browse stock by area": "Ikut kawasan untuk stok",
   "29 areas across Johor": "29 kawasan di Johor",
   "JB, Iskandar, Muar, Batu Pahat and more — pick an area, then browse.": "JB, Iskandar, Muar, Batu Pahat dan lain-lain — pilih kawasan, kemudian lihat.",
   "List once. The whole team helps you find a buyer.": "Senaraikan sekali. Seluruh pasukan membantu cari pembeli.",
