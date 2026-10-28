@@ -21,12 +21,13 @@ function stateName(code, en) {
   return s ? (en ? s.en : s.zh) : "";
 }
 
-function card(p, en) {
+function card(p, lang) {
+  const en = lang === "en";
   const price = p.intent === "rent" ? p.rent_price : p.asking_price;
-  const title = (en ? (p.project_title || p.project_name) : (p.project_title_zh || p.project_title || p.project_name)) || "—";
+  const title = (lang === "zh" ? (p.project_title_zh || p.project_title || p.project_name) : (p.project_title || p.project_name)) || "—";
   return '<a class="pcard" href="/properties/?p=' + encodeURIComponent(p.code) + '">' +
     '<div class="pcard-media">' + (p.cover_url ? '<img class="pcard-img" src="' + esc(p.cover_url.replace(/\.jpg$/i, "_t.jpg")) + '" data-full="' + esc(p.cover_url) + '" onerror="this.onerror=null;this.src=this.dataset.full" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">' : '<div class="ph"><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="rgba(226,200,143,.5)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></div>') +
-    '<span class="pcard-tag">' + (p.intent === "rent" ? (en ? "For rent" : "出租") : (en ? "For sale" : "出售")) + "</span></div>" +
+    '<span class="pcard-tag">' + (p.intent === "rent" ? (lang === "bm" ? "Untuk disewa" : (en ? "For rent" : "出租")) : (lang === "bm" ? "Untuk dijual" : (en ? "For sale" : "出售"))) + "</span></div>" +
     '<div class="pcard-body"><div class="pcard-title">' + esc(title) + "</div>" +
     '<div class="pcard-sub">' + esc([p.block, p.unit_no].filter(Boolean).join(" ")) + "</div>" +
     '<div class="pcard-sub">' + esc(areaName(p.area_code, en)) + " · " + esc([p.bedrooms, p.bathrooms].filter(function (x) { return x != null; }).join("/")) +
@@ -36,8 +37,13 @@ function card(p, en) {
 
 module.exports = function renderAgentPage(agent, listings, opts) {
   opts = opts || {};
-  const en = !!opts.en;
-  const L = en
+  const lang = opts.lang || (opts.en ? "en" : "zh");
+  const en = lang === "en";
+  const BM = { home: "Utama", find: "Kolam Senarai", agents: "Ejen", join: "Untuk Ejen", calc: "Kalkulator", login: "Log Masuk Ejen",
+    listings: "Senarai", verified: "Ejen disahkan", contact: "Hubungi", call: "Telefon", wa: "WhatsApp",
+    none: "Belum ada senarai awam.", areas: "Kawasan diliputi", about: "Tentang", back: "Kembali ke PropNet",
+    view: "Lihat senarai", license: "REN" };
+  const L = lang === "bm" ? BM : (en
     ? { home: "Home", find: "Listing pool", agents: "Agents", join: "For agents", calc: "Calculator", login: "Agent login",
         listings: "Listings", verified: "Verified agent", contact: "Contact", call: "Call", wa: "WhatsApp",
         none: "No public listings yet.", areas: "Areas covered", about: "About", back: "Back to PropNet",
@@ -45,13 +51,13 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     : { home: "首页", find: "房源池", agents: "找中介", join: "给中介", calc: "计算器", login: "中介登录",
         listings: "在售房源", verified: "已验证中介", contact: "联系", call: "打电话", wa: "WhatsApp",
         none: "暂时没有公开房源。", areas: "专长区域", about: "关于", back: "返回 PropNet",
-        view: "查看房源", license: "REN" };
+        view: "查看房源", license: "REN" });
 
   const name = agent.name || "Agent";
   const areas = (agent.areas || []).map(function (a) { return areaName(a, en); }).filter(Boolean);
   const wa = String(agent.phone || "").replace(/[^0-9]/g, "").replace(/^0/, "60");
   const title = esc(name + (agent.ren_no ? " · " + agent.ren_no : "") + " | PropNet");
-  const desc = esc((agent.bio || (en ? "Property agent on PropNet" : "PropNet 认证房产中介")) + " — " + (areas.slice(0, 4).join("、") || (en ? "Johor" : "柔佛")));
+  const desc = esc((agent.bio || (lang === "bm" ? "Ejen hartanah di PropNet" : (en ? "Property agent on PropNet" : "PropNet 认证房产中介"))) + " — " + (areas.slice(0, 4).join("、") || (lang === "bm" ? "Johor" : (en ? "Johor" : "柔佛"))));
 
   const ld = {
     "@context": "https://schema.org",
@@ -63,9 +69,9 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     worksFor: agent.team ? { "@type": "Organization", name: agent.team } : undefined
   };
 
-  const rows = (listings || []).map(function (p) { return card(p, en); }).join("");
+  const rows = (listings || []).map(function (p) { return card(p, lang); }).join("");
 
-  return '<!DOCTYPE html><html lang="' + (en ? "en" : "zh-CN") + '"><head>' +
+  return '<!DOCTYPE html><html lang="' + (lang === "bm" ? "ms" : (en ? "en" : "zh-CN")) + '"><head>' +
     '<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
     "<title>" + title + "</title>" +
     '<meta name="description" content="' + desc + '">' +
@@ -90,6 +96,8 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     '<a class="brand" href="/"><img src="/logo-white.png" alt="KWONG THYE"><span>PROPNET</span></a>' +
     '<nav class="site-nav"><a href="/properties/">' + L.find + '</a><a href="/agents/">' + L.agents + '</a><a href="/join/">' + L.join + '</a><a href="https://calc.kwongthye.com/">' + L.calc + '</a>' +
     '<a class="login" href="/agent/">' + L.login + "</a></nav>" +
+    '<div style="display:flex;gap:6px;margin-left:8px">' +
+    ["zh","en","bm"].map(function(k){ return '<a href="?lang=' + k + '" style="font-size:12px;padding:3px 8px;border:1px solid rgba(255,255,255,.25);border-radius:999px;color:' + (k===lang?'#E2C88F':'rgba(255,255,255,.7)') + '">' + (k==='zh'?'中文':(k==='en'?'EN':'BM')) + '</a>'; }).join("") + "</div>" +
     "</div></header>" +
     '<section class="agentHero"><div class="wrap">' +
     '<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">' +

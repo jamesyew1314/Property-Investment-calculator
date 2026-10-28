@@ -1415,7 +1415,7 @@ app.use("/api/public", createPublicApi({
 app.get("/a", function (req, res) { res.redirect(301, "/agents/"); });
 app.get("/a/:slug", async function (req, res, next) {
   try {
-    const en = req.query.lang === "en";
+    const lang = ["zh", "en", "bm"].indexOf(req.query.lang) >= 0 ? req.query.lang : "zh";
     const slug = String(req.params.slug || "").slice(0, 60);
     const out = await pool.query(
       "SELECT * FROM lib_agents WHERE lower(slug)=lower($1) AND status='active' AND public=true", [slug]);
@@ -1432,7 +1432,7 @@ app.get("/a/:slug", async function (req, res, next) {
       WHERE p.tenant_id=$1 AND p.visibility='public' AND p.status IN ('available','reserved')
       ORDER BY p.published_at DESC NULLS LAST, p.updated_at DESC LIMIT 60`, [agent.id]);
     res.set("Cache-Control", "public, max-age=300");
-    res.type("html").send(renderAgentPage(agent, rows.rows, { en: en }));
+    res.type("html").send(renderAgentPage(agent, rows.rows, { lang: lang }));
   } catch (e) { next(e); }
 });
 
