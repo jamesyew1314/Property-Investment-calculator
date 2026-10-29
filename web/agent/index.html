@@ -20,31 +20,31 @@
     <p class="sub" id="authSub">管理你的房源、客户与带看；发布一次，全团队帮你找买家。</p>
 
     <div class="tabs" id="authTabs">
-      <button type="button" class="on" data-mode="login" id="tabLogin">登录</button>
-      <button type="button" data-mode="register" id="tabRegister">免费注册</button>
+      <button type="button" class="on" data-mode="login" id="tabLogin" data-i18n="tab.login">登录</button>
+      <button type="button" data-mode="register" id="tabRegister" data-i18n="tab.register">免费注册</button>
     </div>
 
     <div id="regFields" hidden>
       <div class="grid2">
-        <div class="field"><label for="rName">姓名 *</label><input id="rName" autocomplete="name" placeholder="Andy Lau"></div>
-        <div class="field"><label for="rPhone">电话 / WhatsApp</label><input id="rPhone" inputmode="tel" autocomplete="tel" placeholder="012-345 6789"></div>
+        <div class="field"><label for="rName" data-i18n="f.name">姓名 *</label><input id="rName" autocomplete="name" placeholder="Andy Lau"></div>
+        <div class="field"><label for="rPhone" data-i18n="f.phone">电话 / WhatsApp</label><input id="rPhone" inputmode="tel" autocomplete="tel" placeholder="012-345 6789"></div>
       </div>
       <div class="grid2">
-        <div class="field"><label for="rTeam">团队 / 公司</label><input id="rTeam" placeholder="THE ROOF REALTY"></div>
-        <div class="field"><label for="rRen">REN 编号</label><input id="rRen" placeholder="REN 12345"></div>
+        <div class="field"><label for="rTeam" data-i18n="f.team">团队 / 公司</label><input id="rTeam" placeholder="THE ROOF REALTY"></div>
+        <div class="field"><label for="rRen" data-i18n="f.ren">REN 编号</label><input id="rRen" placeholder="REN 12345"></div>
       </div>
     </div>
 
-    <div class="field"><label for="aEmail">邮箱 *</label><input id="aEmail" type="email" autocomplete="username" placeholder="you@example.com"></div>
-    <div class="field"><label for="aPass">密码 *</label><input id="aPass" type="password" autocomplete="current-password" placeholder="至少 8 位"></div>
+    <div class="field"><label for="aEmail" data-i18n="f.email">邮箱 *</label><input id="aEmail" type="email" autocomplete="username" placeholder="you@example.com"></div>
+    <div class="field"><label for="aPass" data-i18n="f.pass">密码 *</label><input id="aPass" type="password" autocomplete="current-password" placeholder="至少 8 位" data-i18n-ph="ph.pass"></div>
 
     <button class="btn gold" id="authBtn" type="submit" style="width:100%;margin-top:6px">登录</button>
     <div class="msg" id="authMsg"></div>
-    <p class="sub" id="authNote" style="font-size:11.5px;margin-top:10px">注册后即可发布房源；邮箱验证后显示「已验证」。</p>
+    <p class="sub" id="authNote" style="font-size:11.5px;margin-top:10px"><span data-i18n="auth.note">注册后即可发布房源；邮箱验证后显示「已验证」。</span></p>
 
     <div class="authFoot">
       <span>© KWONG THYE · PROPNET</span>
-      <span><button type="button" id="authLang">EN</button> · <a href="/">返回官网</a></span>
+      <span><button type="button" id="authLang">EN</button> · <a href="/" data-i18n="auth.back">返回官网</a></span>
     </div>
   </form>
 </div>
@@ -61,7 +61,7 @@
       <span id="whoMeta">—</span>
       <div class="row">
         <button id="langBtn" type="button">EN</button>
-        <button id="logoutBtn" type="button">退出</button>
+        <button id="logoutBtn" type="button" data-i18n="logout">退出</button>
       </div>
     </div>
   </aside>

@@ -8,6 +8,32 @@
   };
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
+
+  var STATIC = {
+    "tab.login": ["登录", "Sign in"],
+    "tab.register": ["免费注册", "Create account"],
+    "f.name": ["姓名 *", "Name *"],
+    "f.phone": ["电话 / WhatsApp", "Phone / WhatsApp"],
+    "f.team": ["团队 / 公司", "Team / company"],
+    "f.ren": ["REN 编号", "REN number"],
+    "f.email": ["邮箱 *", "Email *"],
+    "f.pass": ["密码 *", "Password *"],
+    "ph.pass": ["至少 8 位", "At least 8 characters"],
+    "auth.note": ["注册后即可发布房源；邮箱验证后显示「已验证」。", "Publish right after signing up; a verified badge appears after email verification."],
+    "auth.back": ["返回官网", "Back to site"],
+    "logout": ["退出", "Log out"]
+  };
+  function applyStatic() {
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var v = STATIC[el.getAttribute("data-i18n")];
+      if (v) el.textContent = t(v[0], v[1]);
+    });
+    document.querySelectorAll("[data-i18n-ph]").forEach(function (el) {
+      var v = STATIC[el.getAttribute("data-i18n-ph")];
+      if (v) el.placeholder = t(v[0], v[1]);
+    });
+  }
+
   function t(zh, en) {
     if (S.lang === "bm") return (window.BM_MAP || {})[en] || en;
     return S.lang === "en" ? en : zh;
@@ -17,6 +43,7 @@
     S.lang = S.lang === "zh" ? "en" : (S.lang === "en" ? "bm" : "zh");
     localStorage.setItem("kt_lang", S.lang);
     document.documentElement.lang = S.lang === "zh" ? "zh-CN" : (S.lang === "bm" ? "ms" : "en");
+    applyStatic();
   }
   function esc(v) {
     return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
@@ -26,7 +53,7 @@
   function money(n, monthly) {
     var v = Number(n);
     if (!isFinite(v) || v === 0) return "—";
-    return "RM " + v.toLocaleString("en-MY", { maximumFractionDigits: 0 }) + (monthly ? (S.lang === "en" ? " /mo" : " /月") : "");
+    return "RM " + v.toLocaleString("en-MY", { maximumFractionDigits: 0 }) + (monthly ? (S.lang === "en" ? " /mo" : (S.lang === "bm" ? " /bln" : " /月")) : "");
   }
   function int(n) { var v = Number(n); return isFinite(v) ? v.toLocaleString("en-MY") : "—"; }
   function dt(s) { return s ? String(s).slice(0, 10) : "—"; }
@@ -66,7 +93,7 @@
   }
   function confirmBox(text, cb) {
     var m = modal({ title: t("确认", "Confirm"), body: '<p style="margin:0">' + esc(text) + "</p>",
-      footer: '<button class="btn line" data-close>取消</button><button class="btn danger" id="okBtn">确认</button>' });
+      footer: '<button class="btn line" data-close>' + t("取消", "Cancel") + '</button><button class="btn danger" id="okBtn">' + t("确认", "Confirm") + "</button>" });
     $("#okBtn", m.root).addEventListener("click", function () { m.close(); cb(); });
   }
   function field(label, html) { return '<div class="field"><label>' + esc(label) + "</label>" + html + "</div>"; }
@@ -74,7 +101,7 @@
     var states = (S.meta && S.meta.states) || [], areas = (S.meta && S.meta.areas) || [];
     var g = {};
     areas.forEach(function (a) { (g[a.state || ""] = g[a.state || ""] || []).push(a); });
-    var h = '<option value="">— 选择区域</option>';
+    var h = '<option value="">' + t("— 选择区域", "— Select area") + "</option>";
     states.forEach(function (st) {
       var items = g[st.key] || [];
       if (!items.length) return;
@@ -97,16 +124,16 @@
       return '<span class="chip" data-area-chip="' + code + '">' + esc(areaName(code)) + ' <button type="button" data-rm-area="' + code + '">×</button></span>';
     }).join("");
     return '<div class="areaPick"><div class="chips" data-chips>' + chips + '</div>' +
-      '<div class="row"><select data-ap-state>' + optList(stateList(), "", "— 州属") + '</select>' +
-      '<select data-ap-area><option value="">— 区域</option></select>' +
-      '<button type="button" class="btn line sm" data-add-area>+ 添加</button></div></div>';
+      '<div class="row"><select data-ap-state>' + optList(stateList(), "", t("— 州属", "— State")) + '</select>' +
+      '<select data-ap-area><option value="">' + t("— 区域", "— Area") + '</option></select>' +
+      '<button type="button" class="btn line sm" data-add-area>' + t("+ 添加", "+ Add") + "</button></div></div>";
   }
   function bindAreaPicker(root) {
     var st = $("[data-ap-state]", root), ar = $("[data-ap-area]", root), add = $("[data-add-area]", root);
     if (!st || !ar) return;
     var fill = function () {
       var list = ((S.meta && S.meta.areas) || []).filter(function (a) { return !st.value || a.state === st.value; });
-      ar.innerHTML = '<option value="">— 区域</option>' + list.map(function (a) {
+      ar.innerHTML = '<option value="">' + t("— 区域", "— Area") + "</option>" + list.map(function (a) {
         return '<option value="' + a.key + '">' + esc(S.lang === "en" ? a.en : a.zh) + "</option>";
       }).join("");
     };
@@ -135,6 +162,7 @@
     $("#authLang").textContent = langLabel();
   }
   function setAuthMode(mode) {
+    applyStatic();
     S.authMode = mode;
     $("#tabLogin").classList.toggle("on", mode === "login");
     $("#tabRegister").classList.toggle("on", mode === "register");
@@ -194,6 +222,7 @@
     { key: "profile", zh: "个人资料", en: "Profile", ico: "⚙" }
   ];
   function renderNav() {
+    applyStatic();
     var r = S.route || "";
     $("#nav").innerHTML = NAV.filter(function (n) { return SHOW_PLAN || n.key !== "plan"; }).map(function (n) {
       var badge = n.badge && S.stats && S.stats.new_inquiries > 0 ? '<span class="n">' + S.stats.new_inquiries + "</span>" : "";
@@ -201,7 +230,7 @@
         esc(t(n.zh, n.en)) + "</span>" + badge + "</a>";
     }).join("");
     $("#whoName").textContent = S.me ? S.me.name : "—";
-    $("#whoMeta").textContent = S.me ? ((S.me.ren_no || "PropNet") + (S.me.verified ? " · ✓已验证" : "")) : "";
+    $("#whoMeta").textContent = S.me ? ((S.me.ren_no || "PropNet") + (S.me.verified ? t(" · ✓已验证", " · ✓ verified") : "")) : "";
     $("#langBtn").textContent = langLabel();
   }
   function boot() {
@@ -269,10 +298,10 @@
     });
   }
   function pill(status) {
-    var map = { new: ["blue", "新"], accepted: ["green", "已接受"], declined: ["grey", "已拒绝"], done: ["green", "已完成"],
-      available: ["green", "在售/在租"], reserved: ["amber", "已订"], sold: ["grey", "已售"], rented: ["grey", "已租"], off_market: ["grey", "下架"] };
-    var m = map[status] || ["grey", status];
-    return '<span class="pill ' + m[0] + '">' + esc(S.lang === "en" ? status : m[1]) + "</span>";
+    var map = { new: ["blue", "新", "New"], accepted: ["green", "已接受", "Accepted"], declined: ["grey", "已拒绝", "Declined"], done: ["green", "已完成", "Done"],
+      available: ["green", "在售/在租", "Available"], reserved: ["amber", "已订", "Reserved"], sold: ["grey", "已售", "Sold"], rented: ["grey", "已租", "Rented"], off_market: ["grey", "下架", "Off market"] };
+    var m = map[status] || ["grey", status, status];
+    return '<span class="pill ' + m[0] + '">' + esc(t(m[1], m[2])) + "</span>";
   }
   function visPill(v) { return '<span class="pill ' + (v === "public" ? "green" : "grey") + '">' + (v === "public" ? t("官网公开", "Public") : t("仅池内", "Pool only")) + "</span>"; }
 
@@ -380,7 +409,7 @@
     var m = modal({
       title: t("一键导入房源", "Import a listing"),
       body: '<p class="muted" style="margin:0 0 8px">' + t("把 WhatsApp 群文案或网页上复制的文字粘进来，系统自动识别楼盘、区域、价格、房型、面积、单位。", "Paste WhatsApp text or copied web text; we extract project, area, price, type, size and unit.") + "</p>" +
-        '<textarea id="impText" placeholder="【出售】Sutera Utama 五福城&#10;3房2卫 1150sqft&#10;RM 728,000&#10;A-12-03" style="width:100%;min-height:160px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace"></textarea>',
+        '<textarea id="impText" placeholder="' + t("【出售】Sutera Utama 五福城&#10;3房2卫 1150sqft&#10;RM 728,000&#10;A-12-03", "【For sale】Sutera Utama&#10;3 bed 2 bath 1150sqft&#10;RM 728,000&#10;A-12-03") + '" style="width:100%;min-height:160px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace"></textarea>',
       footer: '<button class="btn line" data-close>' + t("取消", "Cancel") + "</button>" +
         '<button class="btn gold" id="impGo">' + t("识别并填入", "Parse & fill") + "</button>"
     });
@@ -450,11 +479,11 @@
     if (row.built_up) bits.push(int(row.built_up) + " sqft");
     var who = S.me.name + (S.me.ren_no ? " (" + S.me.ren_no + ")" : "") + (S.me.phone ? " " + S.me.phone : "");
     var lines = [
-      (row.intent === "rent" ? "【出租】" : "【出售】") + title,
+      (row.intent === "rent" ? (S.lang === "bm" ? "【Untuk disewa】" : "【出租】") : (S.lang === "bm" ? "【Untuk dijual】" : "【出售】")) + title,
       areaName(row.area_code) + " · " + money(price, row.intent === "rent") + (bits.length ? " · " + bits.join(" ") : ""),
-      (S.lang === "en" ? "Agent: " : "中介：") + who,
+      (S.lang === "en" ? "Agent: " : (S.lang === "bm" ? "Ejen: " : "中介：")) + who,
       "https://kwongthye.com/properties/?p=" + row.code,
-      S.lang === "en" ? "Co-broke welcome · PropNet" : "同行可带看 · 成交有记录 · PropNet"
+      (S.lang === "en" ? "Co-broke welcome · PropNet" : (S.lang === "bm" ? "Co-broke dialu-alukan · PropNet" : "同行可带看 · 成交有记录 · PropNet"))
     ];
     return lines.join("\n");
   }
@@ -843,6 +872,10 @@
       field(t("确认新密码", "Confirm"), '<input id="acPw2" type="password">') + "</div>" +
       '<button class="btn dark" id="acPwBtn">' + t("修改密码", "Change password") + "</button></div>";
 
+    h += '<div class="card" style="border-left:3px solid #B23B3B"><h3>' + t("危险区域", "Danger zone") + "</h3>" +
+      '<p class="muted" style="margin:0 0 10px">' + t("注销后：房源、客户、询盘、图片与账号全部删除，不可恢复。", "Deleting removes your listings, clients, inquiries, photos and account. This cannot be undone.") + "</p>" +
+      '<button class="btn danger" id="acDel">' + t("注销账号", "Delete account") + "</button></div>";
+
     h += '<div class="card"><h3>' + t("邮箱验证", "Email verification") + "</h3>" +
       (a.emailVerified ? '<p class="muted" style="margin:0">' + t("已验证 ✓", "Verified ✓") + "</p>"
         : '<p class="muted" style="margin:0 0 8px">' + t("未验证。验证后房源显示「已验证」标记。", "Not verified. Verified listings show a badge.") +
@@ -878,6 +911,27 @@
           toast(e.message === "bad_password" ? t("密码不正确", "Wrong password") : e.message === "email_exists" ? t("邮箱已被使用", "Email already used") : t("邮箱格式不对", "Invalid email"), true);
         });
     });
+    $("#acDel", $("#view")).addEventListener("click", function () {
+      var m = modal({
+        title: t("注销账号", "Delete account"),
+        body: '<p style="margin:0 0 10px;color:#B23B3B;font-weight:600">' + t("此操作不可恢复。", "This cannot be undone.") + "</p>" +
+          '<p class="muted" style="margin:0 0 10px">' + t("将删除：所有房源（含图片）、客户、询盘、订阅与账号本身；审计日志保留。", "Will delete: all listings (with photos), clients, inquiries, subscriptions and the account; audit logs are kept.") + "</p>" +
+          field(t("当前密码", "Current password"), '<input id="delPw" type="password">') +
+          field(t("输入「注销」确认", "Type DELETE to confirm"), '<input id="delConfirm" placeholder="' + t("注销", "DELETE") + '">'),
+        footer: '<button class="btn line" data-close>' + t("取消", "Cancel") + "</button>" +
+          '<button class="btn danger" id="delGo">' + t("确认注销", "Delete forever") + "</button>"
+      });
+      $("#delGo", m.root).addEventListener("click", function () {
+        var btn = this; btn.disabled = true;
+        api("/delete", { method: "POST", body: { password: $("#delPw", m.root).value, confirm: $("#delConfirm", m.root).value } })
+          .then(function () { m.close(); alert(t("账号已注销", "Account deleted")); location.href = "/"; })
+          .catch(function (e) {
+            btn.disabled = false;
+            m.msg(e.message === "bad_password" ? t("密码不正确", "Wrong password") : e.message === "confirm_required" ? t("请输入「注销」确认", "Type 注销 to confirm") : e.message);
+          });
+      });
+    });
+
     $("#acPwBtn", $("#view")).addEventListener("click", function () {
       var p0 = $("#acPw0").value, p1 = $("#acPw1").value, p2 = $("#acPw2").value;
       if (p1.length < 8) return toast(t("新密码至少 8 位", "At least 8 characters"), true);
