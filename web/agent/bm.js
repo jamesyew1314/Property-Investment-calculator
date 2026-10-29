@@ -118,6 +118,7 @@ window.BM_MAP = {
   "Max 12 photos": "Maksimum 12 foto",
   "Email language": "Bahasa e-mel",
   "Loading…": "Memuatkan…",
+  "Preferred time / client notes": "Masa tontonan / nota klien",
   "Import": "Import",
   "Import a listing": "Import senarai",
   "Paste WhatsApp text or copied web text; we extract project, area, price, type, size and unit.": "Tampal teks WhatsApp atau teks web yang disalin; kami ekstrak projek, kawasan, harga, jenis, saiz dan unit.",

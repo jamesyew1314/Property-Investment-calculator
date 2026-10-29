@@ -641,7 +641,7 @@
       body: '<form id="if"><div class="grid2">' +
         field(t("客户姓名 *", "Client name *"), '<input name="client_name">') +
         field(t("客户电话 *", "Client phone *"), '<input name="client_phone" inputmode="tel">') + "</div>" +
-        field(t("留言（选填）", "Message"), '<textarea name="message" placeholder="带看时间 / 客户情况"></textarea>') + "</form>",
+        field(t("留言（选填）", "Message"), '<textarea name="message" placeholder="' + t("带看时间 / 客户情况", "Preferred time / client notes") + '"></textarea>') + "</form>",
       footer: '<button class="btn line" data-close>' + t("取消", "Cancel") + "</button><button class=\"btn gold\" id=\"send\">" + t("发送申请", "Send") + "</button>"
     });
     $("#send", m.root).addEventListener("click", function () {
