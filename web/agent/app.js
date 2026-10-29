@@ -39,11 +39,13 @@
     return S.lang === "en" ? en : zh;
   }
   function langLabel() { return S.lang === "zh" ? "EN" : (S.lang === "en" ? "BM" : "中文"); }
+  function langNow() { return S.lang === "zh" ? "中文" : (S.lang === "en" ? "EN" : "BM"); }
+  function paintFloat() { var b = document.getElementById("langFloat"); if (b) b.textContent = langNow(); }
   function cycleLang() {
     S.lang = S.lang === "zh" ? "en" : (S.lang === "en" ? "bm" : "zh");
     localStorage.setItem("kt_lang", S.lang);
     document.documentElement.lang = S.lang === "zh" ? "zh-CN" : (S.lang === "bm" ? "ms" : "en");
-    applyStatic();
+    applyStatic(); paintFloat();
   }
 
   function projName(r) {
@@ -230,7 +232,7 @@
     { key: "profile", zh: "个人资料", en: "Profile", ico: "⚙" }
   ];
   function renderNav() {
-    applyStatic();
+    applyStatic(); paintFloat();
     var r = S.route || "";
     $("#nav").innerHTML = NAV.filter(function (n) { return SHOW_PLAN || n.key !== "plan"; }).map(function (n) {
       var badge = n.badge && S.stats && S.stats.new_inquiries > 0 ? '<span class="n">' + S.stats.new_inquiries + "</span>" : "";
@@ -996,6 +998,10 @@
   $("#authForm").addEventListener("submit", submitAuth);
   $$("#authTabs button").forEach(function (b) {
     b.addEventListener("click", function () { setAuthMode(b.dataset.mode); });
+  });
+  if (document.getElementById("langFloat")) $("#langFloat").addEventListener("click", function () {
+    cycleLang();
+    if (S.me) { renderNav(); route(); } else { setAuthMode(S.authMode); }
   });
   $("#authLang").addEventListener("click", function () {
     cycleLang(); $("#authLang").textContent = langLabel(); setAuthMode(S.authMode);

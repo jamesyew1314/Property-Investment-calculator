@@ -36,7 +36,7 @@
       if (v) el.placeholder = pick(v);
     });
     document.documentElement.lang = lang === "zh" ? "zh-CN" : (lang === "bm" ? "ms" : "en");
-    $$(".lang-toggle").forEach(function (b) { b.textContent = langLabel(); });
+    $$(".lang-toggle, .lang-fab").forEach(function (b) { b.textContent = langLabel(); });
     document.dispatchEvent(new CustomEvent("kt:lang", { detail: lang }));
   }
   function setLang(next) {
@@ -141,6 +141,13 @@
       $$("a", nav).forEach(function (a) { a.addEventListener("click", function () { nav.classList.remove("open"); }); });
     }
     $$(".lang-toggle").forEach(function (b) { b.addEventListener("click", toggle); });
+    if (!document.querySelector(".lang-fab")) {
+      var fab = document.createElement("button");
+      fab.type = "button"; fab.className = "lang-fab"; fab.textContent = langLabel();
+      fab.setAttribute("aria-label", "language");
+      fab.addEventListener("click", toggle);
+      document.body.appendChild(fab);
+    }
   }
 
   window.KT = {
