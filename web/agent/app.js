@@ -45,6 +45,14 @@
     document.documentElement.lang = S.lang === "zh" ? "zh-CN" : (S.lang === "bm" ? "ms" : "en");
     applyStatic();
   }
+
+  function projName(r) {
+    if (!r) return "—";
+    var zh = r.project_title_zh || r.project_title || r.project_name || "—";
+    var en = r.project_title || r.project_name || r.project_title_zh || "—";
+    return S.lang === "zh" ? zh : en;
+  }
+
   function esc(v) {
     return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -472,7 +480,7 @@
   // ---------- 分享卡（浏览器 canvas 生成 PNG） ----------
   function shareText(row) {
     var price = row.intent === "rent" ? row.rent_price : row.asking_price;
-    var title = row.project_title_zh || row.project_title || row.project_name || "—";
+    var title = projName(row);
     var bits = [];
     if (row.bedrooms) bits.push(row.bedrooms + (S.lang === "en" ? " bed" : "房"));
     if (row.bathrooms) bits.push(row.bathrooms + (S.lang === "en" ? " bath" : "卫"));
@@ -515,7 +523,7 @@
     ctx.strokeStyle = "rgba(198,161,91,.35)"; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(86, 200); ctx.lineTo(W - 86, 200); ctx.stroke();
 
-    var title = (row.project_title_zh || row.project_title || row.project_name || "—");
+    var title = projName(row);
     ctx.fillStyle = "#fff"; ctx.font = "700 66px Georgia, 'Songti SC', serif";
     var lines = wrapText(ctx, title, W - 172, 2);
     lines.forEach(function (ln, i) { ctx.fillText(ln, 86, 300 + i * 82); });
@@ -610,7 +618,7 @@
           var mine = r.tenant_id === S.me.id;
           return '<div class="pcard"><div style="display:flex;gap:8px;align-items:center"><span class="mono">' + esc(r.code) + "</span>" +
             (mine ? '<span class="pill grey">' + t("我的", "Mine") + "</span>" : "") + "</div>" +
-            '<div class="t">' + esc(r.project_title_zh || r.project_title || r.project_name || "—") + "</div>" +
+            '<div class="t">' + esc(projName(r)) + "</div>" +
             '<div class="meta">' + esc(areaName(r.area_code)) + " · " + [r.bedrooms, r.bathrooms].filter(function (x) { return x != null; }).join("/") +
             (r.built_up ? " · " + int(r.built_up) + " sqft" : "") + "</div>" +
             '<div class="price">' + money(price, r.intent === "rent") + "</div>" +
@@ -755,7 +763,7 @@
             "</th><th class='num'>" + t("价格", "Price") + "</th><th>" + t("货源", "Owner") + "</th><th>" + t("操作", "Action") + "</th></tr></thead><tbody>" +
             row.matches.map(function (m) {
               var price = m.intent === "rent" ? m.rent_price : m.asking_price;
-              return "<tr><td><b>" + esc(m.project_title_zh || m.project_title || m.project_name || "—") + "</b> <span class='mono muted'>" + esc(m.code) + "</span></td><td>" +
+              return "<tr><td><b>" + esc(projName(m)) + "</b> <span class='mono muted'>" + esc(m.code) + "</span></td><td>" +
                 esc(areaName(m.area_code)) + "</td><td class='num'>" + money(price, m.intent === "rent") + "</td><td>" + esc(m.owner_name || "—") +
                 "</td><td><button class='btn gold sm' data-act='inquiry' data-code='" + esc(m.code) + "'>" + t("申请带看", "Request") + "</button></td></tr>";
             }).join("") + "</tbody></table></div>";
