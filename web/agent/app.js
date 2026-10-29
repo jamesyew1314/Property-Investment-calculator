@@ -927,7 +927,7 @@
           .then(function () { m.close(); alert(t("账号已注销", "Account deleted")); location.href = "/"; })
           .catch(function (e) {
             btn.disabled = false;
-            m.msg(e.message === "bad_password" ? t("密码不正确", "Wrong password") : e.message === "confirm_required" ? t("请输入「注销」确认", "Type 注销 to confirm") : e.message);
+            m.msg(e.message === "bad_password" ? t("密码不正确", "Wrong password") : e.message === "confirm_required" ? t("请输入「注销」确认", "Type DELETE to confirm") : e.message);
           });
       });
     });
