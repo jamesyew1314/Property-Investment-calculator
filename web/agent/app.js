@@ -169,7 +169,7 @@
   function showAuth(tab) {
     $("#app").hidden = true; $("#auth").hidden = false;
     setAuthMode(tab || S.authMode);
-    $("#authLang").textContent = langLabel();
+    var _al = $("#authLang"); if (_al) _al.textContent = langLabel();
   }
   function setAuthMode(mode) {
     applyStatic();
@@ -241,7 +241,7 @@
     }).join("");
     $("#whoName").textContent = S.me ? S.me.name : "—";
     $("#whoMeta").textContent = S.me ? ((S.me.ren_no || "PropNet") + (S.me.verified ? t(" · ✓已验证", " · ✓ verified") : "")) : "";
-    $("#langBtn").textContent = langLabel();
+    var _lb = $("#langBtn"); if (_lb) _lb.textContent = langLabel();
   }
   function boot() {
     $("#auth").hidden = true; $("#app").hidden = false;
