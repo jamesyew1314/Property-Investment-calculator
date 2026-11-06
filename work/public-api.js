@@ -158,7 +158,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
 
   r.get("/listing/:code", async function (req, res, next) {
     try {
-      const out = await pool.query(PUBLIC_SELECT + " WHERE p.code=$1 AND p.visibility='public' AND p.status IN ('available','reserved')", [req.params.code]);
+      const out = await pool.query(PUBLIC_SELECT + " AND p.code=$1", [req.params.code]);
       if (!out.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
       res.json({ ok: true, row: out.rows[0] });
     } catch (e) { next(e); }
@@ -168,7 +168,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
     try {
       const codes = String(req.query.codes || "").split(",").map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 30);
       if (!codes.length) return res.json({ ok: true, rows: [] });
-      const out = await pool.query(PUBLIC_SELECT + " WHERE p.code = ANY($1) AND p.visibility='public' AND p.status IN ('available','reserved')", [codes]);
+      const out = await pool.query(PUBLIC_SELECT + " AND p.code = ANY($1)", [codes]);
       res.json({ ok: true, rows: out.rows });
     } catch (e) { next(e); }
   });
