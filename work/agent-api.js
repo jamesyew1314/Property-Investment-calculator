@@ -337,8 +337,16 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       res.json({ ok: true });
       if (!email) return;
       const out = await pool.query("SELECT * FROM lib_agents WHERE lower(email)=$1 AND status='active'", [email]);
-      const a = out.rows[0];
-      if (!a) return;
+      let a = out.rows[0];
+      if (!a) {
+        const exists = await pool.query("SELECT id FROM lib_agents WHERE lower(email)=$1", [email]);
+        if (exists.rows[0]) return;
+        const nm = email.split("@")[0].replace(/[._-]+/g, " ").slice(0, 40) || "Agent";
+        const ins = await pool.query(
+          "INSERT INTO lib_agents(name, email, password_hash, status, public, lang) VALUES($1,$2,$3,'active',true,'zh') RETURNING *",
+          [nm, email, hashPw(crypto.randomBytes(16).toString("hex"))]);
+        a = ins.rows[0];
+      }
       const raw = crypto.randomBytes(32).toString("hex");
       await pool.query("INSERT INTO agent_magic_links(agent_id, token_hash, expires_at) VALUES($1,$2,now()+interval '20 minutes')", [a.id, sha256(raw)]);
       magicMail(a, raw).catch(function (e) { console.error("magic mail failed", e.message); });
@@ -355,7 +363,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       const row = out.rows[0];
       if (!row) return res.status(401).json({ ok: false, error: "invalid_token" });
       await pool.query("UPDATE agent_magic_links SET used_at=now() WHERE id=$1", [row.mid]);
-      await pool.query("UPDATE lib_agents SET last_login_at=now() WHERE id=$1", [row.id]);
+      await pool.query("UPDATE lib_agents SET last_login_at=now(), email_verified_at=COALESCE(email_verified_at, now()) WHERE id=$1", [row.id]);
       const token = await createSession(row.id);
       setCookie(res, token);
       res.json({ ok: true, agent: publicAgent(row) });

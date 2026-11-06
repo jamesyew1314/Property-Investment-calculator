@@ -16,6 +16,7 @@ RSYNC="rsync -az -e \"ssh -i $KEY -o StrictHostKeyChecking=no\""
 echo "▸ 1/5 回归测试"
 node web/test.js | tail -1
 node work/test-library.js | tail -1
+node work/test-brand.js | tail -1
 
 echo "▸ 2/5 上传静态站点"
 rsync -az -e "ssh -i $KEY -o StrictHostKeyChecking=no" \
