@@ -137,8 +137,19 @@
     var btn = $(".menu-btn");
     var nav = $(".site-nav");
     if (btn && nav) {
-      btn.addEventListener("click", function () { nav.classList.toggle("open"); });
-      $$("a", nav).forEach(function (a) { a.addEventListener("click", function () { nav.classList.remove("open"); }); });
+      btn.setAttribute("aria-expanded", "false");
+      btn.addEventListener("click", function () {
+        var on = nav.classList.toggle("open");
+        document.body.classList.toggle("nav-open", on);
+        btn.setAttribute("aria-expanded", on ? "true" : "false");
+      });
+      $$("a", nav).forEach(function (a) {
+        a.addEventListener("click", function () {
+          nav.classList.remove("open");
+          document.body.classList.remove("nav-open");
+          btn.setAttribute("aria-expanded", "false");
+        });
+      });
     }
     $$(".lang-toggle").forEach(function (b) { b.addEventListener("click", toggle); });
     if (!document.querySelector(".lang-fab")) {

@@ -273,6 +273,7 @@
     if (!SHOW_PLAN && p.path === "plan") { location.hash = "#/"; return; }
     S.route = p.path;
     renderNav();
+    closeDrawer();
     $("#view").innerHTML = '<div class="card">' + t("加载中…", "Loading…") + "</div>";
     var fn = ({ "": dash, listings: listings, pool: pool, clients: clients, matches: matches, inquiries: inquiries, mandates: mandates, plan: plan, profile: profile })[p.path];
     if (!fn) { location.hash = "#/"; return; }
@@ -1227,7 +1228,21 @@
   $("#logoutBtn").addEventListener("click", function () {
     api("/logout", { method: "POST" }).then(function () { S.me = null; showAuth("login"); }).catch(function () { showAuth("login"); });
   });
-  $("#burger").addEventListener("click", function () { $("#side").classList.toggle("on"); });
+  function closeDrawer() {
+    $("#side").classList.remove("on");
+    var o = $("#drawerOvl");
+    if (o) { o.classList.remove("on"); o.hidden = true; }
+    document.body.style.overflow = "";
+  }
+  $("#burger").addEventListener("click", function () {
+    var on = $("#side").classList.toggle("on");
+    var o = $("#drawerOvl");
+    if (o) { o.hidden = !on; o.classList.toggle("on", on); }
+    document.body.style.overflow = on ? "hidden" : "";
+  });
+  var _dovl = $("#drawerOvl");
+  if (_dovl) _dovl.addEventListener("click", closeDrawer);
+  document.addEventListener("click", function (e) { if (e.target.closest("#side nav a")) closeDrawer(); });
 
   // ---------- 启动 ----------
   function start() {

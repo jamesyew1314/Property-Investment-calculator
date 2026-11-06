@@ -271,3 +271,39 @@ body.is-free .pool-tier{display:none!important}
     cursor:pointer;backdrop-filter:blur(6px)}
   .lang-fab:hover{border-color:var(--gold2)}
 }
+
+/* ---------- 手机端深度优化 ---------- */
+@media (max-width:760px){
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{overscroll-behavior-y:contain}
+  body.nav-open{overflow:hidden}
+  .wrap{padding-left:16px;padding-right:16px}
+  .site-head .bar{height:60px;gap:10px}
+  .site-nav{top:60px;max-height:calc(100dvh - 60px);overflow:auto;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+  .site-nav a{min-height:46px;display:flex;align-items:center}
+  .menu-btn{min-width:42px;min-height:42px;display:flex;align-items:center;justify-content:center}
+  .lang-fab{top:12px;right:58px}
+  .hero{padding:40px 0 44px}
+  .hero h1{font-size:30px;line-height:1.16}
+  .hero .lead{font-size:14.5px;line-height:1.75}
+  .hero-stats{gap:18px;flex-wrap:wrap}
+  .searchbar{grid-template-columns:1fr;gap:10px}
+  .searchbar .btn{width:100%;min-height:46px}
+  .btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+  input,select,textarea{font-size:16px !important}
+  .pcard{border-radius:12px}
+  .pcard-media{aspect-ratio:4/3}
+  .agentGrid,.favGrid{grid-template-columns:1fr}
+  .pd{padding:18px 0 64px}
+  .pd-photo{aspect-ratio:4/3;border-radius:12px}
+  .pd-thumbs{display:flex;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+  .pd-thumbs img{flex:0 0 auto}
+  .waFloat{bottom:calc(14px + env(safe-area-inset-bottom)) !important;right:14px !important}
+  .site-foot .cols{grid-template-columns:1fr;gap:18px}
+  .agentHero{padding:32px 0 26px}
+  .agentHero .bio{font-size:14px}
+  .agentStats{gap:18px}
+  .shareRow button,.shareRow a{min-height:40px}
+  .poolGate{padding:22px}
+  .tiers{grid-template-columns:1fr}
+}
