@@ -135,7 +135,7 @@
       return '<span class="chip" data-area-chip="' + code + '">' + esc(areaName(code)) + ' <button type="button" data-rm-area="' + code + '">×</button></span>';
     }).join("");
     return '<div class="areaPick"><div class="chips" data-chips>' + chips + '</div>' +
-      '<div class="row"><select data-ap-state>' + optList(stateList(), "", t("— 州属", "— State")) + '</select>' +
+      '<div class="row"><select data-ap-state>' + optList(stateList(), stateList().length === 1 ? stateList()[0].key : "", t("— 州属", "— State")) + '</select>' +
       '<select data-ap-area><option value="">' + t("— 区域", "— Area") + '</option></select>' +
       '<button type="button" class="btn line sm" data-add-area>' + t("+ 添加", "+ Add") + "</button></div></div>";
   }
@@ -149,6 +149,15 @@
       }).join("");
     };
     st.addEventListener("change", fill);
+    if (stateList().length === 1 && !st.value) st.value = stateList()[0].key;
+    fill();
+    if (!stateList().length || !((S.meta && S.meta.areas) || []).length) {
+      fetch("/api/public/config?t=" + Date.now()).then(function (r) { return r.json(); }).then(function (cfg) {
+        S.meta = { states: cfg.states || [], areas: cfg.areas || [], property_types: (cfg.taxonomy || {}).property_types || [], tenures: (cfg.taxonomy || {}).tenures || [] };
+        st.innerHTML = optList(stateList(), stateList().length === 1 ? stateList()[0].key : "", t("— 州属", "— State"));
+        fill();
+      }).catch(function () {});
+    }
     fill();
     add.addEventListener("click", function () {
       var code = ar.value; if (!code) return;
