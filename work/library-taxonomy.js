@@ -183,7 +183,10 @@ const CONDITIONS = [
   { key: "renovated", zh: "已翻新", en: "Renovated" },
   { key: "good", zh: "状况良好", en: "Good" },
   { key: "fair", zh: "一般", en: "Fair" },
-  { key: "needs_work", zh: "需整修", en: "Needs work" }
+  { key: "needs_work", zh: "需整修", en: "Needs work" },
+  { key: "vacant", zh: "空置", en: "Vacant" },
+  { key: "occupied", zh: "自住", en: "Occupied" },
+  { key: "tenanted", zh: "出租中", en: "Tenanted" }
 ];
 
 const LISTING_INTENTS = [

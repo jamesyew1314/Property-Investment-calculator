@@ -1,0 +1,12 @@
+BEGIN;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS bumi text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS security text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS renovation text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS other_renovation text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS selling_points text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS price_unit text NOT NULL DEFAULT 'total';
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS bank_value numeric(18,2);
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS show_psf boolean NOT NULL DEFAULT false;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS show_address boolean NOT NULL DEFAULT false;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS expected_bank_value boolean NOT NULL DEFAULT false;
+COMMIT;

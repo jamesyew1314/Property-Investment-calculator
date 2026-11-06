@@ -448,6 +448,13 @@
       field(t("可否议价", "Negotiable"), '<label style="display:flex;gap:8px;align-items:center;padding:9px 0"><input type="checkbox" name="negotiable" value="true"' + (row.negotiable ? " checked" : "") + "> " + t("可议价", "Negotiable") + "</label>") + "</div>" +
       '<div class="grid2">' + field(t("售价 (RM)", "Asking price"), '<input name="asking_price" inputmode="numeric" value="' + esc(row.asking_price || "") + '">') +
       field(t("租金 (RM/月)", "Monthly rent"), '<input name="rent_price" inputmode="numeric" value="' + esc(row.rent_price || "") + '">') + "</div>" +
+      '<div class="grid2">' + field(t("价钱单位", "Price unit"), '<select name="price_unit">' + optList([{key:"total",zh:"总价 Total",en:"Total"},{key:"psf",zh:"每平方尺 psf",en:"Per sqft"}], row.price_unit || "total", false) + "</select>") +
+      field(t("银行估价 (RM)", "Bank value"), '<input name="bank_value" inputmode="numeric" value="' + esc(row.bank_value || "") + '">') + "</div>" +
+      '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:0 0 10px">' +
+      '<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" name="show_psf" value="true"' + (row.show_psf ? " checked" : "") + "> " + t("显示每平方尺价", "Show psf") + "</label>" +
+      '<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" name="show_address" value="true"' + (row.show_address ? " checked" : "") + "> " + t("附完整地址", "Show full address") + "</label>" +
+      '<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" name="expected_bank_value" value="true"' + (row.expected_bank_value ? " checked" : "") + "> " + t("用银行估价代替售价", "Use bank valuation") + "</label>" +
+      "</div>" +
       '<h4 style="margin:4px 0 8px;color:#0E2438">' + t("产业资料", "Property") + "</h4>" +
       '<div class="grid2">' + field(t("卖点标题（选填）", "Headline (optional)"), '<input name="headline" value="' + esc(row.headline || "") + '" placeholder="' + t("例如：低于市价 / Ready move in", "e.g. Below market value") + '">') +
       field(t("区域（用于搜索）", "Area"), '<select name="area_code">' + areaOptions(row.area_code) + "</select>") + "</div>" +
@@ -466,6 +473,21 @@
       field(t("方向", "Facing"), '<input name="facing" value="' + esc(row.facing || "") + '" placeholder="South">') + "</div>" +
       '<div class="grid2">' + field(t("产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") +
       field(t("地契", "Title"), '<select name="title_type">' + optList((S.meta && S.meta.title_types) || [], row.title_type, "—") + "</select>") + "</div>" +
+      '<div class="grid2">' + field(t("家私", "Furnishing"), '<select name="furnishing">' + optList([{key:"unfurnished",zh:"空屋",en:"Unfurnished"},{key:"partial",zh:"部分装修",en:"Partially furnished"},{key:"full",zh:"全装修",en:"Fully furnished"}], row.furnishing, "—") + "</select>") +
+      field(t("保安", "Security"), '<select name="security">' + optList([{key:"gated",zh:"围篱",en:"Gated"},{key:"guarded",zh:"保安",en:"Guarded"},{key:"none",zh:"无",en:"None"}], row.security, "—") + "</select>") + "</div>" +
+      '<div class="grid2">' + field(t("Bumi 状态", "Bumi status"), '<select name="bumi">' + optList([{key:"bumi",zh:"Bumi",en:"Bumi"},{key:"non_bumi",zh:"非 Bumi",en:"Non-Bumi"},{key:"any",zh:"不限",en:"Any"}], row.bumi, "—") + "</select>") +
+      field(t("管理费 (RM/月)", "Maintenance fee"), '<input name="maintenance_fee" inputmode="numeric" value="' + esc(row.maintenance_fee || "") + '">') + "</div>" +
+      '<div class="grid2">' + field(t("现况", "Condition"), '<select name="condition">' + optList([{key:"vacant",zh:"空置",en:"Vacant"},{key:"occupied",zh:"自住",en:"Occupied"},{key:"tenanted",zh:"出租中",en:"Tenanted"},{key:"renovated",zh:"已装修",en:"Renovated"}], row.condition, "—") + "</select>") + "</div>" +
+      '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("装修和卖点", "Renovation & highlights") + "</h4>" +
+      '<div class="muted" style="font-size:12px;margin-bottom:6px">' + t("点选有的装修（再点一次取消）", "Tap what the unit has (tap again to remove)") + "</div>" +
+      '<div id="renChips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">' +
+      [["kitchen_ext","Kitchen Extended 厨房扩建"],["back_ext","Back Extended 后面扩建"],["full_ext","Fully Extended 全扩建"],["awning","Awning 遮阳棚"],["plaster","Plaster Ceiling 石膏天花板"],["autogate","Autogate 自动门"],["grille","Grille 铁花"],["cabinet","Kitchen Cabinet 厨房柜"],["wardrobe","Built-in Wardrobe 嵌入式衣柜"],["aircond","Aircond 冷气"],["heater","Water Heater 热水器"],["solar","Solar Panel 太阳能板"],["tiles","Tiles Upgraded 换新瓷砖"],["bath","Renovated Bathroom 浴室翻新"]].map(function (r) {
+        var on = String(row.renovation || "").split(",").indexOf(r[0]) >= 0;
+        return '<button type="button" class="chip' + (on ? " on" : "") + '" data-ren="' + r[0] + '" style="border:1px solid #D6DCE7;border-radius:999px;padding:6px 11px;background:' + (on ? "#0E2438" : "#fff") + ';color:' + (on ? "#fff" : "#41505F") + ';font-size:12px;cursor:pointer">' + r[1] + "</button>";
+      }).join("") + "</div>" +
+      '<input type="hidden" name="renovation" id="renVal" value="' + esc(row.renovation || "") + '">' +
+      field(t("其他装修（一行一项）", "Other renovation (one per line)"), '<textarea name="other_renovation">' + esc(row.other_renovation || "") + "</textarea>") +
+      field(t("卖点 / 附近设施（一行一项）", "Highlights / nearby (one per line)"), '<textarea name="selling_points">' + esc(row.selling_points || "") + "</textarea>") +
       '<details style="margin:10px 0 4px"><summary style="cursor:pointer;color:#2E5496;font-size:13px">' + t("更多资料（单位、楼层、车位、备注、照片）", "More (unit, floor, carparks, notes, photos)") + "</summary>" +
       '<div class="grid2" style="margin-top:8px">' + field(t("单位号", "Unit"), '<input name="unit_no" value="' + esc(row.unit_no || "") + '">') +
       field(t("座 / Block", "Block"), '<input name="block" value="' + esc(row.block || "") + '">') + "</div>" +
@@ -474,7 +496,11 @@
       field(t("公开描述（客户可见）", "Public description"), '<textarea name="description" id="lfDesc">' + esc(row.description || "") + '</textarea><button type="button" class="btn line sm" id="aiBtn" style="margin-top:6px">' + t("AI 生成描述", "Generate with AI") + "</button>") +
       field(t("备注（不公开）", "Notes (private)"), '<textarea name="remarks">' + esc(row.remarks || "") + "</textarea>") +
       field(t("房源图片（最多 12 张）", "Photos (max 12)"), photoBlock(row)) +
-      "</details></form>";
+      "</details>" +
+      '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("预览（可直接修改）", "Preview (editable)") + "</h4>" +
+      '<textarea id="sharePreview" style="width:100%;min-height:180px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:12.5px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE"></textarea>' +
+      '<button type="button" class="btn line sm" id="prevBtn" style="margin-top:6px">' + t("刷新预览", "Refresh preview") + "</button>" +
+      "</form>";
     var m = modal({
       title: row.id ? t("编辑房源", "Edit listing") : (imported ? t("导入预览（可修改）", "Imported — review") : t("新增房源", "New listing")),
       body: body,
@@ -483,6 +509,27 @@
         '<button class="btn gold" id="save">' + t("保存", "Save") + "</button>"
     });
     bindPhotos(m, row);
+    $$("[data-ren]", m.root).forEach(function (b) {
+      b.addEventListener("click", function () {
+        var v = ($("#renVal", m.root).value || "").split(",").filter(Boolean);
+        var k = b.getAttribute("data-ren"), i = v.indexOf(k);
+        if (i >= 0) v.splice(i, 1); else v.push(k);
+        $("#renVal", m.root).value = v.join(",");
+        var on = v.indexOf(k) >= 0;
+        b.style.background = on ? "#0E2438" : "#fff";
+        b.style.color = on ? "#fff" : "#41505F";
+      });
+    });
+    function currentRow(form) {
+      var o = {}; new FormData(form).forEach(function (v, k) { o[k] = v; });
+      o.code = (row && row.code) || "PREVIEW"; return o;
+    }
+    function refreshPreview() {
+      var ta = $("#sharePreview", m.root); if (ta) ta.value = shareText(currentRow($("#lf", m.root)));
+    }
+    var pb = $("#prevBtn", m.root);
+    if (pb) pb.addEventListener("click", refreshPreview);
+    if (row.id) refreshPreview();
     fetch("/api/public/config?t=" + Date.now()).then(function (r) { return r.json(); }).then(function (cfg) {
       S.meta = { states: cfg.states || [], areas: cfg.areas || [], property_types: (cfg.taxonomy || {}).property_types || [], tenures: (cfg.taxonomy || {}).tenures || [] };
       var sel = document.querySelector('[name="area_code"]');
@@ -543,7 +590,16 @@
     if (row.lot_position) lines.push(String(row.lot_position).replace(/^\\w/, function (c) { return c.toUpperCase(); }) + " lot");
     if (row.facing) lines.push("Facing " + row.facing);
     if (row.tenure) lines.push(String(row.tenure).replace(/^\\w/, function (c) { return c.toUpperCase(); }));
-    if (row.title_type) lines.push(String(row.title_type).replace(/^\\w/, function (c) { return c.toUpperCase(); }));
+    if (row.title_type) lines.push(String(row.title_type).replace(/^\\w/, function (c) { return c.toUpperCase(); }));    if (row.bumi && row.bumi !== "any") lines.push("Bumi: " + (row.bumi === "non_bumi" ? "Non-Bumi" : "Bumi"));
+    if (row.security) lines.push("Security: " + String(row.security).replace(/^\\w/, function (c) { return c.toUpperCase(); }));
+    if (row.maintenance_fee) lines.push("Maintenance RM " + Number(row.maintenance_fee).toLocaleString("en-MY") + "/mo");
+    var REN = { kitchen_ext: "Kitchen Extended", back_ext: "Back Extended", full_ext: "Fully Extended", awning: "Awning", plaster: "Plaster Ceiling", autogate: "Autogate", grille: "Grille", cabinet: "Kitchen Cabinet", wardrobe: "Built-in Wardrobe", aircond: "Aircond", heater: "Water Heater", solar: "Solar Panel", tiles: "Tiles Upgraded", bath: "Renovated Bathroom" };
+    var ren = String(row.renovation || "").split(",").filter(Boolean);
+    if (ren.length) lines.push(ren.map(function (k) { return REN[k] || k; }).join(", "));
+    if (row.other_renovation) String(row.other_renovation).split("\\n").filter(Boolean).forEach(function (x) { lines.push(x); });
+    if (row.bank_value) lines.push("Bank value RM " + Number(row.bank_value).toLocaleString("en-MY"));
+    if (row.show_psf && row.built_up && price) lines.push("RM " + (Number(price) / Number(row.built_up)).toFixed(0) + " psf");
+    if (row.selling_points) { lines.push(""); String(row.selling_points).split("\\n").filter(Boolean).forEach(function (x) { lines.push("• " + x); }); }
     lines.push("");
     lines.push("*" + (rent ? "Rental " : "Selling ") + money(price, rent) + "*");
     if (row.negotiable) lines.push("Negotiable");

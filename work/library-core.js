@@ -146,6 +146,7 @@ function normalizeProject(input, { partial = false } = {}) {
     const st = stateOfArea(out.values.area_code);
     if (st) out.values.state = st;
   }
+  if (!out.values.price_unit) out.values.price_unit = "total";
   return out;
 }
 
@@ -195,6 +196,16 @@ function normalizeProperty(input, { partial = false } = {}) {
   b.numField("extra_rooms", whole, { min: 0, max: 20 });
   b.numField("toilets", whole, { min: 0, max: 20 });
   b.text("lot_position", 40);
+  b.text("bumi", 30);
+  b.text("security", 40);
+  b.text("renovation", 300);
+  b.text("other_renovation", 500);
+  b.text("selling_points", 800);
+  b.text("price_unit", 20);
+  b.numField("bank_value", money);
+  if (b.has("show_psf")) b.put("show_psf", boolOf(input.show_psf));
+  if (b.has("show_address")) b.put("show_address", boolOf(input.show_address));
+  if (b.has("expected_bank_value")) b.put("expected_bank_value", boolOf(input.expected_bank_value));
   if (b.has("negotiable")) b.put("negotiable", boolOf(input.negotiable));
   b.choice("area_code", "areas");
   b.choice("state", "states");
@@ -231,6 +242,7 @@ function normalizeProperty(input, { partial = false } = {}) {
     const st = stateOfArea(out.values.area_code);
     if (st) out.values.state = st;
   }
+  if (!out.values.price_unit) out.values.price_unit = "total";
   if (out.values.built_up != null && out.values.land_area != null &&
       out.values.land_area > out.values.built_up * 20) {
     out.errors.land_area = "range_order";
