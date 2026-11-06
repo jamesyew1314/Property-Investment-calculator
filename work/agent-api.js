@@ -51,6 +51,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       id: a.id, name: a.name, email: a.email, phone: a.phone, team: a.team, ren_no: a.ren_no,
       slug: a.slug, bio: a.bio, photo_url: a.photo_url, areas: a.areas,
       verified: !!a.verified_at, emailVerified: !!a.email_verified_at, lang: a.lang || "zh",
+      years_exp: a.years_exp, deals_count: a.deals_count, deals_value: a.deals_value == null ? null : Number(a.deals_value), avatar_url: a.avatar_url,
       review_status: a.review_status || "pending", review_note: a.review_note || null,
       status: a.status, plan: a.plan, created_at: a.created_at, last_login_at: a.last_login_at
     };
@@ -196,6 +197,9 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       const v = {};
       for (const k of ["name", "phone", "team", "ren_no"]) if (b[k] !== undefined) v[k] = core.str(b[k], 120);
       if (b.lang !== undefined && ["zh", "en", "bm"].indexOf(b.lang) >= 0) v.lang = b.lang;
+      if (b.years_exp !== undefined) { const n = Number(b.years_exp); if (Number.isInteger(n) && n >= 0 && n <= 60) v.years_exp = n; }
+      if (b.deals_count !== undefined) { const n = Number(b.deals_count); if (Number.isInteger(n) && n >= 0 && n <= 100000) v.deals_count = n; }
+      if (b.deals_value !== undefined) { const n = Number(b.deals_value); if (Number.isFinite(n) && n >= 0) v.deals_value = n; }
       if (b.bio !== undefined) v.bio = core.str(b.bio, 1000);
       if (b.areas !== undefined) v.areas = core.listOfEnums("areas", b.areas, 12);
       if (b.slug !== undefined) {
@@ -311,6 +315,75 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
     } finally {
       client.release();
     }
+  });
+
+
+  // ---------- 邮箱一键登录 ----------
+  function magicMail(agent, raw) {
+    const link = base + "/agent/?magic=" + raw;
+    const lang = agent.lang === "en" ? "en" : (agent.lang === "bm" ? "bm" : "zh");
+    const M = {
+      zh: { sub: "PropNet 登录链接", lines: ["你好 " + agent.name + "，", "", "点下面链接直接登录（20 分钟内有效，一次使用）：", link, "", "如果不是你本人操作，忽略这封邮件即可。", "", "PropNet · KWONG THYE"] },
+      en: { sub: "Your PropNet sign-in link", lines: ["Hi " + agent.name + ",", "", "Sign in with this link (valid 20 minutes, one use):", link, "", "If this wasn't you, ignore this email.", "", "PropNet · KWONG THYE"] },
+      bm: { sub: "Pautan log masuk PropNet", lines: ["Hai " + agent.name + ",", "", "Log masuk dengan pautan ini (sah 20 minit, sekali guna):", link, "", "Jika bukan anda, abaikan e-mel ini.", "", "PropNet · KWONG THYE"] }
+    };
+    return sendMail(agent.email, M[lang].sub, M[lang].lines.join("\n"));
+  }
+
+  r.post("/magic", limit(6, 600000), async function (req, res, next) {
+    try {
+      const email = core.str((req.body || {}).email, 120).toLowerCase();
+      res.json({ ok: true });
+      if (!email) return;
+      const out = await pool.query("SELECT * FROM lib_agents WHERE lower(email)=$1 AND status='active'", [email]);
+      const a = out.rows[0];
+      if (!a) return;
+      const raw = crypto.randomBytes(32).toString("hex");
+      await pool.query("INSERT INTO agent_magic_links(agent_id, token_hash, expires_at) VALUES($1,$2,now()+interval '20 minutes')", [a.id, sha256(raw)]);
+      magicMail(a, raw).catch(function (e) { console.error("magic mail failed", e.message); });
+    } catch (e) { next(e); }
+  });
+
+  r.post("/magic/verify", limit(12, 600000), async function (req, res, next) {
+    try {
+      const raw = String((req.body || {}).token || "");
+      if (!raw) return res.status(400).json({ ok: false, error: "invalid_token" });
+      const out = await pool.query(
+        "SELECT m.id AS mid, a.* FROM agent_magic_links m JOIN lib_agents a ON a.id=m.agent_id " +
+        "WHERE m.token_hash=$1 AND m.used_at IS NULL AND m.expires_at > now() AND a.status='active'", [sha256(raw)]);
+      const row = out.rows[0];
+      if (!row) return res.status(401).json({ ok: false, error: "invalid_token" });
+      await pool.query("UPDATE agent_magic_links SET used_at=now() WHERE id=$1", [row.mid]);
+      await pool.query("UPDATE lib_agents SET last_login_at=now() WHERE id=$1", [row.id]);
+      const token = await createSession(row.id);
+      setCookie(res, token);
+      res.json({ ok: true, agent: publicAgent(row) });
+    } catch (e) { next(e); }
+  });
+
+  // ---------- 业主委托 ----------
+  r.get("/mandates", requireAgent, async function (req, res, next) {
+    try {
+      const out = await pool.query("SELECT * FROM mandate_leads WHERE agent_id=$1 ORDER BY created_at DESC LIMIT 200", [req.agent.id]);
+      res.json({ ok: true, rows: out.rows });
+    } catch (e) { next(e); }
+  });
+  r.patch("/mandates/:id", requireAgent, async function (req, res, next) {
+    try {
+      const st = core.str((req.body || {}).status, 20);
+      if (["new", "contacted", "closed"].indexOf(st) < 0) return res.status(400).json({ ok: false, error: "invalid_status" });
+      const out = await pool.query("UPDATE mandate_leads SET status=$1 WHERE id=$2 AND agent_id=$3 RETURNING *", [st, req.params.id, req.agent.id]);
+      if (!out.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+      res.json({ ok: true, row: out.rows[0] });
+    } catch (e) { next(e); }
+  });
+
+  // ---------- 我的评价 ----------
+  r.get("/reviews", requireAgent, async function (req, res, next) {
+    try {
+      const out = await pool.query("SELECT id, author, rating, body, status, created_at FROM agent_reviews WHERE agent_id=$1 ORDER BY created_at DESC LIMIT 100", [req.agent.id]);
+      res.json({ ok: true, rows: out.rows });
+    } catch (e) { next(e); }
   });
 
   // ---------- 我的房源 ----------

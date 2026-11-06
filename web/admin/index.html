@@ -134,6 +134,7 @@
         <button data-tab="leads" data-i18n="tabLeads">加入申请</button>
         <button data-tab="agents" data-i18n="tabAgents">中介审核</button>
         <button data-tab="views" data-i18n="tabViews">访问量</button>
+        <button data-tab="reviews">客户评价</button>
         <button data-tab="refunds" data-i18n="tabRefunds">退款</button>
         <button data-tab="logs" data-i18n="tabLogs">操作日志</button>
         <button data-tab="admins" id="tabBtnAdmins" hidden data-i18n="tabAdmins">管理员</button>
@@ -287,6 +288,13 @@
             <button class="btn line" id="agReload" data-i18n="agReload">刷新</button>
           </div>
           <div id="agTable"><p class="muted">…</p></div>
+        </div>
+      </section>
+
+      <section class="tab" id="tab-reviews">
+        <div class="card"><h3>客户评价审核</h3>
+          <p class="muted" style="margin:0 0 10px">通过后才会显示在中介个人站。</p>
+          <div class="table-wrap"><table class="table"><thead><tr><th>中介</th><th>客户</th><th>评分</th><th>内容</th><th>时间</th><th></th></tr></thead><tbody id="revBody"><tr><td colspan="6" class="muted">加载中…</td></tr></tbody></table></div>
         </div>
       </section>
 
@@ -825,6 +833,7 @@
       if (b.getAttribute("data-tab") === "admins") loadAdmins();
       if (b.getAttribute("data-tab") === "refunds") loadRefunds();
       if (b.getAttribute("data-tab") === "agents") loadAgentReview();
+      if (b.getAttribute("data-tab") === "reviews") loadReviews();
     };
   });
 
@@ -849,6 +858,22 @@
       $("agTable").innerHTML = h;
     });
   }
+  function loadReviews() {
+    api("/reviews?status=pending").then(function (j) {
+      var body = $("revBody"); if (!body) return;
+      if (!j.ok || !j.rows.length) { body.innerHTML = '<tr><td colspan="6" class="muted">没有待审评价</td></tr>'; return; }
+      body.innerHTML = j.rows.map(function (r) {
+        return "<tr><td><b>" + esc(r.agent_name) + "</b><br><span class='muted mono'>" + esc(r.slug || "") + "</span></td><td>" + esc(r.author) +
+          "</td><td>" + "★".repeat(r.rating) + "</td><td style='max-width:420px'>" + esc(r.body) + "</td><td>" + String(r.created_at).slice(0, 10) +
+          "</td><td><button class='btn gold sm' data-rev='approve' data-id='" + r.id + "'>通过</button> <button class='btn line sm' data-rev='reject' data-id='" + r.id + "'>驳回</button></td></tr>";
+      }).join("");
+    });
+  }
+  if ($("revBody")) $("revBody").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-rev]"); if (!b) return;
+    api("/reviews/" + b.getAttribute("data-id") + "/review", { method: "POST", body: { action: b.getAttribute("data-rev") } })
+      .then(function () { loadReviews(); });
+  });
   if ($("agReload")) $("agReload").onclick = loadAgentReview;
   if ($("agFilter")) $("agFilter").onchange = loadAgentReview;
   if ($("agTable")) $("agTable").addEventListener("click", function (e) {

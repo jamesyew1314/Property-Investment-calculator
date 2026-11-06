@@ -33,6 +33,7 @@ function card(p, lang) {
 
 module.exports = function renderAgentPage(agent, listings, opts) {
   opts = opts || {};
+  const reviews = opts.reviews || [];
   const lang = opts.lang || (opts.en ? "en" : "zh");
   const en = lang === "en";
   const L = lang === "bm"
@@ -40,18 +41,27 @@ module.exports = function renderAgentPage(agent, listings, opts) {
         listings: "Senarai awam", verified: "Ejen disahkan", call: "Telefon", wa: "WhatsApp", share: "Kongsi",
         copy: "Salin pautan", copied: "Pautan disalin", consult: "Tanya ejen", mandate: "Serah hartanah",
         about: "Tentang", areas: "Kawasan diliputi", none: "Belum ada senarai awam.", back: "Kembali ke PropNet",
-        statListings: "Senarai awam", statAreas: "Kawasan", statSince: "Di PropNet", license: "REN" }
+        statListings: "Senarai awam", statAreas: "Kawasan", statSince: "Di PropNet", license: "REN",
+        years: "Tahun pengalaman", deals: "Urus niaga", volume: "Jumlah nilai", reviews: "Ulasan klien",
+        reviewNone: "Belum ada ulasan.", mandateTitle: "Serah hartanah anda",
+        mName: "Nama", mPhone: "Telefon / WhatsApp", mArea: "Kawasan", mType: "Jenis", mPrice: "Harga jangkaan", mNotes: "Nota", mSend: "Hantar", mOk: "Diterima, ejen akan hubungi anda.", mErr: "Gagal, cuba lagi." }
     : (en
     ? { home: "Home", find: "Listing pool", agents: "Agents", join: "For agents", calc: "Calculator", login: "Agent login",
         listings: "Listings", verified: "Verified agent", call: "Call", wa: "WhatsApp", share: "Share",
         copy: "Copy link", copied: "Link copied", consult: "Ask the agent", mandate: "List my property",
         about: "About", areas: "Areas covered", none: "No public listings yet.", back: "Back to PropNet",
-        statListings: "Listings", statAreas: "Areas", statSince: "On PropNet", license: "REN" }
+        statListings: "Listings", statAreas: "Areas", statSince: "On PropNet", license: "REN",
+        years: "Years", deals: "Deals", volume: "Total value", reviews: "Client reviews",
+        reviewNone: "No reviews yet.", mandateTitle: "List your property",
+        mName: "Name", mPhone: "Phone / WhatsApp", mArea: "Area", mType: "Type", mPrice: "Expected price", mNotes: "Notes", mSend: "Send", mOk: "Received — the agent will contact you.", mErr: "Failed, try again." }
     : { home: "首页", find: "房源池", agents: "找中介", join: "给中介", calc: "计算器", login: "中介登录",
         listings: "在售房源", verified: "已验证中介", call: "打电话", wa: "WhatsApp", share: "分享",
         copy: "复制链接", copied: "链接已复制", consult: "咨询中介", mandate: "业主委托",
         about: "关于", areas: "专长区域", none: "暂时没有公开房源。", back: "返回 PropNet",
-        statListings: "公开房源", statAreas: "覆盖区域", statSince: "入驻 PropNet", license: "REN" });
+        statListings: "公开房源", statAreas: "覆盖区域", statSince: "入驻 PropNet", license: "REN",
+        years: "从业年限", deals: "成交宗数", volume: "累计成交额", reviews: "客户评价",
+        reviewNone: "还没有评价。", mandateTitle: "业主委托",
+        mName: "姓名", mPhone: "电话 / WhatsApp", mArea: "区域", mType: "房型", mPrice: "期望价格", mNotes: "备注", mSend: "提交委托", mOk: "已收到，中介会联系你。", mErr: "提交失败，请重试。" });
 
   const name = agent.name || "Agent";
   const areas = (agent.areas || []).map(function (a) { return areaName(a, en); }).filter(Boolean);
@@ -116,6 +126,9 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     (agent.bio ? '<p class="bio">' + esc(agent.bio) + "</p>" : "") +
     '<div class="agentStats"><div><b>' + count + "</b><span>" + L.statListings + "</span></div>" +
     "<div><b>" + areas.length + "</b><span>" + L.statAreas + "</span></div>" +
+    (agent.years_exp ? "<div><b>" + Number(agent.years_exp) + "+</b><span>" + L.years + "</span></div>" : "") +
+    (agent.deals_count ? "<div><b>" + Number(agent.deals_count) + "+</b><span>" + L.deals + "</span></div>" : "") +
+    (Number(agent.deals_value) > 0 ? "<div><b>RM " + (Number(agent.deals_value) / 1e6).toFixed(1) + "M</b><span>" + L.volume + "</span></div>" : "") +
     '<div><b>' + (agent.verified_at ? "✓" : "—") + "</b><span>" + L.statSince + "</span></div></div>" +
     (areas.length ? '<div class="chips">' + areas.slice(0, 12).map(function (a) { return '<span class="chip">' + esc(a) + "</span>"; }).join("") + "</div>" : "") +
     '<div class="contactRow">' +
@@ -130,8 +143,23 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     (agent.bio ? "<h2>" + L.about + "</h2><p style=\"max-width:820px;color:#41505F;line-height:1.8;margin:0 0 30px\">" + esc(agent.bio) + "</p>" : "") +
     "<h2>" + L.listings + " · " + count + "</h2>" +
     (rows ? '<div class="agentGrid">' + rows + "</div>" : '<div class="empty" style="padding:40px;text-align:center;border:1px dashed #DCD6C8;border-radius:14px;color:#5D6B7A">' + L.none + "</div>") +
+    (reviews && reviews.length ? "<h2 style=\"margin-top:38px\">" + L.reviews + " · " + reviews.length + "</h2><div style=\"display:grid;grid-template-columns:repeat(2,1fr);gap:14px\">" +
+      reviews.slice(0, 6).map(function (r) { return '<div style="border:1px solid #E3E8F0;border-radius:12px;padding:16px;background:#fff"><div style="color:#B8862F;font-size:13px">' + "★".repeat(Math.max(1, Math.min(5, r.rating || 5))) + '</div><p style="margin:8px 0;color:#41505F;line-height:1.7;font-size:13.5px">' + esc(r.body) + '</p><div style="font-size:12px;color:#8A97A6">— ' + esc(r.author) + "</div></div>"; }).join("") + "</div>" : "") +
+    '<section id="mandate" style="margin-top:40px;border:1px solid #E3E8F0;border-radius:14px;padding:22px;background:#FAFBFD">' +
+    "<h2 style=\"margin:0 0 6px\">" + L.mandateTitle + '</h2>' +
+    '<form id="mandateForm" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">' +
+    '<input name="name" required placeholder="' + L.mName + '" style="padding:10px;border:1px solid #D6DCE7;border-radius:8px">' +
+    '<input name="phone" required placeholder="' + L.mPhone + '" style="padding:10px;border:1px solid #D6DCE7;border-radius:8px">' +
+    '<input name="area_code" placeholder="' + L.mArea + '" style="padding:10px;border:1px solid #D6DCE7;border-radius:8px">' +
+    '<input name="property_type" placeholder="' + L.mType + '" style="padding:10px;border:1px solid #D6DCE7;border-radius:8px">' +
+    '<input name="asking_price" inputmode="numeric" placeholder="' + L.mPrice + '" style="padding:10px;border:1px solid #D6DCE7;border-radius:8px">' +
+    '<input name="notes" placeholder="' + L.mNotes + '" style="padding:10px;border:1px solid #D6DCE7;border-radius:8px">' +
+    '<button type="submit" class="btn gold" style="grid-column:1/-1">' + L.mSend + '</button>' +
+    '<div id="mMsg" style="grid-column:1/-1;font-size:13px"></div></form></section>' +
     '<p style="margin-top:30px"><a href="/agents/" style="color:#2E5496">← ' + L.back + "</a></p></main>" +
     (waConsult ? '<a class="waFloat" href="' + waConsult + '" target="_blank" rel="noopener">WhatsApp</a>' : "") +
-    '<script>document.getElementById("cp").addEventListener("click",function(){var t=location.href;if(navigator.clipboard)navigator.clipboard.writeText(t);this.textContent="' + L.copied + '";});</script>' +
+    '<script>document.getElementById("cp").addEventListener("click",function(){var t=location.href;if(navigator.clipboard)navigator.clipboard.writeText(t);this.textContent="' + L.copied + '";});' +
+    'var f=document.getElementById("mandateForm");if(f){f.addEventListener("submit",function(e){e.preventDefault();var d={};new FormData(f).forEach(function(v,k){d[k]=v});d.agent_slug=' + JSON.stringify(agent.slug || "") + ';d.asking_price=d.asking_price||null;fetch("/api/public/mandate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)}).then(function(r){return r.json()}).then(function(j){var m=document.getElementById("mMsg");m.style.color=j.ok?"#2E7D5B":"#B23B3B";m.textContent=j.ok?' + JSON.stringify(L.mOk) + ':' + JSON.stringify(L.mErr) + ';if(j.ok)f.reset()}).catch(function(){document.getElementById("mMsg").textContent=' + JSON.stringify(L.mErr) + '})})}' +
+    '</script>' +
     "</body></html>";
 };

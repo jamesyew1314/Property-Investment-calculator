@@ -29,6 +29,10 @@ for f in mail-layout.js receipt-pdf.js report-pdf.js admin.js send-reminders.js 
   [ -f "work/$f" ] && $SCP "work/$f" "$USER_@$HOST:/srv/fangchan/api/$f"
 done
 
+echo "▸ 3.5/5 应用数据库迁移"
+$SCP work/migrations/030_brand.sql "$USER_@$HOST:/tmp/030_brand.sql"
+$SSH "$USER_@$HOST" 'sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/030_brand.sql >/dev/null && echo "  migrations ok"'
+
 echo "▸ 4/5 修正权限并重启"
 $SSH "$USER_@$HOST" '
   chown -R fangchan:fangchan /srv/fangchan/api/*.js

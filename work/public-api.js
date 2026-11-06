@@ -13,7 +13,7 @@ const PUBLIC_SELECT = `
          p.bedrooms, p.bathrooms, p.carparks, p.facing, p.furnishing, p.condition, p.intent,
          p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
          p.maintenance_fee::float8 AS maintenance_fee, p.status, p.listed_on::text AS listed_on,
-         p.title_type, p.tags, p.views, p.published_at, p.updated_at, p.cover_url,
+         p.title_type, p.tags, p.views, p.published_at, p.updated_at, p.cover_url, p.description,
          pr.name AS project_title, pr.name_zh AS project_title_zh,
          p.agent AS agent_raw, a.name AS agent_name, a.slug AS agent_slug, a.ren_no AS agent_ren
   FROM lib_properties p
@@ -111,6 +111,68 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
   });
 
   // ---------- 房源列表 ----------
+
+  const rlMandate = rateLimit ? rateLimit(5, 600000) : function (req, res, next) { next(); };
+  const rlReview = rateLimit ? rateLimit(3, 3600000) : function (req, res, next) { next(); };
+
+  r.post("/mandate", rlMandate, async function (req, res, next) {
+    try {
+      const b = req.body || {};
+      const slug = core.str(b.agent_slug, 60);
+      const name = core.str(b.name, 60);
+      const phone = core.str(b.phone, 40);
+      if (!name || !phone) return res.status(400).json({ ok: false, error: "invalid_input" });
+      const a = await pool.query("SELECT id FROM lib_agents WHERE lower(slug)=lower($1) AND status='active' AND public=true", [slug]);
+      if (!a.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+      const price = Number(b.asking_price);
+      await pool.query(
+        "INSERT INTO mandate_leads(agent_id, name, phone, area_code, property_type, asking_price, notes) VALUES($1,$2,$3,$4,$5,$6,$7)",
+        [a.rows[0].id, name, phone, core.str(b.area_code, 40) || null, core.str(b.property_type, 40) || null, isFinite(price) && price > 0 ? price : null, core.str(b.notes, 1000) || null]);
+      res.status(201).json({ ok: true });
+    } catch (e) { next(e); }
+  });
+
+  r.post("/review", rlReview, async function (req, res, next) {
+    try {
+      const b = req.body || {};
+      const slug = core.str(b.agent_slug, 60);
+      const author = core.str(b.author, 60);
+      const body = core.str(b.body, 800);
+      const rating = Math.max(1, Math.min(5, Number(b.rating) || 5));
+      if (!author || body.length < 5) return res.status(400).json({ ok: false, error: "invalid_input" });
+      const a = await pool.query("SELECT id FROM lib_agents WHERE lower(slug)=lower($1) AND status='active' AND public=true", [slug]);
+      if (!a.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+      await pool.query("INSERT INTO agent_reviews(agent_id, author, rating, body) VALUES($1,$2,$3,$4)", [a.rows[0].id, author, rating, body]);
+      res.status(201).json({ ok: true });
+    } catch (e) { next(e); }
+  });
+
+  r.get("/reviews/:slug", async function (req, res, next) {
+    try {
+      const out = await pool.query(
+        "SELECT r.author, r.rating, r.body, r.created_at FROM agent_reviews r JOIN lib_agents a ON a.id=r.agent_id " +
+        "WHERE lower(a.slug)=lower($1) AND r.status='approved' ORDER BY r.created_at DESC LIMIT 50", [req.params.slug]);
+      res.json({ ok: true, rows: out.rows });
+    } catch (e) { next(e); }
+  });
+
+  r.get("/listing/:code", async function (req, res, next) {
+    try {
+      const out = await pool.query(PUBLIC_SELECT + " WHERE p.code=$1 AND p.visibility='public' AND p.status IN ('available','reserved')", [req.params.code]);
+      if (!out.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+      res.json({ ok: true, row: out.rows[0] });
+    } catch (e) { next(e); }
+  });
+
+  r.get("/listings", async function (req, res, next) {
+    try {
+      const codes = String(req.query.codes || "").split(",").map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 30);
+      if (!codes.length) return res.json({ ok: true, rows: [] });
+      const out = await pool.query(PUBLIC_SELECT + " WHERE p.code = ANY($1) AND p.visibility='public' AND p.status IN ('available','reserved')", [codes]);
+      res.json({ ok: true, rows: out.rows });
+    } catch (e) { next(e); }
+  });
+
   r.get("/properties", requireAgent, async function (req, res, next) {
     try {
       const page = Math.max(1, Math.min(500, Number(req.query.page) || 1));

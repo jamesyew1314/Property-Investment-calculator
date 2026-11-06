@@ -21,6 +21,7 @@
     "ph.pass": ["至少 8 位", "At least 8 characters"],
     "auth.note": ["注册后即可发布房源；邮箱验证后显示「已验证」。", "Publish right after signing up; a verified badge appears after email verification."],
     "auth.back": ["返回官网", "Back to site"],
+    "magic": ["邮箱一键登录", "Email me a sign-in link"],
     "logout": ["退出", "Log out"]
   };
   function applyStatic() {
@@ -228,6 +229,7 @@
     { key: "clients", zh: "我的客户", en: "Clients", ico: "👤" },
     { key: "matches", zh: "自动匹配", en: "Matches", ico: "⇄" },
     { key: "inquiries", zh: "带看询盘", en: "Inquiries", ico: "✉", badge: true },
+    { key: "mandates", zh: "业主委托", en: "Mandates", ico: "🗂" },
     { key: "plan", zh: "套餐", en: "Plan", ico: "◆" },
     { key: "profile", zh: "个人资料", en: "Profile", ico: "⚙" }
   ];
@@ -272,7 +274,7 @@
     S.route = p.path;
     renderNav();
     $("#view").innerHTML = '<div class="card">' + t("加载中…", "Loading…") + "</div>";
-    var fn = ({ "": dash, listings: listings, pool: pool, clients: clients, matches: matches, inquiries: inquiries, plan: plan, profile: profile })[p.path];
+    var fn = ({ "": dash, listings: listings, pool: pool, clients: clients, matches: matches, inquiries: inquiries, mandates: mandates, plan: plan, profile: profile })[p.path];
     if (!fn) { location.hash = "#/"; return; }
     fn(p.q).catch(function (e) { if (e.message !== "auth_required") toast(e.message, true); });
   }
@@ -777,6 +779,32 @@
   }
 
   // ---------- 询盘 ----------
+  // ---------- 业主委托 ----------
+  function mandates() {
+    setTitle(t("业主委托", "Owner mandates"), t("从你的个人站提交的委托线索", "Leads submitted from your personal page"));
+    return api("/mandates").then(function (j) {
+      var rows = j.rows || [];
+      setTimeout(function () {
+        document.querySelectorAll("[data-mandate]").forEach(function (sel) {
+          sel.addEventListener("change", function () {
+            api("/mandates/" + sel.getAttribute("data-mandate"), { method: "PATCH", body: { status: sel.value } })
+              .then(function () { toast(t("已更新", "Updated")); }).catch(function (e) { toast(e.message, true); });
+          });
+        });
+      }, 30);
+      if (!rows.length) return '<div class="card"><div class="empty">' + t("还没有委托。把个人站发给业主，他们提交后会出现在这里。", "No mandates yet. Share your page with owners; submissions appear here.") + "</div></div>";
+      return '<div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>' + t("业主", "Owner") + "</th><th>" + t("电话", "Phone") + "</th><th>" + t("区域 / 房型", "Area / type") + "</th><th>" + t("期望价", "Price") + "</th><th>" + t("时间", "When") + "</th><th>" + t("状态", "Status") + "</th></tr></thead><tbody>" +
+        rows.map(function (r) {
+          return "<tr><td><b>" + esc(r.name) + "</b>" + (r.notes ? '<div class="muted">' + esc(r.notes) + "</div>" : "") + "</td>" +
+            "<td>" + esc(r.phone) + "</td><td>" + esc([r.area_code, r.property_type].filter(Boolean).join(" / ")) + "</td>" +
+            "<td>" + (r.asking_price ? money(r.asking_price) : "—") + "</td><td>" + dt(r.created_at) + "</td>" +
+            '<td><select data-mandate="' + r.id + '">' + ["new", "contacted", "closed"].map(function (k) {
+              return '<option value="' + k + '"' + (r.status === k ? " selected" : "") + ">" + t(k === "new" ? "新" : (k === "contacted" ? "已联系" : "已结束"), k === "new" ? "New" : (k === "contacted" ? "Contacted" : "Closed")) + "</option>";
+            }).join("") + "</select></td></tr>";
+        }).join("") + "</tbody></table></div></div>";
+    });
+  }
+
   function inquiries(q) {
     setTitle(t("带看询盘", "Inquiries"), t("同行想带客看你的房源", "Peers requesting viewings"));
     var box = q.box === "out" ? "out" : "in";
@@ -858,6 +886,10 @@
     var h = '<div class="card"><h3>' + t("账号", "Account") + "</h3>" +
       '<div class="grid2">' + field(t("姓名", "Name"), '<input id="pfName" value="' + esc(a.name || "") + '">') +
       field(t("电话 / WhatsApp", "Phone"), '<input id="pfPhone" value="' + esc(a.phone || "") + '">') + "</div>" +
+      '<div class="grid3">' +
+      field(t("从业年限", "Years in business"), '<input id="pfYears" type="number" min="0" max="60" value="' + (a.years_exp == null ? "" : a.years_exp) + '">') +
+      field(t("成交宗数", "Deals closed"), '<input id="pfDeals" type="number" min="0" value="' + (a.deals_count == null ? "" : a.deals_count) + '">') +
+      field(t("累计成交额 (RM)", "Total value (RM)"), '<input id="pfValue" type="number" min="0" step="1000" value="' + (a.deals_value == null ? "" : a.deals_value) + '">') + "</div>" +
       field(t("邮件语言", "Email language"), (function () {
         var names = S.lang === "zh" ? { zh: "中文", en: "English", bm: "Bahasa Melayu" }
           : (S.lang === "bm" ? { zh: "Cina", en: "Inggeris", bm: "Bahasa Melayu" } : { zh: "Chinese", en: "English", bm: "Malay" });
@@ -908,6 +940,9 @@
       var body = {
         name: $("#pfName").value.trim(), phone: $("#pfPhone").value.trim(), team: $("#pfTeam").value.trim(),
         ren_no: $("#pfRen").value.trim(), bio: $("#pfBio").value.trim(), slug: $("#pfSlug").value.trim(), lang: $("#pfLang").value,
+        years_exp: $("#pfYears").value === "" ? null : Number($("#pfYears").value),
+        deals_count: $("#pfDeals").value === "" ? null : Number($("#pfDeals").value),
+        deals_value: $("#pfValue").value === "" ? null : Number($("#pfValue").value),
         areas: collectAreas($("#view"))
       };
       api("/me", { method: "PATCH", body: body }).then(function (j) {
@@ -1003,11 +1038,23 @@
     cycleLang();
     if (S.me) { renderNav(); route(); } else { setAuthMode(S.authMode); }
   });
-  $("#authLang").addEventListener("click", function () {
-    cycleLang(); $("#authLang").textContent = langLabel(); setAuthMode(S.authMode);
+  var _authLang = $("#authLang");
+  if (_authLang) _authLang.addEventListener("click", function () {
+    cycleLang(); _authLang.textContent = langLabel(); setAuthMode(S.authMode);
   });
-  $("#langBtn").addEventListener("click", function () {
+  var _langBtn2 = $("#langBtn");
+  if (_langBtn2) _langBtn2.addEventListener("click", function () {
     cycleLang(); renderNav(); route();
+  });
+  var _magicBtn = $("#magicBtn");
+  if (_magicBtn) _magicBtn.addEventListener("click", function () {
+    var email = $("#aEmail").value.trim(), msg = $("#authMsg");
+    if (!email) { msg.textContent = t("请先填邮箱", "Enter your email first"); return; }
+    _magicBtn.disabled = true;
+    api("/magic", { method: "POST", body: { email: email } })
+      .then(function () { msg.textContent = t("登录链接已发送，请查收邮箱（20 分钟内有效）", "Sign-in link sent — check your email (valid 20 min)"); })
+      .catch(function () { msg.textContent = t("发送失败，请稍后再试", "Failed, try again later"); })
+      .then(function () { setTimeout(function () { _magicBtn.disabled = false; }, 8000); });
   });
   $("#logoutBtn").addEventListener("click", function () {
     api("/logout", { method: "POST" }).then(function () { S.me = null; showAuth("login"); }).catch(function () { showAuth("login"); });
@@ -1027,6 +1074,13 @@
             history.replaceState(null, "", location.pathname);
             toast(j.ok ? t("邮箱已验证", "Email verified") : t("验证链接无效或已过期", "Invalid or expired link"), !j.ok);
           });
+      }
+      var _mt = new URLSearchParams(location.search).get("magic");
+      if (_mt) {
+        api("/magic/verify", { method: "POST", body: { token: _mt } })
+          .then(function (j) { S.me = j.agent; try { history.replaceState(null, "", "/agent/"); } catch (e) {} boot(); })
+          .catch(function () { $("#authMsg").textContent = t("链接已失效，请重新发送", "Link expired — request a new one"); showAuth("login"); });
+        return;
       }
       api("/me").then(function (j) { S.me = j.agent; S.stats = j.stats; boot(); })
         .catch(function () { showAuth("login"); });

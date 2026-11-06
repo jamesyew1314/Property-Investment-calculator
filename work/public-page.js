@@ -82,10 +82,25 @@ module.exports = function renderPublicListing(p, agent, opts) {
     (photos.length > 1 ? '<div class="pd-thumbs">' + photos.slice(0, 8).map(function (u) { return '<img src="' + esc(u.replace(/\.jpg$/i, "_t.jpg")) + '" data-full="' + esc(u) + '" onclick="var m=document.querySelector(\'.pd-photo img\');if(m)m.src=this.dataset.full" alt="">'; }).join("") + "</div>" : "") +
     "<h1>" + esc(title) + "</h1><div style=\"color:#5D6B7A;font-size:13.5px\">" + esc(p.code) + " · " + esc(area) + "</div>" +
     '<div class="price">' + money(price, p.intent === "rent", lang) + ' <span style="font:600 12px/1 sans-serif;padding:4px 9px;border-radius:999px;background:#F3EAD8;color:#8A6420;vertical-align:middle">' + (p.intent === "rent" ? T.forRent : T.forSale) + "</span></div>" +
-    '<div class="specs">' + specs + "</div></div>" +
+    '<div class="specs">' + specs + "</div>" +
+    (p.description ? '<div style="margin:0 0 18px;color:#41505F;line-height:1.8;white-space:pre-wrap">' + esc(p.description) + "</div>" : "") +
+    '<div style="border:1px solid #E3E8F0;border-radius:12px;padding:16px;background:#FAFBFD">' +
+    '<div style="font:600 13px/1 sans-serif;color:#0E2438;margin-bottom:10px">' + (lang === "zh" ? "月供速算" : (lang === "bm" ? "Kira ansuran" : "Monthly instalment")) + "</div>" +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+    '<input id="lwPrice" inputmode="numeric" value="' + (Number(price) || "") + '" style="padding:8px;border:1px solid #D6DCE7;border-radius:8px" placeholder="Price">' +
+    '<input id="lwDp" inputmode="numeric" value="10" style="padding:8px;border:1px solid #D6DCE7;border-radius:8px" placeholder="Down %">' +
+    '<input id="lwRate" inputmode="decimal" value="4.2" style="padding:8px;border:1px solid #D6DCE7;border-radius:8px" placeholder="Rate %">' +
+    '<input id="lwYears" inputmode="numeric" value="30" style="padding:8px;border:1px solid #D6DCE7;border-radius:8px" placeholder="Years">' +
+    "</div>" +
+    '<div id="lwOut" style="margin-top:10px;font:700 18px/1.4 Georgia,serif;color:#B8862F">—</div>' +
+    '<div style="font-size:11.5px;color:#8A97A6;margin-top:4px">' + (lang === "zh" ? "仅供参考，实际以银行审批为准" : (lang === "bm" ? "Anggaran sahaja" : "Estimate only")) + "</div></div></div>" +
     '<aside class="agentBox"><div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#8A97A6">' + T.agent + "</div>" +
     '<div style="display:flex;gap:12px;align-items:center;margin:10px 0 14px"><div class="av">' + esc((agent.name || "A").slice(0, 2).toUpperCase()) + '</div><div><b style="color:#0E2438">' + esc(agent.name || "") + '</b><div style="font-size:12px;color:#5D6B7A">' + esc(agent.team || "PropNet") + (agent.ren_no ? " · " + esc(agent.ren_no) : "") + "</div></div></div>" +
     (wa ? '<a class="btn gold" style="width:100%;text-align:center" href="' + wa + '" target="_blank" rel="noopener">' + T.wa + "</a>" : "") +
     (agent.phone ? '<a class="btn line" style="width:100%;text-align:center;margin-top:8px" href="tel:' + esc(agent.phone) + '">' + T.call + "</a>" : "") +
-    '<a class="btn line" style="width:100%;text-align:center;margin-top:8px" href="/a/' + encodeURIComponent(agent.slug || "") + '?lang=' + lang + '">' + T.more + "</a></aside></div></main></body></html>";
+    '<a class="btn line" style="width:100%;text-align:center;margin-top:8px" href="/a/' + encodeURIComponent(agent.slug || "") + '?lang=' + lang + '">' + T.more + "</a>" +
+    '<button id="favBtn" type="button" style="width:100%;margin-top:8px;padding:9px;border:1px solid #D6DCE7;border-radius:9px;background:#fff;cursor:pointer">♡ ' + (lang === "zh" ? "收藏" : (lang === "bm" ? "Simpan" : "Save")) + "</button></aside></div></main>" +
+    '<script>(function(){var c=' + JSON.stringify(p.code) + ',k="pn_favs",b=document.getElementById("favBtn");function g(){try{return JSON.parse(localStorage.getItem(k)||"[]")}catch(e){return []}}function p(){var a=g(),on=a.indexOf(c)>=0;b.textContent=(on?"♥ ":"♡ ")+(on?' + JSON.stringify(lang === "zh" ? "已收藏" : (lang === "bm" ? "Disimpan" : "Saved")) + ':' + JSON.stringify(lang === "zh" ? "收藏" : (lang === "bm" ? "Simpan" : "Save")) + ')}b.addEventListener("click",function(){var a=g(),i=a.indexOf(c);if(i>=0)a.splice(i,1);else a.unshift(c);localStorage.setItem(k,JSON.stringify(a.slice(0,50)));p()});p()})();' +
+    '(function(){var P=document.getElementById("lwPrice"),D=document.getElementById("lwDp"),R=document.getElementById("lwRate"),Y=document.getElementById("lwYears"),O=document.getElementById("lwOut");function f(){var p=+P.value||0,d=+D.value||0,r=(+R.value||0)/100/12,n=(+Y.value||0)*12,L=p*(1-d/100);if(!L||!n||!r){O.textContent="—";return}var m=L*r/(1-Math.pow(1+r,-n));O.textContent="RM "+m.toLocaleString("en-MY",{maximumFractionDigits:0})}["input","change"].forEach(function(e){[P,D,R,Y].forEach(function(x){x.addEventListener(e,f)})});f()})();</script>' +
+    "</body></html>";
 };

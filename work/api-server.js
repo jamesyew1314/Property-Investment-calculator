@@ -537,6 +537,26 @@ app.get("/api/refunds", requireAuth, async function (req, res, next) {
 
 // 后台：退款列表 + 审批
 // ---------- 中介审核（admin） ----------
+
+app.get("/api/admin/reviews", requireAdmin, async function (req, res, next) {
+  try {
+    const st = ["pending", "approved", "rejected"].indexOf(req.query.status) >= 0 ? req.query.status : "pending";
+    const out = await pool.query(
+      "SELECT r.*, a.name AS agent_name, a.slug FROM agent_reviews r JOIN lib_agents a ON a.id=r.agent_id WHERE r.status=$1 ORDER BY r.created_at DESC LIMIT 200", [st]);
+    res.json({ ok: true, rows: out.rows });
+  } catch (e) { next(e); }
+});
+app.post("/api/admin/reviews/:id/review", requireAdmin, requireWrite, async function (req, res, next) {
+  try {
+    const action = String((req.body || {}).action || "");
+    if (["approve", "reject"].indexOf(action) < 0) return res.status(400).json({ ok: false, error: "invalid_action" });
+    const st = action === "approve" ? "approved" : "rejected";
+    const out = await pool.query("UPDATE agent_reviews SET status=$1, reviewed_at=now() WHERE id=$2 RETURNING id", [st, req.params.id]);
+    if (!out.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    res.json({ ok: true, status: st });
+  } catch (e) { next(e); }
+});
+
 app.get("/api/admin/agents", requireAdmin, async function (req, res, next) {
   try {
     const pending = req.query.filter === "pending";
@@ -1452,7 +1472,8 @@ app.get("/a/:slug", async function (req, res, next) {
       WHERE p.tenant_id=$1 AND p.visibility='public' AND p.status IN ('available','reserved')
       ORDER BY p.published_at DESC NULLS LAST, p.updated_at DESC LIMIT 60`, [agent.id]);
     res.set("Cache-Control", "public, max-age=300");
-    res.type("html").send(renderAgentPage(agent, rows.rows, { lang: lang }));
+    const rv = await pool.query("SELECT author, rating, body, created_at FROM agent_reviews WHERE agent_id=$1 AND status='approved' ORDER BY created_at DESC LIMIT 6", [agent.id]);
+    res.type("html").send(renderAgentPage(agent, rows.rows, { lang: lang, reviews: rv.rows }));
   } catch (e) { next(e); }
 });
 
