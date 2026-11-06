@@ -443,22 +443,38 @@
   function listingForm(row, imported) {
     row = row || {};
     var body = '<form id="lf">' +
-      '<div class="grid2">' + field(t("楼盘 / 项目名 *", "Project *"), '<input name="project_name" value="' + esc(row.project_name || "") + '">') +
-      field(t("区域", "Area"), '<select name="area_code">' + areaOptions(row.area_code) + "</select>") + "</div>" +
-      '<div class="grid2">' + field(t("房型", "Type"), '<select name="property_type">' + optList(typeList(), row.property_type, "—") + "</select>") +
-      field(t("出售 / 出租", "Sale / Rent"), '<select name="intent"><option value="sale"' + (row.intent !== "rent" ? " selected" : "") + ">" + t("出售", "Sale") + '</option><option value="rent"' + (row.intent === "rent" ? " selected" : "") + ">" + t("出租", "Rent") + "</option></select>") + "</div>" +
+      '<h4 style="margin:4px 0 8px;color:#0E2438">' + t("产业资料", "Property") + "</h4>" +
+      '<div class="grid2">' + field(t("卖点标题（选填）", "Headline (optional)"), '<input name="headline" value="' + esc(row.headline || "") + '" placeholder="' + t("例如：低于市价 / Ready move in", "e.g. Below market value") + '">') +
+      field(t("区域（用于搜索）", "Area"), '<select name="area_code">' + areaOptions(row.area_code) + "</select>") + "</div>" +
+      '<div class="grid2">' + field(t("地点 / 花园名（英文）", "Address / garden (EN)"), '<input name="address_text" value="' + esc(row.address_text || row.project_name || "") + '" placeholder="Jalan Tropika @ Taman Desa Cemerlang">') +
+      field(t("中文名（选填）", "Chinese name (optional)"), '<input name="name_zh" value="' + esc(row.name_zh || "") + '" placeholder="' + t("例如：皇后花园", "e.g. 皇后花园") + '">') + "</div>" +
+      '<div class="grid2">' + field(t("产业类别", "Category"), '<select name="category">' + optList([{key:"residential",zh:"住宅",en:"Residential"},{key:"commercial",zh:"商业",en:"Commercial"},{key:"industrial",zh:"工业",en:"Industrial"},{key:"land",zh:"地皮",en:"Land"}], row.category, "—") + "</select>") +
+      field(t("产业类型", "Type"), '<select name="property_type">' + optList(typeList(), row.property_type, "—") + "</select>") + "</div>" +
+      '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("规格", "Specifications") + "</h4>" +
+      '<div class="grid2">' + field(t("土地面积（如 22x70）", "Land size (e.g. 22x70)"), '<input name="land_size" value="' + esc(row.land_size || "") + '" placeholder="22x70">') +
+      field(t("建筑面积 (sqft)", "Built-up (sqft)"), '<input name="built_up" inputmode="numeric" value="' + esc(row.built_up || "") + '">') + "</div>" +
+      '<div class="grid2">' + field(t("房间", "Bedrooms"), '<input name="bedrooms" inputmode="numeric" value="' + esc(row.bedrooms != null ? row.bedrooms : "") + '">') +
+      field(t("额外房间", "Extra rooms"), '<input name="extra_rooms" inputmode="numeric" value="' + esc(row.extra_rooms != null ? row.extra_rooms : "") + '">') + "</div>" +
+      '<div class="grid2">' + field(t("浴室", "Bathrooms"), '<input name="bathrooms" inputmode="numeric" value="' + esc(row.bathrooms != null ? row.bathrooms : "") + '">') +
+      field(t("厕所", "Toilets"), '<input name="toilets" inputmode="numeric" value="' + esc(row.toilets != null ? row.toilets : "") + '">') + "</div>" +
+      '<div class="grid2">' + field(t("Lot 位置", "Lot position"), '<select name="lot_position">' + optList([{key:"intermediate",zh:"中间",en:"Intermediate"},{key:"corner",zh:"角头",en:"Corner"},{key:"end",zh:"尾",en:"End"},{key:"side",zh:"旁边",en:"Side"}], row.lot_position, "—") + "</select>") +
+      field(t("方向", "Facing"), '<input name="facing" value="' + esc(row.facing || "") + '" placeholder="South">') + "</div>" +
+      '<div class="grid2">' + field(t("产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") +
+      field(t("地契", "Title"), '<select name="title_type">' + optList((S.meta && S.meta.title_types) || [], row.title_type, "—") + "</select>") + "</div>" +
+      '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("价格", "Price") + "</h4>" +
+      '<div class="grid2">' + field(t("出售 / 出租", "Sale / Rent"), '<select name="intent"><option value="sale"' + (row.intent !== "rent" ? " selected" : "") + ">" + t("出售", "Sale") + '</option><option value="rent"' + (row.intent === "rent" ? " selected" : "") + ">" + t("出租", "Rent") + "</option></select>") +
+      field(t("可否议价", "Negotiable"), '<label style="display:flex;gap:8px;align-items:center;padding:9px 0"><input type="checkbox" name="negotiable" value="true"' + (row.negotiable ? " checked" : "") + "> " + t("可议价", "Negotiable") + "</label>") + "</div>" +
       '<div class="grid2">' + field(t("售价 (RM)", "Asking price"), '<input name="asking_price" inputmode="numeric" value="' + esc(row.asking_price || "") + '">') +
       field(t("租金 (RM/月)", "Monthly rent"), '<input name="rent_price" inputmode="numeric" value="' + esc(row.rent_price || "") + '">') + "</div>" +
-      '<div class="grid2">' + field(t("单位号", "Unit"), '<input name="unit_no" value="' + esc(row.unit_no || "") + '">') +
+      '<details style="margin:10px 0 4px"><summary style="cursor:pointer;color:#2E5496;font-size:13px">' + t("更多资料（单位、楼层、车位、备注、照片）", "More (unit, floor, carparks, notes, photos)") + "</summary>" +
+      '<div class="grid2" style="margin-top:8px">' + field(t("单位号", "Unit"), '<input name="unit_no" value="' + esc(row.unit_no || "") + '">') +
       field(t("座 / Block", "Block"), '<input name="block" value="' + esc(row.block || "") + '">') + "</div>" +
-      '<div class="grid2">' + field(t("房间", "Beds"), '<input name="bedrooms" inputmode="numeric" value="' + esc(row.bedrooms != null ? row.bedrooms : "") + '">') +
-      field(t("卫浴", "Baths"), '<input name="bathrooms" inputmode="numeric" value="' + esc(row.bathrooms != null ? row.bathrooms : "") + '">') + "</div>" +
-      '<div class="grid2">' + field(t("建筑面积 (sqft)", "Built-up"), '<input name="built_up" inputmode="numeric" value="' + esc(row.built_up || "") + '">') +
-      field(t("产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") + "</div>" +
+      '<div class="grid2">' + field(t("楼层", "Floor"), '<input name="floor" inputmode="numeric" value="' + esc(row.floor || "") + '">') +
+      field(t("车位", "Car parks"), '<input name="carparks" inputmode="numeric" value="' + esc(row.carparks || "") + '">') + "</div>" +
       field(t("公开描述（客户可见）", "Public description"), '<textarea name="description" id="lfDesc">' + esc(row.description || "") + '</textarea><button type="button" class="btn line sm" id="aiBtn" style="margin-top:6px">' + t("AI 生成描述", "Generate with AI") + "</button>") +
       field(t("备注（不公开）", "Notes (private)"), '<textarea name="remarks">' + esc(row.remarks || "") + "</textarea>") +
       field(t("房源图片（最多 12 张）", "Photos (max 12)"), photoBlock(row)) +
-      "</form>";
+      "</details></form>";
     var m = modal({
       title: row.id ? t("编辑房源", "Edit listing") : (imported ? t("导入预览（可修改）", "Imported — review") : t("新增房源", "New listing")),
       body: body,
@@ -504,32 +520,34 @@
   function shareText(row) {
     var rent = row.intent === "rent";
     var price = rent ? row.rent_price : row.asking_price;
-    var T = { condo: "Condo / 公寓", terrace: "Terrace / 排屋", semi_d: "Semi-D / 半独立", bungalow: "Bungalow / 独立式", shop: "Shop Lot / 店铺", land: "Land / 地皮", flat: "Flat / 组屋" };
-    var who = [S.me.phone, S.me.ren_no].filter(Boolean).join(" · ");
+    var T = { condo: "Condominium / 公寓", apartment: "Apartment", terrace: "Terrace / 排屋", semi_d: "Semi-D / 半独立", bungalow: "Bungalow / 独立式", townhouse: "Townhouse", shoplot: "Shoplot / 店屋", office: "Office / 办公室", land: "Land / 地皮" };
+    var C = { residential: "Residential / 住宅", commercial: "Commercial / 商业", industrial: "Industrial / 工业", land: "Land / 地皮" };
     var wa = String(S.me.phone || "").replace(/[^0-9]/g, "").replace(/^0/, "60");
-    var lines = [];
-    lines.push(rent ? "*WTR / For Rent 出租*" : "*WTS / For Sale 出售*");
-    if (row.condition === "vacant" || !row.tenure) lines.push("*Ready move in*");
+    var lines = [rent ? "*WTR / For Rent 出租*" : "*WTS / For Sale 出售*"];
+    if (row.headline) lines.push("*" + row.headline + "*");
     lines.push("");
-    lines.push("*" + (row.project_name || projName(row)) + "*");
-    lines.push(areaName(row.area_code) + (row.block ? " · Block " + row.block : ""));
-    if (row.property_type) lines.push(T[row.property_type] || row.property_type);
-    if (row.built_up) lines.push(Number(row.built_up).toLocaleString("en-MY") + " sqft");
-    if (row.floor) lines.push("Floor " + row.floor);
+    lines.push("*" + (row.address_text || row.project_name || projName(row)) + "*");
+    if (row.name_zh) lines.push(row.name_zh);
+    lines.push(areaName(row.area_code));
+    lines.push(C[row.category] || (row.category || ""));
+    lines.push(T[row.property_type] || row.property_type || "");
+    if (row.land_size) lines.push("Land " + row.land_size);
+    if (row.built_up) lines.push("Built-up " + Number(row.built_up).toLocaleString("en-MY") + " sqft");
+    if (row.bedrooms != null) lines.push(row.bedrooms + " bed" + (row.extra_rooms ? " + " + row.extra_rooms : ""));
+    if (row.bathrooms != null) lines.push(row.bathrooms + " bath" + (row.toilets ? " / " + row.toilets + " toilet" : ""));
+    if (row.lot_position) lines.push(String(row.lot_position).replace(/^\\w/, function (c) { return c.toUpperCase(); }) + " lot");
     if (row.facing) lines.push("Facing " + row.facing);
-    if (row.tenure) lines.push(String(row.tenure).replace(/^\w/, function (c) { return c.toUpperCase(); }));
-    if (row.title_type) lines.push(String(row.title_type).replace(/^\w/, function (c) { return c.toUpperCase(); }));
-    if (row.furnishing) lines.push(String(row.furnishing).replace(/^\w/, function (c) { return c.toUpperCase(); }));
-    if (row.carparks) lines.push(row.carparks + " car park");
+    if (row.tenure) lines.push(String(row.tenure).replace(/^\\w/, function (c) { return c.toUpperCase(); }));
+    if (row.title_type) lines.push(String(row.title_type).replace(/^\\w/, function (c) { return c.toUpperCase(); }));
     lines.push("");
     lines.push("*" + (rent ? "Rental " : "Selling ") + money(price, rent) + "*");
-    lines.push("Negotiable");
+    if (row.negotiable) lines.push("Negotiable");
     lines.push("");
     lines.push("*" + (S.me.team || "PropNet") + "*");
     lines.push("*" + (S.me.name || "") + "*");
-    if (who) lines.push(who);
+    lines.push([S.me.phone, S.me.ren_no].filter(Boolean).join(" · "));
     if (wa) lines.push("www.wasap.my/" + wa + "/" + String(row.code || "").toLowerCase());
-    return lines.join("\n");
+    return lines.filter(function (x) { return x !== "" || true; }).join("\n");
   }
 
   function shareCard(row) {

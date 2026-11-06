@@ -14,7 +14,7 @@ function money(n, monthly, lang) {
   const v = Number(n); if (!isFinite(v) || !v) return "—";
   return "RM " + v.toLocaleString("en-MY", { maximumFractionDigits: 0 }) + (monthly ? (lang === "bm" ? " /bln" : (lang === "en" ? " /mo" : " /月")) : "");
 }
-const TYPE = { condo: ["公寓", "Condo"], terrace: ["排屋", "Terrace"], semi_d: ["半独立", "Semi-D"], bungalow: ["独立式", "Bungalow"], shop: ["店铺", "Shop"], land: ["地皮", "Land"], flat: ["组屋", "Flat"] };
+const TYPE = { condo: ["公寓", "Condominium"], apartment: ["Apartment", "Apartment"], terrace: ["排屋", "Terrace"], semi_d: ["半独立", "Semi-D"], bungalow: ["独立式", "Bungalow"], townhouse: ["Townhouse", "Townhouse"], shoplot: ["店屋", "Shoplot"], office: ["办公室", "Office"], land: ["地皮", "Land"] };
 
 module.exports = function renderPublicListing(p, agent, opts) {
   opts = opts || {};

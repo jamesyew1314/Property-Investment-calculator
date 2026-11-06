@@ -187,6 +187,15 @@ function normalizeClient(input, { partial = false } = {}) {
 function normalizeProperty(input, { partial = false } = {}) {
   const b = builder(input || {}, partial);
   b.text("project_name", 160);
+  b.text("headline", 120);
+  b.text("name_zh", 120);
+  b.text("address_text", 240);
+  b.text("category", 40);
+  b.text("land_size", 40);
+  b.numField("extra_rooms", whole, { min: 0, max: 20 });
+  b.numField("toilets", whole, { min: 0, max: 20 });
+  b.text("lot_position", 40);
+  if (b.has("negotiable")) b.put("negotiable", boolOf(input.negotiable));
   b.choice("area_code", "areas");
   b.choice("state", "states");
   b.choice("property_type", "property_types");

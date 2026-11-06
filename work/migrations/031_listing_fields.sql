@@ -1,0 +1,11 @@
+BEGIN;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS headline text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS name_zh text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS address_text text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS category text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS extra_rooms integer;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS toilets integer;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS lot_position text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS land_size text;
+ALTER TABLE lib_properties ADD COLUMN IF NOT EXISTS negotiable boolean NOT NULL DEFAULT false;
+COMMIT;
