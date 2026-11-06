@@ -71,6 +71,31 @@ eq(r3.rent_price, 2200, "群格式 租金");
 eq(r3.negotiable, true, "群格式 可议价");
 eq(r3._phone, "0165280918", "群格式 电话");
 
+
+// 中文手写格式（Bukit Indah）
+const waZh = `出售 Bukit Indah
+17， Jalan Indah 25/13
+81200 Johor
+Lang size 20x 70
+3房2厕
+有保安隔离
+向东
+卖价 Rm750,000
+估价 Rm800,000`;
+const r4 = parseListing(waZh);
+eq(r4.intent, "sale", "中文 出售");
+eq(r4.address, "17, Jalan Indah 25/13, 81200 Johor", "中文 多行地址");
+eq(r4.address_text, "Jalan Indah 25/13", "中文 花园名");
+eq(r4.area_code, "bukit_indah", "中文 区域");
+eq(r4.land_size, "20x70", "中文 土地");
+eq(r4.bedrooms, 3, "中文 房");
+eq(r4.toilets, 2, "中文 厕");
+eq(r4.security, "guarded", "中文 保安");
+eq(r4.facing, "East", "中文 朝向");
+eq(r4.asking_price, 750000, "中文 卖价");
+eq(r4.bank_value, 800000, "中文 估价");
+eq(r4.category, "residential", "中文 类别推断");
+
 eq(parseListing("随便一段没有房源的文字").asking_price, undefined, "无价格不误判");
 console.log(pass + " pass, " + fail + " fail");
 process.exit(fail ? 1 : 0);
