@@ -309,6 +309,11 @@
       $("#view").innerHTML = h;
     });
   }
+  function statusLabel(k) {
+    var m = { available: ["在售/在租", "Available"], reserved: ["已订", "Reserved"], sold: ["已售", "Sold"], rented: ["已租", "Rented"], off_market: ["下架", "Off market"] };
+    var v = m[k] || [k, k];
+    return t(v[0], v[1]);
+  }
   function pill(status) {
     var map = { new: ["blue", "新", "New"], accepted: ["green", "已接受", "Accepted"], declined: ["grey", "已拒绝", "Declined"], done: ["green", "已完成", "Done"],
       available: ["green", "在售/在租", "Available"], reserved: ["amber", "已订", "Reserved"], sold: ["grey", "已售", "Sold"], rented: ["grey", "已租", "Rented"], off_market: ["grey", "下架", "Off market"] };
@@ -326,7 +331,7 @@
       var h = '<div class="toolbar"><input id="lq" type="search" placeholder="' + t("搜索编号 / 楼盘", "Search code / project") + '" value="' + esc(q.q || "") + '">' +
         '<select id="lst"><option value="">' + t("全部状态", "All status") + "</option>" +
         ["available", "reserved", "sold", "rented", "off_market"].map(function (s) {
-          return '<option value="' + s + '"' + (q.status === s ? " selected" : "") + ">" + esc(s) + "</option>";
+          return '<option value="' + s + '"' + (q.status === s ? " selected" : "") + ">" + esc(statusLabel(s)) + "</option>";
         }).join("") + "</select>" +
         '<span class="count">' + d.total + t(" 条", " listings") + "</span></div>";
       if (!d.rows.length) {
