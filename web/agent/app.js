@@ -1172,7 +1172,7 @@
   function start() {
     var params = new URLSearchParams(location.search);
     var verify = params.get("verify");
-    fetch("/api/public/config").then(function (r) { return r.json(); }).then(function (cfg) {
+    fetch("/api/public/config?t=" + Date.now()).then(function (r) { return r.json(); }).then(function (cfg) {
       S.meta = { states: cfg.states || [], areas: cfg.areas || [], property_types: cfg.taxonomy.property_types || [], tenures: cfg.taxonomy.tenures || [] };
     }).catch(function () {}).then(function () {
       if (verify) {

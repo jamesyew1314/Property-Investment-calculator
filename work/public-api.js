@@ -62,6 +62,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
   }
 
   r.get("/config", async function (req, res, next) {
+    res.setHeader("Cache-Control", "no-store");
     try {
       const counts = await pool.query(`
         SELECT
