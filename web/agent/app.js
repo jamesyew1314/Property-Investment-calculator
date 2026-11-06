@@ -502,20 +502,33 @@
 
   // ---------- 分享卡（浏览器 canvas 生成 PNG） ----------
   function shareText(row) {
-    var price = row.intent === "rent" ? row.rent_price : row.asking_price;
-    var title = projName(row);
-    var bits = [];
-    if (row.bedrooms) bits.push(row.bedrooms + (S.lang === "en" ? " bed" : "房"));
-    if (row.bathrooms) bits.push(row.bathrooms + (S.lang === "en" ? " bath" : "卫"));
-    if (row.built_up) bits.push(int(row.built_up) + " sqft");
-    var who = S.me.name + (S.me.ren_no ? " (" + S.me.ren_no + ")" : "") + (S.me.phone ? " " + S.me.phone : "");
-    var lines = [
-      (row.intent === "rent" ? (S.lang === "bm" ? "【Untuk disewa】" : "【出租】") : (S.lang === "bm" ? "【Untuk dijual】" : "【出售】")) + title,
-      areaName(row.area_code) + " · " + money(price, row.intent === "rent") + (bits.length ? " · " + bits.join(" ") : ""),
-      (S.lang === "en" ? "Agent: " : (S.lang === "bm" ? "Ejen: " : "中介：")) + who,
-      "https://kwongthye.com/properties/?p=" + row.code,
-      (S.lang === "en" ? "Co-broke welcome · PropNet" : (S.lang === "bm" ? "Co-broke dialu-alukan · PropNet" : "同行可带看 · 成交有记录 · PropNet"))
-    ];
+    var rent = row.intent === "rent";
+    var price = rent ? row.rent_price : row.asking_price;
+    var T = { condo: "Condo / 公寓", terrace: "Terrace / 排屋", semi_d: "Semi-D / 半独立", bungalow: "Bungalow / 独立式", shop: "Shop Lot / 店铺", land: "Land / 地皮", flat: "Flat / 组屋" };
+    var who = [S.me.phone, S.me.ren_no].filter(Boolean).join(" · ");
+    var wa = String(S.me.phone || "").replace(/[^0-9]/g, "").replace(/^0/, "60");
+    var lines = [];
+    lines.push(rent ? "*WTR / For Rent 出租*" : "*WTS / For Sale 出售*");
+    if (row.condition === "vacant" || !row.tenure) lines.push("*Ready move in*");
+    lines.push("");
+    lines.push("*" + (row.project_name || projName(row)) + "*");
+    lines.push(areaName(row.area_code) + (row.block ? " · Block " + row.block : ""));
+    if (row.property_type) lines.push(T[row.property_type] || row.property_type);
+    if (row.built_up) lines.push(Number(row.built_up).toLocaleString("en-MY") + " sqft");
+    if (row.floor) lines.push("Floor " + row.floor);
+    if (row.facing) lines.push("Facing " + row.facing);
+    if (row.tenure) lines.push(String(row.tenure).replace(/^\w/, function (c) { return c.toUpperCase(); }));
+    if (row.title_type) lines.push(String(row.title_type).replace(/^\w/, function (c) { return c.toUpperCase(); }));
+    if (row.furnishing) lines.push(String(row.furnishing).replace(/^\w/, function (c) { return c.toUpperCase(); }));
+    if (row.carparks) lines.push(row.carparks + " car park");
+    lines.push("");
+    lines.push("*" + (rent ? "Rental " : "Selling ") + money(price, rent) + "*");
+    lines.push("Negotiable");
+    lines.push("");
+    lines.push("*" + (S.me.team || "PropNet") + "*");
+    lines.push("*" + (S.me.name || "") + "*");
+    if (who) lines.push(who);
+    if (wa) lines.push("www.wasap.my/" + wa + "/" + String(row.code || "").toLowerCase());
     return lines.join("\n");
   }
 
@@ -525,6 +538,7 @@
       title: t("分享到群", "Share to group"),
       body: '<p class="muted" style="margin:0 0 8px">' + t("复制文案，或直接打开 WhatsApp 选群；图片可先下载再一起发。", "Copy the text or open WhatsApp to pick a group; download the image to attach.") + "</p>" +
         '<textarea id="shareText" readonly style="width:100%;min-height:120px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE">' + esc(text) + "</textarea>" +
+        '<div id="waGroups" style="margin-top:12px"></div>' +
         '<div style="margin:12px 0 6px;font-size:12px;color:var(--muted)">' + t("分享卡（可下载发群）", "Share card (download)") + "</div>" +
         '<canvas id="shareCanvas" width="1080" height="1350" style="width:100%;max-width:360px;border-radius:12px;border:1px solid var(--line)"></canvas>',
       footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button>" +
@@ -532,6 +546,27 @@
         '<button class="btn gold" id="openWa">' + t("打开 WhatsApp", "Open WhatsApp") + "</button>" +
         '<button class="btn dark" id="dl">' + t("下载图片", "Download image") + "</button>"
     });
+    api("/wa-groups").then(function (j) {
+      var box = $("#waGroups", m.root); if (!box) return;
+      var gs = (j.rows || []).filter(function (g) { return g.enabled; });
+      if (!gs.length) {
+        box.innerHTML = '<div class="muted" style="font-size:12px">' + t("还没有配置群组。到「个人资料 → WhatsApp 群组」添加群链接。", "No groups yet. Add group links in Profile → WhatsApp groups.") + "</div>";
+        return;
+      }
+      box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">' + t("点一个群：自动复制文案并打开群，直接粘贴发送", "Tap a group: text is copied and the group opens — paste and send") + "</div>" +
+        gs.map(function (g, i) {
+          return '<button type="button" class="btn line sm" data-wa="' + i + '" style="margin:0 6px 6px 0">' + esc(g.label) + " ↗</button>";
+        }).join("");
+      $$("[data-wa]", box).forEach(function (b) {
+        b.addEventListener("click", function () {
+          var g = gs[Number(b.getAttribute("data-wa"))];
+          try { navigator.clipboard.writeText(text); } catch (e) {}
+          toast(t("文案已复制，正在打开群", "Text copied — opening group"));
+          window.open(g.invite_link, "_blank");
+        });
+      });
+    }).catch(function () {});
+
     var cv = $("#shareCanvas", m.root), ctx = cv.getContext("2d");
     var W = 1080, H = 1350;
     var g = ctx.createLinearGradient(0, 0, W, H);
@@ -946,6 +981,13 @@
       '<p class="muted" style="margin:0 0 10px">' + t("注销后：房源、客户、询盘、图片与账号全部删除，不可恢复。", "Deleting removes your listings, clients, inquiries, photos and account. This cannot be undone.") + "</p>" +
       '<button class="btn danger" id="acDel">' + t("注销账号", "Delete account") + "</button></div>";
 
+    h += '<div class="card"><h3>' + t("WhatsApp 群组", "WhatsApp groups") + "</h3>" +
+      '<p class="muted" style="margin:0 0 10px">' + t("把常发的群链接加进来；分享房源时点一下就能复制文案并打开群。", "Add the groups you post to; sharing a listing copies the text and opens the group.") + "</p>" +
+      '<div id="waList" class="muted" style="margin-bottom:10px">' + t("加载中…", "Loading…") + "</div>" +
+      '<div class="grid2">' + field(t("备注", "Label"), '<input id="waLabel" placeholder="JB 房源群">') +
+      field(t("群链接", "Group link"), '<input id="waLink" placeholder="https://chat.whatsapp.com/...">') + "</div>" +
+      '<button class="btn line" id="waAdd">' + t("添加群组", "Add group") + "</button></div>";
+
     h += '<div class="card"><h3>' + t("邮箱验证", "Email verification") + "</h3>" +
       (a.emailVerified ? '<p class="muted" style="margin:0">' + t("已验证 ✓", "Verified ✓") + "</p>"
         : '<p class="muted" style="margin:0 0 8px">' + t("未验证。验证后房源显示「已验证」标记。", "Not verified. Verified listings show a badge.") +
@@ -1014,6 +1056,30 @@
         .then(function () { toast(t("密码已修改", "Password changed")); route(); })
         .catch(function (e) { btn.disabled = false; toast(e.message === "bad_password" ? t("当前密码不正确", "Wrong current password") : e.message, true); });
     });
+    function loadWa() {
+      api("/wa-groups").then(function (j) {
+        var box = $("#waList"); if (!box) return;
+        var rows = j.rows || [];
+        box.innerHTML = rows.length ? rows.map(function (g) {
+          return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #EEF1F6">' +
+            '<span>' + esc(g.label) + ' <a href="' + esc(g.invite_link) + '" target="_blank" rel="noopener" style="color:#2E5496;font-size:11px">open ↗</a></span>' +
+            '<button class="btn danger sm" data-delwa="' + g.id + '">' + t("删除", "Delete") + "</button></div>";
+        }).join("") : '<span style="font-size:12px">' + t("还没有群组", "No groups yet") + "</span>";
+        box.querySelectorAll("[data-delwa]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            api("/wa-groups/" + b.getAttribute("data-delwa"), { method: "DELETE" }).then(loadWa);
+          });
+        });
+      });
+    }
+    loadWa();
+    $("#waAdd", $("#view")).addEventListener("click", function () {
+      var btn = this; btn.disabled = true;
+      api("/wa-groups", { method: "POST", body: { label: $("#waLabel").value.trim(), link: $("#waLink").value.trim() } })
+        .then(function () { $("#waLabel").value = ""; $("#waLink").value = ""; loadWa(); toast(t("已添加", "Added")); })
+        .catch(function (e) { toast(e.message === "invalid_link" ? t("群链接不正确", "Invalid group link") : e.message, true); })
+        .then(function () { btn.disabled = false; });
+    });
     return Promise.resolve();
   }
 
@@ -1028,7 +1094,9 @@
     if (act === "toggle-publish") {
       var pub = el.dataset.pub === "1";
       api("/listings/" + id + "/publish", { method: "POST", body: { public: pub } }).then(function () {
-        toast(pub ? t("已公开到官网", "Published to site") : t("已收回，仅池内可见", "Unpublished")); route();
+        toast(pub ? t("已公开到官网", "Published to site") : t("已收回，仅池内可见", "Unpublished"));
+        route();
+        if (pub) api("/listings/" + id).then(function (j) { shareCard(j.row); }).catch(function () {});
       }).catch(function (e) { toast(e.message === "need_price" ? t("先填写价格再公开", "Add a price first") : e.message, true); });
     }
     if (act === "share") api("/listings/" + id).then(function (j) { shareCard(j.row); });

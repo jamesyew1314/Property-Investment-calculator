@@ -56,4 +56,18 @@ GRANT USAGE, SELECT ON SEQUENCE mandate_leads_id_seq TO fangchan_app;
 GRANT USAGE, SELECT ON SEQUENCE agent_reviews_id_seq TO fangchan_app;
 GRANT USAGE, SELECT ON SEQUENCE agent_magic_links_id_seq TO fangchan_app;
 
+-- WhatsApp 群组配置（分享用）
+CREATE TABLE IF NOT EXISTS agent_wa_groups (
+  id bigserial PRIMARY KEY,
+  agent_id integer NOT NULL REFERENCES lib_agents(id) ON DELETE CASCADE,
+  label text NOT NULL,
+  invite_link text NOT NULL,
+  invite_code text NOT NULL,
+  enabled boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE(agent_id, invite_code)
+);
+GRANT ALL ON agent_wa_groups TO fangchan_app;
+GRANT USAGE, SELECT ON SEQUENCE agent_wa_groups_id_seq TO fangchan_app;
+
 COMMIT;

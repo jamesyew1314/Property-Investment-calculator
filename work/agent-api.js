@@ -409,6 +409,37 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       res.json({ ok: true, text: out.text, engine: out.engine });
     } catch (e) { next(e); }
   });
+
+  // ---------- WhatsApp 群组 ----------
+  function parseInvite(v) {
+    const m = String(v || "").match(/chat\.whatsapp\.com\/([A-Za-z0-9]+)/);
+    return m ? m[1] : (/^[A-Za-z0-9]{8,}$/.test(String(v || "")) ? String(v) : "");
+  }
+  r.get("/wa-groups", requireAgent, async function (req, res, next) {
+    try {
+      const out = await pool.query("SELECT id,label,invite_link,invite_code,enabled FROM agent_wa_groups WHERE agent_id=$1 ORDER BY created_at DESC", [req.agent.id]);
+      res.json({ ok: true, rows: out.rows });
+    } catch (e) { next(e); }
+  });
+  r.post("/wa-groups", requireAgent, limit(20, 600000), async function (req, res, next) {
+    try {
+      const b = req.body || {};
+      const code = parseInvite(b.link);
+      if (!code) return res.status(400).json({ ok: false, error: "invalid_link" });
+      const label = core.str(b.label, 60) || "WhatsApp Group";
+      const link = "https://chat.whatsapp.com/" + code;
+      const out = await pool.query(
+        "INSERT INTO agent_wa_groups(agent_id,label,invite_link,invite_code) VALUES($1,$2,$3,$4) ON CONFLICT (agent_id,invite_code) DO UPDATE SET label=EXCLUDED.label RETURNING *",
+        [req.agent.id, label, link, code]);
+      res.status(201).json({ ok: true, row: out.rows[0] });
+    } catch (e) { next(e); }
+  });
+  r.delete("/wa-groups/:id", requireAgent, async function (req, res, next) {
+    try {
+      await pool.query("DELETE FROM agent_wa_groups WHERE id=$1 AND agent_id=$2", [req.params.id, req.agent.id]);
+      res.json({ ok: true });
+    } catch (e) { next(e); }
+  });
   // ---------- 我的房源 ----------
   const OWN_SELECT = `
     SELECT p.*, p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
