@@ -811,8 +811,8 @@
           });
         });
       }, 30);
-      if (!rows.length) return '<div class="card"><div class="empty">' + t("还没有委托。把个人站发给业主，他们提交后会出现在这里。", "No mandates yet. Share your page with owners; submissions appear here.") + "</div></div>";
-      return '<div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>' + t("业主", "Owner") + "</th><th>" + t("电话", "Phone") + "</th><th>" + t("区域 / 房型", "Area / type") + "</th><th>" + t("期望价", "Price") + "</th><th>" + t("时间", "When") + "</th><th>" + t("状态", "Status") + "</th></tr></thead><tbody>" +
+      if (!rows.length) { var h0 = '<div class="card"><div class="empty">' + t("还没有委托。把个人站发给业主，他们提交后会出现在这里。", "No mandates yet. Share your page with owners; submissions appear here.") + "</div></div>"; $("#view").innerHTML = h0; return h0; }
+      var h = '<div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>' + t("业主", "Owner") + "</th><th>" + t("电话", "Phone") + "</th><th>" + t("区域 / 房型", "Area / type") + "</th><th>" + t("期望价", "Price") + "</th><th>" + t("时间", "When") + "</th><th>" + t("状态", "Status") + "</th></tr></thead><tbody>" +
         rows.map(function (r) {
           return "<tr><td><b>" + esc(r.name) + "</b>" + (r.notes ? '<div class="muted">' + esc(r.notes) + "</div>" : "") + "</td>" +
             "<td>" + esc(r.phone) + "</td><td>" + esc([r.area_code, r.property_type].filter(Boolean).join(" / ")) + "</td>" +
@@ -821,6 +821,8 @@
               return '<option value="' + k + '"' + (r.status === k ? " selected" : "") + ">" + t(k === "new" ? "新" : (k === "contacted" ? "已联系" : "已结束"), k === "new" ? "New" : (k === "contacted" ? "Contacted" : "Closed")) + "</option>";
             }).join("") + "</select></td></tr>";
         }).join("") + "</tbody></table></div></div>";
+      $("#view").innerHTML = h;
+      return h;
     });
   }
 
