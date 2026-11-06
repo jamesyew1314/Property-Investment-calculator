@@ -118,6 +118,7 @@ window.BM_MAP = {
   "Max 12 photos": "Maksimum 12 foto",
   "Email language": "Bahasa e-mel",
   "Loading…": "Memuatkan…",
+  "Sale": "Jual",
   "Preferred time / client notes": "Masa tontonan / nota klien",
   "Import": "Import",
   "Import a listing": "Import senarai",

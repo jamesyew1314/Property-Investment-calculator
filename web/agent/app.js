@@ -441,7 +441,7 @@
       '<div class="grid2">' + field(t("楼盘 / 项目名 *", "Project *"), '<input name="project_name" value="' + esc(row.project_name || "") + '">') +
       field(t("区域", "Area"), '<select name="area_code">' + areaOptions(row.area_code) + "</select>") + "</div>" +
       '<div class="grid2">' + field(t("房型", "Type"), '<select name="property_type">' + optList(typeList(), row.property_type, "—") + "</select>") +
-      field(t("出售 / 出租", "Sale / Rent"), '<select name="intent"><option value="sale"' + (row.intent !== "rent" ? " selected" : "") + ">出售</option><option value=\"rent\"" + (row.intent === "rent" ? " selected" : "") + ">出租</option></select>") + "</div>" +
+      field(t("出售 / 出租", "Sale / Rent"), '<select name="intent"><option value="sale"' + (row.intent !== "rent" ? " selected" : "") + ">" + t("出售", "Sale") + '</option><option value="rent"' + (row.intent === "rent" ? " selected" : "") + ">" + t("出租", "Rent") + "</option></select>") + "</div>" +
       '<div class="grid2">' + field(t("售价 (RM)", "Asking price"), '<input name="asking_price" inputmode="numeric" value="' + esc(row.asking_price || "") + '">') +
       field(t("租金 (RM/月)", "Monthly rent"), '<input name="rent_price" inputmode="numeric" value="' + esc(row.rent_price || "") + '">') + "</div>" +
       '<div class="grid2">' + field(t("单位号", "Unit"), '<input name="unit_no" value="' + esc(row.unit_no || "") + '">') +
