@@ -483,6 +483,11 @@
         '<button class="btn gold" id="save">' + t("保存", "Save") + "</button>"
     });
     bindPhotos(m, row);
+    fetch("/api/public/config?t=" + Date.now()).then(function (r) { return r.json(); }).then(function (cfg) {
+      S.meta = { states: cfg.states || [], areas: cfg.areas || [], property_types: (cfg.taxonomy || {}).property_types || [], tenures: (cfg.taxonomy || {}).tenures || [] };
+      var sel = document.querySelector('[name="area_code"]');
+      if (sel) { var v = sel.value; sel.innerHTML = areaOptions(v || row.area_code || ""); }
+    }).catch(function () {});
     var aiBtn = $("#aiBtn", m.root);
     if (aiBtn) aiBtn.addEventListener("click", function () {
       var f = new FormData($("#lf", m.root));
