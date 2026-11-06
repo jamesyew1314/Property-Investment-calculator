@@ -25,6 +25,52 @@ eq(r2.rent_price, 2800, "租金");
 eq(r2.area_code, "danga_bay", "区域 en");
 eq(r2.property_type, "condo", "房型");
 
+
+// 群组转发完整格式（Andy 样板）
+const waFull = `*WTR / For Rent 出租*
+*Ready move in*
+
+*12 Jalan tropika 12, taman bukit tropika, 81800, Ulu tiram*
+
+*Jalan Tropika @ Taman Desa cemerlang*
+Shop Lot
+22x70
+Intermediate lot
+Facing South
+Non Bumi
+Freehold
+Individual title
+Unfurnished
+Vacant
+Original condition
+
+*Rental RM2,200/month*
+Negotiable
+
+*TRREAG*
+*Andy Lau*
+0165280918
+www.wasap.my/60165280918/tdcr2200`;
+const r3 = parseListing(waFull);
+eq(r3.intent, "rent", "群格式 租");
+eq(r3.headline, "Ready move in", "群格式 标题");
+eq(r3.address, "12 Jalan tropika 12, taman bukit tropika, 81800, Ulu tiram", "群格式 完整地址");
+eq(r3.project_name, "Jalan Tropika @ Taman Desa cemerlang", "群格式 项目");
+eq(r3.area_code, "ulu_tiram", "群格式 区域取邮编地址");
+eq(r3.category, "commercial", "群格式 类别");
+eq(r3.property_type, "shoplot", "群格式 店屋");
+eq(r3.land_size, "22x70", "群格式 土地");
+eq(r3.lot_position, "intermediate", "群格式 Lot");
+eq(r3.facing, "South", "群格式 方向");
+eq(r3.bumi, "non_bumi", "群格式 Bumi");
+eq(r3.tenure, "freehold", "群格式 产权");
+eq(r3.title_type, "individual", "群格式 地契");
+eq(r3.furnishing, "unfurnished", "群格式 家私");
+eq(r3.condition, "vacant", "群格式 现况");
+eq(r3.rent_price, 2200, "群格式 租金");
+eq(r3.negotiable, true, "群格式 可议价");
+eq(r3._phone, "0165280918", "群格式 电话");
+
 eq(parseListing("随便一段没有房源的文字").asking_price, undefined, "无价格不误判");
 console.log(pass + " pass, " + fail + " fail");
 process.exit(fail ? 1 : 0);

@@ -452,7 +452,7 @@
 
   function listingForm(row, imported) {
     row = row || {};
-    var body = '<form id="lf">' +
+    var body = '<form id="lf">' + '<input type="hidden" name="address" value="' + esc(row.address || "") + '">' +
       '<h4 style="margin:4px 0 8px;color:#0E2438">' + t("价格", "Price") + "</h4>" +
       '<div class="grid2">' + field(t("出售 / 出租", "Sale / Rent"), '<select name="intent"><option value="sale"' + (row.intent !== "rent" ? " selected" : "") + ">" + t("出售", "Sale") + '</option><option value="rent"' + (row.intent === "rent" ? " selected" : "") + ">" + t("出租", "Rent") + "</option></select>") +
       field(t("可否议价", "Negotiable"), '<label style="display:flex;gap:8px;align-items:center;padding:9px 0"><input type="checkbox" name="negotiable" value="true"' + (row.negotiable ? " checked" : "") + "> " + t("可议价", "Negotiable") + "</label>") + "</div>" +
