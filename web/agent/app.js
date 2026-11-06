@@ -450,6 +450,7 @@
       field(t("卫浴", "Baths"), '<input name="bathrooms" inputmode="numeric" value="' + esc(row.bathrooms != null ? row.bathrooms : "") + '">') + "</div>" +
       '<div class="grid2">' + field(t("建筑面积 (sqft)", "Built-up"), '<input name="built_up" inputmode="numeric" value="' + esc(row.built_up || "") + '">') +
       field(t("产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") + "</div>" +
+      field(t("公开描述（客户可见）", "Public description"), '<textarea name="description" id="lfDesc">' + esc(row.description || "") + '</textarea><button type="button" class="btn line sm" id="aiBtn" style="margin-top:6px">' + t("AI 生成描述", "Generate with AI") + "</button>") +
       field(t("备注（不公开）", "Notes (private)"), '<textarea name="remarks">' + esc(row.remarks || "") + "</textarea>") +
       field(t("房源图片（最多 12 张）", "Photos (max 12)"), photoBlock(row)) +
       "</form>";
@@ -461,6 +462,19 @@
         '<button class="btn gold" id="save">' + t("保存", "Save") + "</button>"
     });
     bindPhotos(m, row);
+    var aiBtn = $("#aiBtn", m.root);
+    if (aiBtn) aiBtn.addEventListener("click", function () {
+      var f = new FormData($("#lf", m.root));
+      aiBtn.disabled = true;
+      api("/ai/describe", { method: "POST", body: {
+        project_name: f.get("project_name"), area_code: f.get("area_code"), property_type: f.get("property_type"),
+        bedrooms: Number(f.get("bedrooms")) || null, bathrooms: Number(f.get("bathrooms")) || null,
+        built_up: Number(f.get("built_up")) || null, intent: f.get("intent"),
+        price: Number(f.get("asking_price") || f.get("rent_price")) || null, lang: S.lang } })
+        .then(function (j) { $("#lfDesc", m.root).value = j.text; toast(j.engine === "ai" ? t("已生成", "Generated") : t("已用模板生成（未配置 AI Key）", "Template used (no AI key)")); })
+        .catch(function (e) { toast(e.message, true); })
+        .then(function () { aiBtn.disabled = false; });
+    });
     if (row.id) {
       $("#del", m.root).addEventListener("click", function () {
         confirmBox(t("删除这条房源？", "Delete this listing?"), function () {

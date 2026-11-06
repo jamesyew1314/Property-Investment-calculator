@@ -138,6 +138,7 @@ function normalizeProject(input, { partial = false } = {}) {
   b.text("facilities", 1000);
   b.numField("lat", decimal, { min: -90, max: 90 });
   b.numField("lng", decimal, { min: -180, max: 180 });
+  b.text("description", 2000);
   b.text("remarks", 2000);
   if (b.has("archived")) b.put("archived", boolOf(input.archived));
   const out = finish(b.errors, b.values);

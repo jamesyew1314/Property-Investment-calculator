@@ -10,6 +10,7 @@ const agentCore = require("./agent-core");
 const matcher = require("./match");
 const billplz = require("./billplz");
 const importer = require("./import-core");
+const aiCopy = require("./ai-copy");
 let sharp = null; try { sharp = require("sharp"); } catch (e) { sharp = null; }
 const fs = require("node:fs");
 const pathMod = require("node:path");
@@ -386,6 +387,20 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
     } catch (e) { next(e); }
   });
 
+
+  r.post("/ai/describe", requireAgent, limit(12, 600000), async function (req, res, next) {
+    try {
+      const b = req.body || {};
+      const lang = ["zh", "en", "bm"].indexOf(b.lang) >= 0 ? b.lang : (req.agent.lang || "zh");
+      const out = await aiCopy.generate({
+        project_name: core.str(b.project_name, 80), area_code: core.str(b.area_code, 40),
+        property_type: core.str(b.property_type, 30), bedrooms: Number(b.bedrooms) || null,
+        bathrooms: Number(b.bathrooms) || null, built_up: Number(b.built_up) || null,
+        intent: b.intent === "rent" ? "rent" : "sale", price: Number(b.price) || null
+      }, lang);
+      res.json({ ok: true, text: out.text, engine: out.engine });
+    } catch (e) { next(e); }
+  });
   // ---------- 我的房源 ----------
   const OWN_SELECT = `
     SELECT p.*, p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
