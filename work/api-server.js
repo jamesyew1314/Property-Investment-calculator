@@ -10,6 +10,7 @@ const createLibraryApi = require("./library-api");
 const createPublicApi = require("./public-api");
 const createAgentApi = require("./agent-api");
 const renderAgentPage = require("./agent-page");
+const renderPublicListing = require("./public-page");
 const runDigest = require("./digest");
 const billplz = require("./billplz");
 const pathMod = require("node:path");
@@ -1410,6 +1411,25 @@ app.use("/api/public", createPublicApi({
     await sendMail(to, "PropNet 加入申请 — " + lead.name, text, null, [], null);
   }
 }));
+
+
+// ---------- 公开房源详情 /p/:code（业主资料不出网） ----------
+app.get("/p/:code", async function (req, res, next) {
+  try {
+    const lang = ["zh", "en", "bm"].indexOf(req.query.lang) >= 0 ? req.query.lang : "zh";
+    const code = String(req.params.code || "").slice(0, 20);
+    const out = await pool.query(
+      `SELECT p.*, pr.name AS project_title, pr.name_zh AS project_title_zh
+       FROM lib_properties p LEFT JOIN lib_projects pr ON pr.id = p.project_id
+       WHERE p.code=$1 AND p.visibility='public' AND p.status IN ('available','reserved')`, [code]);
+    const p = out.rows[0];
+    if (!p || !p.tenant_id) return res.status(404).type("html").send('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>404 | PropNet</title><link rel="stylesheet" href="/site.css"></head><body style="padding:60px;font-family:system-ui"><h1>找不到这套房源</h1><p><a href="/">回首页 →</a></p></body></html>');
+    const a = await pool.query("SELECT * FROM lib_agents WHERE id=$1 AND status='active'", [p.tenant_id]);
+    if (!a.rows[0]) return res.status(404).send("Not found");
+    res.set("Cache-Control", "public, max-age=300");
+    res.type("html").send(renderPublicListing(p, a.rows[0], { lang: lang }));
+  } catch (e) { next(e); }
+});
 
 // ---------- 中介个人站 /a/:slug（服务端渲染，SEO） ----------
 app.get("/a", function (req, res) { res.redirect(301, "/agents/"); });
