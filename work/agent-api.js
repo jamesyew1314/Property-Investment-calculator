@@ -546,9 +546,12 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       if (pub && (!before.asking_price && !before.rent_price)) {
         return res.status(400).json({ ok: false, error: "need_price" });
       }
+      if (pub && !before.area_code) {
+        return res.status(400).json({ ok: false, error: "need_area" });
+      }
       const out = await pool.query(
         "UPDATE lib_properties SET visibility=$1, published_at=$2, updated_at=now() WHERE id=$3 AND tenant_id=$4 RETURNING *",
-        [pub ? "public" : "pool", pub ? new Date() : null, req.params.id, req.agent.id]);
+        [pub ? "public" : (before.area_code && (before.asking_price || before.rent_price) ? "pool" : "private"), pub ? new Date() : null, req.params.id, req.agent.id]);
       await audit(req.agent.email, pub ? "agent.publish" : "agent.unpublish", "property", Number(req.params.id), {});
       res.json({ ok: true, row: out.rows[0] });
     } catch (e) { next(e); }
@@ -682,7 +685,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
     try {
       const page = Math.max(1, Number(req.query.page) || 1);
       const size = Math.min(48, Number(req.query.pageSize) || 20);
-      const where = ["p.visibility IN ('pool','public')", "p.status IN ('available','reserved')"];
+      const where = ["p.visibility IN ('pool','public')", "p.status IN ('available','reserved')", "p.tenant_id IS NOT NULL", "p.area_code IS NOT NULL", "(COALESCE(p.asking_price,0) > 0 OR COALESCE(p.rent_price,0) > 0)"];
       const args = [];
       function add(clause, val) { args.push(val); where.push(clause.replace("?", "$" + args.length)); }
       if (req.query.q) {
@@ -700,7 +703,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       const rows = await pool.query(`
         SELECT p.id, p.code, p.project_name, p.area_code, p.state, p.property_type, p.intent,
                p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
-               p.bedrooms, p.bathrooms, p.built_up::float8 AS built_up, p.status, p.visibility,
+               p.bedrooms, p.bathrooms, p.built_up::float8 AS built_up, p.status, p.visibility, p.cover_url, p.photos,
                p.tenant_id, p.agent, p.updated_at,
                pr.name AS project_title, pr.name_zh AS project_title_zh,
                a.name AS owner_name, a.phone AS owner_phone, a.ren_no AS owner_ren, a.verified_at AS owner_verified
