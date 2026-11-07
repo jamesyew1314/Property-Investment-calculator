@@ -297,10 +297,10 @@
       var st = res[0].stats, inq = res[1].rows || [];
       S.stats = st; renderNav();
       var h = '<div class="stats">' +
-        '<div class="stat"><b>' + st.listings + "</b><span>" + t("我的房源", "My listings") + "</span></div>" +
-        '<div class="stat"><b>' + st.published + "</b><span>" + t("已公开官网", "Public on site") + "</span></div>" +
-        '<div class="stat"><b>' + st.clients + "</b><span>" + t("我的客户", "Clients") + "</span></div>" +
-        '<div class="stat"><b>' + st.new_inquiries + "</b><span>" + t("待处理询盘", "New inquiries") + "</span></div></div>";
+        '<a class="stat" href="#/listings"><b>' + st.listings + "</b><span>" + t("我的房源", "My listings") + "</span></a>" +
+        '<a class="stat" href="#/listings"><b>' + st.published + "</b><span>" + t("已公开官网", "Public on site") + "</span></a>" +
+        '<a class="stat" href="#/clients"><b>' + st.clients + "</b><span>" + t("我的客户", "Clients") + "</span></a>" +
+        '<a class="stat" href="#/inquiries"><b>' + st.new_inquiries + "</b><span>" + t("待处理询盘", "New inquiries") + "</span></a></div>";
       h += '<div class="card"><h3>' + t("最近询盘", "Latest inquiries") + "</h3>" +
         (inq.length ? '<div class="table" style="border:none"><table class="table"><thead><tr><th>' + t("时间", "When") +
           "</th><th>" + t("房源", "Listing") + "</th><th>" + t("同行", "Agent") + "</th><th>" + t("客户", "Client") +
