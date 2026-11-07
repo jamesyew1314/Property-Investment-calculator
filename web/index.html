@@ -116,7 +116,7 @@
 
       <div class="hero-stats">
         <div><b>2021</b><span data-i18n="stat.since">光泰成立</span></div>
-        <div><b>80+</b><span data-i18n="stat.team">团队中介</span></div>
+        <div><b id="statAgents">—</b><span data-i18n="stat.agents">注册中介</span></div>
         <div><b>42</b><span data-i18n="stat.areas">覆盖区域</span></div>
         <div><b id="statLive">—</b><span data-i18n="stat.live">平台房源</span></div>
       </div>
@@ -173,18 +173,7 @@
     </div>
   </section>
 
-  <section class="sec" id="agentSection" hidden>
-    <div class="wrap">
-      <div class="sec-head row">
-        <div>
-          <div class="eyebrow" data-i18n="dir.kicker">认证中介</div>
-          <h2 data-i18n="dir.title">找一位懂这个区的人</h2>
-        </div>
-        <a class="btn line sm" href="/agents/" data-i18n="dir.all">全部中介 →</a>
-      </div>
-      <div class="grid-4" id="agentGrid"></div>
-    </div>
-  </section>
+  
 
   <section class="sec alt">
     <div class="wrap grid-2">
@@ -279,7 +268,7 @@ window.PAGE_I18N = {
   "search.anyType": ["全部房型", "All types"],
   "search.go": ["搜索房源", "Search"],
   "stat.since": ["光泰成立", "Established"],
-  "stat.team": ["团队中介", "Agents"],
+  "stat.agents": ["注册中介", "Registered agents"],
   "stat.areas": ["覆盖区域", "Areas"],
   "stat.live": ["平台房源", "Listings live"],
   "feat.kicker": ["最新房源", "Latest listings"],
@@ -411,7 +400,8 @@ window.PAGE_I18N = {
     var sec = document.getElementById("agentSection");
     if (state.agents.length < 2) { sec.hidden = true; return; }
     sec.hidden = false;
-    document.getElementById("agentGrid").innerHTML = state.agents.slice(0, 4).map(function (a) {
+    var _ag=document.getElementById("agentGrid"); if(!_ag) return;
+    _ag.innerHTML = state.agents.slice(0, 4).map(function (a) {
       var initials = (a.name || "A").replace(/[^A-Za-z\u4e00-\u9fa5]/g, "").slice(0, 2).toUpperCase();
       return '<div class="agent-card"><div class="avatar">' + KT.esc(initials) + "</div><b>" + KT.esc(a.name) + "</b>" +
         '<small>' + (a.ren_no ? KT.esc(a.ren_no) : "KWONG THYE") + "</small>" +
@@ -427,6 +417,7 @@ window.PAGE_I18N = {
     KT.setFree(!!cfg.platformFree);
     KT.setTax(Object.assign({ areas: cfg.areas }, cfg.taxonomy || {}));
     if (cfg.counts && cfg.counts.listings > 0) document.getElementById("statLive").textContent = cfg.counts.listings;
+    var _sa=document.getElementById("statAgents"); if (_sa && cfg.counts) _sa.textContent = cfg.counts.agents || 0;
     renderAll();
   }).catch(function () { renderAll(); });
 
