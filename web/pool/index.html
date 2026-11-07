@@ -187,7 +187,7 @@ fetch('/api/public/config').then(function(r){return r.json();}).then(function(cf
   AREAS=(cfg.areas||[]).filter(function(a){return a.state==='johor';});
   var sel=document.getElementById('area');
   AREAS.forEach(function(a){ var o=document.createElement('option'); o.value=a.key; o.textContent=LANG==='en'?a.en:a.zh; sel.appendChild(o); });
-  if (INIT.area) sel.value = INIT.area;
+  if (INIT.area) { sel.value = INIT.area; if (typeof render === 'function') render(); }
 }).catch(function(){});
 fetch('/api/public/pool').then(function(r){return r.json();}).then(function(d){
   ROWS=d.rows||[];
