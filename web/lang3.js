@@ -17,7 +17,13 @@
     }).join("");
     b.addEventListener("click", function (e) {
       var t = e.target.closest("button[data-l]");
-      if (t) apply(t.dataset.l);
+      if (!t) return;
+      var l = t.dataset.l;
+      try { localStorage.setItem(KEY, l); localStorage.setItem(LEGACY, l); } catch (e) {}
+      if (typeof window.__pnSetLang === "function") {
+        window.__pnSetLang(l);
+        b.querySelectorAll("button[data-l]").forEach(function (x) { x.classList.toggle("on", x.dataset.l === l); });
+      } else { apply(l); }
     });
     return b;
   }

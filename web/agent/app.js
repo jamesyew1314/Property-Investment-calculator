@@ -42,6 +42,13 @@
   function langLabel() { return S.lang === "zh" ? "EN" : (S.lang === "en" ? "BM" : "中文"); }
   function langNow() { return S.lang === "zh" ? "中文" : (S.lang === "en" ? "EN" : "BM"); }
   function paintFloat() { var b = document.getElementById("langFloat"); if (b) b.textContent = langNow(); }
+  window.__pnSetLang = function (l) {
+    S.lang = ["zh","en","bm"].indexOf(l) >= 0 ? l : "zh";
+    try { localStorage.setItem("kt_lang", S.lang); localStorage.setItem("kwongthye_lang", S.lang); } catch (e) {}
+    document.documentElement.lang = S.lang === "zh" ? "zh-CN" : (S.lang === "bm" ? "ms" : "en");
+    try { var u = new URL(location.href); u.searchParams.set("lang", S.lang); history.replaceState(null, "", u.toString()); } catch (e) {}
+    paintFloat(); if (typeof route === "function") route();
+  };
   function cycleLang() {
     S.lang = S.lang === "zh" ? "en" : (S.lang === "en" ? "bm" : "zh");
     localStorage.setItem("kt_lang", S.lang);

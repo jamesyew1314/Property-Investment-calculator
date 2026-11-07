@@ -3,6 +3,10 @@
   "use strict";
   var LANG_KEY = "kt_lang";
   var lang = localStorage.getItem(LANG_KEY) || "zh";
+  try {
+    var _q = new URLSearchParams(location.search).get("lang");
+    if (["zh","en","bm"].indexOf(_q) >= 0) { lang = _q; localStorage.setItem(LANG_KEY, lang); localStorage.setItem("kwongthye_lang", lang); }
+  } catch (e) {}
   var dict = {};
   var tax = { areas: [], property_types: [], tenures: [], furnishings: [], conditions: [], listing_statuses: [] };
 
@@ -45,6 +49,11 @@
     apply();
   }
   function toggle() { setLang(lang === "zh" ? "en" : (lang === "en" ? "bm" : "zh")); }
+  window.__pnSetLang = function (l) {
+    setLang(l);
+    try { localStorage.setItem("kwongthye_lang", l); } catch (e) {}
+    try { var u = new URL(location.href); u.searchParams.set("lang", l); history.replaceState(null, "", u.toString()); } catch (e) {}
+  };
 
   function money(n, opts) {
     opts = opts || {};

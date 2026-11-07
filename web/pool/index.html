@@ -130,6 +130,12 @@ var STD_NOTE={zh:"发布前需登录中介账号；资料不全的房源不会�
 function t(k){ return (T[LANG]||T.zh)[k]; }
 function money(v, rent){ if(v==null) return '—'; return 'RM ' + Number(v).toLocaleString('en-MY') + (rent?'/mo':''); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+window.__pnSetLang=function(l){
+  LANG=(['zh','en','bm'].indexOf(l)>=0)?l:'zh';
+  try{localStorage.setItem('kt_lang',LANG);localStorage.setItem('kwongthye_lang',LANG);}catch(e){}
+  try{var u=new URL(location.href);u.searchParams.set('lang',LANG);history.replaceState(null,'',u.toString());}catch(e){}
+  apply(); render();
+};
 function apply(){
   document.documentElement.lang = LANG==='zh'?'zh-CN':(LANG==='bm'?'ms':'en');
   document.getElementById('poolTitle').textContent=t('title');
