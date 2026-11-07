@@ -797,7 +797,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
         [req.agent.id]);
       if (!clients.rows.length) return res.json({ ok: true, clients: [], listings: 0 });
       const listings = await pool.query(`
-        SELECT p.code, p.project_name, p.area_code, p.state, p.property_type, p.intent,
+        SELECT p.id, p.code, p.project_name, p.area_code, p.state, p.property_type, p.intent,
                p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
                p.bedrooms, p.bathrooms, p.built_up::float8 AS built_up, p.tenant_id, p.updated_at,
                pr.name AS project_title, pr.name_zh AS project_title_zh, a.name AS owner_name
