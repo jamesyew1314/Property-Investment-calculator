@@ -46,6 +46,7 @@
     var el = document.getElementById("brandSub");
     if (el) el.textContent = S.lang === "en" ? "Agent workspace" : (S.lang === "bm" ? "Ruang kerja ejen" : "中介工作台");
   }
+  try { paintBrand(); } catch (e) {}
   window.__pnSetLang = function (l) {
     S.lang = ["zh","en","bm"].indexOf(l) >= 0 ? l : "zh";
     try { localStorage.setItem("kt_lang", S.lang); localStorage.setItem("kwongthye_lang", S.lang); } catch (e) {}
