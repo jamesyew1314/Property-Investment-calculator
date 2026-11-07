@@ -50,7 +50,6 @@
       wrap.appendChild(login);
     }
     wrap.appendChild(bar());
-    if (inWorkspace) { wrap.style.top = "auto"; wrap.style.bottom = "14px"; }
     document.body.appendChild(wrap);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
