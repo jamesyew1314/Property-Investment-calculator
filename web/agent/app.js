@@ -1081,7 +1081,7 @@
       (a.emailVerified ? '<p class="muted" style="margin:0">' + t("已验证 ✓", "Verified ✓") + "</p>"
         : '<p class="muted" style="margin:0 0 8px">' + t("未验证。验证后房源显示「已验证」标记。", "Not verified. Verified listings show a badge.") +
           '<br><button class="btn line sm" id="resend" style="margin-top:8px">' + t("重新发送验证邮件", "Resend email") + "</button></p>") + "</div>";
-    $("#view").innerHTML = h;
+    $("#view").innerHTML = '<div class="profileWrap">' + h + "</div>";
     bindAreaPicker($("#view"));
     $("#view").addEventListener("click", function (e) {
       var rm = e.target.closest("[data-rm-area]");
