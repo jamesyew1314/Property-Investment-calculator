@@ -36,9 +36,15 @@
   .rules .tabs button.on{background:#0E2438;color:#fff;border-color:#0E2438}
   .rules .body{white-space:pre-line;font-size:13.5px;line-height:1.9;color:#33455A}
   .poolEmpty{padding:36px 12px;text-align:center;color:#67768A}
+  .headActs{display:flex;align-items:center;gap:8px}
+  .langs{display:flex;gap:2px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:3px}
+  .langs button{border:0;background:transparent;color:#D5E0EC;font:600 11px/1 -apple-system,BlinkMacSystemFont,sans-serif;padding:6px 9px;border-radius:999px;cursor:pointer}
+  .langs button.on{background:#fff;color:#0E2438}
   @media(max-width:1000px){.poolGrid{grid-template-columns:1fr 1fr}}
   @media(max-width:760px){
     .poolHead{padding:24px 0 16px}.poolHead h1{font-size:24px}
+    .headActs .btn{padding:9px 10px;font-size:12px}
+    .langs button{padding:6px 7px}
     .poolGrid{grid-template-columns:1fr}
     .poolBar input,.poolBar select{flex:1 1 100%}
     .seg{width:100%}.seg button{flex:1}
@@ -58,6 +64,7 @@
       <a href="/join/">加入</a>
     </nav>
     <div class="headActs">
+      <div class="langs" id="langs"><button type="button" data-l="zh">中文</button><button type="button" data-l="en">EN</button><button type="button" data-l="bm">BM</button></div>
       <a class="btn line sm" href="/agent/">登录 / 发布</a>
       <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
@@ -94,7 +101,6 @@
 
 <footer class="site-foot"><div class="wrap"><p class="muted" style="margin:0;padding:22px 0;font-size:12px">© 2026 KWONG THYE · PropNet</p></div></footer>
 
-<script src="/lang3.js"></script>
 <script>
 var _q=new URLSearchParams(location.search);
 var LANG = _q.get('lang') || localStorage.getItem('kt_lang') || 'zh';
@@ -165,6 +171,10 @@ document.getElementById('seg').addEventListener('click',function(e){
 document.getElementById('q').addEventListener('input',render);
 document.getElementById('area').addEventListener('change',render);
 
+document.querySelectorAll('#langs button').forEach(function(b){
+  b.classList.toggle('on', b.dataset.l===LANG);
+  b.addEventListener('click', function(){ try{localStorage.setItem('kt_lang',b.dataset.l);}catch(e){}; location.href='?lang='+b.dataset.l; });
+});
 document.getElementById('menuBtn').addEventListener('click',function(){ document.getElementById('nav').classList.toggle('open'); this.setAttribute('aria-expanded',document.getElementById('nav').classList.contains('open')); });
 
 fetch('/api/public/config').then(function(r){return r.json();}).then(function(cfg){
