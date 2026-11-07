@@ -490,13 +490,30 @@
       title: t("房源详情", "Listing details"),
       body: body,
       footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button>" +
+        '<button class="btn line" id="vdMatch">' + t("匹配客户", "Match clients") + "</button>" +
         '<button class="btn line" id="vdCopy">' + t("复制文案", "Copy text") + "</button>" +
         '<button class="btn gold" id="vdEdit">' + t("编辑", "Edit") + "</button>"
     });
+    $("#vdMatch", m.root).addEventListener("click", function () { m.close(); matchListing(row); });
     $("#vdCopy", m.root).addEventListener("click", function () {
       copyText(shareText(row)).then(function () { toast(t("文案已复制", "Copied")); });
     });
     $("#vdEdit", m.root).addEventListener("click", function () { m.close(); listingForm(row); });
+  }
+
+  function matchListing(row) {
+    api("/matches").then(function (d) {
+      var hits = (d.clients || []).filter(function (c) {
+        return (c.matches || []).some(function (m) { return m.code === row.code; });
+      });
+      var body = hits.length ? hits.map(function (c) {
+        var cl = c.client;
+        return '<div style="padding:10px 0;border-bottom:1px solid #F1F3F7"><b style="color:#0E2438">' + esc(cl.name || "") + "</b>" +
+          (cl.phone ? ' <a href="tel:' + esc(cl.phone) + '" style="color:#2E5496;font-size:12px">' + esc(cl.phone) + "</a>" : "") +
+          '<div style="font-size:12px;color:#6B7A8D;margin-top:3px">' + esc([cl.intent === "rent" ? t("租", "Rent") : t("买", "Buy"), money(cl.budget_min), money(cl.budget_max)].filter(Boolean).join(" · ")) + "</div></div>";
+      }).join("") : '<p class="muted" style="margin:0">' + t("暂时没有匹配的客户。", "No matching clients yet.") + "</p>";
+      modal({ title: t("匹配客户", "Matching clients") + " · " + row.code, body: body, footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button>" });
+    }).catch(function (e) { toast(e.message, true); });
   }
 
   function listingForm(row, imported) {
