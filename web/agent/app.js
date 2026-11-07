@@ -177,7 +177,8 @@
   function optList(list, sel, blank) {
     var h = blank === false ? "" : '<option value="">' + esc(blank || "—") + "</option>";
     (list || []).forEach(function (x) {
-      h += '<option value="' + x.key + '"' + (x.key === sel ? " selected" : "") + ">" + esc(S.lang === "en" ? x.en : x.zh) + "</option>";
+      var lab = S.lang === "en" ? x.en : (S.lang === "bm" ? ((window.BM_MAP || {})[x.en] || x.en) : (x.en + "（" + x.zh + "）"));
+      h += '<option value="' + x.key + '"' + (x.key === sel ? " selected" : "") + ">" + esc(lab) + "</option>";
     });
     return h;
   }
@@ -597,17 +598,17 @@
       '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("规格", "Specifications") + "</h4>" +
       '<div class="grid2 nums">' + field(t("Land size 土地面积（如 22x70）", "Land size (e.g. 22x70)"), '<input name="land_size" value="' + esc(row.land_size || "") + '" placeholder="22x70">') +
       field(t("Built-up 建筑面积（sqft）", "Built-up (sqft)"), '<input name="built_up" inputmode="numeric" value="' + esc(row.built_up || "") + '">') + "</div>" +
-      '<div class="grid2 nums">' + field(t("Bedrooms 房间", "Bedrooms"), '<input name="bedrooms" inputmode="numeric" value="' + esc(row.bedrooms != null ? row.bedrooms : "") + '">') +
-      field(t("Extra rooms 额外房间", "Extra rooms"), '<input name="extra_rooms" inputmode="numeric" value="' + esc(row.extra_rooms != null ? row.extra_rooms : "") + '">') + "</div>" +
-      '<div class="grid2 nums">' + field(t("Bathrooms 浴室", "Bathrooms"), '<input name="bathrooms" inputmode="numeric" value="' + esc(row.bathrooms != null ? row.bathrooms : "") + '">') +
-      field(t("Toilets 厕所", "Toilets"), '<input name="toilets" inputmode="numeric" value="' + esc(row.toilets != null ? row.toilets : "") + '">') + "</div>" +
-      '<div class="grid2 nums">' + field(t("Lot 位置", "Lot position"), '<select name="lot_position">' + optList([{key:"intermediate",zh:"中间",en:"Intermediate"},{key:"corner",zh:"角头",en:"Corner"},{key:"end",zh:"尾",en:"End"},{key:"side",zh:"旁边",en:"Side"}], row.lot_position, "—") + "</select>") +
-      field(t("Facing 方向（可不填）", "Facing (optional)"), '<input name="facing" value="' + esc(row.facing || "") + '" placeholder="South">') + "</div>" +
+      '<div class="grid2 nums">' + field(t("Bedrooms 房间", "Bedrooms"), '<select name="bedrooms">' + optList([{key:"0",zh:"Studio",en:"Studio"}].concat([1,2,3,4,5,6,7,8,9,10].map(function(n){return {key:String(n),zh:n+" 房",en:String(n)}})), row.bedrooms != null ? String(row.bedrooms) : "", "—") + "</select>") +
+      field(t("Extra rooms 额外房间", "Extra rooms"), '<select name="extra_rooms">' + optList([1,2,3].map(function(n){return {key:String(n),zh:"+"+n,en:"+"+n}}), row.extra_rooms != null ? String(row.extra_rooms) : "", "—") + "</select>") + "</div>" +
+      '<div class="grid2 nums">' + field(t("Bathrooms 浴室", "Bathrooms"), '<select name="bathrooms">' + optList([1,2,3,4,5,6,7,8].map(function(n){return {key:String(n),zh:n+" 浴",en:String(n)}}), row.bathrooms != null ? String(row.bathrooms) : "", "—") + "</select>") +
+      field(t("Toilets 厕所", "Toilets"), '<select name="toilets">' + optList([1,2,3,4,5].map(function(n){return {key:String(n),zh:n+" 厕",en:String(n)}}), row.toilets != null ? String(row.toilets) : "", "—") + "</select>") + "</div>" +
+      '<div class="grid2 nums">' + field(t("Lot 位置", "Lot position"), '<select name="lot_position">' + optList([{key:"intermediate",zh:"中间",en:"Intermediate lot"},{key:"corner",zh:"角头",en:"Corner lot"},{key:"end",zh:"尾间",en:"End lot"},{key:"corner_extra",zh:"角头 + 多余地",en:"Corner lot with extra land"},{key:"facing_open",zh:"面向空地",en:"Facing open"}], row.lot_position, "—") + "</select>") +
+      field(t("Facing 方向（可不填）", "Facing (optional)"), '<select name="facing">' + optList([{key:"North",zh:"朝北",en:"North"},{key:"South",zh:"朝南",en:"South"},{key:"East",zh:"朝东",en:"East"},{key:"West",zh:"朝西",en:"West"},{key:"North East",zh:"朝东北",en:"North East"},{key:"North West",zh:"朝西北",en:"North West"},{key:"South East",zh:"朝东南",en:"South East"},{key:"South West",zh:"朝西南",en:"South West"}], row.facing, "—") + "</select>") + "</div>" +
       '<div class="grid2 nums">' + field(t("Tenure 产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") +
       field(t("Title 地契类型（可不填）", "Title type (optional)"), '<select name="title_type">' + optList((S.meta && S.meta.title_types) || [], row.title_type, "—") + "</select>") + "</div>" +
       '<div class="grid2 nums">' + field(t("Furnishing 家私（可不填）", "Furnishing (optional)"), '<select name="furnishing">' + optList([{key:"unfurnished",zh:"空屋",en:"Unfurnished"},{key:"partial",zh:"部分装修",en:"Partially furnished"},{key:"full",zh:"全装修",en:"Fully furnished"}], row.furnishing, "—") + "</select>") +
       field(t("Security 保安（可不填）", "Security (optional)"), '<select name="security">' + optList([{key:"gated",zh:"围篱",en:"Gated"},{key:"guarded",zh:"保安",en:"Guarded"},{key:"none",zh:"无",en:"None"}], row.security, "—") + "</select>") + "</div>" +
-      '<div class="grid2 nums">' + field(t("Bumi 状态", "Bumi status"), '<select name="bumi">' + optList([{key:"bumi",zh:"Bumi",en:"Bumi"},{key:"non_bumi",zh:"非 Bumi",en:"Non-Bumi"},{key:"any",zh:"不限",en:"Any"}], row.bumi, "—") + "</select>") +
+      '<div class="grid2 nums">' + field(t("Bumi 状态", "Bumi status"), '<select name="bumi">' + optList([{key:"non_bumi",zh:"非土著",en:"Non Bumi"},{key:"bumi",zh:"土著地",en:"Bumi lot"},{key:"malay_reserve",zh:"马来保留地",en:"Malay Reserve"}], row.bumi, "—") + "</select>") +
       field(t("Maintenance 管理费（RM/月，可不填）", "Maintenance fee (RM/month, optional)"), '<input name="maintenance_fee" inputmode="numeric" value="' + esc(row.maintenance_fee || "") + '">') + "</div>" +
       '<div class="grid2">' + field(t("Condition 现况（可不填）", "Condition (optional)"), '<select name="condition">' + optList([{key:"vacant",zh:"空置",en:"Vacant"},{key:"occupied",zh:"自住",en:"Occupied"},{key:"tenanted",zh:"出租中",en:"Tenanted"},{key:"renovated",zh:"已装修",en:"Renovated"}], row.condition, "—") + "</select>") + "</div>" +
       '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("装修和卖点", "Renovation & highlights") + "</h4>" +

@@ -374,5 +374,23 @@ window.BM_MAP = {
   "Security (optional)": "Keselamatan (pilihan)",
   "Maintenance fee (RM/month, optional)": "Yuran penyelenggaraan (RM/bulan, pilihan)",
   "Condition (optional)": "Keadaan (pilihan)",
-  "Facing (optional)": "Arah hadap (pilihan)"
+  "Facing (optional)": "Arah hadap (pilihan)",
+  /* fixed options */
+  "Intermediate lot": "Lot pertengahan",
+  "Corner lot": "Lot sudut",
+  "End lot": "Lot hujung",
+  "Corner lot with extra land": "Lot sudut dengan tanah tambahan",
+  "Facing open": "Menghadap kawasan lapang",
+  "North": "Utara",
+  "South": "Selatan",
+  "East": "Timur",
+  "West": "Barat",
+  "North East": "Timur Laut",
+  "North West": "Barat Laut",
+  "South East": "Tenggara",
+  "South West": "Barat Daya",
+  "Non Bumi": "Bukan Bumi",
+  "Bumi lot": "Lot Bumi",
+  "Malay Reserve": "Tanah Simpanan Melayu",
+  "Studio": "Studio"
 };
