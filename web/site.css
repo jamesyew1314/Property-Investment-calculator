@@ -340,3 +340,21 @@ input,select,textarea{font-size:16px!important}
   .hero h1{font-size:27px!important;line-height:1.28!important}
   .hero .lead{font-size:15px!important;line-height:1.8!important}
 }
+
+/* 首页居中品牌 Hero */
+.heroCenter{text-align:center;max-width:900px;margin:0 auto 28px}
+.heroBrand{font-family:Georgia,serif;font-size:clamp(58px,9vw,96px);line-height:1;color:#fff;letter-spacing:.01em;margin:0 0 10px}
+.heroKicker{font-size:13px;letter-spacing:.3em;color:#D8C08A;font-weight:700;margin-bottom:18px}
+.hero .heroTitle{font-size:clamp(24px,3.4vw,36px)!important;line-height:1.35!important;margin:0 auto 18px!important;max-width:22ch!important;color:#fff}
+.heroIntro{max-width:760px;margin:0 auto 8px;color:rgba(255,255,255,.9);font-size:16.5px;line-height:1.8}
+.heroDesc{max-width:780px;margin:0 auto 22px;color:rgba(255,255,255,.74);font-size:15px;line-height:1.85}
+.heroCta{display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:999px;background:linear-gradient(135deg,#EBD39C,#C99B45);color:#1B2430;font-weight:800;font-size:16px;text-decoration:none;box-shadow:0 10px 26px rgba(201,155,69,.35)}
+.heroCta:hover{filter:brightness(1.04)}
+.heroSlogan{font-family:Georgia,serif;color:#D8C08A;font-size:13.5px;letter-spacing:.04em;margin:26px 0 0}
+@media(max-width:760px){
+  .heroBrand{font-size:64px}
+  .hero .heroTitle{font-size:24px!important}
+  .heroIntro{font-size:15px}
+  .heroDesc{font-size:14px}
+  .heroCta{width:100%;max-width:340px}
+}
