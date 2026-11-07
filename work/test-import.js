@@ -96,6 +96,59 @@ eq(r4.asking_price, 750000, "中文 卖价");
 eq(r4.bank_value, 800000, "中文 估价");
 eq(r4.category, "residential", "中文 类别推断");
 
+
+// 群组英文样板 1（ECO TROPICS）
+const waEn1 = `FOR SALES
+具有马来风味的装修风格，后面厨房有扩建
+ECO TROPICS (KOTA MASAI) – THE RAINFOREST (TULIPWOOD) @ JALAN RAMBAI
+• 2 Storey Cluster House
+• Land Size: 35x70
+• Built up: 2,288 sqft
+• 4 Bedrooms & 4 Bathrooms
+• Freehold
+• Non bumi
+• Intermediate lot
+• 24 Hours Gated & Guarded
+• Facing Direction: South
+• Expected Selling Price: RM 750,000
+Kindly Contact: Terence Tan
+012-3918024`;
+const r5 = parseListing(waEn1);
+eq(r5.intent, "sale", "群样板1 售");
+eq(r5.property_type, "townhouse", "群样板1 房型");
+eq(r5.land_size, "35x70", "群样板1 土地");
+eq(r5.built_up, 2288, "群样板1 建筑");
+eq(r5.bedrooms, 4, "群样板1 房");
+eq(r5.bathrooms, 4, "群样板1 浴");
+eq(r5.tenure, "freehold", "群样板1 产权");
+eq(r5.bumi, "non_bumi", "群样板1 Bumi");
+eq(r5.lot_position, "intermediate", "群样板1 Lot");
+eq(r5.security, "gated", "群样板1 保安");
+eq(r5.facing, "South", "群样板1 朝向");
+eq(r5.asking_price, 750000, "群样板1 价格");
+eq(r5.area_code, "kota_masai", "群样板1 区域");
+
+// 群组英文样板 2（SETIA INDAH ENDLOT）
+const waEn2 = `FOR SALE
+SETIA INDAH ENDLOT DOUBLE STOREY
+Land size 30'x70'
+4 Bedrooms, 3 bathrooms
+Gated and Guarded
+Fully furnish
+Facing west
+Freehold
+Non bumi lot
+Asking price RM818K nego
+Kavin 0127784176`;
+const r6 = parseListing(waEn2);
+eq(r6.property_type, "terrace", "群样板2 房型");
+eq(r6.headline, "SETIA INDAH ENDLOT DOUBLE STOREY", "群样板2 标题");
+eq(r6.lot_position, "end", "群样板2 Lot");
+eq(r6.land_size, "30x70", "群样板2 土地");
+eq(r6.asking_price, 818000, "群样板2 价格");
+eq(r6.negotiable, true, "群样板2 可议价");
+eq(r6.area_code, "setia_indah", "群样板2 区域");
+
 eq(parseListing("随便一段没有房源的文字").asking_price, undefined, "无价格不误判");
 console.log(pass + " pass, " + fail + " fail");
 process.exit(fail ? 1 : 0);

@@ -1,199 +1,235 @@
 "use strict";
-// import-core.js — 从粘贴文本识别房源字段（纯函数，可单测）
+// import-core.js — 解析 WhatsApp/群组房源文案（纯函数，可单测）
 const tax = require("./library-taxonomy");
 
 const TYPES = [
-  [/shop\s*lot|shoplot|店铺|店屋/i, "shoplot", "commercial"],
-  [/condo|condominium|公寓|共管/i, "condo", "residential"],
-  [/apartment|apartmen|服务式|service residence/i, "apartment", "residential"],
+  [/cluster\s*house/i, "townhouse", "residential"],
+  [/town\s*house|townhouse/i, "townhouse", "residential"],
   [/semi[-\s]?d|半独立/i, "semi_d", "residential"],
   [/bungalow|独立式|洋房|villa/i, "bungalow", "residential"],
-  [/townhouse/i, "townhouse", "residential"],
-  [/terrace|排屋|linked house|taman/i, "terrace", "residential"],
+  [/shop\s*lot|shoplot|店铺|店屋/i, "shoplot", "commercial"],
   [/office|办公室|办公楼/i, "office", "commercial"],
-  [/factory|工业|industrial|gudang|warehouse/i, "office", "industrial"],
-  [/land|地皮|土地|空地|lot\s*tanah/i, "land", "land"],
-  [/flat|组屋|low cost|廉价/i, "flat", "residential"]
+  [/factory|工业|industrial|warehouse|gudang/i, "office", "industrial"],
+  [/condo|condominium|公寓|共管|service residence/i, "condo", "residential"],
+  [/apartment|apartmen|flat|组屋/i, "apartment", "residential"],
+  [/terrace|terraced|排屋|linked house|double\s*storey|2\s*storey|2\s*层|双层/i, "terrace", "residential"],
+  [/(^land$|land\s*(plot|title)|地皮|土地|空地)/i, "land", "land"]
 ];
 
+function clean(v) {
+  return String(v || "")
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{2705}\u{274C}\u{26D4}\u{1F6AB}]/gu, " ")
+    .replace(/^[\s•·\-–—*✅✔☎📞🏡💥❌⛔📛▶️]+/u, "")
+    .replace(/^[\s\d]+[.)、]\s*/, "")
+    .replace(/\s+/g, " ")
+    .replace(/[*_]+$/g, "")
+    .trim();
+}
 function num(s) { return Number(String(s).replace(/[^\d.]/g, "")) || null; }
-function strip(v) { return String(v || "").replace(/^[*_\s]+|[*_\s]+$/g, "").trim(); }
+function money(s) {
+  const m = String(s).replace(/,/g, "").match(/([\d.]+)\s*([kKmM])?/);
+  if (!m) return null;
+  let v = Number(m[1]);
+  if (!isFinite(v)) return null;
+  const u = (m[2] || "").toLowerCase();
+  if (u === "k") v *= 1000;
+  if (u === "m") v *= 1000000;
+  return v;
+}
+function titleCase(s) {
+  return String(s || "").toLowerCase().replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+}
 
 function parseListing(text) {
   const raw = String(text || "");
-  const lines = raw.split(/\r?\n/).map(strip).map(function (x) { return x.replace(/，/g, ","); }).filter(Boolean);
+  const lines = raw.split(/\r?\n/).map(clean).map(function (x) { return x.replace(/，/g, ","); }).filter(Boolean);
+  const low = lines.join("\n").toLowerCase();
   const out = { remarks: raw.trim().slice(0, 3000) };
-  const lower = lines.join("\n").toLowerCase();
+  const junk = [];
 
-  // 1. 租 / 售
-  if (/wtr|for rent|出租|招租|sewa|rental/i.test(lower)) out.intent = "rent";
-  else if (/wts|for sale|出售|dijual|selling/i.test(lower)) out.intent = "sale";
+  // 1) 租 / 售
+  if (/for rent|wtr|出租|招租|sewa|rental/i.test(low)) out.intent = "rent";
+  else if (/for sale|wts|出售|dijual|selling|sales/i.test(low)) out.intent = "sale";
 
-  // 2. 标题：类型行后的第一行
-  let headIdx = -1;
-  for (let i = 0; i < lines.length; i++) {
-    if (/wtr|wts|for rent|for sale|出租|出售/i.test(lines[i])) { headIdx = i; break; }
-  }
-  if (headIdx >= 0 && lines[headIdx + 1] && !/\d/.test(lines[headIdx + 1]) && !/^\d{5}|,/.test(lines[headIdx + 1])) out.headline = lines[headIdx + 1].slice(0, 80);
-
-  // 3. 逐行识别
+  // 2) 逐行识别
+  let headDone = false;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    const l = line.toLowerCase();
 
+    if (/^repost$/i.test(line)) continue;
 
-
-    // 完整地址（含 5 位邮编 + 逗号）
-    if (/\b\d{5}\b/.test(line) && line.includes(",")) {
-      if (!out.address) out.address = line.slice(0, 240);
-      continue;
-    }
-    // 门牌 + 路名，下一行是邮编城市 → 合并
+    // 地址：门牌 + 路名，下一行邮编城市 → 合并
     if (/^\d+[A-Za-z]?\s*,?\s*(jalan|jln|lorong|taman|street|road|persiaran)/i.test(line)) {
-      var nxt = lines[i + 1] || "";
+      const nxt = lines[i + 1] || "";
       out.address = (line + (/^\d{5}/.test(nxt) ? ", " + nxt : "")).slice(0, 240);
       if (/^\d{5}/.test(nxt)) i++;
       continue;
     }
-    // 电话
-    const phone = line.match(/(?:\+?60|0)1\d[\s-]?\d{3,4}[\s-]?\d{4}/);
-    if (phone && /^(agent|电话|tel|contact|hubungi|wa|whatsapp)?[\s:：-]*$/i.test(line.replace(phone[0], "").trim())) { out._phone = phone[0]; continue; }
-    // 网站
-    if (/wasap\.my|wa\.me/i.test(line)) continue;
+    if (/\b\d{5}\b/.test(line) && line.includes(",")) { out.address = out.address || line.slice(0, 240); continue; }
 
-    // 项目/花园名（含 @ 或除属性外最长一行）
-    if (line.includes("@")) { out.project_name = out.project_name || line.slice(0, 120); out.address_text = out.address_text || line.slice(0, 160); continue; }
-
-    // 土地尺寸 22x70
-    const land = line.match(/(?:land|lang|lot)?\s*size\s*[:\-]?\s*(\d{1,4})\s*[x×]\s*(\d{1,4})/i) || line.match(/^(\d{1,4})\s*[x×]\s*(\d{1,4})$/i);
-    if (land) { out.land_size = (land[1] + "x" + land[2]); continue; }
-
-    // Lot 位置
-    if (/intermediate|middle lot|中间/i.test(line)) { out.lot_position = "intermediate"; continue; }
-    if (/corner|角头/i.test(line)) { out.lot_position = "corner"; continue; }
-    if (/end\s*lot|尾/i.test(line)) { out.lot_position = "end"; continue; }
-
-    // 方向
-    const face = line.match(/facing\s*[:\-]?\s*(north|south|east|west|n\/e|n\/w|s\/e|s\/w)/i) || line.match(/(?:向|朝)(东|南|西|北)/);
-    if (face) {
-      var DIR = { "东": "East", "南": "South", "西": "West", "北": "North" };
-      out.facing = DIR[face[1]] || face[1].replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    // 项目 / 地址（含 @、破折号、全大写花园名）
+    if (!out.project_name && (line.includes("@") || /–|—/.test(line) || (/^[A-Z0-9 &().'\/-]{10,}$/.test(line) && /taman|eco|jalan|park|residence|heights/i.test(line)))) {
+      out.project_name = line.slice(0, 160);
+      out.address_text = line.slice(0, 180);
       continue;
     }
 
-    // 保安
-    if (/保安|围篱|守卫|guarded|gated|security/i.test(line)) { out.security = /围篱|gated/i.test(line) ? "gated" : "guarded"; continue; }
-    // Bumi
-    if (/non[-\s]?bumi/i.test(line)) { out.bumi = "non_bumi"; continue; }
-    if (/\bbumi\b/i.test(line) && !/non/i.test(line)) { out.bumi = "bumi"; continue; }
+    // 电话 / 网址 / REN-only
+    const phone = line.match(/(?:\+?60|0)1\d[\s-]?\d{3,4}[\s-]?\d{4}/);
+    if (phone && line.replace(phone[0], "").replace(/\(?[A-Za-z ]+\)?/g, "").trim().length <= 6) { out._phone = out._phone || phone[0]; continue; }
+    if (/wasap\.my|wa\.me|ren\s*\d{3,}/i.test(line)) continue;
 
-    // 产权
-    if (/freehold|永久/i.test(line)) { out.tenure = "freehold"; continue; }
-    if (/leasehold|租赁/i.test(line)) { out.tenure = "leasehold"; continue; }
+    // 土地尺寸（30'x70' / 35X80 / 18 x 65 sq ft）
+    const land = line.match(/lan[gd]\s*(?:size|area)?\s*[:\-]?\s*(\d{1,3})\s*['’]?\s*[x×]\s*(\d{1,3})/i) || line.match(/^(\d{1,3})\s*['’]?\s*[x×]\s*(\d{1,3})/);
+    if (land) { out.land_size = land[1] + "x" + land[2]; continue; }
 
-    // 地契
-    if (/individual\s*title|个别地契/i.test(line)) { out.title_type = "individual"; continue; }
-    if (/strata\s*title|分层地契/i.test(line)) { out.title_type = "strata"; continue; }
-    if (/master\s*title|总地契/i.test(line)) { out.title_type = "master"; continue; }
+    // 建筑面积
+    if (/built[-\s]?up/i.test(line)) {
+      const b = line.match(/([\d,]{3,6})/);
+      if (b) out.built_up = num(b[1]);
+      continue;
+    }
 
-    // 家私
-    if (/unfurnished|空屋|无家私/i.test(line)) { out.furnishing = "unfurnished"; continue; }
-    if (/partially|部分家私|partial/i.test(line)) { out.furnishing = "partial"; continue; }
-    if (/fully furnished|全装修|full furnished/i.test(line)) { out.furnishing = "full"; continue; }
+    // 房 / 浴 / 厕
+    const bm = line.match(/(\d+)\s*(?:bedrooms?|beds?|房|bilik)/i);
+    const ba = line.match(/(\d+)\s*(?:bathrooms?|baths?|浴室|卫|bilik air)/i);
+    const to = line.match(/(\d+)\s*(?:toilets?|厕所|厕)/i);
+    if (bm || ba || to) {
+      if (bm) out.bedrooms = Number(bm[1]);
+      if (ba) out.bathrooms = Number(ba[1]);
+      if (to) out.toilets = Number(to[1]);
+      if (!out.built_up) { const s = line.match(/([\d,]{3,6})\s*sq\.?\s*ft/i); if (s) out.built_up = num(s[1]); }
+    }
+
+    // 朝向
+    const face = line.match(/facing(?:\s*direction)?\s*[:\-]?\s*(north\s*east|north\s*west|south\s*east|south\s*west|north|south|east|west)/i) || line.match(/(?:向|朝)(东|南|西|北)/);
+    if (face) { out.facing = /东|南|西|北/.test(face[1]) ? ({ "东": "East", "南": "South", "西": "West", "北": "North" })[face[1]] : titleCase(face[1]); continue; }
+
+    // 产权 / 地契
+    if (/freehold/i.test(line)) { out.tenure = "freehold"; }
+    if (/leasehold/i.test(line)) { out.tenure = "leasehold"; }
+    if (/individual\s*title|个别地契/i.test(line)) { out.title_type = "individual"; }
+    if (/strata\s*title|分层地契/i.test(line)) { out.title_type = "strata"; }
+    if (/master\s*title|总地契/i.test(line)) { out.title_type = "master"; }
+    if (/freehold|leasehold|title/i.test(line)) continue;
 
     // 现况
     if (/vacant|空置/i.test(line)) { out.condition = "vacant"; continue; }
     if (/occupied|自住/i.test(line)) { out.condition = "occupied"; continue; }
     if (/tenanted|出租中/i.test(line)) { out.condition = "tenanted"; continue; }
-    if (/renovated|已装修|有装修/i.test(line) && !/original/i.test(line)) { out.condition = "renovated"; continue; }
+    if (/renovated|已装修|有装修/i.test(line)) { out.condition = "renovated"; continue; }
 
-    // 价格
-    const labeled = line.match(/(卖价|售价|selling|asking|租金|rental|租|估价|银行估价|bank\s*value|valuation)[^\d]{0,8}RM\s*([\d,]+(?:\.\d+)?)\s*([kKmM])?/i);
-    if (labeled) {
-      let lv = Number(labeled[2].replace(/,/g, ""));
-      const lu = (labeled[3] || "").toLowerCase();
-      if (lu === "k") lv *= 1000;
-      if (lu === "m") lv *= 1000000;
-      if (/估|bank|valuation/i.test(labeled[1])) out.bank_value = lv;
-      else if (/租|rent/i.test(labeled[1])) out.rent_price = lv;
-      else out.asking_price = lv;
-      if (/可议价|negotiable/i.test(line)) out.negotiable = true;
+    // 保安
+    if (/gated\s*(&|and)?\s*guarded|guarded|保安|围篱/i.test(line)) { out.security = /gated|围篱/i.test(line) ? "gated" : "guarded"; continue; }
+
+    // 家私
+    if (/fully\s*furnish|full\s*furnish|全装修/i.test(line)) { out.furnishing = "full"; continue; }
+    else if (/partial|部分家私/i.test(line)) { out.furnishing = "partial"; continue; }
+    else if (/unfurnished|空屋/i.test(line)) { out.furnishing = "unfurnished"; continue; }
+
+    // Bumi
+    if (/non[-\s]?bumi/i.test(line)) { out.bumi = "non_bumi"; continue; }
+    else if (/\bbumi\b/i.test(line)) { out.bumi = "bumi"; continue; }
+
+    // 房屋类型行（同时可作标题）
+    if (/storey|cluster|terrace|terraced|bungalow|semi[-\s]?d|town\s*house|townhouse/i.test(line)) {
+      for (let k = 0; k < TYPES.length; k++) {
+        if (TYPES[k][0].test(line)) { if (!out.property_type) { out.property_type = TYPES[k][1]; out.category = TYPES[k][2]; } break; }
+      }
+      if (!out.headline) { out.headline = line.slice(0, 100); headDone = true; }
+      if (/intermediate|中间单位/i.test(line)) out.lot_position = "intermediate";
+      else if (/corner|角头/i.test(line)) out.lot_position = "corner";
+      else if (/end\s*lot|endlot|尾/i.test(line)) out.lot_position = "end";
       continue;
     }
-    const price = line.match(/RM\s*([\d,]+(?:\.\d+)?)\s*([kKmM])?/);
-    if (price) {
-      let v = Number(price[1].replace(/,/g, ""));
-      const unit = (price[2] || "").toLowerCase();
-      if (unit === "k") v *= 1000;
-      if (unit === "m") v *= 1000000;
-      if (/rent|租|month|bulan/i.test(line) || out.intent === "rent") out.rent_price = v;
-      else out.asking_price = v;
-      if (/negotiable|可议价|bincang/i.test(line)) out.negotiable = true;
+
+    // Lot
+    if (/intermediate|中间单位|中间 lot/i.test(line)) { out.lot_position = "intermediate"; continue; }
+    else if (/corner|角头/i.test(line)) { out.lot_position = "corner"; continue; }
+    else if (/end\s*lot|endlot|尾/i.test(line)) { out.lot_position = "end"; continue; }
+
+    // 管理费
+    const mf = line.match(/maintenance\s*fees?\s*[:\-]?\s*RM\s*([\d,]+)/i);
+    if (mf) { out.maintenance_fee = num(mf[1]); continue; }
+
+    // 银行估价（TBC 忽略）
+    if (/bank\s*value|valuation|估价/i.test(line)) {
+      const bv = line.match(/([\d,]+)\s*([kKmM])?/);
+      if (bv && !/tbc/i.test(line)) out.bank_value = money(bv[0]);
+      continue;
     }
-    if (/negotiable|可议价/i.test(line)) { out.negotiable = true; continue; }
 
-    // 房间 / 卫浴
-    const bm = line.match(/(\d+)\s*(?:房|bed\s*room|bedroom|bed|bilik)/i);
-    const ba = line.match(/(\d+)\s*(?:卫|bath\s*room|bathroom|bath|bilik air)/i);
-    if (bm) out.bedrooms = Number(bm[1]);
-    if (ba) out.bathrooms = Number(ba[1]);
-    const toi = line.match(/(\d+)\s*(?:toilet|厕所|厕|卫生间)/i);
-    if (toi) out.toilets = Number(toi[1]);
+    // 价格
+    const priceLine = /price|rm\s*[\d,]|售价|卖价|出租|rental|for sale|for rent|nego/i.test(line);
+    if (priceLine) {
+      const rm = line.match(/RM\s*([\d,]+(?:\.\d+)?)\s*([kKmM])?/i);
+      if (rm) {
+        const v = money(rm[1] + (rm[2] || ""));
+        if (/rent|租|month|bulan/i.test(line) || out.intent === "rent") out.rent_price = v;
+        else out.asking_price = v;
+        if (/nego|可议价|negotiable/i.test(line)) out.negotiable = true;
+      }
+      if (/nego|可议价/i.test(line)) { out.negotiable = true; continue; }
+    }
 
-    // 面积 sqft
-    const sm = line.match(/([\d,]{3,5})\s*(?:sq\.?\s*ft|sqft|sf|方尺|平方尺)/i);
-    if (sm) { out.built_up = num(sm[1]); }
+    // 单位号
+    const um = line.match(/(?:unit|单位)\s*[:\-]?\s*([A-Za-z0-9-]{2,20})/i) || line.match(/\b([A-Z]{0,2}\d{1,2}-\d{1,3}(?:-\d{1,3})?)\b/);
+    if (um) { out.unit_no = um[1]; continue; }
 
     // 房型
+    let matchedType = false;
     for (let k = 0; k < TYPES.length; k++) {
       if (TYPES[k][0].test(line)) {
-        out.property_type = out.property_type || TYPES[k][1];
-        out.category = out.category || TYPES[k][2];
+        if (!out.property_type) { out.property_type = TYPES[k][1]; out.category = TYPES[k][2]; }
+        matchedType = true;
         break;
       }
     }
+    if (matchedType) continue;
+
+    // 标题：第一段营销文案
+    if (!headDone && !out.headline && !/^(for sale|for rent|wts|wtr)|出售|出租|dijual|disewa/i.test(l) && line.length >= 6) {
+      out.headline = line.slice(0, 100); headDone = true; continue;
+    }
+
+    // 其余有价值的信息进卖点
+    if (line.length >= 4 && !/^(kindly contact|contact|welcome cobroke|agent|www\.)/i.test(line)) junk.push(line);
   }
 
-  // 4. 单位号
-  const um = raw.match(/\b([A-Z]{0,2}\s?-?\s?\d{1,2}\s*[-–]\s*\d{1,3}(?:\s*[-–]\s*\d{1,3})?)\b/);
-  if (um) out.unit_no = um[1].replace(/\s+/g, "").replace(/–/g, "-");
-
-  // 5. 区域（最长匹配中文/英文/去掉 Taman）
+  // 3) 区域：优先地址，其次全文
   function findArea(hay) {
     let best = null, bestLen = 0;
     tax.AREAS.forEach(function (a) {
-      [a.zh, a.en, String(a.zh || "").replace(/^Taman\s+/i, ""), String(a.en || "").replace(/^Taman\s+/i, "")].forEach(function (name) {
-        if (!name || name.length < 3) return;
-        if (hay.indexOf(name.toLowerCase()) >= 0 && name.length > bestLen) { best = a.key; bestLen = name.length; }
+      [a.zh, a.en, String(a.zh || "").replace(/^Taman\s+/i, ""), String(a.en || "").replace(/^Taman\s+/i, "")].forEach(function (n) {
+        if (!n || n.length < 3) return;
+        if (hay.indexOf(n.toLowerCase()) >= 0 && n.length > bestLen) { best = a.key; bestLen = n.length; }
       });
     });
     return best;
   }
-  const areaFromAddress = out.address ? findArea(out.address.toLowerCase()) : null;
-  const best = areaFromAddress || findArea(lower);
-  if (best) out.area_code = best;
+  out.area_code = (out.address && findArea(out.address.toLowerCase())) || findArea(low) || undefined;
 
-  // 6. 地址里取路名作为花园名
+  // 4) 卖点（去重、限 8 条）
+  if (junk.length) {
+    out.selling_points = junk.filter(function (x, i, a) { return a.indexOf(x) === i; }).slice(0, 8).join("\n").slice(0, 800);
+  }
+
+  // 5) 兜底
   if (!out.address_text && out.address) {
     const seg = out.address.match(/,\s*([^,]+),\s*\d{5}/);
     if (seg) { out.address_text = seg[1].trim().slice(0, 160); out.project_name = out.project_name || out.address_text; }
   }
-  // 7. 项目名回退：第一条非属性长行
-  if (!out.project_name) {
-    for (let i = 0; i < lines.length; i++) {
-      const l = lines[i];
-      if (l.length < 4 || l.length > 80) continue;
-      if (/wtr|wts|rm\s*[\d,]|出售|出租|for sale|for rent|dijual|disewa/i.test(l)) continue;
-      if (out.address && l === out.address) continue;
-      if (/^\d{5}|wasap|^0?1\d/i.test(l)) continue;
-      const isAttr = TYPES.some(function (t) { return t[0].test(l); }) || /freehold|leasehold|bumi|title|furnish|vacant|facing|intermediate|^\d+x\d+/i.test(l);
-      if (!isAttr) { out.project_name = l.slice(0, 120); out.address_text = out.address_text || l.slice(0, 160); break; }
-    }
+  if (!out.project_name && out.area_code) {
+    const a = tax.AREAS.filter(function (x) { return x.key === out.area_code; })[0];
+    if (a) { out.project_name = a.en || a.zh; out.address_text = out.address_text || out.project_name; }
   }
-
-  out.confidence = ["intent","headline","project_name","address_text","address","area_code","category","property_type","land_size","built_up","bedrooms","bathrooms","toilets","lot_position","facing","bumi","tenure","title_type","furnishing","condition","asking_price","rent_price","negotiable","unit_no"]
-    .filter(function (k) { return out[k] != null && out[k] !== ""; }).length;
+  if (!out.category && (out.bedrooms || out.bathrooms)) out.category = "residential";
   if (!out.property_type && out.category === "commercial") out.property_type = "shoplot";
-  if (!out.category && (out.bedrooms || out.bathrooms || out.toilets)) out.category = "residential";
+  if (out.intent === "rent" && !out.rent_price && out.asking_price) { out.rent_price = out.asking_price; delete out.asking_price; }
+
+  out.confidence = ["intent","headline","project_name","address_text","area_code","category","property_type","land_size","built_up","bedrooms","bathrooms","toilets","lot_position","facing","bumi","tenure","title_type","furnishing","condition","asking_price","rent_price","bank_value","maintenance_fee","negotiable","unit_no"]
+    .filter(function (k) { return out[k] != null && out[k] !== ""; }).length;
   return out;
 }
 
