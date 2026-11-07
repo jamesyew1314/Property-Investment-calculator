@@ -35,20 +35,25 @@ jobs:
       #   SSH_KEY   部署用私钥（建议单独生成一把，只用于部署）
       #   SSH_USER  root（可选，默认 root）
       - name: Prepare SSH
+        id: ssh
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
           set -e
           if [ -z "${SSH_KEY:-}" ] || [ -z "${SSH_HOST:-}" ]; then
-            echo "缺少 SSH_HOST / SSH_KEY，跳过部署。"; exit 1
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=跳过部署::未配置 SSH_HOST / SSH_KEY，本次只跑测试，不部署。"
+            exit 0
           fi
           mkdir -p ~/.ssh
           printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "ready=true" >> "$GITHUB_OUTPUT"
 
       - name: Deploy
+        if: steps.ssh.outputs.ready == 'true'
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -56,6 +61,7 @@ jobs:
           KEY=~/.ssh/deploy_key HOST="$SSH_HOST" USER_="${SSH_USER:-root}" bash deploy/deploy.sh
 
       - name: Smoke test (public URL)
+        if: steps.ssh.outputs.ready == 'true'
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
