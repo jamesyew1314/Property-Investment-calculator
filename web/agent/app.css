@@ -230,3 +230,9 @@ a.stat:hover{border-color:var(--gold)}
   #modal .body{padding-bottom:96px}
   body:has(#modal .dlg) #lang3wrap{display:none!important}
 }
+
+/* 手机端弹窗：底部按钮跟随内容，避免浮在字段中间 */
+@media(max-width:760px){
+  #modal footer{position:static!important;background:#fff;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+  #modal .body{padding-bottom:12px!important}
+}
