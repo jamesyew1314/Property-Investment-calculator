@@ -930,6 +930,14 @@
       '<div class="grid2">' + field(t("预算下限", "Budget min"), '<input name="budget_min" inputmode="numeric" value="' + esc(row.budget_min || "") + '">') +
       field(t("预算上限", "Budget max"), '<input name="budget_max" inputmode="numeric" value="' + esc(row.budget_max || "") + '">') + "</div>" +
       field(t("想看区域（可多选）", "Preferred areas"), areaSel) +
+      '<details style="margin:4px 0 8px"><summary style="cursor:pointer;color:#2E5496;font-size:13px">' + t("+ 更多资料（选填）", "+ More details (optional)") + "</summary>" +
+      '<div class="grid2" style="margin-top:8px">' +
+      field(t("邮箱", "Email"), '<input name="email" value="' + esc(row.email || "") + '">') +
+      field(t("最少房间", "Min bedrooms"), '<input name="bedrooms_min" inputmode="numeric" value="' + esc(row.bedrooms_min == null ? "" : row.bedrooms_min) + '">') + "</div>" +
+      field(t("偏好房型（可多选）", "Preferred types (multi)"), '<select name="property_types" multiple size="4" style="min-height:96px">' + (S.meta && S.meta.property_types ? S.meta.property_types : []).map(function (x) { return '<option value="' + x.key + '"' + ((row.property_types || []).indexOf(x.key) >= 0 ? " selected" : "") + ">" + esc(S.lang === "en" ? x.en : x.zh) + "</option>"; }).join("") + "</select>") +
+      '<div class="grid2">' + field(t("时间线", "Timeline"), '<select name="timeline">' + optList([{key:"now",zh:"一个月内",en:"Within 1 month"},{key:"3m",zh:"三个月内",en:"Within 3 months"},{key:"6m",zh:"半年内",en:"Within 6 months"},{key:"1y",zh:"一年内",en:"Within 1 year"},{key:"exploring",zh:"先看看",en:"Just exploring"}], row.timeline, "—") + "</select>") +
+      field(t("来源", "Source"), '<select name="source">' + optList([{key:"referral",zh:"转介绍",en:"Referral"},{key:"walk_in",zh:"上门 / 陌生客",en:"Walk-in"},{key:"portal",zh:"PropertyGuru / iProperty",en:"Portal"},{key:"social",zh:"Facebook / 小红书 / TikTok",en:"Social"},{key:"signage",zh:"广告牌 / 传单",en:"Signage"},{key:"existing",zh:"老客户",en:"Existing client"}], row.source, "—") + "</select>") + "</div>" +
+      "</details>" +
       field(t("备注", "Notes"), '<textarea name="remarks">' + esc(row.remarks || "") + "</textarea>") + "</form>";
     var m = modal({
       title: row.id ? t("编辑客户", "Edit client") : t("新增客户", "New client"),
@@ -955,6 +963,7 @@
         if (el.name && el.closest("[data-ap-state],[data-ap-area]") === null) body[el.name] = el.value;
       });
       body.area_codes = collectAreas(m.root);
+      body.property_types = $$('select[name="property_types"] option:checked', m.root).map(function (o) { return o.value; });
       var p = row.id ? api("/clients/" + row.id, { method: "PATCH", body: body }) : api("/clients", { method: "POST", body: body });
       p.then(function () { m.close(); toast(t("已保存", "Saved")); route(); })
         .catch(function (e) { btn.disabled = false; m.msg(e.data && e.data.fields ? Object.values(e.data.fields)[0] : e.message); });
