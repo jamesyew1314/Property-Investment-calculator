@@ -983,16 +983,16 @@
 
   // ---------- 套餐 ----------
   function plan() {
-    setTitle(t("套餐", "Plan"), t("现阶段全部功能免费；收费与支付稍后推出", "Everything is free for now; billing comes later"));
+    setTitle(t("账号", "Account"), t("所有功能均可使用", "All features available"));
     return api("/plan").then(function (d) {
       var until = d.expires_at ? String(d.expires_at).slice(0, 10) : "—";
       var isFree = !d.plan || d.plan === "free";
       var h = '<div class="card"><h3>' + t("当前套餐", "Current plan") + "</h3>" +
         '<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">' +
         '<b style="font-family:Georgia,serif;font-size:30px;color:var(--navy)">' + esc(isFree ? t("免费", "Free") : d.plan.toUpperCase()) + "</b>" +
-        '<span class="pill ' + (isFree ? "grey" : "green") + '">' + (isFree ? t("免费开放期", "Free period") : t("已开通", "Active")) + "</span>" +
+        '<span class="pill ' + (isFree ? "grey" : "green") + '">' + (isFree ? t("使用中", "Active") : t("已开通", "Active")) + "</span>" +
         '<span class="muted">' + t("到期", "Expires") + "：" + esc(until) + "</span></div>" +
-        '<p class="muted" style="margin:10px 0 0">' + t("免费期内所有功能不限制；开始收费前至少提前 30 天通知。", "No limits during the free period. We will give 30 days' notice before charging.") + "</p></div>";
+        '<p class="muted" style="margin:10px 0 0">' + t("所有功能均可使用。", "All features are available.") + "</p></div>";
 
       h += '<div class="card"><h3>' + t("兑换码开通", "Redeem a code") + "</h3>" +
         '<p class="muted" style="margin:0 0 10px">' + t("如果已经通过转账/线下付款，输入我们给你的兑换码即可开通。", "If you paid by transfer, enter the code we sent you.") + "</p>" +
