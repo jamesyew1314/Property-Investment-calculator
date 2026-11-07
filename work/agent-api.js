@@ -10,6 +10,7 @@ const agentCore = require("./agent-core");
 const matcher = require("./match");
 const billplz = require("./billplz");
 const importer = require("./import-core");
+const aiImporter = require("./import-ai");
 const aiCopy = require("./ai-copy");
 let sharp = null; try { sharp = require("sharp"); } catch (e) { sharp = null; }
 const fs = require("node:fs");
@@ -244,7 +245,17 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
     try {
       const text = core.str((req.body || {}).text, 6000);
       if (!text || text.length < 8) return res.status(400).json({ ok: false, error: "invalid_input" });
-      const fields = importer.parseListing(text);
+      let fields = importer.parseListing(text);
+      try {
+        const ai = await aiImporter.enrich(text, fields);
+        if (ai) {
+          Object.keys(ai).forEach(function (k) {
+            if (ai[k] !== null && ai[k] !== undefined && ai[k] !== "") fields[k] = ai[k];
+          });
+          fields.ai = true;
+          fields.confidence = ["intent","headline","project_name","address_text","area_code","category","property_type","land_size","built_up","bedrooms","bathrooms","toilets","lot_position","facing","bumi","tenure","title_type","furnishing","condition","asking_price","rent_price","bank_value","maintenance_fee","negotiable","unit_no"].filter(function (k) { return fields[k] != null && fields[k] !== ""; }).length;
+        }
+      } catch (e) { fields.ai_error = true; }
       res.json({ ok: true, fields: fields });
     } catch (e) { next(e); }
   });
