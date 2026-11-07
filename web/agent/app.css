@@ -217,3 +217,16 @@ a.stat:hover{border-color:var(--gold)}
 /* 可议价勾选：紧凑靠左 */
 .f label.chk{display:inline-flex!important;align-items:center;gap:8px;height:42px;width:auto;font-size:13px;color:var(--navy);white-space:nowrap}
 .f label.chk input{width:16px;height:16px;flex:0 0 16px;margin:0}
+
+/* 手机端房源表单：单列、全宽、预览按钮不挤 */
+@media(max-width:760px){
+  #lf .grid2,#lf .grid3,#lf .grid4,
+  #modal #lf .grid2.nums{grid-template-columns:1fr!important;gap:0!important}
+  #lf .field{width:100%;min-width:0}
+  #lf input,#lf select,#lf textarea{width:100%!important;max-width:100%}
+  #lf #sharePreview{width:100%!important;min-height:200px}
+  #lf #prevBtn,#lf #copyPrev{width:100%!important;display:flex;margin:8px 0 0!important;border-radius:10px!important}
+  #lf [data-ren]{min-height:38px}
+  #modal .body{padding-bottom:96px}
+  body:has(#modal .dlg) #lang3wrap{display:none!important}
+}
