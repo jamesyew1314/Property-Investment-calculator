@@ -36,10 +36,13 @@
     document.head.appendChild(s);
     var wrap = document.createElement("div");
     wrap.id = "lang3wrap";
-    var login = document.createElement("a");
-    login.id = "lang3login"; login.href = "/agent/";
-    login.textContent = (lang === "en" ? "Agent login" : lang === "bm" ? "Log masuk ejen" : "中介登录");
-    wrap.appendChild(login);
+    var inWorkspace = location.pathname.indexOf("/agent") === 0;
+    if (!inWorkspace) {
+      var login = document.createElement("a");
+      login.id = "lang3login"; login.href = "/agent/";
+      login.textContent = (lang === "en" ? "Agent login" : lang === "bm" ? "Log masuk ejen" : "中介登录");
+      wrap.appendChild(login);
+    }
     wrap.appendChild(bar());
     document.body.appendChild(wrap);
   }
