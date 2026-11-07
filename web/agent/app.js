@@ -555,6 +555,7 @@
       field(t("管理费 (RM/月)", "Maintenance fee"), '<input name="maintenance_fee" inputmode="numeric" value="' + esc(row.maintenance_fee || "") + '">') + "</div>" +
       '<div class="grid2">' + field(t("现况", "Condition"), '<select name="condition">' + optList([{key:"vacant",zh:"空置",en:"Vacant"},{key:"occupied",zh:"自住",en:"Occupied"},{key:"tenanted",zh:"出租中",en:"Tenanted"},{key:"renovated",zh:"已装修",en:"Renovated"}], row.condition, "—") + "</select>") + "</div>" +
       '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("装修和卖点", "Renovation & highlights") + "</h4>" +
+      '<div class="muted" style="font-size:12px;margin:-4px 0 8px">' + t("仅用于房源记录与分享，不参与自动匹配。", "For your own records and sharing only — not used for matching.") + "</div>" +
       '<div class="muted" style="font-size:12px;margin-bottom:6px">' + t("点选有的装修（再点一次取消）", "Tap what the unit has (tap again to remove)") + "</div>" +
       '<div id="renChips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">' +
       [["kitchen_ext","Kitchen Extended 厨房扩建"],["back_ext","Back Extended 后面扩建"],["full_ext","Fully Extended 全扩建"],["awning","Awning 遮阳棚"],["plaster","Plaster Ceiling 石膏天花板"],["autogate","Autogate 自动门"],["grille","Grille 铁花"],["cabinet","Kitchen Cabinet 厨房柜"],["wardrobe","Built-in Wardrobe 嵌入式衣柜"],["aircond","Aircond 冷气"],["heater","Water Heater 热水器"],["solar","Solar Panel 太阳能板"],["tiles","Tiles Upgraded 换新瓷砖"],["bath","Renovated Bathroom 浴室翻新"]].map(function (r) {
