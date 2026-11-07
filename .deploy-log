@@ -1,8 +1,6 @@
-▸ 1/5 回归测试
-76 pass, 0 fail
-43 pass, 0 fail
-69 pass, 0 fail
-11 pass, 0 fail
+ready=true
+2048 SHA256:SXyMHUF7VD4tmZPIYobXnZ8rrXoMYXwwWbh9qfQG/fY no comment (RSA)
+---deploy---
 ▸ 2/5 上传静态站点
 ▸ 3/5 上传后端
 ▸ 3.5/5 应用数据库迁移
@@ -21,7 +19,6 @@ psql:/tmp/030_brand.sql:50: NOTICE:  relation "magic_agent_idx" already exists, 
 psql:/tmp/030_brand.sql:69: NOTICE:  relation "agent_wa_groups" already exists, skipping
 psql:/tmp/031_listing_fields.sql:2: NOTICE:  column "headline" of relation "lib_properties" already exists, skipping
 psql:/tmp/031_listing_fields.sql:3: NOTICE:  column "name_zh" of relation "lib_properties" already exists, skipping
-  migrations ok
 psql:/tmp/031_listing_fields.sql:4: NOTICE:  column "address_text" of relation "lib_properties" already exists, skipping
 psql:/tmp/031_listing_fields.sql:5: NOTICE:  column "category" of relation "lib_properties" already exists, skipping
 psql:/tmp/031_listing_fields.sql:6: NOTICE:  column "extra_rooms" of relation "lib_properties" already exists, skipping
@@ -39,7 +36,8 @@ psql:/tmp/032_form_v3.sql:8: NOTICE:  column "bank_value" of relation "lib_prope
 psql:/tmp/032_form_v3.sql:9: NOTICE:  column "show_psf" of relation "lib_properties" already exists, skipping
 psql:/tmp/032_form_v3.sql:10: NOTICE:  column "show_address" of relation "lib_properties" already exists, skipping
 psql:/tmp/032_form_v3.sql:11: NOTICE:  column "expected_bank_value" of relation "lib_properties" already exists, skipping
+  migrations ok
 ▸ 4/5 修正权限并重启
 ▸ 5/5 健康检查
-  {"ok":true,"db":true,"time":"2026-11-07T02:35:14.991Z","version":"0.64.0"}
+  {"ok":true,"db":true,"time":"2026-11-07T02:38:16.835Z","version":"0.64.0"}
 ✓ 发布完成：https://kwongthye.com/
