@@ -11,7 +11,7 @@ const PUBLIC_SELECT = `
   SELECT p.code, p.project_id, p.project_name, p.area_code, p.state, p.property_type, p.tenure, p.photos, p.cover_url,
          p.block, p.unit_no, p.floor, p.built_up::float8 AS built_up, p.land_area::float8 AS land_area,
          p.bedrooms, p.bathrooms, p.carparks, p.facing, p.furnishing, p.condition, p.intent,
-         p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
+         p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price, p.bank_value::float8 AS bank_value,
          p.maintenance_fee::float8 AS maintenance_fee, p.status, p.listed_on::text AS listed_on,
          p.title_type, p.tags, p.views, p.published_at, p.updated_at, p.cover_url, p.description,
          pr.name AS project_title, pr.name_zh AS project_title_zh,
@@ -172,7 +172,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
       const out = await pool.query(`
         SELECT p.code, p.project_name, p.address_text, p.name_zh, p.area_code, p.state, p.category, p.property_type,
                p.intent, p.bedrooms, p.bathrooms, p.built_up::float8 AS built_up, p.land_size, p.facing,
-               p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
+               p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price, p.bank_value::float8 AS bank_value,
                p.photos, p.cover_url, p.headline, p.status, p.updated_at, p.description,
                a.name AS agent_name, a.phone AS agent_phone, a.team AS agent_team, a.ren_no AS agent_ren,
                a.slug AS agent_slug, a.verified_at AS agent_verified, a.cobroke_note

@@ -90,6 +90,7 @@
       <button data-intent="sale">出售 WTS</button>
       <button data-intent="rent">出租 WTL</button>
     </div>
+    <button type="button" id="dealBtn" style="border:1px solid #D6DCE7;background:#fff;border-radius:10px;padding:10px 12px;font:inherit;font-size:13px;cursor:pointer">🔥 <span id="dealTxt">低于估价 20%</span></button>
     <input id="q" type="search" placeholder="搜索编号 / 楼盘 / 地址">
     <select id="area"><option value="">全部区域</option></select>
   </div>
@@ -113,9 +114,9 @@ var INIT = { area: _q.get('area') || '', intent: _q.get('intent') || '', q: _q.g
 var AREAS = [];
 var ROWS = [];
 var T = {
-  zh: { title:'房源池', sub:'无需登录，浏览全部同行货源 · 登录后发布你的房源', all:'全部', sale:'出售 WTS', rent:'出租 WTL', q:'搜索编号 / 楼盘 / 地址', area:'全部区域', count:'共 {n} 条货源', login:'登录 / 发布', wa:'WhatsApp 联系', rules:'WhatsApp 群规', join:'加入 WhatsApp 群', empty:'还没有货源，稍后再来看看。', noArea:'区域待补', verified:'已验证' },
-  en: { title:'Listing Pool', sub:'Browse every co-broke listing without logging in · Log in to post yours', all:'All', sale:'Sale WTS', rent:'Rent WTL', q:'Search code / project / address', area:'All areas', count:'{n} listings', login:'Login / Post', wa:'WhatsApp', rules:'WhatsApp group rules', join:'Join WhatsApp group', empty:'No listings yet — check back soon.', noArea:'Area pending', verified:'Verified' },
-  bm: { title:'Kolam Senarai', sub:'Lihat semua senarai rakan tanpa log masuk · Log masuk untuk siar', all:'Semua', sale:'Jual WTS', rent:'Sewa WTL', q:'Cari kod / projek / alamat', area:'Semua kawasan', count:'{n} senarai', login:'Log Masuk / Siar', wa:'WhatsApp', rules:'Peraturan kumpulan WhatsApp', join:'Sertai kumpulan WhatsApp', empty:'Belum ada senarai — semak semula nanti.', noArea:'Kawasan belum diisi', verified:'Disahkan' }
+  zh: { title:'房源池', sub:'无需登录，浏览全部同行货源 · 登录后发布你的房源', all:'全部', sale:'出售 WTS', rent:'出租 WTL', q:'搜索编号 / 楼盘 / 地址', area:'全部区域', count:'共 {n} 条货源', login:'登录 / 发布', wa:'WhatsApp 联系', rules:'WhatsApp 群规', join:'加入 WhatsApp 群', empty:'还没有货源，稍后再来看看。', noArea:'区域待补', deal:'低于估价 20%', verified:'已验证' },
+  en: { title:'Listing Pool', sub:'Browse every co-broke listing without logging in · Log in to post yours', all:'All', sale:'Sale WTS', rent:'Rent WTL', q:'Search code / project / address', area:'All areas', count:'{n} listings', login:'Login / Post', wa:'WhatsApp', rules:'WhatsApp group rules', join:'Join WhatsApp group', empty:'No listings yet — check back soon.', noArea:'Area pending', deal:'20% below valuation', verified:'Verified' },
+  bm: { title:'Kolam Senarai', sub:'Lihat semua senarai rakan tanpa log masuk · Log masuk untuk siar', all:'Semua', sale:'Jual WTS', rent:'Sewa WTL', q:'Cari kod / projek / alamat', area:'Semua kawasan', count:'{n} senarai', login:'Log Masuk / Siar', wa:'WhatsApp', rules:'Peraturan kumpulan WhatsApp', join:'Sertai kumpulan WhatsApp', empty:'Belum ada senarai — semak semula nanti.', noArea:'Kawasan belum diisi', deal:'20% bawah penilaian', verified:'Disahkan' }
 };
 var STD = {
 zh:["只发布 WTS 出售 / WTL 出租，不发布 WTB / WTR","必须填写：照片、价格、区域、面积或房型、公司与 REN、联系电话","合作分佣默认 A+B ÷ 2；如有 referral fee，请在个人资料中注明","资料不全或违规，平台会下架并要求补充"],
@@ -131,6 +132,7 @@ function apply(){
   document.getElementById('poolTitle').textContent=t('title');
   document.getElementById('poolSub').textContent=t('sub');
   document.getElementById('q').placeholder=t('q');
+  var _dt=document.getElementById('dealTxt'); if(_dt) _dt.textContent=t('deal');
   document.getElementById('stdTitle').textContent=LANG==='zh'?'发布规范':(LANG==='bm'?'Peraturan siaran':'Posting standards');
   document.getElementById('stdList').innerHTML=(STD[LANG]||STD.zh).map(function(x){return '<li>'+esc(x)+'</li>';}).join('');
   document.getElementById('stdNote').textContent=(STD_NOTE[LANG]||STD_NOTE.zh);
@@ -145,7 +147,9 @@ function render(){
   var q=document.getElementById('q').value.toLowerCase().trim();
   var area=document.getElementById('area').value;
   var intent=document.querySelector('#seg button.on').dataset.intent;
+  var dealOnly=document.getElementById('dealBtn').classList.contains('on');
   var list=ROWS.filter(function(r){
+    if(dealOnly){ if(!(Number(r.bank_value)>0 && Number(r.asking_price)>0 && Number(r.asking_price)<=Number(r.bank_value)*0.8)) return false; }
     if(intent && r.intent!==intent) return false;
     if(area && r.area_code!==area) return false;
     if(q){ var hay=(r.code+' '+(r.address_text||'')+' '+(r.project_name||'')).toLowerCase(); if(hay.indexOf(q)<0) return false; }
@@ -162,6 +166,7 @@ function render(){
     return '<article class="plCard">'+(img?'<img src="'+esc(img)+'" loading="lazy" alt="">':'')+
       '<div class="plBody"><div class="plTop"><span class="plCode">'+esc(r.code)+'</span><span class="plTag '+(rent?'rent':'')+'">'+(rent?t('rent'):t('sale'))+'</span></div>'+
       '<div class="plTitle">'+esc(r.project_name||r.address_text||r.code)+'</div>'+
+      (Number(r.bank_value)>0?'<div class="plMeta">银行估价 RM '+Number(r.bank_value).toLocaleString('en-MY')+(Number(r.asking_price)>0?' · '+(Number(r.asking_price)<=Number(r.bank_value)*0.8?'低于估价 '+Math.round((1-Number(r.asking_price)/Number(r.bank_value))*100)+'%':'') :'')+'</div>':'')+
       '<div class="plMeta">'+esc(r.area_code||'')+(r.bedrooms!=null?' · '+r.bedrooms+'房':'')+(r.bathrooms!=null?' / '+r.bathrooms+'卫':'')+(r.built_up?' · '+Number(r.built_up).toLocaleString('en-MY')+' sqft':'')+'</div>'+
       '<div class="plPrice">'+money(price,rent)+'</div>'+
       (r.cobroke_note?'<div class="plMeta">合作：'+esc(r.cobroke_note)+'</div>':'')+
@@ -174,6 +179,7 @@ document.getElementById('seg').addEventListener('click',function(e){
   var b=e.target.closest('button'); if(!b) return;
   this.querySelectorAll('button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); render();
 });
+document.getElementById('dealBtn').addEventListener('click',function(){ this.classList.toggle('on'); this.style.background=this.classList.contains('on')?'#0E2438':'#fff'; this.style.color=this.classList.contains('on')?'#fff':'#0E2438'; render(); });
 document.getElementById('q').addEventListener('input',render);
 document.getElementById('area').addEventListener('change',render);
 
