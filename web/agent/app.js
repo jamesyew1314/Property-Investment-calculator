@@ -819,7 +819,7 @@
     ctx.strokeStyle = "rgba(198,161,91,.55)"; ctx.lineWidth = 3;
     ctx.strokeRect(44, 44, W - 88, H - 88);
     ctx.fillStyle = "#E2C88F"; ctx.font = "600 26px Georgia, serif";
-    ctx.fillText("RoofX  ·  ROOFX", 86, 132);
+    ctx.fillText("RoofX  ·  RoofX", 86, 132);
     ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "20px -apple-system, system-ui";
     ctx.fillText(t("柔佛房源网络", "Johor listings network"), 86, 168);
     ctx.strokeStyle = "rgba(198,161,91,.35)"; ctx.lineWidth = 1;
