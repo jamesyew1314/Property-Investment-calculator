@@ -435,7 +435,10 @@
   }
   function areaName(code) {
     var a = ((S.meta && S.meta.areas) || []).filter(function (x) { return x.key === code; })[0];
-    return a ? (S.lang === "en" ? a.en : a.zh) : (code || "—");
+    if (!a) return code || "—";
+    if (S.lang === "en") return a.en;
+    if (S.lang === "bm") return (window.BM_MAP && window.BM_MAP[a.en]) || a.en;
+    return a.zh;
   }
   function photoBlock(row) {
     var photos = row.photos || [];
