@@ -321,3 +321,13 @@ body.is-free .pool-tier{display:none!important}
 @media(max-width:760px){
   .calcTop{display:inline-block;margin-left:auto;margin-right:6px;font-size:11px;padding:7px 9px}
 }
+
+/* 年长中介友好：整体字号放大 */
+body{font-size:17px}
+.lead{font-size:18px}
+.btn{font-size:15.5px;padding:11px 20px}
+input,select,textarea{font-size:16px!important}
+.vcard p,.agent-card p,.site-foot p{font-size:15px}
+.spec{font-size:15px!important}
+.pd .spec b{font-size:15px}
+#lang3 button{font-size:12px!important;padding:8px 10px!important}

@@ -242,3 +242,14 @@ a.stat:hover{border-color:var(--gold)}
   #lf .optChk{display:flex!important;align-items:center;gap:8px;width:100%;font-size:13px;line-height:1.4;white-space:normal}
   #lf .optChk input[type="checkbox"]{width:18px!important;min-width:18px;height:18px;flex:0 0 18px;margin:0}
 }
+
+/* 年长中介友好：工作台字号放大 */
+body{font-size:16px}
+#side nav a{font-size:15px}
+#top h1{font-size:20px}
+#top .sub{font-size:13px}
+#modal .field label, .field label{font-size:13.5px}
+.btn{font-size:14.5px}
+input,select,textarea{font-size:16px!important}
+.card h3{font-size:16px}
+.stat b{font-size:26px}
