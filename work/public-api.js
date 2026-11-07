@@ -157,6 +157,34 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
     } catch (e) { next(e); }
   });
 
+  // 公开房源池：无需登录，全部同行货源
+  r.get("/pool", async function (req, res, next) {
+    try {
+      const q = String(req.query.q || "").trim();
+      const area = String(req.query.area || "").trim();
+      const intent = String(req.query.intent || "").trim();
+      const where = ["p.visibility IN ('pool','public')", "p.status IN ('available','reserved')", "p.tenant_id IS NOT NULL", "p.area_code IS NOT NULL", "(COALESCE(p.asking_price,0) > 0 OR COALESCE(p.rent_price,0) > 0)"];
+      const args = [];
+      function add(cl, v) { args.push(v); where.push(cl.replace("?", "$" + args.length)); }
+      if (area) add("p.area_code=?", area);
+      if (intent === "sale" || intent === "rent") add("p.intent=?", intent);
+      if (q) { args.push("%" + q.replace(/[%_]/g, "\\$&") + "%"); where.push("(p.code ILIKE $" + args.length + " OR p.project_name ILIKE $" + args.length + " OR p.address_text ILIKE $" + args.length + ")"); }
+      const out = await pool.query(`
+        SELECT p.code, p.project_name, p.address_text, p.name_zh, p.area_code, p.state, p.category, p.property_type,
+               p.intent, p.bedrooms, p.bathrooms, p.built_up::float8 AS built_up, p.land_size, p.facing,
+               p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
+               p.photos, p.cover_url, p.headline, p.status, p.updated_at, p.description,
+               a.name AS agent_name, a.phone AS agent_phone, a.team AS agent_team, a.ren_no AS agent_ren,
+               a.slug AS agent_slug, a.verified_at AS agent_verified
+        FROM lib_properties p
+        JOIN lib_agents a ON a.id = p.tenant_id
+        WHERE ` + where.join(" AND ") + `
+        ORDER BY p.published_at DESC NULLS LAST, p.updated_at DESC
+        LIMIT 200`, args);
+      res.json({ ok: true, rows: out.rows, total: out.rows.length });
+    } catch (e) { next(e); }
+  });
+
   r.get("/listing/:code", async function (req, res, next) {
     try {
       const out = await pool.query(PUBLIC_SELECT + " AND p.code=$1", [req.params.code]);

@@ -573,7 +573,6 @@
         <div class="row"><label data-i18n="fCode">开通码</label><input class="manual" id="proCode" type="text" placeholder="XXXX-XXXX-XXXX"><span class="unit"></span></div>
         <div class="btnRow"><button class="btn" id="redeemBtn" data-i18n="btnRedeem">开通 / 续费</button></div>
         <div class="btnRow" style="margin-top:6px">
-          <a class="btn btn2" href="/pricing/" target="_blank" rel="noopener" data-i18n="proMore">查看价格 / 升级 →</a>
         </div>
       </div>
       <details class="acctMore" id="payBox">
@@ -845,7 +844,7 @@
       errUnverified: "Please verify your email first (resend from your account panel)",
       coNew: "Save as", coDel: "Delete", coDefault: "Default header",
       ckTitle: "Cookies", ckText: "Essential cookies keep you signed in and secure; analytics cookies help us improve the site. You choose.",
-      ckMore: "Details", ckNec: "Essential only", ckAll: "Accept all", proHint: "🔒 PDF / share / save / export are Pro features.", proOnlyAsk: "This is a Pro feature. View pricing and upgrade?",
+      ckMore: "Details", ckNec: "Essential only", ckAll: "Accept all", proHint: "🔒 此功能暂未开放。", proOnlyAsk: "此功能暂未开放。",
       freeBadge: "🎁 Everything is free right now — cloud saving, PDF report, comparison, sharing", errNeedLogin: "Please sign in (free) to export the report", payTitle: "Payments / receipts", payLoading: "Loading…",
       payEmpty: "No payments yet. Receipts appear here after you redeem a code.", payReceipt: "Receipt",
       btnRefund: "Request refund", refundPrompt: "Please briefly tell us why (at least 4 characters):",
@@ -2097,7 +2096,7 @@
   }
   function requirePro() {
     if (unlocked()) return true;
-    if (confirm(t("proOnlyAsk"))) window.open("/pricing/", "_blank");
+    if (confirm(t("proOnlyAsk"))) {}
     return false;
   }
 

@@ -124,7 +124,7 @@
         '<div class="muted">' + t("payment") + "</div>" +
         '<div class="actions"><a class="btn" href="/api/payments/' + p.id + '/receipt.pdf">' + t("pdf") + "</a>" +
         '<button class="btn ghost" onclick="window.print()">' + t("print") + "</button>" +
-        '<a class="btn ghost" href="/pricing/">' + t("pricing") + "</a></div>";
+        '</div>";
     }
     try { localStorage.setItem(KEY, lang); } catch (e) {}
   }
