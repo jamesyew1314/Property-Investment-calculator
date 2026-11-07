@@ -63,7 +63,7 @@ function shell(heading, bodyHtml, preheader) {
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
     'style="max-width:560px;background:#ffffff;border:1px solid #E7E2D7;border-radius:12px;overflow:hidden">' +
     '<tr><td style="background:' + NAVY + ';padding:18px 24px">' +
-    '<img src="' + LOGO + '" alt="KWONG THYE 光泰" height="34" style="height:34px;width:auto;display:block;border:0;outline:none">' +
+    '<img src="' + LOGO + '" alt="RoofX — The Roof Property Exchange" height="34" style="height:34px;width:auto;display:block;border:0;outline:none">' +
     "</td></tr>" +
     '<tr><td style="height:3px;background:' + GOLD + ';font-size:0;line-height:0">&nbsp;</td></tr>' +
     '<tr><td style="padding:26px 24px 6px">' +

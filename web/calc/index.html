@@ -213,7 +213,7 @@
 </style>
 <style id="printCfg"></style>
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="KWONG THYE 光泰">
+<meta property="og:site_name" content="RoofX">
 <meta property="og:title" content="房地产投资快速计算器 | Malaysia Property Investment Calculator">
 <meta property="og:description" content="买入费用、贷款月供、持有费用、租金回报、RPGT 与出售利润，一间房从买到卖一次算清。免费使用。">
 <meta property="og:url" content="https://kwongthye.com/calc/">
@@ -437,7 +437,7 @@
   <div id="toast"></div>
 </main>
 <div class="no-print" style="text-align:center;padding:0 0 22px;font-size:12.5px">
-  <a href="/" style="color:#2E5496;text-decoration:none">← KWONG THYE 光泰</a>
+  <a href="/" style="color:#2E5496;text-decoration:none">← RoofX</a>
   <span style="color:#C8CED8"> · </span><a href="/privacy/" data-i18n="legalPrivacy" style="color:#2E5496;text-decoration:none">隐私政策</a>
   <span style="color:#C8CED8"> · </span><a href="/terms/" data-i18n="legalTerms" style="color:#2E5496;text-decoration:none">使用条款</a>
 </div>
@@ -1598,7 +1598,7 @@
   function exportCsv() {
     if (!requirePro()) return;
     if (!lastRes || !lastInp) { toast(t("aiFail")); return; }
-    var rows = [["KWONG THYE calculator", ""], ["Plan", $("planName").value || ""], ["Exported", new Date().toLocaleString()], []];
+    var rows = [["RoofX calculator", ""], ["Plan", $("planName").value || ""], ["Exported", new Date().toLocaleString()], []];
     rows.push(["Part 1", ""]);
     rows.push(["SPA", lastInp.spa], ["Actual price", lastInp.actual], ["Loan", lastInp.loan],
       ["Monthly instalment", lastRes.part1.pmt], ["Acquisition costs", lastRes.part1.purchaseCosts],

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>收据 / Receipt — KWONG THYE 光泰</title>
+<title>收据 / Receipt — RoofX</title>
 <link rel="icon" type="image/png" href="/icon-256.png?v=tr1">
 <style>
   :root{--navy:#0E2438;--gold:#C6A15B;--cream:#F7F4EE;--ink:#1B2430;--muted:#5D6B7A;--line:#E4DED2}
@@ -41,7 +41,7 @@
 <body>
 <header>
   <div class="wrap bar">
-    <img src="/logo-white.png?v=tr1" alt="KWONG THYE 光泰">
+    <img src="/logo-white.png?v=tr1" alt="RoofX — The Roof Property Exchange">
     <a class="back" href="/calc/" data-i18n="back">← 返回计算器</a>
     <button id="langBtn">EN</button>
   </div>
@@ -50,12 +50,12 @@
   <div class="wrap">
     <div class="card" id="card">
       <h1 id="pageTitle">收据</h1>
-      <div class="sub" data-i18n="brandLine">KWONG THYE 光泰 · kwongthye.com</div>
+      <div class="sub" data-i18n="brandLine">RoofX · kwongthye.com</div>
       <div id="body"><p class="muted" data-i18n="loading">加载中…</p></div>
     </div>
     <footer>
       <p class="noprint" data-i18n="autoNote">此收据由系统自动生成，无需签名。</p>
-      <p class="noprint">KWONG THYE · Johor Bahru, Malaysia · andylau.theroof@gmail.com</p>
+      <p class="noprint">RoofX · Johor Bahru, Malaysia · andylau.theroof@gmail.com</p>
     </footer>
   </div>
 </main>
@@ -67,7 +67,7 @@
       back: "← 返回计算器", loading: "加载中…", title: "收据",
       autoNote: "此收据由系统自动生成，无需签名。",
       no: "收据编号", date: "日期", billed: "客户", desc: "项目", valid: "有效期至", status: "状态",
-      paid: "已付款", plan: "KWONG THYE 专业版", days: "天",
+      paid: "已付款", plan: "RoofX 专业版", days: "天",
       payment: "付款方式：银行转账 / 开通码",
       pdf: "下载 PDF", print: "打印", pricing: "价格",
       auth: "请先登录后查看收据。", signin: "去登录",
@@ -77,7 +77,7 @@
       back: "← Back to calculator", loading: "Loading…", title: "Receipt",
       autoNote: "This receipt is generated automatically and requires no signature.",
       no: "Receipt No.", date: "Date", billed: "Billed to", desc: "Description", valid: "Valid until", status: "Status",
-      paid: "Paid", plan: "KWONG THYE Pro", days: "days",
+      paid: "Paid", plan: "RoofX Pro", days: "days",
       payment: "Payment: bank transfer / activation code",
       pdf: "Download PDF", print: "Print", pricing: "Pricing",
       auth: "Please sign in to view this receipt.", signin: "Sign in",
@@ -97,7 +97,7 @@
 
   function render() {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-    document.title = (lang === "zh" ? "收据 Receipt" : "Receipt") + " — KWONG THYE";
+    document.title = (lang === "zh" ? "收据 Receipt" : "Receipt") + " — RoofX";
     document.getElementById("langBtn").textContent = lang === "zh" ? "EN" : "中文";
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       var k = el.getAttribute("data-i18n");

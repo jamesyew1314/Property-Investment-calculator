@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>管理后台 Admin — KWONG THYE</title>
+<title>管理后台 Admin — RoofX</title>
 <link rel="icon" type="image/png" href="/icon-256.png?v=tr1">
 <style>
   :root{--navy:#0E2438;--gold:#C6A15B;--cream:#F6F7FB;--ink:#1B2430;--muted:#5D6B7A;--line:#E2E6EE;--blue:#2E5496}
@@ -73,7 +73,7 @@
 <body>
 <header>
   <div class="wrap bar">
-    <a href="/"><img src="/logo-white.png?v=tr1" alt="KWONG THYE"></a>
+    <a href="/"><img src="/logo-white.png?v=tr1" alt="RoofX"></a>
     <b><span data-i18n="adminTitle">管理后台</span> <span style="color:#C6A15B;font-size:12px">Admin</span></b>
     <span class="sp"></span>
     <span id="who" hidden style="color:#8FE3B0;font-size:12px;margin-right:6px" data-i18n="signedIn">● 已登录</span>
@@ -166,7 +166,7 @@
         </div>
 
         <div class="card" style="margin-top:16px">
-          <h3 data-i18n="agentCodeTitle">PropNet 中介兑换码</h3>
+          <h3 data-i18n="agentCodeTitle">RoofX 中介兑换码</h3>
           <p class="muted" style="margin:0 0 12px;font-size:12px" data-i18n="agentCodeHint">生成后发给中介，在工作台「套餐」页兑换；每次兑换顺延到期日。</p>
           <div class="grid3">
             <div><label data-i18n="agentPlan">套餐</label><select id="acPlan"><option value="pro">Pro</option><option value="team">Team</option></select></div>
@@ -280,7 +280,7 @@
       <section class="tab" id="tab-agents">
         <div class="card">
           <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
-            <h3 style="margin:0" data-i18n="agentReviewTitle">PropNet 中介审核</h3>
+            <h3 style="margin:0" data-i18n="agentReviewTitle">RoofX 中介审核</h3>
             <select id="agFilter" style="margin-left:auto">
               <option value="" data-i18n="agAll">全部</option>
               <option value="pending" data-i18n="agPending">待审核</option>
@@ -485,7 +485,7 @@
 
   function applyLang() {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-    document.title = (lang === "zh" ? "管理后台" : "Admin") + " — KWONG THYE";
+    document.title = (lang === "zh" ? "管理后台" : "Admin") + " — RoofX";
     $("langBtn").textContent = lang === "zh" ? "EN" : "中文";
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       var k = el.getAttribute("data-i18n");

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>房源池 · PropNet</title>
+<title>房源池 · RoofX</title>
 <meta name="description" content="柔佛同行房源池：无需登录浏览全部货源，登录后发布自己的房源。WTS / WTL 合作共赢。">
 <link rel="stylesheet" href="/site.css?v=20261107a">
 <style>
@@ -63,7 +63,7 @@
 <body>
 <header class="site-head">
   <div class="wrap bar">
-    <a class="brand" href="/" aria-label="PropNet"><img src="/logo.png?v=tr1" alt="" onerror="this.style.display='none'"><span><b>KWONG THYE</b><em>PROPNET</em></span></a>
+    <a class="brand" href="/" aria-label="RoofX"><img src="/logo.png?v=tr1" alt="" onerror="this.style.display='none'"><span><b>ROOFX</b><em>THE ROOF PROPERTY EXCHANGE</em></span></a>
     <nav class="site-nav" id="nav">
       <a href="/">首页</a>
       <a href="/pool/" class="on">房源池</a>
@@ -107,7 +107,7 @@
   </section>
 </main>
 
-<footer class="site-foot"><div class="wrap"><p class="muted" style="margin:0;padding:22px 0;font-size:12px">© 2026 KWONG THYE · PropNet</p></div></footer>
+<footer class="site-foot"><div class="wrap"><p class="muted" style="margin:0;padding:22px 0;font-size:12px">© 2026 ROOFX · THE ROOF PROPERTY EXCHANGE</p></div></footer>
 
 <script>
 var _q=new URLSearchParams(location.search);
@@ -168,7 +168,7 @@ function render(){
     var price=rent?r.rent_price:r.asking_price;
     var img=r.cover_url || (Array.isArray(r.photos)&&r.photos[0]) || '';
     var phone=String(r.agent_phone||'').replace(/[^0-9]/g,'').replace(/^0/,'60');
-    var wa='https://wa.me/'+phone+'?text='+encodeURIComponent('Hi '+ (r.agent_name||'') +', 我在 PropNet 看到 '+r.code);
+    var wa='https://wa.me/'+phone+'?text='+encodeURIComponent('Hi '+ (r.agent_name||'') +', 我在 RoofX 看到 '+r.code);
     return '<article class="plCard">'+(img?'<img src="'+esc(img)+'" loading="lazy" alt="">':'')+
       '<div class="plBody"><div class="plTop"><span class="plCode">'+esc(r.code)+'</span><span class="plTag '+(rent?'rent':'')+'">'+(rent?t('rent'):t('sale'))+'</span></div>'+
       '<div class="plTitle">'+esc(r.project_name||r.address_text||r.code)+'</div>'+

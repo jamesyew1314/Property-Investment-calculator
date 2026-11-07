@@ -1,4 +1,4 @@
-/* PropNet BM — 以英文为键的马来语词典（工作台） */
+/* RoofX BM — 以英文为键的马来语词典（工作台） */
 window.BM_MAP = {
   "Sign in": "Log Masuk",
   "Create your account": "Daftar Akaun",

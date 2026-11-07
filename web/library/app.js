@@ -82,7 +82,7 @@
       T("状态：", "Status: ") + lab("listing_statuses", p.status),
       p.agent ? T("中介：", "Agent: ") + p.agent : "",
       "",
-      "KWONG THYE · THE ROOF REALTY SDN BHD",
+      "RoofX · THE ROOF REALTY SDN BHD",
       "Andy Lau 刘泌光 · REN 32839 · +60 16-528 0918"
     ];
     return lines.filter(function (x) { return x !== ""; }).join("\n");

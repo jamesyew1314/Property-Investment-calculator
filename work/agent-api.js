@@ -1,5 +1,5 @@
 "use strict";
-// agent-api.js — PropNet 中介工作台 API（/api/agent）
+// agent-api.js — RoofX 中介工作台 API（/api/agent）
 // 账号：邮箱 + 密码（scrypt），会话 cookie pn_sid；房源/客户按 tenant_id 隔离。
 // 公开范围：visibility='pool'（仅中介可见）或 'public'（官网可见）。
 
@@ -110,9 +110,9 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       const link = base + "/agent/?verify=" + token;
       const lang = agent.lang === "en" ? "en" : (agent.lang === "bm" ? "bm" : "zh");
       const V = {
-        zh: { sub: "验证你的 PropNet 邮箱", lines: ["你好 " + agent.name + "，", "", "请点击下面链接验证邮箱（48 小时内有效）：", link, "", "验证后你的房源会显示「已验证」标记。", "", "PropNet · KWONG THYE"] },
-        en: { sub: "Verify your PropNet email", lines: ["Hi " + agent.name + ",", "", "Please verify your email within 48 hours:", link, "", "Verified listings show a verified badge.", "", "PropNet · KWONG THYE"] },
-        bm: { sub: "Sahkan e-mel PropNet anda", lines: ["Hai " + agent.name + ",", "", "Sila sahkan e-mel anda dalam 48 jam:", link, "", "Senarai yang disahkan memaparkan lencana.", "", "PropNet · KWONG THYE"] }
+        zh: { sub: "验证你的 RoofX 邮箱", lines: ["你好 " + agent.name + "，", "", "请点击下面链接验证邮箱（48 小时内有效）：", link, "", "验证后你的房源会显示「已验证」标记。", "", "RoofX · KWONG THYE"] },
+        en: { sub: "Verify your RoofX email", lines: ["Hi " + agent.name + ",", "", "Please verify your email within 48 hours:", link, "", "Verified listings show a verified badge.", "", "RoofX · KWONG THYE"] },
+        bm: { sub: "Sahkan e-mel RoofX anda", lines: ["Hai " + agent.name + ",", "", "Sila sahkan e-mel anda dalam 48 jam:", link, "", "Senarai yang disahkan memaparkan lencana.", "", "RoofX · KWONG THYE"] }
       };
       await sendMail(agent.email, V[lang].sub, V[lang].lines.join("\n"));
     } catch (e) { console.error("verify mail failed", e.message); }
@@ -325,9 +325,9 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
     const link = base + "/agent/?magic=" + raw;
     const lang = agent.lang === "en" ? "en" : (agent.lang === "bm" ? "bm" : "zh");
     const M = {
-      zh: { sub: "PropNet 登录链接", lines: ["你好 " + agent.name + "，", "", "点下面链接直接登录（20 分钟内有效，一次使用）：", link, "", "如果不是你本人操作，忽略这封邮件即可。", "", "PropNet · KWONG THYE"] },
-      en: { sub: "Your PropNet sign-in link", lines: ["Hi " + agent.name + ",", "", "Sign in with this link (valid 20 minutes, one use):", link, "", "If this wasn't you, ignore this email.", "", "PropNet · KWONG THYE"] },
-      bm: { sub: "Pautan log masuk PropNet", lines: ["Hai " + agent.name + ",", "", "Log masuk dengan pautan ini (sah 20 minit, sekali guna):", link, "", "Jika bukan anda, abaikan e-mel ini.", "", "PropNet · KWONG THYE"] }
+      zh: { sub: "RoofX 登录链接", lines: ["你好 " + agent.name + "，", "", "点下面链接直接登录（20 分钟内有效，一次使用）：", link, "", "如果不是你本人操作，忽略这封邮件即可。", "", "RoofX · KWONG THYE"] },
+      en: { sub: "Your RoofX sign-in link", lines: ["Hi " + agent.name + ",", "", "Sign in with this link (valid 20 minutes, one use):", link, "", "If this wasn't you, ignore this email.", "", "RoofX · KWONG THYE"] },
+      bm: { sub: "Pautan log masuk RoofX", lines: ["Hai " + agent.name + ",", "", "Log masuk dengan pautan ini (sah 20 minit, sekali guna):", link, "", "Jika bukan anda, abaikan e-mel ini.", "", "RoofX · KWONG THYE"] }
     };
     return sendMail(agent.email, M[lang].sub, M[lang].lines.join("\n"));
   }
@@ -743,7 +743,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
           secretKey: key, collectionId: coll, sandbox: process.env.BILLPLZ_SANDBOX === "1",
           bill: {
             collection_id: coll, email: req.agent.email, name: req.agent.name, amount: Math.round(amount * 100),
-            description: "PropNet " + plan + " " + months + " month(s)",
+            description: "RoofX " + plan + " " + months + " month(s)",
             callback_url: base + "/api/billing/billplz/callback",
             redirect_url: base + "/agent/?paid=1#/plan", reference_1: String(id)
           }

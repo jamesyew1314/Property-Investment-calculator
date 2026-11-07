@@ -1,5 +1,5 @@
 "use strict";
-// public-api.js — PropNet 官网公开接口（无需登录，只暴露公开字段）
+// public-api.js — RoofX 官网公开接口（无需登录，只暴露公开字段）
 // 只读取 visibility='public' 且仍在售/在租的房源；业主、备注、完整地址不出网。
 
 const express = require("express");

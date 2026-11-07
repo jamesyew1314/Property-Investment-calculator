@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>中介目录 | PropNet 柔佛 · 仅限中介</title>
-<meta name="description" content="PropNet 中介目录仅对认证中介开放：登录后查看 REN、专长区域与在售房源。">
+<title>中介目录 | RoofX 柔佛 · 仅限中介</title>
+<meta name="description" content="RoofX 中介目录仅对认证中介开放：登录后查看 REN、专长区域与在售房源。">
 <link rel="canonical" href="https://kwongthye.com/agents/">
-<meta property="og:title" content="找中介 | PropNet">
+<meta property="og:title" content="找中介 | RoofX">
 <meta property="og:description" content="柔佛认证房产中介目录：REN、专长区域与在售房源。">
 <meta property="og:url" content="https://kwongthye.com/agents/">
 <link rel="icon" type="image/png" href="/icon-256.png?v=tr1">
@@ -17,7 +17,7 @@
 
 <header class="site-head">
   <div class="wrap bar">
-    <a class="brand" href="/"><img src="/logo-white.png?v=tr1" alt="KWONG THYE 光泰"><span>PROPNET</span></a>
+    <a class="brand" href="/"><img src="/logo-white.png?v=tr1" alt="RoofX — The Roof Property Exchange"><span>ROOFX</span></a>
     <a class="calcTop" href="https://calc.kwongthye.com/" aria-label="Calculator"><span data-i18n="nav.calc">计算器</span></a>
     <button class="menu-btn" aria-label="Menu">☰</button>
     <nav class="site-nav">
@@ -56,7 +56,7 @@
         <h2 data-i18n="ag.bandT">把你的名片放进目录</h2>
         <p data-i18n="ag.bandS">个人站 + 房源池，客户搜区域时就能找到你。</p>
       </div>
-      <a class="btn gold" href="/join/" data-i18n="ag.bandC">加入 PropNet</a>
+      <a class="btn gold" href="/join/" data-i18n="ag.bandC">加入 RoofX</a>
     </div>
   </section>
 </main>
@@ -64,11 +64,11 @@
 <footer class="site-foot">
   <div class="wrap">
     <div class="cols">
-      <div><b>KWONG THYE · PROPNET</b><p data-i18n="foot.tag">柔佛房源与中介网络。</p></div>
+      <div><b>ROOFX · THE ROOF PROPERTY EXCHANGE</b><p data-i18n="foot.tag">柔佛房源与中介网络。</p></div>
       <div><b data-i18n="foot.platform">平台</b><p><br><a href="/agents/" data-i18n="nav.agents">找中介</a><br><a href="/join/" data-i18n="nav.join">给中介</a></p></div>
       <div><b data-i18n="foot.company">公司</b><p><a href="/about/" data-i18n="nav.about">关于</a><br><br><a href="/privacy/" data-i18n="foot.privacy">隐私政策</a></p></div>
     </div>
-    <div class="legal"><span>© 2026 KWONG THYE.</span><span>THE ROOF REALTY SDN BHD · E(1)1605/1</span><span>Andy Lau REN 32839</span></div>
+    <div class="legal"><span>© 2026 RoofX.</span><span>THE ROOF REALTY SDN BHD · E(1)1605/1</span><span>Andy Lau REN 32839</span></div>
   </div>
 </footer>
 
@@ -82,12 +82,12 @@ window.PAGE_I18N = {
   "ag.listings": ["套房源", "listings"],
   "ag.view": ["看房源 →", "View listings →"],
   "ag.empty": ["首批认证中介正在上线", "The first verified agents are onboarding"],
-  "ag.emptySub": ["PropNet 正在招募首批中介。现在加入，你会是目录里的第一批。", "We are onboarding our founding agents. Join now and be among the first in the directory."],
+  "ag.emptySub": ["RoofX 正在招募首批中介。现在加入，你会是目录里的第一批。", "We are onboarding our founding agents. Join now and be among the first in the directory."],
   "ag.join": ["申请加入", "Apply to join"],
   "ag.bandK": ["你是中介吗？", "Are you an agent?"],
   "ag.bandT": ["把你的名片放进目录", "Put your card in the directory"],
   "ag.bandS": ["个人站 + 房源池，客户搜区域时就能找到你。", "Your page plus the listing pool, so clients find you when they search the area."],
-  "ag.bandC": ["加入 PropNet", "Join PropNet"],
+  "ag.bandC": ["加入 RoofX", "Join RoofX"],
   "foot.tag": ["柔佛房源与中介网络。", "Malaysia listings and agent network."],
   "foot.platform": ["平台", "Platform"], "foot.company": ["公司", "Company"], "foot.pricing": ["价格", "Pricing"],
   "foot.privacy": ["隐私政策", "Privacy"]
@@ -115,7 +115,7 @@ window.PAGE_I18N = {
     grid.innerHTML = state.rows.map(function (a) {
       var initials = (a.name || "A").replace(/[^A-Za-z\u4e00-\u9fa5]/g, "").slice(0, 2).toUpperCase();
       return '<div class="agent-card"><div class="avatar">' + KT.esc(initials) + "</div>" +
-        "<b>" + KT.esc(a.name) + "</b><small>" + KT.esc(a.ren_no || "KWONG THYE") + "</small>" +
+        "<b>" + KT.esc(a.name) + "</b><small>" + KT.esc(a.ren_no || "RoofX") + "</small>" +
         '<div style="margin-top:6px"><span class="tag">' + a.listings + " " + KT.t("ag.listings") + "</span></div>" +
         (a.slug ? '<a class="btn line sm" style="margin-top:12px" href="/a/' + encodeURIComponent(a.slug) + '">' + KT.t("ag.page") + "</a>" : "") +
         '<a class="btn gold sm" style="margin-top:8px" href="/properties/?agent=' + encodeURIComponent(a.name) + '">' + KT.t("ag.view") + "</a></div>";

@@ -45,17 +45,17 @@ module.exports = async function runDigest({ pool, sendMail, days, force }) {
       const lang = a.lang === "en" ? "en" : (a.lang === "bm" ? "bm" : "zh");
       const T = {
         zh: {
-          subj: "PropNet 每日摘要 · 新询盘与匹配", hi: "你好 " + a.name + "，",
+          subj: "RoofX 每日摘要 · 新询盘与匹配", hi: "你好 " + a.name + "，",
           today: "今天有 " + inq.rows.length + " 条新询盘，" + matches.length + " 位客户有新的匹配房源。",
           inq: "【新询盘】", match: "【客户匹配】", open: "打开工作台："
         },
         en: {
-          subj: "PropNet daily digest · inquiries & matches", hi: "Hi " + a.name + ",",
+          subj: "RoofX daily digest · inquiries & matches", hi: "Hi " + a.name + ",",
           today: "You have " + inq.rows.length + " new inquir" + (inq.rows.length === 1 ? "y" : "ies") + " and new matches for " + matches.length + " client(s).",
           inq: "New inquiries", match: "Client matches", open: "Open workspace:"
         },
         bm: {
-          subj: "Ringkasan harian PropNet · pertanyaan & padanan", hi: "Hai " + a.name + ",",
+          subj: "Ringkasan harian RoofX · pertanyaan & padanan", hi: "Hai " + a.name + ",",
           today: "Anda ada " + inq.rows.length + " pertanyaan baru dan padanan baru untuk " + matches.length + " klien.",
           inq: "Pertanyaan baru", match: "Padanan klien", open: "Buka ruang kerja:"
         }
@@ -82,7 +82,7 @@ module.exports = async function runDigest({ pool, sendMail, days, force }) {
         });
         lines.push("");
       }
-      lines.push(L.open + "https://kwongthye.com/agent/#/matches", "", "— PropNet · KWONG THYE");
+      lines.push(L.open + "https://kwongthye.com/agent/#/matches", "", "— RoofX · KWONG THYE");
       const r = await sendMail(a.email, L.subj, lines.join("\n"));
       await pool.query("INSERT INTO digest_log(agent_id) VALUES($1) ON CONFLICT DO NOTHING", [a.id]);
       sent++;

@@ -63,7 +63,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
 
   return '<!DOCTYPE html><html lang="' + (lang === "bm" ? "ms" : (en ? "en" : "zh-CN")) + '"><head>' +
     '<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
-    "<title>" + esc(title) + " · " + esc(area) + " | PropNet</title>" +
+    "<title>" + esc(title) + " · " + esc(area) + " | RoofX</title>" +
     '<meta name="description" content="' + esc(title + " · " + area + " · " + money(price, p.intent === "rent", lang) + " · " + tname) + '">' +
     '<link rel="canonical" href="https://kwongthye.com/p/' + encodeURIComponent(p.code) + '">' +
     '<meta property="og:type" content="product"><meta property="og:title" content="' + esc(title) + '">' +
@@ -81,7 +81,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
     ".agentBox .av{width:52px;height:52px;border-radius:50%;background:#0E2438;color:#E2C88F;display:grid;place-items:center;font:700 18px Georgia,serif}" +
     "@media(max-width:820px){.pd-grid{grid-template-columns:1fr}}" +
     "</style></head><body>" +
-    '<header class="site-head"><div class="wrap bar"><a class="brand" href="/"><img src="/logo-white.png" alt="KWONG THYE"><span>PROPNET</span></a>' +
+    '<header class="site-head"><div class="wrap bar"><a class="brand" href="/"><img src="/logo-white.png" alt="RoofX"><span>ROOFX</span></a>' +
     '<nav class="site-nav"><a href="/properties/">' + (lang === "zh" ? "房源池" : (en ? "Listing pool" : "Kolam Senarai")) + '</a><a href="/agents/">' + (lang === "zh" ? "中介目录" : (en ? "Agents" : "Ejen")) + '</a><a href="/join/">' + (lang === "zh" ? "给中介" : (en ? "For agents" : "Untuk Ejen")) + '</a><a class="login" href="/agent/">' + (lang === "zh" ? "中介登录" : (en ? "Agent login" : "Log Masuk Ejen")) + "</a></nav></div></header>" +
     '<main class="wrap pd"><a class="pd-back" href="/a/' + encodeURIComponent(agent.slug || "") + '?lang=' + lang + '">← ' + T.back + "</a>" +
     '<div class="pd-grid"><div><div class="pd-photo">' + (main ? '<img src="' + esc(main) + '" alt="' + esc(title) + '">' : "") + "</div>" +
@@ -101,7 +101,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
     '<div id="lwOut" style="margin-top:10px;font:700 18px/1.4 Georgia,serif;color:#B8862F">—</div>' +
     '<div style="font-size:11.5px;color:#8A97A6;margin-top:4px">' + (lang === "zh" ? "仅供参考，实际以银行审批为准" : (lang === "bm" ? "Anggaran sahaja" : "Estimate only")) + "</div></div></div>" +
     '<aside class="agentBox"><div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#8A97A6">' + T.agent + "</div>" +
-    '<div style="display:flex;gap:12px;align-items:center;margin:10px 0 14px"><div class="av">' + esc((agent.name || "A").slice(0, 2).toUpperCase()) + '</div><div><b style="color:#0E2438">' + esc(agent.name || "") + '</b><div style="font-size:12px;color:#5D6B7A">' + esc(agent.team || "PropNet") + (agent.ren_no ? " · " + esc(agent.ren_no) : "") + "</div></div></div>" +
+    '<div style="display:flex;gap:12px;align-items:center;margin:10px 0 14px"><div class="av">' + esc((agent.name || "A").slice(0, 2).toUpperCase()) + '</div><div><b style="color:#0E2438">' + esc(agent.name || "") + '</b><div style="font-size:12px;color:#5D6B7A">' + esc(agent.team || "RoofX") + (agent.ren_no ? " · " + esc(agent.ren_no) : "") + "</div></div></div>" +
     (wa ? '<a class="btn gold" style="width:100%;text-align:center" href="' + wa + '" target="_blank" rel="noopener">' + T.wa + "</a>" : "") +
     (agent.phone ? '<a class="btn line" style="width:100%;text-align:center;margin-top:8px" href="tel:' + esc(agent.phone) + '">' + T.call + "</a>" : "") +
     '<a class="btn line" style="width:100%;text-align:center;margin-top:8px" href="/a/' + encodeURIComponent(agent.slug || "") + '?lang=' + lang + '">' + T.more + "</a>" +

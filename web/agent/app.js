@@ -1,4 +1,4 @@
-/* PropNet /app — 中介工作台（零依赖） */
+/* RoofX /app — 中介工作台（零依赖） */
 (function () {
   "use strict";
   var SHOW_PLAN = false; // 套餐/收费 UI：后期上线时改 true
@@ -251,7 +251,7 @@
         esc(t(n.zh, n.en)) + "</span>" + badge + "</a>";
     }).join("");
     $("#whoName").textContent = S.me ? S.me.name : "—";
-    $("#whoMeta").textContent = S.me ? ((S.me.ren_no || "PropNet") + (S.me.verified ? t(" · ✓已验证", " · ✓ verified") : "")) : "";
+    $("#whoMeta").textContent = S.me ? ((S.me.ren_no || "RoofX") + (S.me.verified ? t(" · ✓已验证", " · ✓ verified") : "")) : "";
     var _lb = $("#langBtn"); if (_lb) _lb.textContent = langLabel();
   }
   function boot() {
@@ -701,7 +701,7 @@
     if (price) lines.push("*" + (rent ? "Rental " : "Selling ") + "RM " + Number(price).toLocaleString("en-MY") + (rent ? "/month" : "") + "*");
     if (row.negotiable) lines.push("Negotiable");
     lines.push("");
-    lines.push("*" + (S.me.team || "PropNet") + "*");
+    lines.push("*" + (S.me.team || "RoofX") + "*");
     lines.push("*" + (S.me.name || "") + "*");
     if (S.me.phone) lines.push(S.me.phone);
     if (wa) lines.push("www.wasap.my/" + wa + "/" + String(row.code || "").toLowerCase());
@@ -761,7 +761,7 @@
     ctx.strokeStyle = "rgba(198,161,91,.55)"; ctx.lineWidth = 3;
     ctx.strokeRect(44, 44, W - 88, H - 88);
     ctx.fillStyle = "#E2C88F"; ctx.font = "600 26px Georgia, serif";
-    ctx.fillText("KWONG THYE  ·  PROPNET", 86, 132);
+    ctx.fillText("RoofX  ·  ROOFX", 86, 132);
     ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "20px -apple-system, system-ui";
     ctx.fillText(t("柔佛房源网络", "Johor listings network"), 86, 168);
     ctx.strokeStyle = "rgba(198,161,91,.35)"; ctx.lineWidth = 1;
@@ -813,7 +813,7 @@
       cv.toBlob(function (blob) {
         var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = "propnet-" + row.code + ".png";
+        a.download = "roofx-" + row.code + ".png";
         a.click();
         setTimeout(function () { URL.revokeObjectURL(a.href); }, 3000);
         toast(t("已下载", "Downloaded"));

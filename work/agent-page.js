@@ -46,8 +46,8 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     ? { home: "Utama", find: "Kolam Senarai", agents: "Ejen", join: "Untuk Ejen", calc: "Kalkulator", login: "Log Masuk Ejen",
         listings: "Senarai awam", verified: "Ejen disahkan", call: "Telefon", wa: "WhatsApp", share: "Kongsi",
         copy: "Salin pautan", copied: "Pautan disalin", consult: "Tanya ejen", mandate: "Serah hartanah",
-        about: "Tentang", areas: "Kawasan diliputi", none: "Belum ada senarai awam.", back: "Kembali ke PropNet",
-        statListings: "Senarai awam", statAreas: "Kawasan", statSince: "Di PropNet", license: "REN",
+        about: "Tentang", areas: "Kawasan diliputi", none: "Belum ada senarai awam.", back: "Kembali ke RoofX",
+        statListings: "Senarai awam", statAreas: "Kawasan", statSince: "Di RoofX", license: "REN",
         years: "Tahun pengalaman", deals: "Urus niaga", volume: "Jumlah nilai", reviews: "Ulasan klien",
         reviewNone: "Belum ada ulasan.", mandateTitle: "Serah hartanah anda",
         mName: "Nama", mPhone: "Telefon / WhatsApp", mArea: "Kawasan", mType: "Jenis", mPrice: "Harga jangkaan", mNotes: "Nota", mSend: "Hantar", mOk: "Diterima, ejen akan hubungi anda.", mErr: "Gagal, cuba lagi." }
@@ -55,16 +55,16 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     ? { home: "Home", find: "Listing pool", agents: "Agents", join: "For agents", calc: "Calculator", login: "Agent login",
         listings: "Listings", verified: "Verified agent", call: "Call", wa: "WhatsApp", share: "Share",
         copy: "Copy link", copied: "Link copied", consult: "Ask the agent", mandate: "List my property",
-        about: "About", areas: "Areas covered", none: "No public listings yet.", back: "Back to PropNet",
-        statListings: "Listings", statAreas: "Areas", statSince: "On PropNet", license: "REN",
+        about: "About", areas: "Areas covered", none: "No public listings yet.", back: "Back to RoofX",
+        statListings: "Listings", statAreas: "Areas", statSince: "On RoofX", license: "REN",
         years: "Years", deals: "Deals", volume: "Total value", reviews: "Client reviews",
         reviewNone: "No reviews yet.", mandateTitle: "List your property",
         mName: "Name", mPhone: "Phone / WhatsApp", mArea: "Area", mType: "Type", mPrice: "Expected price", mNotes: "Notes", mSend: "Send", mOk: "Received — the agent will contact you.", mErr: "Failed, try again." }
     : { home: "首页", find: "房源池", agents: "找中介", join: "给中介", calc: "计算器", login: "中介登录",
         listings: "在售房源", verified: "已验证中介", call: "打电话", wa: "WhatsApp", share: "分享",
         copy: "复制链接", copied: "链接已复制", consult: "咨询中介", mandate: "业主委托",
-        about: "关于", areas: "专长区域", none: "暂时没有公开房源。", back: "返回 PropNet",
-        statListings: "公开房源", statAreas: "覆盖区域", statSince: "入驻 PropNet", license: "REN",
+        about: "关于", areas: "专长区域", none: "暂时没有公开房源。", back: "返回 RoofX",
+        statListings: "公开房源", statAreas: "覆盖区域", statSince: "入驻 RoofX", license: "REN",
         years: "从业年限", deals: "成交宗数", volume: "累计成交额", reviews: "客户评价",
         reviewNone: "还没有评价。", mandateTitle: "业主委托",
         mName: "姓名", mPhone: "电话 / WhatsApp", mArea: "区域", mType: "房型", mPrice: "期望价格", mNotes: "备注", mSend: "提交委托", mOk: "已收到，中介会联系你。", mErr: "提交失败，请重试。" });
@@ -74,8 +74,8 @@ module.exports = function renderAgentPage(agent, listings, opts) {
   const wa = String(agent.phone || "").replace(/[^0-9]/g, "").replace(/^0/, "60");
   const slug = encodeURIComponent(agent.slug || "");
   const pageUrl = "https://kwongthye.com/a/" + slug;
-  const title = esc(name + (agent.ren_no ? " · " + agent.ren_no : "") + " | PropNet");
-  const desc = esc((agent.bio || (lang === "bm" ? "Ejen hartanah di PropNet" : (en ? "Property agent on PropNet" : "PropNet 认证房产中介"))) + " — " + (areas.slice(0, 4).join("、") || "Johor"));
+  const title = esc(name + (agent.ren_no ? " · " + agent.ren_no : "") + " | RoofX");
+  const desc = esc((agent.bio || (lang === "bm" ? "Ejen hartanah di RoofX" : (en ? "Property agent on RoofX" : "RoofX 认证房产中介"))) + " — " + (areas.slice(0, 4).join("、") || "Johor"));
   const count = (listings || []).length;
 
   const ld = {
@@ -118,7 +118,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     "@media(max-width:760px){.agentGrid{grid-template-columns:1fr}.agentHero{padding:34px 0 28px}.agentStats{gap:20px}.waFloat{right:12px;bottom:12px}}" +
     "</style></head><body>" +
     '<header class="site-head"><div class="wrap bar">' +
-    '<a class="brand" href="/"><img src="/logo-white.png" alt="KWONG THYE"><span>PROPNET</span></a>' +
+    '<a class="brand" href="/"><img src="/logo-white.png" alt="RoofX"><span>ROOFX</span></a>' +
     '<nav class="site-nav"><a href="/properties/">' + L.find + '</a><a href="/agents/">' + L.agents + '</a><a href="/join/">' + L.join + '</a><a href="https://calc.kwongthye.com/">' + L.calc + '</a>' +
     '<a class="login" href="/agent/">' + L.login + "</a></nav>" +
     '<div style="display:flex;gap:6px;margin-left:8px">' +
@@ -128,7 +128,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     '<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">' +
     '<div class="avatar">' + esc(name.slice(0, 2).toUpperCase()) + "</div>" +
     "<div><h1>" + esc(name) + (agent.verified_at ? ' <span style="font-size:13px;color:#8FD3B4;vertical-align:middle">✓ ' + L.verified + "</span>" : "") + "</h1>" +
-    '<div class="meta">' + esc(agent.team || "PropNet") + (agent.ren_no ? " · " + esc(agent.ren_no) : "") + "</div></div></div>" +
+    '<div class="meta">' + esc(agent.team || "RoofX") + (agent.ren_no ? " · " + esc(agent.ren_no) : "") + "</div></div></div>" +
     (agent.bio ? '<p class="bio">' + esc(agent.bio) + "</p>" : "") +
     '<div class="agentStats"><div><b>' + count + "</b><span>" + L.statListings + "</span></div>" +
     "<div><b>" + areas.length + "</b><span>" + L.statAreas + "</span></div>" +
@@ -142,7 +142,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     (waMandate ? '<a class="btn ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" href="' + waMandate + '" target="_blank" rel="noopener">' + L.mandate + "</a>" : "") +
     (agent.phone ? '<a class="btn ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" href="tel:' + esc(agent.phone) + '">' + L.call + "</a>" : "") +
     "</div>" +
-    '<div class="shareRow"><button type="button" id="cp">🔗 ' + L.copy + '</button><a href="https://wa.me/?text=' + encodeURIComponent(name + " · PropNet " + pageUrl) + '" target="_blank" rel="noopener">WhatsApp</a>' +
+    '<div class="shareRow"><button type="button" id="cp">🔗 ' + L.copy + '</button><a href="https://wa.me/?text=' + encodeURIComponent(name + " · RoofX " + pageUrl) + '" target="_blank" rel="noopener">WhatsApp</a>' +
     '<a href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(pageUrl) + '" target="_blank" rel="noopener">Facebook</a></div>' +
     "</div></section>" +
     '<main class="wrap agentBody">' +

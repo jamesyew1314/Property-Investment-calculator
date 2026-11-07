@@ -1,4 +1,4 @@
-/* PropNet · site.js — 共用：中英切换、手机菜单、格式化、房源卡 */
+/* RoofX · site.js — 共用：中英切换、手机菜单、格式化、房源卡 */
 (function () {
   "use strict";
   var LANG_KEY = "kt_lang";
@@ -102,7 +102,7 @@
       '<div class="pcard-sub">' + esc(areaName(p.area_code)) + "</div>" +
       '<div class="pcard-meta">' + esc(meta.join(" · ")) + "</div>" +
       '<div class="pcard-price">' + esc(money(price)) + (isRent ? ' <small>/ ' + (lang === "en" ? "mo" : "月") + "</small>" : "") + "</div>" +
-      '<div class="pcard-agent"><span>' + (lang === "en" ? "Listed by " : "货源：") + "<b>" + esc(p.agent_name || p.agent_raw || "KWONG THYE") + "</b></span>" +
+      '<div class="pcard-agent"><span>' + (lang === "en" ? "Listed by " : "货源：") + "<b>" + esc(p.agent_name || p.agent_raw || "RoofX") + "</b></span>" +
       (p.agent_ren ? "<span>" + esc(p.agent_ren) + "</span>" : "") + "</div>" +
       "</div></a>";
   }

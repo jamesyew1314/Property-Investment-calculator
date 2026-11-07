@@ -602,7 +602,7 @@ app.post("/api/admin/agents/:id/verify", requireAdmin, requireWrite, async funct
   } catch (e) { next(e); }
 });
 
-// ---------- PropNet 中介兑换码（admin） ----------
+// ---------- RoofX 中介兑换码（admin） ----------
 app.get("/api/admin/agent-codes", requireAdmin, async function (req, res, next) {
   try {
     const out = await pool.query(`
@@ -1394,7 +1394,7 @@ app.post("/api/subscription/redeem", requireAuth, requireVerified, rateLimit(10,
   }
 });
 
-// ---------- 官网加入申请（PropNet） ----------
+// ---------- 官网加入申请（RoofX） ----------
 app.get("/api/admin/leads", requireAdmin, async function (req, res, next) {
   try {
     const days = Math.max(1, Math.min(365, Number(req.query.days) || 90));
@@ -1425,10 +1425,10 @@ app.use("/api/public", createPublicApi({
   ipSalt: process.env.IP_SALT,
   notify: async function (lead) {
     const to = process.env.ADMIN_EMAIL || "andylau.theroof@gmail.com";
-    const text = ["新的 PropNet 加入申请", "", "姓名：" + lead.name, "电话：" + lead.phone,
+    const text = ["新的 RoofX 加入申请", "", "姓名：" + lead.name, "电话：" + lead.phone,
       "邮箱：" + (lead.email || "—"), "REN：" + (lead.ren || "—"), "团队：" + (lead.team || "—"),
       "留言：" + (lead.message || "—"), "", "后台查看：https://kwongthye.com/admin/"].join("\n");
-    await sendMail(to, "PropNet 加入申请 — " + lead.name, text, null, [], null);
+    await sendMail(to, "RoofX 加入申请 — " + lead.name, text, null, [], null);
   }
 }));
 
@@ -1443,7 +1443,7 @@ app.get("/p/:code", async function (req, res, next) {
        FROM lib_properties p LEFT JOIN lib_projects pr ON pr.id = p.project_id
        WHERE p.code=$1 AND p.visibility IN ('pool','public') AND p.status IN ('available','reserved')`, [code]);
     const p = out.rows[0];
-    if (!p || !p.tenant_id) return res.status(404).type("html").send('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>404 | PropNet</title><link rel="stylesheet" href="/site.css"></head><body style="padding:60px;font-family:system-ui"><h1>找不到这套房源</h1><p><a href="/">回首页 →</a></p></body></html>');
+    if (!p || !p.tenant_id) return res.status(404).type("html").send('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>404 | RoofX</title><link rel="stylesheet" href="/site.css"></head><body style="padding:60px;font-family:system-ui"><h1>找不到这套房源</h1><p><a href="/">回首页 →</a></p></body></html>');
     const a = await pool.query("SELECT * FROM lib_agents WHERE id=$1 AND status='active'", [p.tenant_id]);
     if (!a.rows[0]) return res.status(404).send("Not found");
     res.set("Cache-Control", "public, max-age=300");
@@ -1461,7 +1461,7 @@ app.get("/a/:slug", async function (req, res, next) {
       "SELECT * FROM lib_agents WHERE lower(slug)=lower($1) AND status='active' AND public=true", [slug]);
     const agent = out.rows[0];
     if (!agent) {
-      return res.status(404).type("html").send('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>404 | PropNet</title><link rel="stylesheet" href="/site.css"></head><body style="padding:60px;font-family:system-ui"><h1>找不到这个中介页</h1><p><a href="/agents/">看全部中介 →</a></p></body></html>');
+      return res.status(404).type("html").send('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>404 | RoofX</title><link rel="stylesheet" href="/site.css"></head><body style="padding:60px;font-family:system-ui"><h1>找不到这个中介页</h1><p><a href="/agents/">看全部中介 →</a></p></body></html>');
     }
     const rows = await pool.query(`
       SELECT p.code, p.project_name, p.area_code, p.intent, p.cover_url,
@@ -1522,7 +1522,7 @@ app.post("/api/cron/digest", async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
-// ---------- 中介工作台（PropNet /app） ----------
+// ---------- 中介工作台（RoofX /app） ----------
 app.use("/api/agent", createAgentApi({
   pool: pool,
   sendMail: sendMail,

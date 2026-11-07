@@ -1,5 +1,5 @@
 /*!
- * KWONG THYE — Cookie 偏好中心（全站共用）
+ * RoofX — Cookie 偏好中心（全站共用）
  * 用法：<script src="/cookie-consent.js" defer></script>
  * 首次访问显示横幅；点「设置」可分类开关；选择存在 localStorage["kwthye_cookie_prefs"]。
  * 兼容旧值 kwthye_cookie_consent（"all" / "necessary"）。
