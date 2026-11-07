@@ -26,12 +26,13 @@
 </div></header>
 <main class="wrap" style="padding:40px 0 80px">
   <div class="eyebrow">PROPNET</div>
-  <h1 style="font-family:Georgia,serif;color:#0E2438;margin:6px 0 4px">我的收藏</h1>
-  <p style="color:#5D6B7A;margin:0">保存在这台设备，不上传服务器。</p>
+  <h1 id="favTitle" style="font-family:Georgia,serif;color:#0E2438;margin:6px 0 4px">我的收藏</h1>
+  <p id="favSub" style="color:#5D6B7A;margin:0">保存在这台设备，不上传服务器。</p>
   <div id="favList" class="favGrid"></div>
-  <div id="favEmpty" class="emptyFav" hidden>还没有收藏。在房源详情点「♡ 收藏」。</div>
+  <div id="favEmpty" class="emptyFav" hidden><span id="favEmptyTxt">还没有收藏。在房源详情点「♡ 收藏」。</span></div>
 </main>
 <script src="/bm-public.js?v=20261106m"></script>
+<script src="/lang3.js"></script>
 <script src="/site.js?v=20261106m"></script>
 <script>
 (function () {
@@ -52,6 +53,9 @@
     }).join("");
   }).catch(function () { empty.hidden = false; });
 })();
+</script>
+<script>
+(function(){var q=new URLSearchParams(location.search),l=q.get('lang')||localStorage.getItem('kt_lang')||'zh';var D={zh:['我的收藏','保存在这台设备，不上传服务器。','还没有收藏。在房源详情点「♡ 收藏」。'],en:['My saved listings','Saved on this device only.','No saved listings yet. Tap ♡ on a listing.'],bm:['Senarai simpanan','Disimpan pada peranti ini sahaja.','Belum ada simpanan. Tekan ♡ pada senarai.']}[l]||[];if(D.length){document.getElementById('favTitle').textContent=D[0];document.getElementById('favSub').textContent=D[1];document.getElementById('favEmptyTxt').textContent=D[2];}})();
 </script>
 </body>
 </html>

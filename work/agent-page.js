@@ -1,4 +1,10 @@
 "use strict";
+function langSwitch(lang){
+  const opts=[["zh","中文"],["en","EN"],["bm","BM"]];
+  return '<div id="l3" style="position:fixed;top:12px;right:12px;z-index:9999;display:flex;gap:4px;background:#fff;border:1px solid #D6DCE7;border-radius:999px;padding:3px">'+
+    opts.map(function(o){return '<a href="?lang='+o[0]+'" style="font:600 11px/1 -apple-system,sans-serif;text-decoration:none;padding:6px 9px;border-radius:999px;'+(lang===o[0]?'background:#0E2438;color:#fff':'color:#0E2438')+'">'+o[1]+'</a>';}).join("")+'</div>';
+}
+
 // agent-page.js — 中介个人站（服务端渲染，SEO 友好）
 const tax = require("./library-taxonomy");
 
@@ -161,5 +167,5 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     '<script>document.getElementById("cp").addEventListener("click",function(){var t=location.href;if(navigator.clipboard)navigator.clipboard.writeText(t);this.textContent="' + L.copied + '";});' +
     'var f=document.getElementById("mandateForm");if(f){f.addEventListener("submit",function(e){e.preventDefault();var d={};new FormData(f).forEach(function(v,k){d[k]=v});d.agent_slug=' + JSON.stringify(agent.slug || "") + ';d.asking_price=d.asking_price||null;fetch("/api/public/mandate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)}).then(function(r){return r.json()}).then(function(j){var m=document.getElementById("mMsg");m.style.color=j.ok?"#2E7D5B":"#B23B3B";m.textContent=j.ok?' + JSON.stringify(L.mOk) + ':' + JSON.stringify(L.mErr) + ';if(j.ok)f.reset()}).catch(function(){document.getElementById("mMsg").textContent=' + JSON.stringify(L.mErr) + '})})}' +
     '</script>' +
-    "</body></html>";
+    + langSwitch(lang) + "</body></html>";
 };

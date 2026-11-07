@@ -44,6 +44,7 @@
 <meta name="twitter:title" content="使用条款 | KWONG THYE 光泰">
 <meta name="twitter:description" content="服务范围、估算免责声明、责任限制与适用法律。">
 <meta name="twitter:image" content="https://kwongthye.com/og-image.png">
+<style id="lang3Hide">#langBtn{display:none!important}</style>
 </head>
 <body>
 <header>
@@ -213,7 +214,7 @@
     }
   };
   var lang = "zh";
-  try { lang = localStorage.getItem("kwongthye_lang") || "zh"; } catch (e) {}
+  try { lang = localStorage.getItem("kwongthye_lang") || "zh"; if (lang === "bm") lang = "en"; } catch (e) {}
   function apply() {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
@@ -243,5 +244,6 @@
 })();
 </script>
 <script src="/cookie-consent.js" defer></script>
+<script src="/lang3.js"></script>
 </body>
 </html>

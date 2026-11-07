@@ -43,6 +43,7 @@
 <meta name="twitter:title" content="隐私政策 | KWONG THYE 光泰">
 <meta name="twitter:description" content="我们收集什么、如何使用、保存多久，以及你在 PDPA 下的查阅与删除权利。">
 <meta name="twitter:image" content="https://kwongthye.com/og-image.png">
+<style id="lang3Hide">#langBtn{display:none!important}</style>
 </head>
 <body>
 <header>
@@ -236,7 +237,7 @@
     }
   };
   var lang = "zh";
-  try { lang = localStorage.getItem("kwongthye_lang") || "zh"; } catch (e) {}
+  try { lang = localStorage.getItem("kwongthye_lang") || "zh"; if (lang === "bm") lang = "en"; } catch (e) {}
   function apply() {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
@@ -266,5 +267,6 @@
 })();
 </script>
 <script src="/cookie-consent.js" defer></script>
+<script src="/lang3.js"></script>
 </body>
 </html>

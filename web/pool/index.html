@@ -94,8 +94,10 @@
 
 <footer class="site-foot"><div class="wrap"><p class="muted" style="margin:0;padding:22px 0;font-size:12px">© 2026 KWONG THYE · PropNet</p></div></footer>
 
+<script src="/lang3.js"></script>
 <script>
-var LANG = localStorage.getItem('pn_lang') || 'zh';
+var _q=new URLSearchParams(location.search);
+var LANG = _q.get('lang') || localStorage.getItem('kt_lang') || 'zh';
 var AREAS = [];
 var ROWS = [];
 var T = {
