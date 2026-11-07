@@ -209,3 +209,7 @@ img{max-width:100%}
   .profileWrap .field input,.profileWrap .field select{max-width:420px}
   .profileWrap .field textarea{max-width:100%}
 }
+
+/* 概览统计卡可点击 */
+a.stat{display:block;text-decoration:none;color:inherit;transition:border-color .15s}
+a.stat:hover{border-color:var(--gold)}
