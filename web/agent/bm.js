@@ -248,7 +248,7 @@ window.BM_MAP = {
   "Updated": "Dikemas kini",
   "Email verified": "E-mel disahkan",
   "Invalid or expired link": "Pautan tidak sah atau tamat",
-  "No limits during the free period.": "Tiada had sepanjang tempoh percuma."
+  "No limits during the free period.": "Tiada had sepanjang tempoh percuma.",
   /* auto-added missing translations */
   "Create an account to publish and manage listings.": "Cipta akaun untuk menerbitkan dan menguruskan senarai hartanah.",
   "Copy all active": "Salin semua yang aktif",
