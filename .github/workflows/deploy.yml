@@ -60,11 +60,17 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           if ! ssh-keygen -y -P "" -f ~/.ssh/deploy_key >/dev/null 2>&1; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "ready=false" > /tmp/ssh-info
+            echo "reason=ssh_key_invalid" >> /tmp/ssh-info
+            echo "len=${#SSH_KEY}" >> /tmp/ssh-info
+            echo "head=$(printf '%s' "$SSH_KEY" | head -c 40)" >> /tmp/ssh-info
             echo "::warning title=SSH_KEY 无效::私钥格式不正确（可能粘贴不完整）。请重新复制并覆盖 SSH_KEY。"
             exit 0
           fi
           ssh-keygen -lf ~/.ssh/deploy_key | awk '{print "key fingerprint " $2}'
           ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "ready=true" > /tmp/ssh-info
+          ssh-keygen -lf ~/.ssh/deploy_key >> /tmp/ssh-info 2>&1 || true
           echo "ready=true" >> "$GITHUB_OUTPUT"
 
       - name: Deploy
@@ -79,7 +85,7 @@ jobs:
       - name: Upload deploy log
         if: always()
         run: |
-          [ -f /tmp/deploy.log ] && cp /tmp/deploy.log .deploy-log || echo "no log" > .deploy-log
+          { [ -f /tmp/ssh-info ] && cat /tmp/ssh-info; echo "---deploy---"; [ -f /tmp/deploy.log ] && tail -40 /tmp/deploy.log || echo "deploy skipped"; } > .deploy-log
           git config user.name "deploy-bot"
           git config user.email "deploy@kwongthye.com"
           git add .deploy-log
