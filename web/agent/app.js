@@ -76,7 +76,7 @@
     S.lang = S.lang === "zh" ? "en" : (S.lang === "en" ? "bm" : "zh");
     localStorage.setItem("kt_lang", S.lang);
     document.documentElement.lang = S.lang === "zh" ? "zh-CN" : (S.lang === "bm" ? "ms" : "en");
-    applyStatic(); paintFloat(); paintBrand();
+    applyStatic(); paintFloat(); paintBrand(); warmCache();
   }
 
   function projName(r) {
@@ -105,19 +105,38 @@
     $("#toast").appendChild(el);
     setTimeout(function () { el.remove(); }, err ? 5000 : 2600);
   }
+  var _cache = {}, _inflight = {}, CACHE_TTL = 30000;
   function api(path, opts) {
     opts = opts || {};
-    var init = { method: opts.method || "GET", credentials: "same-origin", headers: {} };
+    var method = opts.method || "GET";
+    if (method === "GET") {
+      var c = _cache[path];
+      if (c && Date.now() - c.t < CACHE_TTL) return Promise.resolve(c.j);
+      if (_inflight[path]) return _inflight[path];
+    }
+    var init = { method: method, credentials: "same-origin", headers: {} };
     if (opts.body !== undefined) {
       init.headers["Content-Type"] = "application/json";
       init.body = JSON.stringify(opts.body);
     }
-    return fetch("/api/agent" + path, init).then(function (r) {
+    var p = fetch("/api/agent" + path, init).then(function (r) {
       return r.json().then(function (j) {
         if (r.status === 401) { showAuth(); throw new Error("auth_required"); }
         if (!r.ok || j.ok === false) { var e = new Error(j.error || "failed"); e.data = j; throw e; }
+        if (method === "GET") _cache[path] = { t: Date.now(), j: j };
+        else _cache = {};
         return j;
       });
+    });
+    if (method === "GET") {
+      _inflight[path] = p;
+      p.then(function () { delete _inflight[path]; }, function () { delete _inflight[path]; });
+    }
+    return p;
+  }
+  function warmCache() {
+    ["/me", "/inquiries", "/listings?pageSize=20", "/matches"].forEach(function (p) {
+      api(p).catch(function () {});
     });
   }
   function modal(cfg) {
