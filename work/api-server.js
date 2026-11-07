@@ -1441,7 +1441,7 @@ app.get("/p/:code", async function (req, res, next) {
     const out = await pool.query(
       `SELECT p.*, pr.name AS project_title, pr.name_zh AS project_title_zh
        FROM lib_properties p LEFT JOIN lib_projects pr ON pr.id = p.project_id
-       WHERE p.code=$1 AND p.visibility='public' AND p.status IN ('available','reserved')`, [code]);
+       WHERE p.code=$1 AND p.visibility IN ('pool','public') AND p.status IN ('available','reserved')`, [code]);
     const p = out.rows[0];
     if (!p || !p.tenant_id) return res.status(404).type("html").send('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>404 | PropNet</title><link rel="stylesheet" href="/site.css"></head><body style="padding:60px;font-family:system-ui"><h1>找不到这套房源</h1><p><a href="/">回首页 →</a></p></body></html>');
     const a = await pool.query("SELECT * FROM lib_agents WHERE id=$1 AND status='active'", [p.tenant_id]);
@@ -1469,7 +1469,7 @@ app.get("/a/:slug", async function (req, res, next) {
              p.block, p.unit_no, p.bedrooms, p.bathrooms, p.built_up::float8 AS built_up,
              pr.name AS project_title, pr.name_zh AS project_title_zh
       FROM lib_properties p LEFT JOIN lib_projects pr ON pr.id = p.project_id
-      WHERE p.tenant_id=$1 AND p.visibility='public' AND p.status IN ('available','reserved')
+      WHERE p.tenant_id=$1 AND p.visibility IN ('pool','public') AND p.status IN ('available','reserved')
       ORDER BY p.published_at DESC NULLS LAST, p.updated_at DESC LIMIT 60`, [agent.id]);
     res.set("Cache-Control", "public, max-age=300");
     const rv = await pool.query("SELECT author, rating, body, created_at FROM agent_reviews WHERE agent_id=$1 AND status='approved' ORDER BY created_at DESC LIMIT 6", [agent.id]);

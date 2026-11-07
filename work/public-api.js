@@ -19,7 +19,7 @@ const PUBLIC_SELECT = `
   FROM lib_properties p
   LEFT JOIN lib_projects pr ON pr.id = p.project_id
   LEFT JOIN lib_agents a ON lower(a.name) = lower(p.agent)
-  WHERE p.visibility = 'public' AND p.status IN ('available', 'reserved')`;
+  WHERE p.visibility IN ('pool','public') AND p.status IN ('available', 'reserved')`;
 
 module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, freeMode, plans }) {
   const r = express.Router();

@@ -166,7 +166,7 @@ function render(){
       '<div class="plPrice">'+money(price,rent)+'</div>'+
       (r.cobroke_note?'<div class="plMeta">合作：'+esc(r.cobroke_note)+'</div>':'')+
       '<div class="plAgent"><b>'+esc(r.agent_name||'')+'</b>'+(r.agent_team?' · '+esc(r.agent_team):'')+(r.agent_ren?' · REN '+esc(r.agent_ren):'')+(r.agent_verified?' · '+t('verified'):'')+'</div>'+
-      (phone?'<div class="plActions"><a class="btn gold" href="'+wa+'" target="_blank" rel="noopener">'+t('wa')+'</a></div>':'')+
+      '<div class="plActions"><a class="btn line" href="/p/'+encodeURIComponent(r.code)+'">'+(LANG==='zh'?'查看详情':(LANG==='bm'?'Lihat butiran':'View details'))+'</a>'+(phone?'<a class="btn gold" href="'+wa+'" target="_blank" rel="noopener">'+t('wa')+'</a>':'')+'</div>'+
       '</div></article>';
   }).join('');
 }
