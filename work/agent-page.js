@@ -167,5 +167,5 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     '<script>document.getElementById("cp").addEventListener("click",function(){var t=location.href;if(navigator.clipboard)navigator.clipboard.writeText(t);this.textContent="' + L.copied + '";});' +
     'var f=document.getElementById("mandateForm");if(f){f.addEventListener("submit",function(e){e.preventDefault();var d={};new FormData(f).forEach(function(v,k){d[k]=v});d.agent_slug=' + JSON.stringify(agent.slug || "") + ';d.asking_price=d.asking_price||null;fetch("/api/public/mandate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)}).then(function(r){return r.json()}).then(function(j){var m=document.getElementById("mMsg");m.style.color=j.ok?"#2E7D5B":"#B23B3B";m.textContent=j.ok?' + JSON.stringify(L.mOk) + ':' + JSON.stringify(L.mErr) + ';if(j.ok)f.reset()}).catch(function(){document.getElementById("mMsg").textContent=' + JSON.stringify(L.mErr) + '})})}' +
     '</script>' +
-    + langSwitch(lang) + "</body></html>";
+    langSwitch(lang) + "</body></html>";
 };
