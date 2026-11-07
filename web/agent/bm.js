@@ -392,5 +392,6 @@ window.BM_MAP = {
   "Non Bumi": "Bukan Bumi",
   "Bumi lot": "Lot Bumi",
   "Malay Reserve": "Tanah Simpanan Melayu",
-  "Studio": "Studio"
+  "Studio": "Studio",
+  "Back to home": "Kembali ke utama"
 };

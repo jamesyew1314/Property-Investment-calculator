@@ -302,7 +302,7 @@
       var badge = n.badge && S.stats && S.stats.new_inquiries > 0 ? '<span class="n">' + S.stats.new_inquiries + "</span>" : "";
       return '<a href="#/' + n.key + '" class="' + (r === n.key ? "on" : "") + '"><span>' + n.ico + "</span><span>" +
         esc(t(n.zh, n.en)) + "</span>" + badge + "</a>";
-    }).join("");
+    }).join("") + '<a href="/" style="margin-top:14px;border-top:1px solid rgba(255,255,255,.12);padding-top:12px;color:#C9B98E">← ' + esc(t("回到主页", "Back to home")) + "</a>";
     $("#whoName").textContent = S.me ? S.me.name : "—";
     $("#whoMeta").textContent = S.me ? ((S.me.ren_no || "RoofX") + (S.me.verified ? t(" · ✓已验证", " · ✓ verified") : "")) : "";
     var _lb = $("#langBtn"); if (_lb) _lb.textContent = langLabel();
