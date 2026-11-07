@@ -331,3 +331,12 @@ input,select,textarea{font-size:16px!important}
 .spec{font-size:15px!important}
 .pd .spec b{font-size:15px}
 #lang3 button{font-size:12px!important;padding:8px 10px!important}
+
+/* Hero 排版修正：标签、标题、口号不重叠 */
+.hero .eyebrow{margin:0 0 14px!important;font-size:11.5px!important;letter-spacing:.18em!important;line-height:1.4!important}
+.hero h1{max-width:20ch!important;line-height:1.22!important;margin:0 0 14px!important;font-size:clamp(30px,5.2vw,46px)!important}
+.hero p[data-i18n="hero.slogan"]{display:block!important;margin:0 0 14px!important;font-size:13.5px!important;line-height:1.6!important}
+@media(max-width:760px){
+  .hero h1{font-size:27px!important;line-height:1.28!important}
+  .hero .lead{font-size:15px!important;line-height:1.8!important}
+}
