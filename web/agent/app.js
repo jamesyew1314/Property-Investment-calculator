@@ -454,11 +454,11 @@
     row = row || {};
     var body = '<form id="lf">' + '<input type="hidden" name="address" value="' + esc(row.address || "") + '">' +
       '<h4 style="margin:4px 0 8px;color:#0E2438">' + t("价格", "Price") + "</h4>" +
-      '<div class="grid2">' + field(t("出售 / 出租", "Sale / Rent"), '<select name="intent"><option value="sale"' + (row.intent !== "rent" ? " selected" : "") + ">" + t("出售", "Sale") + '</option><option value="rent"' + (row.intent === "rent" ? " selected" : "") + ">" + t("出租", "Rent") + "</option></select>") +
+      '<div class="grid2 nums">' + field(t("出售 / 出租", "Sale / Rent"), '<select name="intent"><option value="sale"' + (row.intent !== "rent" ? " selected" : "") + ">" + t("出售", "Sale") + '</option><option value="rent"' + (row.intent === "rent" ? " selected" : "") + ">" + t("出租", "Rent") + "</option></select>") +
       field(t("可否议价", "Negotiable"), '<label style="display:flex;gap:8px;align-items:center;padding:9px 0"><input type="checkbox" name="negotiable" value="true"' + (row.negotiable ? " checked" : "") + "> " + t("可议价", "Negotiable") + "</label>") + "</div>" +
-      '<div class="grid2">' + field(t("售价 (RM)", "Asking price"), '<input name="asking_price" inputmode="numeric" value="' + esc(row.asking_price || "") + '">') +
+      '<div class="grid2 nums">' + field(t("售价 (RM)", "Asking price"), '<input name="asking_price" inputmode="numeric" value="' + esc(row.asking_price || "") + '">') +
       field(t("租金 (RM/月)", "Monthly rent"), '<input name="rent_price" inputmode="numeric" value="' + esc(row.rent_price || "") + '">') + "</div>" +
-      '<div class="grid2">' + field(t("价钱单位", "Price unit"), '<select name="price_unit">' + optList([{key:"total",zh:"总价 Total",en:"Total"},{key:"psf",zh:"每平方尺 psf",en:"Per sqft"}], row.price_unit || "total", false) + "</select>") +
+      '<div class="grid2 nums">' + field(t("价钱单位", "Price unit"), '<select name="price_unit">' + optList([{key:"total",zh:"总价 Total",en:"Total"},{key:"psf",zh:"每平方尺 psf",en:"Per sqft"}], row.price_unit || "total", false) + "</select>") +
       field(t("银行估价 (RM)", "Bank value"), '<input name="bank_value" inputmode="numeric" value="' + esc(row.bank_value || "") + '">') + "</div>" +
       '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:0 0 10px">' +
       '<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" name="show_psf" value="true"' + (row.show_psf ? " checked" : "") + "> " + t("显示每平方尺价", "Show psf") + "</label>" +
@@ -466,26 +466,26 @@
       '<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" name="expected_bank_value" value="true"' + (row.expected_bank_value ? " checked" : "") + "> " + t("用银行估价代替售价", "Use bank valuation") + "</label>" +
       "</div>" +
       '<h4 style="margin:4px 0 8px;color:#0E2438">' + t("产业资料", "Property") + "</h4>" +
-      '<div class="grid2">' + field(t("卖点标题（选填）", "Headline (optional)"), '<input name="headline" value="' + esc(row.headline || "") + '" placeholder="' + t("例如：低于市价 / Ready move in", "e.g. Below market value") + '">') +
+      '<div class="grid2 nums">' + field(t("卖点标题（选填）", "Headline (optional)"), '<input name="headline" value="' + esc(row.headline || "") + '" placeholder="' + t("例如：低于市价 / Ready move in", "e.g. Below market value") + '">') +
       field(t("区域（用于搜索）", "Area"), '<select name="area_code">' + areaOptions(row.area_code) + "</select>") + "</div>" +
       '<div class="grid2">' + field(t("地点 / 花园名（英文）", "Address / garden (EN)"), '<input name="address_text" value="' + esc(row.address_text || row.project_name || "") + '" placeholder="Jalan Tropika @ Taman Desa Cemerlang">') +
       field(t("中文名（选填）", "Chinese name (optional)"), '<input name="name_zh" value="' + esc(row.name_zh || "") + '" placeholder="' + t("例如：皇后花园", "e.g. 皇后花园") + '">') + "</div>" +
-      '<div class="grid2">' + field(t("产业类别", "Category"), '<select name="category">' + optList([{key:"residential",zh:"住宅",en:"Residential"},{key:"commercial",zh:"商业",en:"Commercial"},{key:"industrial",zh:"工业",en:"Industrial"},{key:"land",zh:"地皮",en:"Land"}], row.category, "—") + "</select>") +
+      '<div class="grid2 nums">' + field(t("产业类别", "Category"), '<select name="category">' + optList([{key:"residential",zh:"住宅",en:"Residential"},{key:"commercial",zh:"商业",en:"Commercial"},{key:"industrial",zh:"工业",en:"Industrial"},{key:"land",zh:"地皮",en:"Land"}], row.category, "—") + "</select>") +
       field(t("产业类型", "Type"), '<select name="property_type">' + optList(typeList(), row.property_type, "—") + "</select>") + "</div>" +
       '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("规格", "Specifications") + "</h4>" +
-      '<div class="grid2">' + field(t("土地面积（如 22x70）", "Land size (e.g. 22x70)"), '<input name="land_size" value="' + esc(row.land_size || "") + '" placeholder="22x70">') +
+      '<div class="grid2 nums">' + field(t("土地面积（如 22x70）", "Land size (e.g. 22x70)"), '<input name="land_size" value="' + esc(row.land_size || "") + '" placeholder="22x70">') +
       field(t("建筑面积 (sqft)", "Built-up (sqft)"), '<input name="built_up" inputmode="numeric" value="' + esc(row.built_up || "") + '">') + "</div>" +
-      '<div class="grid2">' + field(t("房间", "Bedrooms"), '<input name="bedrooms" inputmode="numeric" value="' + esc(row.bedrooms != null ? row.bedrooms : "") + '">') +
+      '<div class="grid2 nums">' + field(t("房间", "Bedrooms"), '<input name="bedrooms" inputmode="numeric" value="' + esc(row.bedrooms != null ? row.bedrooms : "") + '">') +
       field(t("额外房间", "Extra rooms"), '<input name="extra_rooms" inputmode="numeric" value="' + esc(row.extra_rooms != null ? row.extra_rooms : "") + '">') + "</div>" +
-      '<div class="grid2">' + field(t("浴室", "Bathrooms"), '<input name="bathrooms" inputmode="numeric" value="' + esc(row.bathrooms != null ? row.bathrooms : "") + '">') +
+      '<div class="grid2 nums">' + field(t("浴室", "Bathrooms"), '<input name="bathrooms" inputmode="numeric" value="' + esc(row.bathrooms != null ? row.bathrooms : "") + '">') +
       field(t("厕所", "Toilets"), '<input name="toilets" inputmode="numeric" value="' + esc(row.toilets != null ? row.toilets : "") + '">') + "</div>" +
-      '<div class="grid2">' + field(t("Lot 位置", "Lot position"), '<select name="lot_position">' + optList([{key:"intermediate",zh:"中间",en:"Intermediate"},{key:"corner",zh:"角头",en:"Corner"},{key:"end",zh:"尾",en:"End"},{key:"side",zh:"旁边",en:"Side"}], row.lot_position, "—") + "</select>") +
+      '<div class="grid2 nums">' + field(t("Lot 位置", "Lot position"), '<select name="lot_position">' + optList([{key:"intermediate",zh:"中间",en:"Intermediate"},{key:"corner",zh:"角头",en:"Corner"},{key:"end",zh:"尾",en:"End"},{key:"side",zh:"旁边",en:"Side"}], row.lot_position, "—") + "</select>") +
       field(t("方向", "Facing"), '<input name="facing" value="' + esc(row.facing || "") + '" placeholder="South">') + "</div>" +
-      '<div class="grid2">' + field(t("产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") +
+      '<div class="grid2 nums">' + field(t("产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") +
       field(t("地契", "Title"), '<select name="title_type">' + optList((S.meta && S.meta.title_types) || [], row.title_type, "—") + "</select>") + "</div>" +
-      '<div class="grid2">' + field(t("家私", "Furnishing"), '<select name="furnishing">' + optList([{key:"unfurnished",zh:"空屋",en:"Unfurnished"},{key:"partial",zh:"部分装修",en:"Partially furnished"},{key:"full",zh:"全装修",en:"Fully furnished"}], row.furnishing, "—") + "</select>") +
+      '<div class="grid2 nums">' + field(t("家私", "Furnishing"), '<select name="furnishing">' + optList([{key:"unfurnished",zh:"空屋",en:"Unfurnished"},{key:"partial",zh:"部分装修",en:"Partially furnished"},{key:"full",zh:"全装修",en:"Fully furnished"}], row.furnishing, "—") + "</select>") +
       field(t("保安", "Security"), '<select name="security">' + optList([{key:"gated",zh:"围篱",en:"Gated"},{key:"guarded",zh:"保安",en:"Guarded"},{key:"none",zh:"无",en:"None"}], row.security, "—") + "</select>") + "</div>" +
-      '<div class="grid2">' + field(t("Bumi 状态", "Bumi status"), '<select name="bumi">' + optList([{key:"bumi",zh:"Bumi",en:"Bumi"},{key:"non_bumi",zh:"非 Bumi",en:"Non-Bumi"},{key:"any",zh:"不限",en:"Any"}], row.bumi, "—") + "</select>") +
+      '<div class="grid2 nums">' + field(t("Bumi 状态", "Bumi status"), '<select name="bumi">' + optList([{key:"bumi",zh:"Bumi",en:"Bumi"},{key:"non_bumi",zh:"非 Bumi",en:"Non-Bumi"},{key:"any",zh:"不限",en:"Any"}], row.bumi, "—") + "</select>") +
       field(t("管理费 (RM/月)", "Maintenance fee"), '<input name="maintenance_fee" inputmode="numeric" value="' + esc(row.maintenance_fee || "") + '">') + "</div>" +
       '<div class="grid2">' + field(t("现况", "Condition"), '<select name="condition">' + optList([{key:"vacant",zh:"空置",en:"Vacant"},{key:"occupied",zh:"自住",en:"Occupied"},{key:"tenanted",zh:"出租中",en:"Tenanted"},{key:"renovated",zh:"已装修",en:"Renovated"}], row.condition, "—") + "</select>") + "</div>" +
       '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("装修和卖点", "Renovation & highlights") + "</h4>" +
@@ -763,7 +763,7 @@
         h += '<div class="grid3">' + d.rows.map(function (r) {
           var price = r.intent === "rent" ? r.rent_price : r.asking_price;
           var mine = r.tenant_id === S.me.id;
-          return '<div class="pcard"><div style="display:flex;gap:8px;align-items:center"><span class="mono">' + esc(r.code) + "</span>" +
+          return '<div class="pcard">' + (r.cover_url ? '<img src="' + esc(r.cover_url) + '" alt="" loading="lazy" style="width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:8px">' : "") + '<div style="display:flex;gap:8px;align-items:center"><span class="mono">' + esc(r.code) + "</span>" +
             (mine ? '<span class="pill grey">' + t("我的", "Mine") + "</span>" : "") + "</div>" +
             '<div class="t">' + esc(projName(r)) + "</div>" +
             '<div class="meta">' + esc(areaName(r.area_code)) + " · " + [r.bedrooms, r.bathrooms].filter(function (x) { return x != null; }).join("/") +
