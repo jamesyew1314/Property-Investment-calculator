@@ -213,3 +213,7 @@ img{max-width:100%}
 /* 概览统计卡可点击 */
 a.stat{display:block;text-decoration:none;color:inherit;transition:border-color .15s}
 a.stat:hover{border-color:var(--gold)}
+
+/* 可议价勾选：紧凑靠左 */
+.f label.chk{display:inline-flex!important;align-items:center;gap:8px;height:42px;width:auto;font-size:13px;color:var(--navy);white-space:nowrap}
+.f label.chk input{width:16px;height:16px;flex:0 0 16px;margin:0}

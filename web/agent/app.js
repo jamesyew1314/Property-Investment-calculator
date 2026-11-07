@@ -521,7 +521,7 @@
     var body = '<form id="lf">' + '<input type="hidden" name="address" value="' + esc(row.address || "") + '">' +
       '<h4 style="margin:4px 0 8px;color:#0E2438">' + t("价格", "Price") + "</h4>" +
       '<div class="grid2 nums">' + field(t("出售 / 出租", "Sale / Rent"), '<select name="intent"><option value="sale"' + (row.intent !== "rent" ? " selected" : "") + ">" + t("出售", "Sale") + '</option><option value="rent"' + (row.intent === "rent" ? " selected" : "") + ">" + t("出租", "Rent") + "</option></select>") +
-      field(t("可否议价", "Negotiable"), '<label style="display:flex;gap:8px;align-items:center;padding:9px 0"><input type="checkbox" name="negotiable" value="true"' + (row.negotiable ? " checked" : "") + "> " + t("可议价", "Negotiable") + "</label>") + "</div>" +
+      '<div class="f"><label>' + t("可否议价", "Negotiable") + '</label><label class="chk"><input type="checkbox" name="negotiable" value="true"' + (row.negotiable ? " checked" : "") + "> " + t("可议价", "Negotiable") + "</label></div>" +
       '<div class="grid2 nums">' + field(t("售价 (RM)", "Asking price"), '<input name="asking_price" inputmode="numeric" value="' + esc(row.asking_price || "") + '">') +
       field(t("租金 (RM/月)", "Monthly rent"), '<input name="rent_price" inputmode="numeric" value="' + esc(row.rent_price || "") + '">') + "</div>" +
       '<div class="grid2 nums">' + field(t("价钱单位", "Price unit"), '<select name="price_unit">' + optList([{key:"total",zh:"总价 Total",en:"Total"},{key:"psf",zh:"每平方尺 psf",en:"Per sqft"}], row.price_unit || "total", false) + "</select>") +
