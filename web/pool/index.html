@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" translate="no">
 <head>
 <meta charset="utf-8">
+<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>房源池 · RoofX</title>
 <meta name="description" content="柔佛同行房源池：无需登录浏览全部货源，登录后发布自己的房源。WTS / WTL 合作共赢。">
@@ -209,7 +210,8 @@ fetch('/api/public/config').then(function(r){return r.json();}).then(function(cf
   AREAS=(cfg.areas||[]).filter(function(a){return a.state==='johor';});
   var sel=document.getElementById('area');
   AREAS.forEach(function(a){ var o=document.createElement('option'); o.value=a.key; o.textContent=LANG==='en'?a.en:a.zh; sel.appendChild(o); });
-  if (INIT.area) { sel.value = INIT.area; if (typeof render === 'function') render(); }
+  if (INIT.area) sel.value = INIT.area;
+  if (typeof render === 'function' && ROWS.length) render();
 }).catch(function(){});
 fetch('/api/public/pool').then(function(r){return r.json();}).then(function(d){
   ROWS=d.rows||[];
