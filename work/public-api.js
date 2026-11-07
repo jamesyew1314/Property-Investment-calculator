@@ -66,19 +66,19 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
     try {
       const counts = await pool.query(`
         SELECT
-          (SELECT count(*) FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved'))::int AS listings,
+          (SELECT count(*) FROM lib_properties WHERE visibility IN ('pool','public') AND status IN ('available','reserved'))::int AS listings,
           (SELECT count(*) FROM lib_agents WHERE public=true AND active=true)::int AS agents,
-          (SELECT count(DISTINCT area_code) FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved'))::int AS areas,
-          (SELECT count(DISTINCT state) FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved'))::int AS states`);
+          (SELECT count(DISTINCT area_code) FROM lib_properties WHERE visibility IN ('pool','public') AND status IN ('available','reserved'))::int AS areas,
+          (SELECT count(DISTINCT state) FROM lib_properties WHERE visibility IN ('pool','public') AND status IN ('available','reserved'))::int AS states`);
       const areaRows = await pool.query(`
         SELECT area_code, count(*)::int AS n
-        FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved') AND area_code IS NOT NULL
+        FROM lib_properties WHERE visibility IN ('pool','public') AND status IN ('available','reserved') AND area_code IS NOT NULL
         GROUP BY area_code`);
       const nOf = {};
       areaRows.rows.forEach(function (x) { nOf[x.area_code] = x.n; });
       const stateRows = await pool.query(`
         SELECT state, count(*)::int AS n
-        FROM lib_properties WHERE visibility='public' AND status IN ('available','reserved') AND state IS NOT NULL
+        FROM lib_properties WHERE visibility IN ('pool','public') AND status IN ('available','reserved') AND state IS NOT NULL
         GROUP BY state`);
       const sOf = {};
       stateRows.rows.forEach(function (x) { sOf[x.state] = x.n; });
@@ -95,7 +95,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
         ok: true,
         platformFree: !!freeMode,
         scope: (process.env.PUBLIC_SCOPE || "johor"),
-        plans: plans || null,
+        plans: null,
         counts: counts.rows[0],
         states: states,
         areas: areas,
