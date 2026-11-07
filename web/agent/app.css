@@ -259,3 +259,7 @@ input,select,textarea{font-size:16px!important}
 #modal #lf .grid2.nums{grid-template-columns:1fr!important;gap:0!important}
 #lf .field{width:100%;margin-bottom:12px}
 #lf h4{margin:18px 0 8px!important}
+
+#side .sideHome{margin-left:auto;font-size:12px;color:#C9B98E;text-decoration:none;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 9px;white-space:nowrap}
+#side .sideHome:hover{border-color:#C9B98E}
+@media(max-width:760px){#side .sideHome{font-size:11px;padding:5px 8px}}
