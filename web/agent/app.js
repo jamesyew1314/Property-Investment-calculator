@@ -335,7 +335,7 @@
   // ---------- 我的房源 ----------
   function listings(q) {
     setTitle(t("我的房源", "My listings"), t("发布、公开到官网、管理询盘", "Publish, expose to the site, track inquiries"));
-    $("#topActs").innerHTML = '<button class="btn line sm" data-act="import">' + t("一键导入", "Import") + '</button> <button class="btn gold sm" data-act="new-listing">+ ' + t("新增房源", "New listing") + "</button>";
+    $("#topActs").innerHTML = '<button class="btn line sm" data-act="import">' + t("一键导入", "Import") + '</button> <button class="btn line sm" data-act="copy-all">' + t("复制全部在售", "Copy all active") + '</button> <button class="btn gold sm" data-act="new-listing">+ ' + t("新增房源", "New listing") + "</button>";
     var qs = new URLSearchParams(); ["q", "status"].forEach(function (k) { if (q[k]) qs.set(k, q[k]); });
     return api("/listings?" + qs.toString()).then(function (d) {
       var h = '<div class="toolbar"><input id="lq" type="search" placeholder="' + t("搜索编号 / 楼盘", "Search code / project") + '" value="' + esc(q.q || "") + '">' +
@@ -583,42 +583,58 @@
     var rent = row.intent === "rent";
     var price = rent ? row.rent_price : row.asking_price;
     var T = { condo: "Condominium / 公寓", apartment: "Apartment", terrace: "Terrace / 排屋", semi_d: "Semi-D / 半独立", bungalow: "Bungalow / 独立式", townhouse: "Townhouse", shoplot: "Shoplot / 店屋", office: "Office / 办公室", land: "Land / 地皮" };
-    var C = { residential: "Residential / 住宅", commercial: "Commercial / 商业", industrial: "Industrial / 工业", land: "Land / 地皮" };
+    var LOT = { intermediate: "Intermediate lot", corner: "Corner lot", end: "End lot", side: "Side lot" };
+    var FUR = { unfurnished: "Unfurnished", partial: "Partially furnished", full: "Fully furnished" };
+    var COND = { vacant: "Vacant", occupied: "Occupied", tenanted: "Tenanted", renovated: "Renovated", new: "New", good: "Good condition", fair: "Fair condition", needs_work: "Needs work" };
+    var TITLE = { individual: "Individual title", strata: "Strata title", master: "Master title" };
     var wa = String(S.me.phone || "").replace(/[^0-9]/g, "").replace(/^0/, "60");
     var lines = [rent ? "*WTR / For Rent 出租*" : "*WTS / For Sale 出售*"];
     if (row.headline) lines.push("*" + row.headline + "*");
     lines.push("");
-    lines.push("*" + (row.address_text || row.project_name || projName(row)) + "*");
-    if (row.name_zh) lines.push(row.name_zh);
-    lines.push(areaName(row.area_code));
-    lines.push(C[row.category] || (row.category || ""));
-    lines.push(T[row.property_type] || row.property_type || "");
-    if (row.land_size) lines.push("Land " + row.land_size);
+    var addr = row.address || "";
+    var proj = row.project_name || row.address_text || projName(row) || "";
+    if (addr) lines.push("*" + addr + "*");
+    if (proj && proj !== addr) lines.push("*" + proj + "*");
+    if (!addr && !proj) lines.push("*" + areaName(row.area_code) + "*");
+    lines.push("");
+    if (row.property_type) lines.push(T[row.property_type] || row.property_type);
+    if (row.land_size) lines.push(row.land_size);
     if (row.built_up) lines.push("Built-up " + Number(row.built_up).toLocaleString("en-MY") + " sqft");
     if (row.bedrooms != null) lines.push(row.bedrooms + " bed" + (row.extra_rooms ? " + " + row.extra_rooms : ""));
     if (row.bathrooms != null) lines.push(row.bathrooms + " bath" + (row.toilets ? " / " + row.toilets + " toilet" : ""));
-    if (row.lot_position) lines.push(String(row.lot_position).replace(/^\\w/, function (c) { return c.toUpperCase(); }) + " lot");
+    if (row.lot_position && LOT[row.lot_position]) lines.push(LOT[row.lot_position]);
     if (row.facing) lines.push("Facing " + row.facing);
-    if (row.tenure) lines.push(String(row.tenure).replace(/^\\w/, function (c) { return c.toUpperCase(); }));
-    if (row.title_type) lines.push(String(row.title_type).replace(/^\\w/, function (c) { return c.toUpperCase(); }));    if (row.bumi && row.bumi !== "any") lines.push("Bumi: " + (row.bumi === "non_bumi" ? "Non-Bumi" : "Bumi"));
-    if (row.security) lines.push("Security: " + String(row.security).replace(/^\\w/, function (c) { return c.toUpperCase(); }));
-    if (row.maintenance_fee) lines.push("Maintenance RM " + Number(row.maintenance_fee).toLocaleString("en-MY") + "/mo");
+    if (row.bumi && row.bumi !== "any") lines.push(row.bumi === "non_bumi" ? "Non Bumi" : "Bumi");
+    if (row.tenure) lines.push(String(row.tenure).replace(/^\w/, function (c) { return c.toUpperCase(); }));
+    if (row.title_type) lines.push(TITLE[row.title_type] || String(row.title_type));
+    if (row.furnishing) lines.push(FUR[row.furnishing] || String(row.furnishing));
+    if (row.condition) lines.push(COND[row.condition] || String(row.condition));
+    if (row.security) lines.push("Security: " + String(row.security).replace(/^\w/, function (c) { return c.toUpperCase(); }));
+    if (row.maintenance_fee) lines.push("Maintenance RM " + Number(row.maintenance_fee).toLocaleString("en-MY") + "/month");
     var REN = { kitchen_ext: "Kitchen Extended", back_ext: "Back Extended", full_ext: "Fully Extended", awning: "Awning", plaster: "Plaster Ceiling", autogate: "Autogate", grille: "Grille", cabinet: "Kitchen Cabinet", wardrobe: "Built-in Wardrobe", aircond: "Aircond", heater: "Water Heater", solar: "Solar Panel", tiles: "Tiles Upgraded", bath: "Renovated Bathroom" };
     var ren = String(row.renovation || "").split(",").filter(Boolean);
     if (ren.length) lines.push(ren.map(function (k) { return REN[k] || k; }).join(", "));
-    if (row.other_renovation) String(row.other_renovation).split("\\n").filter(Boolean).forEach(function (x) { lines.push(x); });
-    if (row.bank_value) lines.push("Bank value RM " + Number(row.bank_value).toLocaleString("en-MY"));
-    if (row.show_psf && row.built_up && price) lines.push("RM " + (Number(price) / Number(row.built_up)).toFixed(0) + " psf");
-    if (row.selling_points) { lines.push(""); String(row.selling_points).split("\\n").filter(Boolean).forEach(function (x) { lines.push("• " + x); }); }
+    if (row.other_renovation) String(row.other_renovation).split("\n").filter(Boolean).forEach(function (x) { lines.push(x); });
+    if (row.selling_points) { lines.push(""); String(row.selling_points).split("\n").filter(Boolean).forEach(function (x) { lines.push("• " + x); }); }
     lines.push("");
-    lines.push("*" + (rent ? "Rental " : "Selling ") + money(price, rent) + "*");
+    if (price) lines.push("*" + (rent ? "Rental " : "Selling ") + "RM " + Number(price).toLocaleString("en-MY") + (rent ? "/month" : "") + "*");
     if (row.negotiable) lines.push("Negotiable");
     lines.push("");
     lines.push("*" + (S.me.team || "PropNet") + "*");
     lines.push("*" + (S.me.name || "") + "*");
-    lines.push([S.me.phone, S.me.ren_no].filter(Boolean).join(" · "));
+    if (S.me.phone) lines.push(S.me.phone);
     if (wa) lines.push("www.wasap.my/" + wa + "/" + String(row.code || "").toLowerCase());
-    return lines.filter(function (x) { return x !== "" || true; }).join("\n");
+    return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  function copyText(t) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t);
+    var ta = document.createElement("textarea");
+    ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    ta.remove();
+    return Promise.resolve();
   }
 
   function shareCard(row) {
@@ -1197,6 +1213,20 @@
         };
         toast(map[e.message] || e.message, true);
       });
+    }
+    if (act === "copy-all") {
+      var all = [], page = 1;
+      (function load() {
+        api("/listings?pageSize=50&page=" + page).then(function (d) {
+          all = all.concat(d.rows || []);
+          if (all.length < d.total && page < 20) { page++; load(); return; }
+          var rows = all.filter(function (r) { return r.status === "available" || r.status === "reserved"; });
+          if (!rows.length) { toast(t("还没有在售房源", "No active listings yet"), true); return; }
+          copyText(rows.map(shareText).join("\n\n————————\n\n")).then(function () {
+            toast(t("已复制 " + rows.length + " 条在售房源", "Copied " + rows.length + " active listings"));
+          });
+        }).catch(function (e) { toast(e.message, true); });
+      })();
     }
     if (act === "share") api("/listings/" + id).then(function (j) { shareCard(j.row); });
     if (act === "inquiry") inquiryForm(el.dataset.code);
