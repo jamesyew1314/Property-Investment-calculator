@@ -1147,11 +1147,11 @@
     return api("/plan").then(function (d) {
       var until = d.expires_at ? String(d.expires_at).slice(0, 10) : "—";
       var isFree = !d.plan || d.plan === "free";
-      var h = '<div class="card"><h3>' + t("当前套餐", "Current plan") + "</h3>" +
+      var h = '<div class="card"><h3>' + t("账号状态", "Account status") + "</h3>" +
         '<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">' +
-        '<b style="font-family:Georgia,serif;font-size:30px;color:var(--navy)">' + esc(isFree ? t("免费", "Free") : d.plan.toUpperCase()) + "</b>" +
-        '<span class="pill ' + (isFree ? "grey" : "green") + '">' + (isFree ? t("使用中", "Active") : t("已开通", "Active")) + "</span>" +
-        '<span class="muted">' + t("到期", "Expires") + "：" + esc(until) + "</span></div>" +
+        '<b style="font-family:Georgia,serif;font-size:30px;color:var(--navy)">' + esc("RoofX") + "</b>" +
+        '<span class="pill ' + (isFree ? "grey" : "green") + '">' + t("正常", "Active") + "</span>" +
+        '<span class="muted">' + t("有效期", "Valid until") + "：" + esc(until) + "</span></div>" +
         '<p class="muted" style="margin:10px 0 0">' + t("所有功能均可使用。", "All features are available.") + "</p></div>";
 
       h += '<div class="card"><h3>' + t("兑换码开通", "Redeem a code") + "</h3>" +
