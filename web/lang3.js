@@ -25,13 +25,23 @@
     /* 统一：隐藏各页原有切换，只保留一个固定条，位置永远一致 */
     if (document.querySelector("#lang3")) return;
     document.querySelectorAll(".langs, #l3, .lang-toggle, #langBtn, #langFloat, .lang-fab").forEach(function (el) { el.style.display = "none"; });
+    document.querySelectorAll('.site-nav .login, .headActs a[href="/agent/"]').forEach(function (el) { el.style.display = "none"; });
     var s = document.createElement("style");
-    s.textContent = "#lang3{position:fixed;top:64px;right:12px;z-index:99999;display:flex;gap:2px;background:#0E2438;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:3px;box-shadow:0 6px 20px rgba(14,36,56,.28)}" +
+    s.textContent = "#lang3wrap{position:fixed;top:64px;right:14px;z-index:99999;display:flex;align-items:center;gap:8px}" +
+      "#lang3login{padding:8px 12px;border:1px solid #C9B98E;border-radius:999px;background:#0E2438;color:#F3E7C9;font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;white-space:nowrap;box-shadow:0 6px 20px rgba(14,36,56,.28)}" +
+      "#lang3{display:flex;gap:2px;background:#0E2438;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:3px;box-shadow:0 6px 20px rgba(14,36,56,.28)}" +
       "#lang3 button{border:0;background:transparent;color:#D5E0EC;font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:7px 9px;border-radius:999px;cursor:pointer}" +
       "#lang3 button.on{background:#fff;color:#0E2438}" +
-      "@media(max-width:760px){#lang3{top:58px;right:8px}}";
+      "@media(max-width:760px){#lang3wrap{top:58px;right:8px;gap:6px}#lang3login{padding:7px 9px;font-size:11px}}";
     document.head.appendChild(s);
-    document.body.appendChild(bar());
+    var wrap = document.createElement("div");
+    wrap.id = "lang3wrap";
+    var login = document.createElement("a");
+    login.id = "lang3login"; login.href = "/agent/";
+    login.textContent = (lang === "en" ? "Agent login" : lang === "bm" ? "Log masuk ejen" : "中介登录");
+    wrap.appendChild(login);
+    wrap.appendChild(bar());
+    document.body.appendChild(wrap);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
