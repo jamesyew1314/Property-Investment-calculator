@@ -123,16 +123,7 @@
     </div>
   </section>
 
-  <section class="sec alt">
-    <div class="wrap">
-      <div class="sec-head">
-        <div class="eyebrow" data-i18n="areas.kicker">按区域看货源</div>
-        <h2 data-i18n="areas.title">柔佛 42 个区域</h2>
-        <p data-i18n="areas.sub">先选你熟悉的区域，再看有哪些房源与货源中介。</p>
-      </div>
-      <div class="grid-4" id="areaGrid"></div>
-    </div>
-  </section>
+  
 
   <section class="sec" id="for-agents">
     <div class="wrap">
@@ -406,6 +397,7 @@ window.PAGE_I18N = {
 
   function renderAreas() {
     var grid = document.getElementById("areaGrid");
+    if (!grid) return;
     var areas = ((state.cfg && state.cfg.areas) || []).slice(0, 12);
     grid.innerHTML = areas.map(function (a) {
       var name = KT.lang === "en" ? a.en : a.zh;
