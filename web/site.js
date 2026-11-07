@@ -23,7 +23,7 @@
     return lang === "en" ? v[1] : v[0];
   }
   function pick(v) {
-    if (lang === "bm") return (window.BM_MAP || {})[v[1]] || v[1];
+    if (lang === "bm") return v[2] || (window.BM_MAP || {})[v[1]] || v[1];
     return lang === "en" ? v[1] : v[0];
   }
   function langLabel() { return lang === "zh" ? "EN" : (lang === "en" ? "BM" : "中文"); }
