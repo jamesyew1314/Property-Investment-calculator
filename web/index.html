@@ -384,6 +384,7 @@ window.PAGE_I18N = {
 
   function renderAgents() {
     var sec = document.getElementById("agentSection");
+    if (!sec) return;
     if (state.agents.length < 2) { sec.hidden = true; return; }
     sec.hidden = false;
     var _ag=document.getElementById("agentGrid"); if(!_ag) return;
@@ -402,10 +403,20 @@ window.PAGE_I18N = {
     state.cfg = cfg;
     KT.setFree(!!cfg.platformFree);
     KT.setTax(Object.assign({ areas: cfg.areas }, cfg.taxonomy || {}));
-    if (cfg.counts && cfg.counts.listings > 0) document.getElementById("statLive").textContent = cfg.counts.listings;
-    var _sa=document.getElementById("statAgents"); if (_sa && cfg.counts) _sa.textContent = cfg.counts.agents || 0;
+    setCounts(cfg);
     renderAll();
-  }).catch(function () { renderAll(); });
+  }).catch(function () {
+    renderAll();
+    setTimeout(function () {
+      KT.fetchJSON("/api/public/config?retry=" + Date.now()).then(function (cfg) { setCounts(cfg); }).catch(function () {});
+    }, 1200);
+  });
+  function setCounts(cfg) {
+    if (!cfg || !cfg.counts) return;
+    var n = cfg.counts.listings, a = cfg.counts.agents;
+    var e1 = document.getElementById("statLive"); if (e1 && n) e1.textContent = n;
+    var e2 = document.getElementById("statAgents"); if (e2) e2.textContent = a || 0;
+  }
 
   KT.fetchJSON("/api/public/agents").then(function (j) {
     state.agents = j.rows || [];

@@ -222,6 +222,9 @@ p{margin:0 0 12px}
 .hero .seg{background:rgba(255,255,255,.12)}
 .hero .seg button{color:rgba(255,255,255,.7)}
 .hero .seg button.on{background:var(--gold);color:#1B2430}
+.searchbar .seg{background:#F1EDE4}
+.searchbar .seg button{color:#5D6B7A}
+.searchbar .seg button.on{background:var(--gold);color:#1B2430}
 
 /* ---------- 房源筛选条 ---------- */
 .filterbar{background:var(--cream);border:1px solid var(--line);border-radius:16px;padding:14px;
