@@ -47,7 +47,26 @@
     try { localStorage.setItem("kt_lang", S.lang); localStorage.setItem("kwongthye_lang", S.lang); } catch (e) {}
     document.documentElement.lang = S.lang === "zh" ? "zh-CN" : (S.lang === "bm" ? "ms" : "en");
     try { var u = new URL(location.href); u.searchParams.set("lang", S.lang); history.replaceState(null, "", u.toString()); } catch (e) {}
-    paintFloat(); if (typeof route === "function") route();
+    paintFloat();
+    var lf = document.getElementById("lf");
+    if (lf) {
+      var snap = {};
+      $$("#lf input,#lf select,#lf textarea").forEach(function (el) {
+        if (!el.name) return;
+        if (el.type === "checkbox") snap[el.name] = el.checked;
+        else if (el.multiple) snap[el.name] = Array.prototype.map.call(el.selectedOptions, function (o) { return o.value; });
+        else snap[el.name] = el.value;
+      });
+      if (typeof collectAreas === "function" && window.__lfModal) snap.area_codes = collectAreas(window.__lfModal.root);
+      var base = Object.assign({}, window.__lfRow || {}, snap);
+      var imgs = $$("#modal [data-ph-grid] img").map(function (im) { return im.dataset.full; }).filter(Boolean);
+      if (imgs.length) base.photos = imgs;
+      if (window.__lfModal) window.__lfModal.close();
+      if (typeof route === "function") route();
+      setTimeout(function () { listingForm(base, true); }, 0);
+      return;
+    }
+    if (typeof route === "function") route();
   };
   function cycleLang() {
     S.lang = S.lang === "zh" ? "en" : (S.lang === "en" ? "bm" : "zh");
@@ -525,6 +544,7 @@
 
   function listingForm(row, imported) {
     row = row || {};
+    window.__lfRow = row;
     var body = '<form id="lf">' + '<input type="hidden" name="address" value="' + esc(row.address || "") + '">' +
       '<h4 style="margin:4px 0 8px;color:#0E2438">' + t("价格", "Price") + "</h4>" +
       '<div class="grid2 nums">' + field(t("出售 / 出租", "Sale / Rent"), '<select name="intent"><option value="sale"' + (row.intent !== "rent" ? " selected" : "") + ">" + t("出售", "Sale") + '</option><option value="rent"' + (row.intent === "rent" ? " selected" : "") + ">" + t("出租", "Rent") + "</option></select>") +
@@ -593,6 +613,7 @@
         (row.id ? '<button class="btn danger" id="del">' + t("删除", "Delete") + "</button>" : "") +
         '<button class="btn gold" id="save">' + t("保存", "Save") + "</button>"
     });
+    window.__lfModal = m;
     bindPhotos(m, row);
     $$("[data-ren]", m.root).forEach(function (b) {
       b.addEventListener("click", function () {
