@@ -42,12 +42,16 @@
   function langLabel() { return S.lang === "zh" ? "EN" : (S.lang === "en" ? "BM" : "中文"); }
   function langNow() { return S.lang === "zh" ? "中文" : (S.lang === "en" ? "EN" : "BM"); }
   function paintFloat() { var b = document.getElementById("langFloat"); if (b) b.textContent = langNow(); }
+  function paintBrand() {
+    var el = document.getElementById("brandSub");
+    if (el) el.textContent = S.lang === "en" ? "Agent workspace" : (S.lang === "bm" ? "Ruang kerja ejen" : "中介工作台");
+  }
   window.__pnSetLang = function (l) {
     S.lang = ["zh","en","bm"].indexOf(l) >= 0 ? l : "zh";
     try { localStorage.setItem("kt_lang", S.lang); localStorage.setItem("kwongthye_lang", S.lang); } catch (e) {}
     document.documentElement.lang = S.lang === "zh" ? "zh-CN" : (S.lang === "bm" ? "ms" : "en");
     try { var u = new URL(location.href); u.searchParams.set("lang", S.lang); history.replaceState(null, "", u.toString()); } catch (e) {}
-    paintFloat();
+    paintFloat(); paintBrand();
     var lf = document.getElementById("lf");
     if (lf) {
       var snap = {};
@@ -72,7 +76,7 @@
     S.lang = S.lang === "zh" ? "en" : (S.lang === "en" ? "bm" : "zh");
     localStorage.setItem("kt_lang", S.lang);
     document.documentElement.lang = S.lang === "zh" ? "zh-CN" : (S.lang === "bm" ? "ms" : "en");
-    applyStatic(); paintFloat();
+    applyStatic(); paintFloat(); paintBrand();
   }
 
   function projName(r) {
@@ -269,7 +273,7 @@
     { key: "profile", zh: "个人资料", en: "Profile", ico: "⚙" }
   ];
   function renderNav() {
-    applyStatic(); paintFloat();
+    applyStatic(); paintFloat(); paintBrand();
     var r = S.route || "";
     $("#nav").innerHTML = NAV.filter(function (n) { return SHOW_PLAN || n.key !== "plan"; }).map(function (n) {
       var badge = n.badge && S.stats && S.stats.new_inquiries > 0 ? '<span class="n">' + S.stats.new_inquiries + "</span>" : "";
