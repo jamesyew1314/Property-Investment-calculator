@@ -46,6 +46,8 @@
     .headActs .btn{padding:9px 10px;font-size:12px}
     .langs button{padding:6px 7px}
     .headActs{gap:6px}
+    .poolGrid{grid-template-columns:1fr}
+    .poolBar input,.poolBar select{flex:1 1 100%}
   }
   @media(max-width:430px){
     .headActs .btn{display:none}
@@ -110,7 +112,7 @@
 <script>
 var _q=new URLSearchParams(location.search);
 var LANG = _q.get('lang') || localStorage.getItem('kt_lang') || 'zh';
-var INIT = { area: _q.get('area') || '', intent: _q.get('intent') || '', q: _q.get('q') || '' };
+var INIT = { area: _q.get('area') || '', intent: _q.get('intent') || '', q: _q.get('q') || '', type: _q.get('type') || '', min: Number(_q.get('min')) || 0, max: Number(_q.get('max')) || 0, deal: _q.get('deal') === '1' };
 var AREAS = [];
 var ROWS = [];
 var T = {
@@ -151,6 +153,10 @@ function render(){
   var list=ROWS.filter(function(r){
     if(dealOnly){ if(!(Number(r.bank_value)>0 && Number(r.asking_price)>0 && Number(r.asking_price)<=Number(r.bank_value)*0.8)) return false; }
     if(intent && r.intent!==intent) return false;
+    if(INIT.type && r.property_type!==INIT.type) return false;
+    var pv=Number(r.asking_price||r.rent_price||0);
+    if(INIT.min && pv<INIT.min) return false;
+    if(INIT.max && pv>INIT.max) return false;
     if(area && r.area_code!==area) return false;
     if(q){ var hay=(r.code+' '+(r.address_text||'')+' '+(r.project_name||'')).toLowerCase(); if(hay.indexOf(q)<0) return false; }
     return true;
@@ -197,6 +203,7 @@ fetch('/api/public/config').then(function(r){return r.json();}).then(function(cf
 }).catch(function(){});
 fetch('/api/public/pool').then(function(r){return r.json();}).then(function(d){
   ROWS=d.rows||[];
+  if (INIT.deal) { var _db=document.getElementById('dealBtn'); _db.classList.add('on'); _db.style.background='#0E2438'; _db.style.color='#fff'; }
   if (INIT.q) document.getElementById('q').value = INIT.q;
   if (INIT.intent) document.querySelectorAll('#seg button').forEach(function(b){ b.classList.toggle('on', b.dataset.intent===INIT.intent); });
   apply();
