@@ -83,7 +83,7 @@ jobs:
           KEY=~/.ssh/deploy_key HOST="$SSH_HOST" USER_="${SSH_USER:-root}" bash deploy/deploy.sh 2>&1 | tee /tmp/deploy.log
 
       - name: Upload deploy log
-        if: always()
+        if: failure()
         run: |
           { [ -f /tmp/ssh-info ] && cat /tmp/ssh-info; echo "---deploy---"; [ -f /tmp/deploy.log ] && tail -40 /tmp/deploy.log || echo "deploy skipped"; } > .deploy-log
           git config user.name "deploy-bot"

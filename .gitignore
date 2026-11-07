@@ -53,3 +53,4 @@ match-platform/data/
 match-platform/backups/
 match-platform/.env
 match-platform/*.log
+.deploy-log
