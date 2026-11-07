@@ -321,5 +321,24 @@ window.BM_MAP = {
   "Pro": "Pro",
   "For full-time agents": "Untuk ejen sepenuh masa",
   "RM890/year (2 months free)": "RM890/tahun (2 bulan percuma)",
-  "Unlimited listings and clients": "Senarai dan klien tanpa had"
+  "Unlimited listings and clients": "Senarai dan klien tanpa had",
+  /* auto-added */
+  "ROOFX · THE ROOF PROPERTY EXCHANGE": "ROOFX · BURSA HARTANAH BUMBUNG",
+  "Listing pool · browse freely": "Kumpulan penyenaraian · layari dengan bebas",
+  "Every co-broke listing, open to browse": "Setiap penyenaraian co-broke, terbuka untuk dilayari",
+  "Browse the pool": "Layari kumpulan",
+  "Registered agents": "Ejen berdaftar",
+  "One workspace for listings, clients and co-broke": "Satu ruang kerja untuk penyenaraian, klien dan co-broke",
+  "Your page + listing pool + buyer pool + co-broke records.": "Halaman anda + kumpulan penyenaraian + kumpulan pembeli + rekod co-broke.",
+  "Let's talk, then join": "Mari berbincang, kemudian sertai",
+  "What you get after joining": "Apa yang anda dapat selepas menyertai",
+  "Every agent has a REN and an area of focus. Open a profile to see their listings.": "Setiap ejen mempunyai REN dan bidang tumpuan. Buka profil untuk melihat penyenaraian mereka.",
+  "listings": "penyenaraian",
+  "View listings →": "Lihat penyenaraian →",
+  "The first verified agents are onboarding": "Ejen terpilih yang pertama sedang mendaftar",
+  "We are onboarding our founding agents. Join now and be among the first in the directory.": "Kami sedang mendaftarkan ejen pengasas kami. Sertai sekarang dan jadilah antara yang pertama dalam direktori.",
+  "Are you an agent?": "Adakah anda ejen?",
+  "Put your card in the directory": "Letakkan kad anda dalam direktori",
+  "Your page plus the listing pool, so clients find you when they search the area.": "Halaman anda serta kumpulan penyenaraian, supaya klien menemui anda apabila mereka mencari kawasan tersebut.",
+  "The pool is open to browse; posting and client tools are for agent accounts only.": "Kumpulan ini terbuka untuk dilayari; penyiaran dan alat klien hanya untuk akaun ejen."
 };
