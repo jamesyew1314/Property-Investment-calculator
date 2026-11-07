@@ -578,9 +578,9 @@
       '<div class="grid2 nums">' + field(t("价钱单位", "Price unit"), '<select name="price_unit">' + optList([{key:"total",zh:"总价 Total",en:"Total"},{key:"psf",zh:"每平方尺 psf",en:"Per sqft"}], row.price_unit || "total", false) + "</select>") +
       field(t("银行估价 (RM)", "Bank value"), '<input name="bank_value" inputmode="numeric" value="' + esc(row.bank_value || "") + '">') + "</div>" +
       '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:0 0 10px">' +
-      '<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" name="show_psf" value="true"' + (row.show_psf ? " checked" : "") + "> " + t("显示每平方尺价", "Show psf") + "</label>" +
-      '<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" name="show_address" value="true"' + (row.show_address ? " checked" : "") + "> " + t("附完整地址", "Show full address") + "</label>" +
-      '<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" name="expected_bank_value" value="true"' + (row.expected_bank_value ? " checked" : "") + "> " + t("用银行估价代替售价", "Use bank valuation") + "</label>" +
+      '<label class="optChk"><input type="checkbox" name="show_psf" value="true"' + (row.show_psf ? " checked" : "") + "> " + t("显示每平方尺价", "Show psf") + "</label>" +
+      '<label class="optChk"><input type="checkbox" name="show_address" value="true"' + (row.show_address ? " checked" : "") + "> " + t("附完整地址", "Show full address") + "</label>" +
+      '<label class="optChk"><input type="checkbox" name="expected_bank_value" value="true"' + (row.expected_bank_value ? " checked" : "") + "> " + t("用银行估价代替售价", "Use bank valuation") + "</label>" +
       "</div>" +
       '<h4 style="margin:4px 0 8px;color:#0E2438">' + t("产业资料", "Property") + "</h4>" +
       '<div class="grid2 nums">' + field(t("卖点标题（选填）", "Headline (optional)"), '<input name="headline" value="' + esc(row.headline || "") + '" placeholder="' + t("例如：低于市价 / Ready move in", "e.g. Below market value") + '">') +

@@ -236,3 +236,9 @@ a.stat:hover{border-color:var(--gold)}
   #modal footer{position:static!important;background:#fff;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
   #modal .body{padding-bottom:12px!important}
 }
+
+/* 手机端多选项：整行显示，避免文字竖排 */
+@media(max-width:760px){
+  #lf .optChk{display:flex!important;align-items:center;gap:8px;width:100%;font-size:13px;line-height:1.4;white-space:normal}
+  #lf .optChk input[type="checkbox"]{width:18px!important;min-width:18px;height:18px;flex:0 0 18px;margin:0}
+}
