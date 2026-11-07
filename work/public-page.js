@@ -61,6 +61,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
     p.tenure ? [T.tenure, p.tenure] : null
   ].filter(Boolean).map(function (r) { return '<div class="spec"><span>' + r[0] + "</span><b>" + esc(r[1]) + "</b></div>"; }).join("");
 
+  const CL = lang === "zh" ? { price: "房价 (RM)", dp: "首付 %", rate: "年利率 %", years: "贷款年数" } : lang === "bm" ? { price: "Harga (RM)", dp: "Bayaran pendahuluan %", rate: "Kadar faedah %", years: "Tempoh pinjaman (tahun)" } : { price: "Price (RM)", dp: "Down payment %", rate: "Interest rate %", years: "Loan tenure (years)" };
   return '<!DOCTYPE html><html lang="' + (lang === "bm" ? "ms" : (en ? "en" : "zh-CN")) + '"><head>' +
     '<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
     "<title>" + esc(title) + " · " + esc(area) + " | RoofX</title>" +
@@ -93,10 +94,10 @@ module.exports = function renderPublicListing(p, agent, opts) {
     '<div style="border:1px solid #E3E8F0;border-radius:12px;padding:16px;background:#FAFBFD">' +
     '<div style="font:600 13px/1 sans-serif;color:#0E2438;margin-bottom:10px">' + (lang === "zh" ? "月供速算" : (lang === "bm" ? "Kira ansuran" : "Monthly instalment")) + "</div>" +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
-    '<input id="lwPrice" inputmode="numeric" value="' + (Number(price) || "") + '" style="padding:8px;border:1px solid #D6DCE7;border-radius:8px" placeholder="Price">' +
-    '<input id="lwDp" inputmode="numeric" value="10" style="padding:8px;border:1px solid #D6DCE7;border-radius:8px" placeholder="Down %">' +
-    '<input id="lwRate" inputmode="decimal" value="4.2" style="padding:8px;border:1px solid #D6DCE7;border-radius:8px" placeholder="Rate %">' +
-    '<input id="lwYears" inputmode="numeric" value="30" style="padding:8px;border:1px solid #D6DCE7;border-radius:8px" placeholder="Years">' +
+    '<label style="display:block;font-size:12px;color:#5D6B7A">' + CL.price + '<input id="lwPrice" inputmode="numeric" value="' + (Number(price) || "") + '" style="width:100%;margin-top:4px;padding:8px;border:1px solid #D6DCE7;border-radius:8px"></label>' +
+    '<label style="display:block;font-size:12px;color:#5D6B7A">' + CL.dp + '<input id="lwDp" inputmode="numeric" value="10" style="width:100%;margin-top:4px;padding:8px;border:1px solid #D6DCE7;border-radius:8px"></label>' +
+    '<label style="display:block;font-size:12px;color:#5D6B7A">' + CL.rate + '<input id="lwRate" inputmode="decimal" value="4.2" style="width:100%;margin-top:4px;padding:8px;border:1px solid #D6DCE7;border-radius:8px"></label>' +
+    '<label style="display:block;font-size:12px;color:#5D6B7A">' + CL.years + '<input id="lwYears" inputmode="numeric" value="30" style="width:100%;margin-top:4px;padding:8px;border:1px solid #D6DCE7;border-radius:8px"></label>' +
     "</div>" +
     '<div id="lwOut" style="margin-top:10px;font:700 18px/1.4 Georgia,serif;color:#B8862F">—</div>' +
     '<div style="font-size:11.5px;color:#8A97A6;margin-top:4px">' + (lang === "zh" ? "仅供参考，实际以银行审批为准" : (lang === "bm" ? "Anggaran sahaja" : "Estimate only")) + "</div></div></div>" +
