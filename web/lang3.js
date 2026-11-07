@@ -22,10 +22,9 @@
     return b;
   }
   function init() {
-    /* 已有三语控件（房源池 / 详情页）则不重复 */
-    if (document.querySelector("#lang3, #l3")) return;
-    if (document.querySelector(".langs") && !document.querySelector(".lang-toggle")) return;
-    document.querySelectorAll(".lang-toggle, #langBtn, #langFloat, .lang-fab").forEach(function (el) { el.style.display = "none"; });
+    /* 统一：隐藏各页原有切换，只保留一个固定条，位置永远一致 */
+    if (document.querySelector("#lang3")) return;
+    document.querySelectorAll(".langs, #l3, .lang-toggle, #langBtn, #langFloat, .lang-fab").forEach(function (el) { el.style.display = "none"; });
     var s = document.createElement("style");
     s.textContent = "#lang3{position:fixed;top:64px;right:12px;z-index:99999;display:flex;gap:2px;background:#0E2438;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:3px;box-shadow:0 6px 20px rgba(14,36,56,.28)}" +
       "#lang3 button{border:0;background:transparent;color:#D5E0EC;font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:7px 9px;border-radius:999px;cursor:pointer}" +
