@@ -1,0 +1,10 @@
+▸ 1/5 回归测试
+76 pass, 0 fail
+43 pass, 0 fail
+69 pass, 0 fail
+11 pass, 0 fail
+▸ 2/5 上传静态站点
+Load key "/home/runner/.ssh/deploy_key": error in libcrypto
+root@47.254.235.22: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [sender]
+rsync error: unexplained error (code 255) at io.c(232) [sender=3.4.1]
