@@ -367,5 +367,12 @@ window.BM_MAP = {
   "Water Heater 热水器": "Pemanas Air 热水器",
   "Solar Panel 太阳能板": "Panel Suria 太阳能板",
   "Tiles Upgraded 换新瓷砖": "Jubin Dinaik Taraf 换新瓷砖",
-  "Renovated Bathroom 浴室翻新": "Bilik Mandi Diubah Suai 浴室翻新"
+  "Renovated Bathroom 浴室翻新": "Bilik Mandi Diubah Suai 浴室翻新",
+  /* form labels */
+  "Title type (optional)": "Jenis hakmilik (pilihan)",
+  "Furnishing (optional)": "Perabot (pilihan)",
+  "Security (optional)": "Keselamatan (pilihan)",
+  "Maintenance fee (RM/month, optional)": "Yuran penyelenggaraan (RM/bulan, pilihan)",
+  "Condition (optional)": "Keadaan (pilihan)",
+  "Facing (optional)": "Arah hadap (pilihan)"
 };

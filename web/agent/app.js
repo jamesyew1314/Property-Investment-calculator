@@ -595,21 +595,21 @@
       '<div class="grid2 nums">' + field(t("产业类别", "Category"), '<select name="category">' + optList([{key:"residential",zh:"住宅",en:"Residential"},{key:"commercial",zh:"商业",en:"Commercial"},{key:"industrial",zh:"工业",en:"Industrial"},{key:"land",zh:"地皮",en:"Land"}], row.category, "—") + "</select>") +
       field(t("产业类型", "Type"), '<select name="property_type">' + optList(typeList(), row.property_type, "—") + "</select>") + "</div>" +
       '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("规格", "Specifications") + "</h4>" +
-      '<div class="grid2 nums">' + field(t("土地面积（如 22x70）", "Land size (e.g. 22x70)"), '<input name="land_size" value="' + esc(row.land_size || "") + '" placeholder="22x70">') +
-      field(t("建筑面积 (sqft)", "Built-up (sqft)"), '<input name="built_up" inputmode="numeric" value="' + esc(row.built_up || "") + '">') + "</div>" +
-      '<div class="grid2 nums">' + field(t("房间", "Bedrooms"), '<input name="bedrooms" inputmode="numeric" value="' + esc(row.bedrooms != null ? row.bedrooms : "") + '">') +
-      field(t("额外房间", "Extra rooms"), '<input name="extra_rooms" inputmode="numeric" value="' + esc(row.extra_rooms != null ? row.extra_rooms : "") + '">') + "</div>" +
-      '<div class="grid2 nums">' + field(t("浴室", "Bathrooms"), '<input name="bathrooms" inputmode="numeric" value="' + esc(row.bathrooms != null ? row.bathrooms : "") + '">') +
-      field(t("厕所", "Toilets"), '<input name="toilets" inputmode="numeric" value="' + esc(row.toilets != null ? row.toilets : "") + '">') + "</div>" +
+      '<div class="grid2 nums">' + field(t("Land size 土地面积（如 22x70）", "Land size (e.g. 22x70)"), '<input name="land_size" value="' + esc(row.land_size || "") + '" placeholder="22x70">') +
+      field(t("Built-up 建筑面积（sqft）", "Built-up (sqft)"), '<input name="built_up" inputmode="numeric" value="' + esc(row.built_up || "") + '">') + "</div>" +
+      '<div class="grid2 nums">' + field(t("Bedrooms 房间", "Bedrooms"), '<input name="bedrooms" inputmode="numeric" value="' + esc(row.bedrooms != null ? row.bedrooms : "") + '">') +
+      field(t("Extra rooms 额外房间", "Extra rooms"), '<input name="extra_rooms" inputmode="numeric" value="' + esc(row.extra_rooms != null ? row.extra_rooms : "") + '">') + "</div>" +
+      '<div class="grid2 nums">' + field(t("Bathrooms 浴室", "Bathrooms"), '<input name="bathrooms" inputmode="numeric" value="' + esc(row.bathrooms != null ? row.bathrooms : "") + '">') +
+      field(t("Toilets 厕所", "Toilets"), '<input name="toilets" inputmode="numeric" value="' + esc(row.toilets != null ? row.toilets : "") + '">') + "</div>" +
       '<div class="grid2 nums">' + field(t("Lot 位置", "Lot position"), '<select name="lot_position">' + optList([{key:"intermediate",zh:"中间",en:"Intermediate"},{key:"corner",zh:"角头",en:"Corner"},{key:"end",zh:"尾",en:"End"},{key:"side",zh:"旁边",en:"Side"}], row.lot_position, "—") + "</select>") +
-      field(t("方向", "Facing"), '<input name="facing" value="' + esc(row.facing || "") + '" placeholder="South">') + "</div>" +
-      '<div class="grid2 nums">' + field(t("产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") +
-      field(t("地契", "Title"), '<select name="title_type">' + optList((S.meta && S.meta.title_types) || [], row.title_type, "—") + "</select>") + "</div>" +
-      '<div class="grid2 nums">' + field(t("家私", "Furnishing"), '<select name="furnishing">' + optList([{key:"unfurnished",zh:"空屋",en:"Unfurnished"},{key:"partial",zh:"部分装修",en:"Partially furnished"},{key:"full",zh:"全装修",en:"Fully furnished"}], row.furnishing, "—") + "</select>") +
-      field(t("保安", "Security"), '<select name="security">' + optList([{key:"gated",zh:"围篱",en:"Gated"},{key:"guarded",zh:"保安",en:"Guarded"},{key:"none",zh:"无",en:"None"}], row.security, "—") + "</select>") + "</div>" +
+      field(t("Facing 方向（可不填）", "Facing (optional)"), '<input name="facing" value="' + esc(row.facing || "") + '" placeholder="South">') + "</div>" +
+      '<div class="grid2 nums">' + field(t("Tenure 产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") +
+      field(t("Title 地契类型（可不填）", "Title type (optional)"), '<select name="title_type">' + optList((S.meta && S.meta.title_types) || [], row.title_type, "—") + "</select>") + "</div>" +
+      '<div class="grid2 nums">' + field(t("Furnishing 家私（可不填）", "Furnishing (optional)"), '<select name="furnishing">' + optList([{key:"unfurnished",zh:"空屋",en:"Unfurnished"},{key:"partial",zh:"部分装修",en:"Partially furnished"},{key:"full",zh:"全装修",en:"Fully furnished"}], row.furnishing, "—") + "</select>") +
+      field(t("Security 保安（可不填）", "Security (optional)"), '<select name="security">' + optList([{key:"gated",zh:"围篱",en:"Gated"},{key:"guarded",zh:"保安",en:"Guarded"},{key:"none",zh:"无",en:"None"}], row.security, "—") + "</select>") + "</div>" +
       '<div class="grid2 nums">' + field(t("Bumi 状态", "Bumi status"), '<select name="bumi">' + optList([{key:"bumi",zh:"Bumi",en:"Bumi"},{key:"non_bumi",zh:"非 Bumi",en:"Non-Bumi"},{key:"any",zh:"不限",en:"Any"}], row.bumi, "—") + "</select>") +
-      field(t("管理费 (RM/月)", "Maintenance fee"), '<input name="maintenance_fee" inputmode="numeric" value="' + esc(row.maintenance_fee || "") + '">') + "</div>" +
-      '<div class="grid2">' + field(t("现况", "Condition"), '<select name="condition">' + optList([{key:"vacant",zh:"空置",en:"Vacant"},{key:"occupied",zh:"自住",en:"Occupied"},{key:"tenanted",zh:"出租中",en:"Tenanted"},{key:"renovated",zh:"已装修",en:"Renovated"}], row.condition, "—") + "</select>") + "</div>" +
+      field(t("Maintenance 管理费（RM/月，可不填）", "Maintenance fee (RM/month, optional)"), '<input name="maintenance_fee" inputmode="numeric" value="' + esc(row.maintenance_fee || "") + '">') + "</div>" +
+      '<div class="grid2">' + field(t("Condition 现况（可不填）", "Condition (optional)"), '<select name="condition">' + optList([{key:"vacant",zh:"空置",en:"Vacant"},{key:"occupied",zh:"自住",en:"Occupied"},{key:"tenanted",zh:"出租中",en:"Tenanted"},{key:"renovated",zh:"已装修",en:"Renovated"}], row.condition, "—") + "</select>") + "</div>" +
       '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("装修和卖点", "Renovation & highlights") + "</h4>" +
       '<div class="muted" style="font-size:12px;margin:-4px 0 8px">' + t("仅用于房源记录与分享，不参与自动匹配。", "For your own records and sharing only — not used for matching.") + "</div>" +
       '<div class="muted" style="font-size:12px;margin-bottom:6px">' + t("点选有的装修（再点一次取消）", "Tap what the unit has (tap again to remove)") + "</div>" +
