@@ -23,6 +23,8 @@
       if (typeof window.__pnSetLang === "function") {
         window.__pnSetLang(l);
         b.querySelectorAll("button[data-l]").forEach(function (x) { x.classList.toggle("on", x.dataset.l === l); });
+        var lg = document.getElementById("lang3login");
+        if (lg) lg.textContent = l === "en" ? "Agent login" : l === "bm" ? "Log masuk ejen" : "中介登录";
       } else { apply(l); }
     });
     return b;

@@ -66,10 +66,10 @@
   <div class="wrap bar">
     <a class="brand" href="/" aria-label="RoofX"><img src="/logo.png?v=tr1" alt="" onerror="this.style.display='none'"><span><b>ROOFX</b></span></a>
     <nav class="site-nav" id="nav">
-      <a href="/">首页</a>
-      <a href="/pool/" class="on">房源池</a>
-      <a href="/agents/">中介</a>
-      <a href="/join/">加入</a>
+      <a href="/" id="navHome">首页</a>
+      <a href="/pool/" class="on" id="navPool">房源池</a>
+      <a href="/agents/" id="navAgents">中介</a>
+      <a href="/join/" id="navJoin">加入</a>
     </nav>
     <div class="headActs">
       <div class="langs" id="langs"><button type="button" data-l="zh">中文</button><button type="button" data-l="en">EN</button><button type="button" data-l="bm">BM</button></div>
@@ -117,9 +117,9 @@ var INIT = { area: _q.get('area') || '', intent: _q.get('intent') || '', q: _q.g
 var AREAS = [];
 var ROWS = [];
 var T = {
-  zh: { title:'房源池', sub:'无需登录，浏览全部同行货源 · 登录后发布你的房源', all:'全部', sale:'出售 WTS', rent:'出租 WTL', q:'搜索编号 / 楼盘 / 地址', area:'全部区域', count:'共 {n} 条货源', login:'登录 / 发布', wa:'WhatsApp 联系', rules:'WhatsApp 群规', join:'加入 WhatsApp 群', empty:'还没有货源，稍后再来看看。', noArea:'区域待补', deal:'低于估价 20%', verified:'已验证' },
-  en: { title:'Listing Pool', sub:'Browse every co-broke listing without logging in · Log in to post yours', all:'All', sale:'Sale WTS', rent:'Rent WTL', q:'Search code / project / address', area:'All areas', count:'{n} listings', login:'Login / Post', wa:'WhatsApp', rules:'WhatsApp group rules', join:'Join WhatsApp group', empty:'No listings yet — check back soon.', noArea:'Area pending', deal:'20% below valuation', verified:'Verified' },
-  bm: { title:'Kolam Senarai', sub:'Lihat semua senarai rakan tanpa log masuk · Log masuk untuk siar', all:'Semua', sale:'Jual WTS', rent:'Sewa WTL', q:'Cari kod / projek / alamat', area:'Semua kawasan', count:'{n} senarai', login:'Log Masuk / Siar', wa:'WhatsApp', rules:'Peraturan kumpulan WhatsApp', join:'Sertai kumpulan WhatsApp', empty:'Belum ada senarai — semak semula nanti.', noArea:'Kawasan belum diisi', deal:'20% bawah penilaian', verified:'Disahkan' }
+  zh: { title:'房源池', sub:'无需登录，浏览全部同行货源 · 登录后发布你的房源', all:'全部', sale:'出售 WTS', rent:'出租 WTL', q:'搜索编号 / 楼盘 / 地址', area:'全部区域', count:'共 {n} 条货源', login:'登录 / 发布', wa:'WhatsApp 联系', rules:'WhatsApp 群规', join:'加入 WhatsApp 群', empty:'还没有货源，稍后再来看看。', noArea:'区域待补', deal:'低于估价 20%', verified:'已验证', home:'首页', navPool:'房源池', navAgents:'中介', navJoin:'加入', bank:'银行估价', below:'低于估价', bed:'房', bath:'卫', areaPending:'区域待补' },
+  en: { title:'Listing Pool', sub:'Browse every co-broke listing without logging in · Log in to post yours', all:'All', sale:'Sale WTS', rent:'Rent WTL', q:'Search code / project / address', area:'All areas', count:'{n} listings', login:'Login / Post', wa:'WhatsApp', rules:'WhatsApp group rules', join:'Join WhatsApp group', empty:'No listings yet — check back soon.', noArea:'Area pending', deal:'20% below valuation', verified:'Verified', home:'Home', navPool:'Listings', navAgents:'Agents', navJoin:'Join', bank:'Bank value', below:'below valuation', bed:'bed', bath:'bath', areaPending:'Area pending' },
+  bm: { title:'Kolam Senarai', sub:'Lihat semua senarai rakan tanpa log masuk · Log masuk untuk siar', all:'Semua', sale:'Jual WTS', rent:'Sewa WTL', q:'Cari kod / projek / alamat', area:'Semua kawasan', count:'{n} senarai', login:'Log Masuk / Siar', wa:'WhatsApp', rules:'Peraturan kumpulan WhatsApp', join:'Sertai kumpulan WhatsApp', empty:'Belum ada senarai — semak semula nanti.', noArea:'Kawasan belum diisi', deal:'20% bawah penilaian', verified:'Disahkan', home:'Utama', navPool:'Kolam', navAgents:'Ejen', navJoin:'Sertai', bank:'Nilai bank', below:'bawah penilaian', bed:'bilik', bath:'bilik air', areaPending:'Kawasan belum diisi' }
 };
 var STD = {
 zh:["只发布 WTS 出售 / WTL 出租，不发布 WTB / WTR","必须填写：照片、价格、区域、面积或房型、公司与 REN、联系电话","合作分佣默认 A+B ÷ 2；如有 referral fee，请在个人资料中注明","资料不全或违规，平台会下架并要求补充"],
@@ -128,6 +128,7 @@ bm:["Siar WTS (jual) dan WTL (sewa) sahaja — tiada WTB / WTR","Wajib: gambar, 
 };
 var STD_NOTE={zh:"发布前需登录中介账号；资料不全的房源不会进入房源池。",en:"Log in to post. Incomplete listings will not enter the pool.",bm:"Log masuk untuk siar. Senarai tidak lengkap tidak akan masuk kolam."};
 function t(k){ return (T[LANG]||T.zh)[k]; }
+function areaLabel(code){ if(!code) return t('areaPending'); var a=(AREAS||[]).filter(function(x){return x.key===code;})[0]; if(!a) return code; return LANG==='en'?(a.en||a.zh):(a.zh||a.en); }
 function money(v, rent){ if(v==null) return '—'; return 'RM ' + Number(v).toLocaleString('en-MY') + (rent?'/mo':''); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 window.__pnSetLang=function(l){
@@ -141,6 +142,7 @@ function apply(){
   document.getElementById('poolTitle').textContent=t('title');
   document.getElementById('poolSub').textContent=t('sub');
   document.getElementById('q').placeholder=t('q');
+  [['navHome','home'],['navPool','navPool'],['navAgents','navAgents'],['navJoin','navJoin']].forEach(function(x){var el=document.getElementById(x[0]); if(el) el.textContent=t(x[1]);});
   var _dt=document.getElementById('dealTxt'); if(_dt) _dt.textContent=t('deal');
   document.getElementById('stdTitle').textContent=LANG==='zh'?'发布规范':(LANG==='bm'?'Peraturan siaran':'Posting standards');
   document.getElementById('stdList').innerHTML=(STD[LANG]||STD.zh).map(function(x){return '<li>'+esc(x)+'</li>';}).join('');
@@ -179,8 +181,8 @@ function render(){
     return '<article class="plCard">'+(img?'<img src="'+esc(img)+'" loading="lazy" alt="">':'')+
       '<div class="plBody"><div class="plTop"><span class="plCode">'+esc(r.code)+'</span><span class="plTag '+(rent?'rent':'')+'">'+(rent?t('rent'):t('sale'))+'</span></div>'+
       '<div class="plTitle">'+esc(r.project_name||r.address_text||r.code)+'</div>'+
-      (Number(r.bank_value)>0?'<div class="plMeta">银行估价 RM '+Number(r.bank_value).toLocaleString('en-MY')+(Number(r.asking_price)>0?' · '+(Number(r.asking_price)<=Number(r.bank_value)*0.8?'低于估价 '+Math.round((1-Number(r.asking_price)/Number(r.bank_value))*100)+'%':'') :'')+'</div>':'')+
-      '<div class="plMeta">'+esc(r.area_code||'')+(r.bedrooms!=null?' · '+r.bedrooms+'房':'')+(r.bathrooms!=null?' / '+r.bathrooms+'卫':'')+(r.built_up?' · '+Number(r.built_up).toLocaleString('en-MY')+' sqft':'')+'</div>'+
+      (Number(r.bank_value)>0?'<div class="plMeta">'+t('bank')+' RM '+Number(r.bank_value).toLocaleString('en-MY')+(Number(r.asking_price)>0?' · '+(Number(r.asking_price)<=Number(r.bank_value)*0.8?t('below')+' '+Math.round((1-Number(r.asking_price)/Number(r.bank_value))*100)+'%':'') :'')+'</div>':'')+
+      '<div class="plMeta">'+esc(areaLabel(r.area_code))+(r.bedrooms!=null?' · '+r.bedrooms+' '+t('bed'):'')+(r.bathrooms!=null?' / '+r.bathrooms+' '+t('bath'):'')+(r.built_up?' · '+Number(r.built_up).toLocaleString('en-MY')+' sqft':'')+'</div>'+
       '<div class="plPrice">'+money(price,rent)+'</div>'+
       (r.cobroke_note?'<div class="plMeta">合作：'+esc(r.cobroke_note)+'</div>':'')+
       '<div class="plAgent"><b>'+esc(r.agent_name||'')+'</b>'+(r.agent_team?' · '+esc(r.agent_team):'')+(r.agent_ren?' · REN '+esc(r.agent_ren):'')+(r.agent_verified?' · '+t('verified'):'')+'</div>'+
