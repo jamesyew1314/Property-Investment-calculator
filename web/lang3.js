@@ -6,10 +6,10 @@
   if (q.get("lang")) { try { localStorage.setItem(KEY, lang); localStorage.setItem(LEGACY, lang); } catch (e) {} }
   function css() {
     var s = document.createElement("style");
-    s.textContent = "#lang3{position:fixed;top:12px;right:12px;z-index:9999;display:flex;gap:4px;background:#fff;border:1px solid #D6DCE7;border-radius:999px;padding:3px;box-shadow:0 4px 16px rgba(14,36,56,.14)}" +
+    s.textContent = "#lang3{position:fixed;top:64px;right:12px;z-index:9999;display:flex;gap:4px;background:#fff;border:1px solid #D6DCE7;border-radius:999px;padding:3px;box-shadow:0 4px 16px rgba(14,36,56,.14)}" +
       "#lang3 button{border:0;background:transparent;font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#0E2438;padding:6px 9px;border-radius:999px;cursor:pointer}" +
       "#lang3 button.on{background:#0E2438;color:#fff}" +
-      "@media(max-width:760px){#lang3{top:8px;right:8px}}";
+      "@media(max-width:760px){#lang3{top:56px;right:8px}}";
     document.head.appendChild(s);
   }
   function render() {
