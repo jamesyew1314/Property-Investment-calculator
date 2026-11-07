@@ -11,7 +11,7 @@
 
   var STATIC = {
     "tab.login": ["登录", "Sign in"],
-    "tab.register": ["免费注册", "Create account"],
+    "tab.register": ["注册", "Create account"],
     "f.name": ["姓名 *", "Name *"],
     "f.phone": ["电话 / WhatsApp", "Phone / WhatsApp"],
     "f.team": ["团队 / 公司", "Team / company"],
@@ -71,6 +71,8 @@
       setTimeout(function () { listingForm(base, true); }, 0);
       return;
     }
+    var authEl = document.getElementById("auth");
+    if (authEl && !authEl.hidden) setAuthMode(S.authMode || "login");
     if (typeof route === "function") route();
   };
   function cycleLang() {
@@ -237,11 +239,11 @@
     $("#tabLogin").classList.toggle("on", mode === "login");
     $("#tabRegister").classList.toggle("on", mode === "register");
     $("#regFields").hidden = mode !== "register";
-    $("#authTitle").textContent = mode === "login" ? t("登录工作台", "Sign in") : t("免费注册", "Create your account");
+    $("#authTitle").textContent = mode === "login" ? t("登录工作台", "Sign in") : t("创建账号", "Create your account");
     $("#authSub").textContent = mode === "login"
       ? t("管理你的房源、客户与带看；发布一次，全团队帮你找买家。", "Manage your listings, clients and viewings. List once — the network helps you sell.")
-      : t("免费使用全部功能；注册后即可发布房源。", "Free for now. Publish your listings right after signing up.");
-    $("#authBtn").textContent = mode === "login" ? t("登录", "Sign in") : t("免费注册", "Create account");
+      : t("注册后即可发布与管理房源。", "Create an account to publish and manage listings.");
+    $("#authBtn").textContent = mode === "login" ? t("登录", "Sign in") : t("注册", "Create account");
     $("#authMsg").textContent = "";
     $("#aPass").setAttribute("autocomplete", mode === "login" ? "current-password" : "new-password");
   }
