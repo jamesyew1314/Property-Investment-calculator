@@ -805,8 +805,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
         LEFT JOIN lib_projects pr ON pr.id=p.project_id
         LEFT JOIN lib_agents a ON a.id=p.tenant_id
         WHERE p.visibility IN ('pool','public') AND p.status IN ('available','reserved')
-          AND p.tenant_id IS DISTINCT FROM $1
-        ORDER BY p.updated_at DESC LIMIT 800`, [req.agent.id]);
+        ORDER BY p.updated_at DESC LIMIT 800`);
 
       const out = matcher.matchClients(clients.rows, listings.rows, 6);
       res.json({ ok: true, clients: out, listings: listings.rows.length });
