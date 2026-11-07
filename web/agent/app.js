@@ -355,11 +355,12 @@
         "</th><th>" + t("操作", "Actions") + "</th></tr></thead><tbody>" +
         d.rows.map(function (r) {
           var price = r.intent === "rent" ? r.rent_price : r.asking_price;
-          return '<tr><td class="mono">' + esc(r.code) + "</td><td><b>" + esc(r.project_title || r.project_name || "—") + "</b>" +
+          return '<tr data-act="view-listing" data-id="' + r.id + '" style="cursor:pointer"><td class="mono">' + esc(r.code) + "</td><td><b>" + esc(r.project_title || r.project_name || "—") + "</b>" +
             (r.unit_no ? '<span class="muted"> · ' + esc([r.block, r.unit_no].filter(Boolean).join(" ")) + "</span>" : "") +
             "</td><td>" + esc(areaName(r.area_code)) + "</td><td class='num'>" + money(price, r.intent === "rent") + "</td><td>" + pill(r.status) +
             "</td><td>" + visPill(r.visibility) + "</td><td class='num'>" + (r.inquiries || 0) + "</td>" +
-            '<td><button class="btn line sm" data-act="edit-listing" data-id="' + r.id + '">' + t("编辑", "Edit") + "</button> " +
+            '<td><button class="btn line sm" data-act="view-listing" data-id="' + r.id + '">' + t("查看", "View") + "</button> " +
+            '<button class="btn line sm" data-act="edit-listing" data-id="' + r.id + '">' + t("编辑", "Edit") + "</button> " +
             '<button class="btn line sm" data-act="share" data-id="' + r.id + '">' + t("分享到群", "Share") + "</button> " +
             '<button class="btn ' + (r.visibility === "public" ? "line" : "gold") + ' sm" data-act="toggle-publish" data-id="' + r.id + '" data-pub="' + (r.visibility === "public" ? "0" : "1") + '">' +
             (r.visibility === "public" ? t("取消公开", "Unpublish") : t("公开官网", "Publish")) + "</button></td></tr>";
@@ -448,6 +449,54 @@
         toast(t("已识别 " + (j.fields.confidence || 0) + " 项，请核对", "Extracted " + (j.fields.confidence || 0) + " fields — please check"));
       }).catch(function (e) { btn.disabled = false; m.msg(e.message === "invalid_input" ? t("请先粘贴内容", "Paste something first") : e.message); });
     });
+  }
+
+  function listingDetail(row) {
+    var T = { condo: "Condominium / 公寓", apartment: "Apartment", terrace: "Terrace / 排屋", semi_d: "Semi-D / 半独立", bungalow: "Bungalow / 独立式", townhouse: "Townhouse", shoplot: "Shoplot / 店屋", office: "Office / 办公室", land: "Land / 地皮" };
+    var LOT = { intermediate: "Intermediate lot", corner: "Corner lot", end: "End lot", side: "Side lot" };
+    var FUR = { unfurnished: "Unfurnished", partial: "Partially furnished", full: "Fully furnished" };
+    var COND = { vacant: "Vacant", occupied: "Occupied", tenanted: "Tenanted", renovated: "Renovated", new: "New", good: "Good", fair: "Fair", needs_work: "Needs work" };
+    var TITLE = { individual: "Individual title", strata: "Strata title", master: "Master title" };
+    function row2(label, val) {
+      if (val == null || val === "") return "";
+      return '<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid #F1F3F7"><span style="flex:0 0 112px;color:#6B7A8D;font-size:12px">' + esc(label) + '</span><span style="font-size:13px;color:#0E2438;word-break:break-word">' + val + "</span></div>";
+    }
+    var price = row.intent === "rent" ? row.rent_price : row.asking_price;
+    var photos = Array.isArray(row.photos) ? row.photos : [];
+    var body = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><b style="font-family:Georgia,serif;font-size:20px;color:#0E2438">' + esc(row.code) + "</b>" + pill(row.status) + visPill(row.visibility) + "</div>" +
+      (row.headline ? '<div style="font-weight:700;color:#0E2438;margin-bottom:8px">' + esc(row.headline) + "</div>" : "") +
+      (photos.length ? '<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:12px">' + photos.slice(0, 8).map(function (u) { return '<img src="' + esc(u) + '" style="width:96px;height:72px;object-fit:cover;border-radius:8px;flex:0 0 auto">'; }).join("") + "</div>" : "") +
+      row2(t("售价 / 租金", "Price"), price ? money(price, row.intent === "rent") + (row.negotiable ? " · " + t("可议价", "Negotiable") : "") : "") +
+      row2(t("银行估价", "Bank value"), row.bank_value ? money(row.bank_value) : "") +
+      row2(t("项目 / 地址", "Project / address"), esc([row.project_name, row.address].filter(Boolean).join(" · "))) +
+      row2(t("花园名", "Address text"), esc(row.address_text || "")) +
+      row2(t("中文名", "Chinese name"), esc(row.name_zh || "")) +
+      row2(t("区域", "Area"), esc(areaName(row.area_code))) +
+      row2(t("类别 / 房型", "Category / type"), esc([row.category, T[row.property_type] || row.property_type].filter(Boolean).join(" · "))) +
+      row2(t("土地 / 建筑", "Land / built-up"), esc([row.land_size, row.built_up ? Number(row.built_up).toLocaleString("en-MY") + " sqft" : ""].filter(Boolean).join(" · "))) +
+      row2(t("房 / 浴 / 厕", "Beds / baths / toilets"), [row.bedrooms != null ? row.bedrooms : "", row.bathrooms != null ? row.bathrooms : "", row.toilets != null ? row.toilets : ""].filter(function (x) { return x !== ""; }).join(" / ") || "") +
+      row2(t("Lot / 方向", "Lot / facing"), esc([LOT[row.lot_position] || "", row.facing ? "Facing " + row.facing : ""].filter(Boolean).join(" · "))) +
+      row2(t("Bumi", "Bumi"), row.bumi ? (row.bumi === "non_bumi" ? "Non Bumi" : "Bumi") : "") +
+      row2(t("产权 / 地契", "Tenure / title"), esc([row.tenure, TITLE[row.title_type] || row.title_type].filter(Boolean).join(" · "))) +
+      row2(t("家私 / 现况", "Furnishing / condition"), esc([FUR[row.furnishing] || row.furnishing, COND[row.condition] || row.condition].filter(Boolean).join(" · "))) +
+      row2(t("保安 / 管理费", "Security / maintenance"), esc([row.security, row.maintenance_fee ? "RM " + Number(row.maintenance_fee).toLocaleString("en-MY") + "/mo" : ""].filter(Boolean).join(" · "))) +
+      row2(t("装修", "Renovation"), esc(String(row.renovation || "").split(",").filter(Boolean).join(", "))) +
+      row2(t("其他装修", "Other renovation"), esc(row.other_renovation || "")) +
+      row2(t("卖点", "Highlights"), esc(row.selling_points || "")) +
+      row2(t("公开描述", "Public description"), esc(row.description || "")) +
+      row2(t("备注", "Notes"), esc(row.remarks || "")) +
+      row2(t("更新时间", "Updated"), esc(String(row.updated_at || "").slice(0, 16).replace("T", " ")));
+    var m = modal({
+      title: t("房源详情", "Listing details"),
+      body: body,
+      footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button>" +
+        '<button class="btn line" id="vdCopy">' + t("复制文案", "Copy text") + "</button>" +
+        '<button class="btn gold" id="vdEdit">' + t("编辑", "Edit") + "</button>"
+    });
+    $("#vdCopy", m.root).addEventListener("click", function () {
+      copyText(shareText(row)).then(function () { toast(t("文案已复制", "Copied")); });
+    });
+    $("#vdEdit", m.root).addEventListener("click", function () { m.close(); listingForm(row); });
   }
 
   function listingForm(row, imported) {
@@ -1228,6 +1277,7 @@
         }).catch(function (e) { toast(e.message, true); });
       })();
     }
+    if (act === "view-listing") api("/listings/" + id).then(function (j) { listingDetail(j.row); }).catch(function (e) { toast(e.message, true); });
     if (act === "share") api("/listings/" + id).then(function (j) { shareCard(j.row); });
     if (act === "inquiry") inquiryForm(el.dataset.code);
     if (act === "new-client") clientForm(null);
