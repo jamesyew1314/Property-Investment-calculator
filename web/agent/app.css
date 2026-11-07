@@ -253,3 +253,9 @@ body{font-size:16px}
 input,select,textarea{font-size:16px!important}
 .card h3{font-size:16px}
 .stat b{font-size:26px}
+
+/* 房源表单：统一单列，字段整行（对齐同业） */
+#lf .grid2,#lf .grid3,#lf .grid4,
+#modal #lf .grid2.nums{grid-template-columns:1fr!important;gap:0!important}
+#lf .field{width:100%;margin-bottom:12px}
+#lf h4{margin:18px 0 8px!important}
