@@ -50,8 +50,20 @@ jobs:
             exit 0
           fi
           mkdir -p ~/.ssh
-          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          # 清洗：CRLF / 首尾空白 / 被转义成字面 \n 的情况
+          printf '%s' "$SSH_KEY" | sed 's/\r$//' > /tmp/key.raw
+          if ! grep -q 'BEGIN .*PRIVATE KEY' /tmp/key.raw && grep -q '\\n' /tmp/key.raw; then
+            sed 's/\\n/\n/g' /tmp/key.raw > ~/.ssh/deploy_key
+          else
+            cp /tmp/key.raw ~/.ssh/deploy_key
+          fi
           chmod 600 ~/.ssh/deploy_key
+          if ! ssh-keygen -y -P "" -f ~/.ssh/deploy_key >/dev/null 2>&1; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=SSH_KEY 无效::私钥格式不正确（可能粘贴不完整）。请重新复制并覆盖 SSH_KEY。"
+            exit 0
+          fi
+          ssh-keygen -lf ~/.ssh/deploy_key | awk '{print "key fingerprint " $2}'
           ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           echo "ready=true" >> "$GITHUB_OUTPUT"
 
