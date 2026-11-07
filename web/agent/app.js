@@ -559,6 +559,7 @@
       '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("预览（可直接修改）", "Preview (editable)") + "</h4>" +
       '<textarea id="sharePreview" style="width:100%;min-height:180px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:12.5px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE"></textarea>' +
       '<button type="button" class="btn line sm" id="prevBtn" style="margin-top:6px">' + t("刷新预览", "Refresh preview") + "</button>" +
+      '<button type="button" class="btn gold sm" id="copyPrev" style="margin-top:6px;margin-left:6px">' + t("复制文案", "Copy text") + "</button>" +
       "</form>";
     var m = modal({
       title: row.id ? t("编辑房源", "Edit listing") : (imported ? t("导入预览（可修改）", "Imported — review") : t("新增房源", "New listing")),
@@ -583,11 +584,24 @@
       var o = {}; new FormData(form).forEach(function (v, k) { o[k] = v; });
       o.code = (row && row.code) || "PREVIEW"; return o;
     }
+    var previewDirty = false;
     function refreshPreview() {
-      var ta = $("#sharePreview", m.root); if (ta) ta.value = shareText(currentRow($("#lf", m.root)));
+      var ta = $("#sharePreview", m.root);
+      if (ta) { ta.value = shareText(currentRow($("#lf", m.root))); previewDirty = false; }
     }
     var pb = $("#prevBtn", m.root);
     if (pb) pb.addEventListener("click", refreshPreview);
+    var formEl = $("#lf", m.root);
+    if (formEl) formEl.addEventListener("input", function () { if (!previewDirty) refreshPreview(); });
+    if (formEl) formEl.addEventListener("change", function () { if (!previewDirty) refreshPreview(); });
+    var ta0 = $("#sharePreview", m.root);
+    if (ta0) ta0.addEventListener("input", function () { previewDirty = true; });
+    var cp = $("#copyPrev", m.root);
+    if (cp) cp.addEventListener("click", function () {
+      var ta = $("#sharePreview", m.root);
+      var txt = ta && ta.value ? ta.value : shareText(currentRow($("#lf", m.root)));
+      copyText(txt).then(function () { toast(t("文案已复制", "Copied")); });
+    });
     if (row.id) refreshPreview();
     fetch("/api/public/config?t=" + Date.now()).then(function (r) { return r.json(); }).then(function (cfg) {
       S.meta = { states: cfg.states || [], areas: cfg.areas || [], property_types: (cfg.taxonomy || {}).property_types || [], tenures: (cfg.taxonomy || {}).tenures || [] };
