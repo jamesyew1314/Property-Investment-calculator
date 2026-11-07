@@ -409,7 +409,7 @@ window.PAGE_I18N = {
     var areas = ((state.cfg && state.cfg.areas) || []).slice(0, 12);
     grid.innerHTML = areas.map(function (a) {
       var name = KT.lang === "en" ? a.en : a.zh;
-      return '<a class="area-card" href="/properties/?area=' + a.key + '"><b>' + KT.esc(name) + "</b>" +
+      return '<a class="area-card" href="/pool/?area=' + a.key + '"><b>' + KT.esc(name) + "</b>" +
         '<span>' + (a.n ? a.n + (KT.lang === "en" ? " listings" : " 套在售") : (KT.lang === "en" ? "Coming soon" : "即将开放")) + "</span>" +
         '<em>' + (KT.lang === "en" ? "Browse →" : "查看房源 →") + "</em></a>";
     }).join("");
