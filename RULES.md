@@ -159,6 +159,7 @@
 | 2026-11-07 | 建立本文件；整理品牌、三语、房源池、工作台、导入、匹配、部署规则 |
 | 2026-11-07 | 新增强制条款：每次修复必须同步核查手机端，并在记录中注明「手机端已验证」 |
 | 2026-11-07 | 新增强制条款：全站每页完整三语，翻译 100%，新增/修改功能必须同步补齐三语 |
+| 2026-11-08 | 房/浴/厕下拉出现「2（2 房）」重复：数值选项只显示数字（Studio/1–10、1–8、1–5、+1–+3），双语括号仅在中文标签不同时显示。手机端已验证 |
 | 2026-11-07 | 房源表单下拉改为固定双语选项：Bedrooms(Studio/1–10)、Bathrooms(1–8)、Toilets(1–5)、Extra rooms(+1–+3)、Lot(Intermediate/Corner/End/Corner+extra land/Facing open)、Facing(8 方位)、Bumi(Non Bumi/Bumi/Malay Reserve)；所有选项显示「English（中文）」，BM 已补。手机端已验证 |
 | 2026-11-07 | 房源表单参考同业改为「英文术语 + 中文 + 可不填」标签：Tenure 产权、Title 地契类型、Furnishing 家私、Security 保安、Maintenance 管理费、Condition 现况、Facing 方向、Bedrooms/Bathrooms/Toilets、Land size/Built-up；可选字段标注（可不填）。手机端已验证 |
 | 2026-11-07 | 三语全量审计：工作台补 118 条 BM、公共页补 18 条 BM、隐私/条款补 101 条 BM；区域名按语言显示（BM 用英文名，不再混中文）；移除隐私/条款 BM 回退英文。手机端同 DOM，已验证 |
