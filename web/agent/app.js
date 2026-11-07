@@ -1046,6 +1046,7 @@
       '<div class="grid2">' + field(t("团队 / 公司", "Team"), '<input id="pfTeam" value="' + esc(a.team || "") + '">') +
       field(t("REN 编号", "REN"), '<input id="pfRen" value="' + esc(a.ren_no || "") + '">') + "</div>" +
       field(t("简介", "Bio"), '<textarea id="pfBio">' + esc(a.bio || "") + "</textarea>") +
+      field(t("合作分佣说明（显示在房源池）", "Co-broke terms (shown in pool)"), '<input id="pfCobroke" placeholder="' + t("例如：Comm A+B÷2；referral fee 需提前说明", "e.g. Comm A+B÷2; referral fee must be declared") + '" value="' + esc(a.cobroke_note || "") + '">') +
       field(t("个人页地址", "Your page"), '<div style="display:flex;align-items:center;gap:6px"><span class="muted">kwongthye.com/a/</span><input id="pfSlug" value="' + esc(a.slug || "") + '"></div>') +
       field(t("专长区域（可多选）", "Areas you cover"), areaSel) +
       '<div style="margin-top:6px"><button class="btn gold" id="pfSave">' + t("保存资料", "Save profile") + "</button></div></div>";
@@ -1092,6 +1093,7 @@
       var body = {
         name: $("#pfName").value.trim(), phone: $("#pfPhone").value.trim(), team: $("#pfTeam").value.trim(),
         ren_no: $("#pfRen").value.trim(), bio: $("#pfBio").value.trim(), slug: $("#pfSlug").value.trim(), lang: $("#pfLang").value,
+        cobroke_note: ($("#pfCobroke") || {}).value || "",
         years_exp: $("#pfYears").value === "" ? null : Number($("#pfYears").value),
         deals_count: $("#pfDeals").value === "" ? null : Number($("#pfDeals").value),
         deals_value: $("#pfValue").value === "" ? null : Number($("#pfValue").value),
@@ -1186,7 +1188,15 @@
         toast(pub ? t("已公开到官网", "Published to site") : t("已收回，仅池内可见", "Unpublished"));
         route();
         if (pub) api("/listings/" + id).then(function (j) { shareCard(j.row); }).catch(function () {});
-      }).catch(function (e) { toast(e.message === "need_price" ? t("先填写价格再公开", "Add a price first") : e.message, true); });
+      }).catch(function (e) {
+        var map = {
+          need_price: t("先填写价格再公开", "Add a price first"),
+          need_area: t("先选择区域再公开", "Select an area first"),
+          need_photos: t("至少上传 1 张照片再公开", "Upload at least 1 photo first"),
+          need_profile: t("请先在个人资料填写电话和 REN", "Add your phone and REN in Profile first")
+        };
+        toast(map[e.message] || e.message, true);
+      });
     }
     if (act === "share") api("/listings/" + id).then(function (j) { shareCard(j.row); });
     if (act === "inquiry") inquiryForm(el.dataset.code);

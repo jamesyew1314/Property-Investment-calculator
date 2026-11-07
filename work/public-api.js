@@ -175,7 +175,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
                p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
                p.photos, p.cover_url, p.headline, p.status, p.updated_at, p.description,
                a.name AS agent_name, a.phone AS agent_phone, a.team AS agent_team, a.ren_no AS agent_ren,
-               a.slug AS agent_slug, a.verified_at AS agent_verified
+               a.slug AS agent_slug, a.verified_at AS agent_verified, a.cobroke_note
         FROM lib_properties p
         JOIN lib_agents a ON a.id = p.tenant_id
         WHERE ` + where.join(" AND ") + `

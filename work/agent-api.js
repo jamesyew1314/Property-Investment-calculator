@@ -52,7 +52,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       id: a.id, name: a.name, email: a.email, phone: a.phone, team: a.team, ren_no: a.ren_no,
       slug: a.slug, bio: a.bio, photo_url: a.photo_url, areas: a.areas,
       verified: !!a.verified_at, emailVerified: !!a.email_verified_at, lang: a.lang || "zh",
-      years_exp: a.years_exp, deals_count: a.deals_count, deals_value: a.deals_value == null ? null : Number(a.deals_value), avatar_url: a.avatar_url,
+      years_exp: a.years_exp, deals_count: a.deals_count, deals_value: a.deals_value == null ? null : Number(a.deals_value), avatar_url: a.avatar_url, cobroke_note: a.cobroke_note || null,
       review_status: a.review_status || "pending", review_note: a.review_note || null,
       status: a.status, plan: a.plan, created_at: a.created_at, last_login_at: a.last_login_at
     };
@@ -202,6 +202,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       if (b.deals_count !== undefined) { const n = Number(b.deals_count); if (Number.isInteger(n) && n >= 0 && n <= 100000) v.deals_count = n; }
       if (b.deals_value !== undefined) { const n = Number(b.deals_value); if (Number.isFinite(n) && n >= 0) v.deals_value = n; }
       if (b.bio !== undefined) v.bio = core.str(b.bio, 1000);
+      if (b.cobroke_note !== undefined) v.cobroke_note = core.str(b.cobroke_note, 300);
       if (b.areas !== undefined) v.areas = core.listOfEnums("areas", b.areas, 12);
       if (b.slug !== undefined) {
         const s = String(b.slug).toLowerCase().trim();
@@ -548,6 +549,12 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       }
       if (pub && !before.area_code) {
         return res.status(400).json({ ok: false, error: "need_area" });
+      }
+      if (pub && (!Array.isArray(before.photos) || before.photos.length === 0)) {
+        return res.status(400).json({ ok: false, error: "need_photos" });
+      }
+      if (pub && (!req.agent.phone || !req.agent.ren_no)) {
+        return res.status(400).json({ ok: false, error: "need_profile" });
       }
       const out = await pool.query(
         "UPDATE lib_properties SET visibility=$1, published_at=$2, updated_at=now() WHERE id=$3 AND tenant_id=$4 RETURNING *",

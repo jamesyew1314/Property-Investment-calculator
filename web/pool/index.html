@@ -87,14 +87,9 @@
   <div id="empty" class="poolEmpty" hidden>还没有货源，稍后再来看看。</div>
 
   <section class="rules">
-    <h2 id="rulesTitle">WhatsApp 群规</h2>
-    <div class="tabs" id="rulesTabs">
-      <button data-l="zh" class="on">中文</button><button data-l="en">English</button><button data-l="bm">Bahasa Melayu</button>
-    </div>
-    <div class="body" id="rulesBody"></div>
-    <div style="margin-top:14px">
-      <a class="btn gold" id="joinGroup" href="https://chat.whatsapp.com/Gih6fsOwXLc13dJCkY6vMT" target="_blank" rel="noopener">加入 WhatsApp 群</a>
-    </div>
+    <h2 id="stdTitle">发布规范</h2>
+    <ul id="stdList" style="margin:10px 0 0;padding-left:18px;font-size:13.5px;line-height:1.9;color:#33455A"></ul>
+    <p class="muted" id="stdNote" style="margin:10px 0 0;font-size:12px">发布前需登录中介账号；资料不全的房源不会进入房源池。</p>
   </section>
 </main>
 
@@ -109,50 +104,12 @@ var T = {
   en: { title:'Listing Pool', sub:'Browse every co-broke listing without logging in · Log in to post yours', all:'All', sale:'Sale WTS', rent:'Rent WTL', q:'Search code / project / address', area:'All areas', count:'{n} listings', login:'Login / Post', wa:'WhatsApp', rules:'WhatsApp group rules', join:'Join WhatsApp group', empty:'No listings yet — check back soon.', noArea:'Area pending', verified:'Verified' },
   bm: { title:'Kolam Senarai', sub:'Lihat semua senarai rakan tanpa log masuk · Log masuk untuk siar', all:'Semua', sale:'Jual WTS', rent:'Sewa WTL', q:'Cari kod / projek / alamat', area:'Semua kawasan', count:'{n} senarai', login:'Log Masuk / Siar', wa:'WhatsApp', rules:'Peraturan kumpulan WhatsApp', join:'Sertai kumpulan WhatsApp', empty:'Belum ada senarai — semak semula nanti.', noArea:'Kawasan belum diisi', verified:'Disahkan' }
 };
-var RULES = {
-zh:`🤝我们欢迎所有 Agent 与 Agency 同行加入🤝
-我们群的目的是【合作共赢】，让大家互相分享好货、互相帮忙打广告，一起开单赚钱💪。
-
-💥本群只开放【WTS】出售 & 【WTL】出租
-❌ WTB & WTR 一律不允许
-
-▶️ 欢迎有诚信、有责任感的同行
-▶️ 必须有 REN
-▶️ 愿意 Comm A + B ÷ 2（如有 referral fee 必须提前说明）
-▶️ 邀请加入的必须是本人见过面或合作过的同行
-▶️ 所有货源必须有照片、详细资料、价钱、公司名字、REN、电话号码
-▶️ 请不要重复分享（每月 repost 一次即可）
-▶️ 屡次犯规或不听劝告，会被请出本群
-▶️ 如被投诉「potong」（需有证据），请通知群主，我们会立即将该人移出群`,
-en:`🤝 We welcome all agents & agencies 🤝
-Our group is about WIN-WIN: share good listings, help each other advertise, and close deals together 💪.
-
-💥 Only 【WTS】Sale & 【WTL】Rent are allowed
-❌ WTB & WTR are NOT allowed
-
-▶️ Honest and responsible peers only
-▶️ Must have a REN
-▶️ Willing to co-broke Comm A + B ÷ 2 (any referral fee must be declared upfront)
-▶️ Invite only agents you have met or worked with
-▶️ Every listing must include photos, full details, price, company name, REN and phone number
-▶️ Do not keep reposting (once a month is enough)
-▶️ Repeated violations or ignoring reminders will result in removal
-▶️ If someone is reported for "potong" (with proof), inform the admin and we will remove them immediately`,
-bm:`🤝 Kami mengalu-alukan semua ejen & agensi 🤝
-Kumpulan ini untuk MENANG-MENANG: kongsi senarai baik, bantu promosi, dan tutup jualan bersama 💪.
-
-💥 Hanya 【WTS】Jual & 【WTL】Sewa dibenarkan
-❌ WTB & WTR TIDAK dibenarkan
-
-▶️ Hanya rakan yang jujur dan bertanggungjawab
-▶️ Mesti ada REN
-▶️ Bersedia Comm A + B ÷ 2 (sebarang referral fee mesti dinyatakan lebih awal)
-▶️ Jemput hanya ejen yang pernah berjumpa atau bekerja dengan anda
-▶️ Setiap senarai mesti ada gambar, butiran lengkap, harga, nama syarikat, REN dan nombor telefon
-▶️ Jangan ulang siar (sekali sebulan sudah cukup)
-▶️ Pelanggaran berulang atau abaikan peringatan akan dikeluarkan
-▶️ Jika ada aduan "potong" (dengan bukti), maklumkan admin dan kami akan keluarkan serta-merta`
+var STD = {
+zh:["只发布 WTS 出售 / WTL 出租，不发布 WTB / WTR","必须填写：照片、价格、区域、面积或房型、公司与 REN、联系电话","合作分佣默认 A+B ÷ 2；如有 referral fee，请在个人资料中注明","同一房源每月最多更新一次，避免重复刷屏","资料不全或违规，平台会下架并要求补充"],
+en:["Post WTS (sale) and WTL (rent) only — no WTB / WTR","Required: photos, price, area, size or layout, company & REN, contact number","Co-broke commission defaults to A+B ÷ 2; declare any referral fee in your profile","Update each listing at most once a month — no repeated posting","Incomplete or non-compliant listings will be unpublished"],
+bm:["Siar WTS (jual) dan WTL (sewa) sahaja — tiada WTB / WTR","Wajib: gambar, harga, kawasan, saiz atau susun atur, syarikat & REN, nombor telefon","Komisen co-broke lalai A+B ÷ 2; nyatakan referral fee dalam profil","Kemas kini setiap senarai maksimum sekali sebulan — jangan ulang siar","Senarai tidak lengkap atau melanggar akan dinyahsiar"]
 };
+var STD_NOTE={zh:"发布前需登录中介账号；资料不全的房源不会进入房源池。",en:"Log in to post. Incomplete listings will not enter the pool.",bm:"Log masuk untuk siar. Senarai tidak lengkap tidak akan masuk kolam."};
 function t(k){ return (T[LANG]||T.zh)[k]; }
 function money(v, rent){ if(v==null) return '—'; return 'RM ' + Number(v).toLocaleString('en-MY') + (rent?'/mo':''); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
@@ -161,13 +118,12 @@ function apply(){
   document.getElementById('poolTitle').textContent=t('title');
   document.getElementById('poolSub').textContent=t('sub');
   document.getElementById('q').placeholder=t('q');
-  document.getElementById('rulesTitle').textContent=t('rules');
-  document.getElementById('joinGroup').textContent=t('join');
+  document.getElementById('stdTitle').textContent=LANG==='zh'?'发布规范':(LANG==='bm'?'Peraturan siaran':'Posting standards');
+  document.getElementById('stdList').innerHTML=(STD[LANG]||STD.zh).map(function(x){return '<li>'+esc(x)+'</li>';}).join('');
+  document.getElementById('stdNote').textContent=(STD_NOTE[LANG]||STD_NOTE.zh);
   document.querySelector('#seg [data-intent=""]').textContent=t('all');
   document.querySelector('#seg [data-intent="sale"]').textContent=t('sale');
   document.querySelector('#seg [data-intent="rent"]').textContent=t('rent');
-  document.querySelectorAll('#rulesTabs button').forEach(function(b){ b.classList.toggle('on', b.dataset.l===LANG); });
-  document.getElementById('rulesBody').textContent=RULES[LANG]||RULES.zh;
   document.querySelector('#area option').textContent=t('area');
   document.querySelector('.headActs .btn').textContent=t('login');
   render();
@@ -195,6 +151,7 @@ function render(){
       '<div class="plTitle">'+esc(r.project_name||r.address_text||r.code)+'</div>'+
       '<div class="plMeta">'+esc(r.area_code||'')+(r.bedrooms!=null?' · '+r.bedrooms+'房':'')+(r.bathrooms!=null?' / '+r.bathrooms+'卫':'')+(r.built_up?' · '+Number(r.built_up).toLocaleString('en-MY')+' sqft':'')+'</div>'+
       '<div class="plPrice">'+money(price,rent)+'</div>'+
+      (r.cobroke_note?'<div class="plMeta">合作：'+esc(r.cobroke_note)+'</div>':'')+
       '<div class="plAgent"><b>'+esc(r.agent_name||'')+'</b>'+(r.agent_team?' · '+esc(r.agent_team):'')+(r.agent_ren?' · REN '+esc(r.agent_ren):'')+(r.agent_verified?' · '+t('verified'):'')+'</div>'+
       (phone?'<div class="plActions"><a class="btn gold" href="'+wa+'" target="_blank" rel="noopener">'+t('wa')+'</a></div>':'')+
       '</div></article>';
@@ -206,9 +163,7 @@ document.getElementById('seg').addEventListener('click',function(e){
 });
 document.getElementById('q').addEventListener('input',render);
 document.getElementById('area').addEventListener('change',render);
-document.getElementById('rulesTabs').addEventListener('click',function(e){
-  var b=e.target.closest('button'); if(!b) return; LANG=b.dataset.l; localStorage.setItem('pn_lang',LANG); apply();
-});
+
 document.getElementById('menuBtn').addEventListener('click',function(){ document.getElementById('nav').classList.toggle('open'); this.setAttribute('aria-expanded',document.getElementById('nav').classList.contains('open')); });
 
 fetch('/api/public/config').then(function(r){return r.json();}).then(function(cfg){
