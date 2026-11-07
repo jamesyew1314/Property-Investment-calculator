@@ -1025,7 +1025,7 @@
               var price = m.intent === "rent" ? m.rent_price : m.asking_price;
               return "<tr><td><b>" + esc(projName(m)) + "</b> <span class='mono muted'>" + esc(m.code) + "</span></td><td>" +
                 esc(areaName(m.area_code)) + "</td><td class='num'>" + money(price, m.intent === "rent") + "</td><td>" + esc(m.owner_name || "—") +
-                "</td><td><button class='btn line sm' data-act='view-listing' data-id='" + m.id + "'>" + t("查看详情", "View") + "</button></td></tr>";
+                "</td><td><a class='btn line sm' href='/p/" + encodeURIComponent(m.code) + "' target='_blank' rel='noopener'>" + t("查看详情", "View") + "</a></td></tr>";
             }).join("") + "</tbody></table></div>";
         }
         h += "</div>";
