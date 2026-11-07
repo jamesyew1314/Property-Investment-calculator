@@ -10,6 +10,9 @@ on:
       - "**/*.md"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
   group: production
   cancel-in-progress: false
@@ -58,7 +61,18 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
-          KEY=~/.ssh/deploy_key HOST="$SSH_HOST" USER_="${SSH_USER:-root}" bash deploy/deploy.sh
+          set -o pipefail
+          KEY=~/.ssh/deploy_key HOST="$SSH_HOST" USER_="${SSH_USER:-root}" bash deploy/deploy.sh 2>&1 | tee /tmp/deploy.log
+
+      - name: Upload deploy log
+        if: always()
+        run: |
+          [ -f /tmp/deploy.log ] && cp /tmp/deploy.log .deploy-log || echo "no log" > .deploy-log
+          git config user.name "deploy-bot"
+          git config user.email "deploy@kwongthye.com"
+          git add .deploy-log
+          git commit -m "chore: deploy log" || true
+          git push || true
 
       - name: Smoke test (public URL)
         if: steps.ssh.outputs.ready == 'true'
