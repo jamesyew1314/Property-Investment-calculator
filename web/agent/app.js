@@ -997,8 +997,8 @@
       '<details style="margin:4px 0 8px"><summary style="cursor:pointer;color:#2E5496;font-size:13px">' + t("+ 更多资料（选填）", "+ More details (optional)") + "</summary>" +
       '<div class="grid2" style="margin-top:8px">' +
       field(t("邮箱", "Email"), '<input name="email" value="' + esc(row.email || "") + '">') +
-      field(t("最少房间", "Min bedrooms"), '<input name="bedrooms_min" inputmode="numeric" value="' + esc(row.bedrooms_min == null ? "" : row.bedrooms_min) + '">') + "</div>" +
-      '<div class="grid2">' + field(t("最少浴室", "Min bathrooms"), '<input name="bathrooms_min" inputmode="numeric" value="' + esc(row.bathrooms_min == null ? "" : row.bathrooms_min) + '">') +
+      field(t("最少房间", "Min bedrooms"), '<select name="bedrooms_min">' + optList([1,2,3,4,5,6,7,8,9,10].map(function(n){return {key:String(n),zh:String(n),en:String(n)}}), row.bedrooms_min != null ? String(row.bedrooms_min) : "", "不限") + "</select>") + "</div>" +
+      '<div class="grid2">' + field(t("最少浴室", "Min bathrooms"), '<select name="bathrooms_min">' + optList([1,2,3,4,5,6,7,8].map(function(n){return {key:String(n),zh:String(n),en:String(n)}}), row.bathrooms_min != null ? String(row.bathrooms_min) : "", "不限") + "</select>") +
       field(t("最小建筑面积 (sqft)", "Min built-up (sqft)"), '<input name="built_up_min" inputmode="numeric" value="' + esc(row.built_up_min == null ? "" : row.built_up_min) + '">') + "</div>" +
       '<div class="grid2">' + field(t("家私", "Furnishing"), '<select name="furnishing">' + optList([{key:"unfurnished",zh:"空屋",en:"Unfurnished"},{key:"partial",zh:"部分装修",en:"Partially furnished"},{key:"full",zh:"全装修",en:"Fully furnished"}], row.furnishing, "—") + "</select>") +
       field(t("产权", "Tenure"), '<select name="tenure">' + optList(S.meta ? S.meta.tenures : [], row.tenure, "—") + "</select>") + "</div>" +
@@ -1008,8 +1008,6 @@
       field(t("现况", "Condition"), '<select name="condition">' + optList([{key:"vacant",zh:"空置",en:"Vacant"},{key:"occupied",zh:"自住",en:"Occupied"},{key:"tenanted",zh:"出租中",en:"Tenanted"},{key:"renovated",zh:"已装修",en:"Renovated"}], row.condition, "—") + "</select>") + "</div>" +
       field(t("保安", "Security"), '<select name="security">' + optList([{key:"gated",zh:"围篱",en:"Gated"},{key:"guarded",zh:"保安",en:"Guarded"},{key:"none",zh:"无",en:"None"}], row.security, "—") + "</select>") +
       field(t("偏好房型（可多选）", "Preferred types (multi)"), '<select name="property_types" multiple size="4" style="min-height:96px">' + (S.meta && S.meta.property_types ? S.meta.property_types : []).map(function (x) { return '<option value="' + x.key + '"' + ((row.property_types || []).indexOf(x.key) >= 0 ? " selected" : "") + ">" + esc(S.lang === "en" ? x.en : x.zh) + "</option>"; }).join("") + "</select>") +
-      '<div class="grid2">' + field(t("时间线", "Timeline"), '<select name="timeline">' + optList([{key:"now",zh:"一个月内",en:"Within 1 month"},{key:"3m",zh:"三个月内",en:"Within 3 months"},{key:"6m",zh:"半年内",en:"Within 6 months"},{key:"1y",zh:"一年内",en:"Within 1 year"},{key:"exploring",zh:"先看看",en:"Just exploring"}], row.timeline, "—") + "</select>") +
-      field(t("来源", "Source"), '<select name="source">' + optList([{key:"referral",zh:"转介绍",en:"Referral"},{key:"walk_in",zh:"上门 / 陌生客",en:"Walk-in"},{key:"portal",zh:"PropertyGuru / iProperty",en:"Portal"},{key:"social",zh:"Facebook / 小红书 / TikTok",en:"Social"},{key:"signage",zh:"广告牌 / 传单",en:"Signage"},{key:"existing",zh:"老客户",en:"Existing client"}], row.source, "—") + "</select>") + "</div>" +
       "</details>" +
       field(t("备注", "Notes"), '<textarea name="remarks">' + esc(row.remarks || "") + "</textarea>") + "</form>";
     var m = modal({
