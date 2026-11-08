@@ -266,3 +266,6 @@ input,select,textarea{font-size:16px!important}
 
 /* 概览 3 个统计卡（已移除公开统计） */
 .stats{grid-template-columns:repeat(3,1fr)}
+
+/* 概览 2 个统计卡（移除询盘） */
+.stats{grid-template-columns:repeat(2,1fr)}

@@ -290,8 +290,6 @@
     { key: "pool", zh: "中心池", en: "Pool", ico: "◈" },
     { key: "clients", zh: "我的客户", en: "Clients", ico: "👤" },
     { key: "matches", zh: "自动匹配", en: "Matches", ico: "⇄" },
-    { key: "inquiries", zh: "带看询盘", en: "Inquiries", ico: "✉", badge: true },
-    { key: "mandates", zh: "业主委托", en: "Mandates", ico: "🗂" },
     { key: "plan", zh: "套餐", en: "Plan", ico: "◆" },
     { key: "profile", zh: "个人资料", en: "Profile", ico: "⚙" }
   ];
@@ -346,26 +344,14 @@
 
   // ---------- 概览 ----------
   function dash() {
-    setTitle(t("概览", "Overview"), t("今天的房源、客户与询盘", "Your listings, clients and inquiries"));
+    setTitle(t("概览", "Overview"), t("今天的房源与客户", "Your listings and clients"));
     $("#topActs").innerHTML = '<button class="btn gold sm" data-act="new-listing">+ ' + t("新增房源", "New listing") + "</button>";
-    return Promise.all([api("/me"), api("/inquiries?box=in")]).then(function (res) {
-      var st = res[0].stats, inq = res[1].rows || [];
+    return api("/me").then(function (me) {
+      var st = me.stats;
       S.stats = st; renderNav();
       var h = '<div class="stats">' +
         '<a class="stat" href="#/listings"><b>' + st.listings + "</b><span>" + t("我的房源", "My listings") + "</span></a>" +
-
-        '<a class="stat" href="#/clients"><b>' + st.clients + "</b><span>" + t("我的客户", "Clients") + "</span></a>" +
-        '<a class="stat" href="#/inquiries"><b>' + st.new_inquiries + "</b><span>" + t("待处理询盘", "New inquiries") + "</span></a></div>";
-      h += '<div class="card"><h3>' + t("最近询盘", "Latest inquiries") + "</h3>" +
-        (inq.length ? '<div class="table" style="border:none"><table class="table"><thead><tr><th>' + t("时间", "When") +
-          "</th><th>" + t("房源", "Listing") + "</th><th>" + t("同行", "Agent") + "</th><th>" + t("客户", "Client") +
-          "</th><th>" + t("状态", "Status") + "</th></tr></thead><tbody>" +
-          inq.slice(0, 8).map(function (i) {
-            return "<tr><td class='muted'>" + dt(i.at) + "</td><td class='mono'>" + esc(i.code) + " · " + esc(i.project_title || i.project_name || "") +
-              "</td><td>" + esc(i.from_name || "—") + "</td><td>" + esc(i.client_name || "") + "<br><span class='muted'>" + esc(i.client_phone || "") +
-              "</span></td><td>" + pill(i.status) + "</td></tr>";
-          }).join("") + "</tbody></table></div>"
-          : '<p class="muted">' + t("还没有询盘。把房源放进中心池，同行才找得到。", "No inquiries yet. Put listings in the pool so peers can find them.") + "</p>") + "</div>";
+        '<a class="stat" href="#/clients"><b>' + st.clients + "</b><span>" + t("我的客户", "Clients") + "</span></a></div>";
       h += '<div class="card"><h3>' + t("快速开始", "Quick start") + "</h3><div style='display:flex;gap:8px;flex-wrap:wrap'>" +
         '<a class="btn dark sm" href="#/listings">' + t("管理房源", "Manage listings") + "</a>" +
         '<a class="btn line sm" href="#/pool">' + t("逛中心池", "Browse pool") + "</a>" +
@@ -929,7 +915,7 @@
             '<div class="meta">' + t("货源：", "Listed by ") + "<b>" + esc(r.owner_name || r.agent || "—") + "</b>" +
             (r.owner_ren ? " · " + esc(r.owner_ren) : "") + (r.owner_verified ? " ✓" : "") + "</div>" +
             '<div class="foot">' + (mine ? '<span class="muted">' + t("这是你的房源", "Your listing") + "</span>" :
-              '<button class="btn gold sm" data-act="inquiry" data-code="' + esc(r.code) + '">' + t("申请带看", "Request viewing") + "</button>" +
+              '<a class="btn line sm" href="/p/' + encodeURIComponent(r.code) + '" target="_blank" rel="noopener">' + t("查看详情", "View details") + "</a>" +
               (r.owner_phone ? '<a class="btn line sm" href="tel:' + esc(r.owner_phone) + '">' + esc(r.owner_phone) + "</a>" : "")) + "</div></div>";
         }).join("") + "</div>";
       }
