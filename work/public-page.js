@@ -81,7 +81,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
     ".agentBox .av{width:52px;height:52px;border-radius:50%;background:#0E2438;color:#E2C88F;display:grid;place-items:center;font:700 18px Georgia,serif}" +
     "@media(max-width:820px){.pd-grid{grid-template-columns:1fr}}" +
     "</style></head><body>" +
-    '<header class="site-head"><div class="wrap bar"><a class="brand" href="/"><img src="/logo-white.png" alt="RoofX"><span>ROOFX</span></a>' +
+    '<header class="site-head"><div class="wrap bar"><a class="brand" href="/"><img src="/logo-white.png" alt="RoofX"><span>RoofX</span></a>' +
     '<nav class="site-nav"><a href="/properties/">' + (lang === "zh" ? "房源池" : (en ? "Listing pool" : "Semua Senarai RoofX")) + '</a><a href="/agents/">' + (lang === "zh" ? "中介简介" : (en ? "Agent profiles" : "Profil ejen")) + '</a><a href="/join/">' + (lang === "zh" ? "中介注册" : (en ? "Agent registration" : "Pendaftaran ejen")) + '</a><a class="login" href="/agent/">' + (lang === "zh" ? "中介登录" : (en ? "Agent login" : "Log Masuk Ejen")) + "</a></nav></div></header>" +
     '<main class="wrap pd"><a class="pd-back" href="/a/' + encodeURIComponent(agent.slug || "") + '?lang=' + lang + '">← ' + T.back + "</a>" +
     '<div class="pd-grid"><div><div class="pd-photo">' + (main ? '<img src="' + esc(main) + '" alt="' + esc(title) + '">' : "") + "</div>" +

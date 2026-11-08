@@ -118,7 +118,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     "@media(max-width:760px){.agentGrid{grid-template-columns:1fr}.agentHero{padding:34px 0 28px}.agentStats{gap:20px}.waFloat{right:12px;bottom:12px}}" +
     "</style></head><body>" +
     '<header class="site-head"><div class="wrap bar">' +
-    '<a class="brand" href="/"><img src="/logo-white.png" alt="RoofX"><span>ROOFX</span></a>' +
+    '<a class="brand" href="/"><img src="/logo-white.png" alt="RoofX"><span>RoofX</span></a>' +
     '<nav class="site-nav"><a href="/properties/">' + L.find + '</a><a href="/agents/">' + L.agents + '</a><a href="/join/">' + L.join + '</a><a href="https://calc.kwongthye.com/">' + L.calc + '</a>' +
     '<a class="login" href="/agent/">' + L.login + "</a></nav>" +
     '<div style="display:flex;gap:6px;margin-left:8px">' +
