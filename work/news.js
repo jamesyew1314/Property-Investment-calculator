@@ -12,7 +12,7 @@ const FEEDS = [
 const ALLOW_SOURCE = /the star|thestar|the edge|theedgemalaysia|malay mail|new straits|nst|bernama|free malaysia today|fmt|malaysian reserve|business times|reuters|bloomberg|channel news asia|cna|the sun|sinar harian|utusan|harian metro|nikkei|financial times/i;
 const BLOCK_URL = /edgeprop|propertyguru|mudah\.my|iproperty|99\.co|ohmyhome|brickz|propsocial|roomster|estateagent|realestate\.com|agent/i;
 const BLOCK_TITLE = /(for sale|for rent|@\s|service residence|new launch|show unit|open for viewing|book a viewing)/i;
-const RELEVANT = /(propert|real estate|housing|condo|apartment|residence|landed|rental|tenant|developer|development|Iskandar|RTS|Johor Bahru|high-rise|industrial|warehous|mall)/i;
+const RELEVANT = /(propert|real estate|housing|condo|apartment|residence|landed|rental|tenant|developer|Iskandar|RTS|Johor Bahru|high-rise|industrial|warehous|mall|property development)/i;
 
 function dayMYT() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kuala_Lumpur", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
