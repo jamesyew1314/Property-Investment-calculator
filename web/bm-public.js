@@ -340,5 +340,6 @@ window.BM_MAP = {
   "Are you an agent?": "Adakah anda ejen?",
   "Put your card in the directory": "Letakkan kad anda dalam direktori",
   "Your page plus the listing pool, so clients find you when they search the area.": "Halaman anda serta kumpulan penyenaraian, supaya klien menemui anda apabila mereka mencari kawasan tersebut.",
-  "The pool is open to browse; posting and client tools are for agent accounts only.": "Kumpulan ini terbuka untuk dilayari; penyiaran dan alat klien hanya untuk akaun ejen."
+  "The pool is open to browse; posting and client tools are for agent accounts only.": "Kumpulan ini terbuka untuk dilayari; penyiaran dan alat klien hanya untuk akaun ejen.",
+  "ROI calculator": "Kalkulator ROI"
 };

@@ -249,7 +249,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
   });
 
   // ---------- 中介目录 ----------
-  r.get("/agents", requireAgent, async function (req, res, next) {
+  r.get("/agents", async function (req, res, next) {
     try {
       const out = await pool.query(`
         SELECT a.id, a.name, a.slug, a.ren_no, a.phone, a.email, a.bio, a.photo_url, a.areas, a.verified_at,
