@@ -6,6 +6,7 @@
 const express = require("express");
 const crypto = require("node:crypto");
 const core = require("./library-core");
+const listingCode = require("./listing-code");
 const agentCore = require("./agent-core");
 const matcher = require("./match");
 const billplz = require("./billplz");
@@ -489,6 +490,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       v.intent = v.intent || "sale";
       v.status = v.status || "available";
       v.visibility = "pool";
+      v.code = await listingCode.nextCode(pool, req.agent);
       const cols = Object.keys(v);
       const out = await pool.query("INSERT INTO lib_properties(" + cols.join(",") + ") VALUES(" +
         cols.map((_, i) => "$" + (i + 1)).join(",") + ") RETURNING *", cols.map((c) => v[c]));

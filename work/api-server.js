@@ -9,6 +9,7 @@ const { buildReportPdf } = require("./report-pdf");
 const createLibraryApi = require("./library-api");
 const createPublicApi = require("./public-api");
 const { createNewsApi, startScheduler: startNewsScheduler } = require("./news");
+const listingCode = require("./listing-code");
 const createAgentApi = require("./agent-api");
 const renderAgentPage = require("./agent-page");
 const renderPublicListing = require("./public-page");
@@ -1546,3 +1547,4 @@ app.use(function (err, req, res, next) {
 
 app.listen(PORT, "127.0.0.1", function () { console.log("api listening on " + PORT); });
 startNewsScheduler(pool).catch(function (e) { console.error("news scheduler", e.message); });
+listingCode.backfill(pool).then(function (r) { console.log("listing codes backfilled", JSON.stringify(r)); }).catch(function (e) { console.error("listing codes", e.message); });
