@@ -1194,7 +1194,7 @@
     var areaSel = areaPicker(a.areas || []);
     var h = '<div class="card"><h3>' + t("账号", "Account") + "</h3>" +
       '<div class="grid2">' + field(t("姓名", "Name"), '<input id="pfName" value="' + esc(a.name || "") + '">') +
-      field(t("电话 / WhatsApp", "Phone"), '<input id="pfPhone" value="' + esc(a.phone || "") + '">') + "</div>" +
+      field(t("电话 / WhatsApp", "Phone"), '<input id="pfPhone" type="tel" inputmode="tel" autocomplete="tel" value="' + esc(a.phone || "") + '">') + "</div>" +
       '<div class="grid3">' +
       field(t("从业年限", "Years in business"), '<input id="pfYears" type="number" min="0" max="60" value="' + (a.years_exp == null ? "" : a.years_exp) + '">') +
       field(t("成交宗数", "Deals closed"), '<input id="pfDeals" type="number" min="0" value="' + (a.deals_count == null ? "" : a.deals_count) + '">') +
