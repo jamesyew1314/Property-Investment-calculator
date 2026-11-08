@@ -4,11 +4,15 @@ const express = require("express");
 const https = require("node:https");
 
 const FEEDS = [
-  "https://news.google.com/rss/search?q=Johor+property&hl=en-MY&gl=MY&ceid=MY:en",
-  "https://news.google.com/rss/search?q=Malaysia+property+market&hl=en-MY&gl=MY&ceid=MY:en",
-  "https://news.google.com/rss/search?q=Iskandar+Johor+property&hl=en-MY&gl=MY&ceid=MY:en",
-  "https://news.google.com/rss/search?q=Johor+Bahru+real+estate&hl=en-MY&gl=MY&ceid=MY:en"
+  "https://news.google.com/rss/search?q=Johor+property+OR+housing+OR+%22real+estate%22+(site:thestar.com.my+OR+site:theedgemalaysia.com+OR+site:malaymail.com+OR+site:nst.com.my+OR+site:bernama.com+OR+site:freemalaysiatoday.com)&hl=en-MY&gl=MY&ceid=MY:en",
+  "https://news.google.com/rss/search?q=Iskandar+Johor+OR+%22Johor+Bahru%22+property+(site:thestar.com.my+OR+site:theedgemalaysia.com+OR+site:malaymail.com+OR+site:nst.com.my+OR+site:bernama.com)&hl=en-MY&gl=MY&ceid=MY:en",
+  "https://news.google.com/rss/search?q=Malaysia+property+market+(site:thestar.com.my+OR+site:theedgemalaysia.com+OR+site:malaymail.com+OR+site:nst.com.my+OR+site:bernama.com)&hl=en-MY&gl=MY&ceid=MY:en"
 ];
+// 只允许正规新闻媒体；排除房源平台与中介帖
+const ALLOW_SOURCE = /the star|thestar|the edge|theedgemalaysia|malay mail|new straits|nst|bernama|free malaysia today|fmt|malaysian reserve|business times|reuters|bloomberg|channel news asia|cna|the sun|sinar harian|utusan|harian metro|nikkei|financial times/i;
+const BLOCK_URL = /edgeprop|propertyguru|mudah\.my|iproperty|99\.co|ohmyhome|brickz|propsocial|roomster|estateagent|realestate\.com|agent/i;
+const BLOCK_TITLE = /(for sale|for rent|@\s|service residence|new launch|show unit|open for viewing|book a viewing)/i;
+const RELEVANT = /(propert|real estate|housing|condo|apartment|residence|landed|rental|tenant|developer|development|Iskandar|RTS|Johor Bahru|high-rise|industrial|mall|office|land|building)/i;
 
 function dayMYT() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kuala_Lumpur", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
@@ -51,7 +55,8 @@ function parseRss(xml) {
     const title = clean(t), url = clean(l);
     if (!title || !url) continue;
     const published = p ? new Date(p) : new Date();
-    out.push({ title: title, url: url, summary: clean(d).slice(0, 260), source: clean(src) || "News", published_at: isNaN(published) ? new Date() : published });
+    const cleanTitle = title.replace(/\s+-\s+[^-]{2,40}$/, "").trim();
+    out.push({ title: cleanTitle, url: url, summary: clean(d).slice(0, 260), source: clean(src) || "News", published_at: isNaN(published) ? new Date() : published });
   }
   return out;
 }
@@ -62,6 +67,9 @@ async function fetchAll() {
     try {
       const xml = await get(feed);
       for (const it of parseRss(xml)) {
+        if (!ALLOW_SOURCE.test(it.source) && !ALLOW_SOURCE.test(it.url)) continue;
+        if (BLOCK_URL.test(it.url) || BLOCK_TITLE.test(it.title)) continue;
+        if (!RELEVANT.test(it.title + " " + it.summary)) continue;
         const key = it.title.toLowerCase().replace(/\s+/g, " ").trim();
         if (seen.has(key)) continue;
         seen.add(key); all.push(it);
@@ -120,6 +128,7 @@ async function refresh(pool) {
       n++;
     } catch (e) { console.error("news insert failed", e.message); }
   }
+  await pool.query("DELETE FROM news_items WHERE source ~* 'edgeprop|propertyguru|mudah|iproperty|99\\.co|ohmyhome|brickz|propsocial' OR url ~* 'edgeprop|propertyguru|mudah|iproperty|99\\.co|ohmyhome|brickz|propsocial'").catch(function () {});
   await pool.query("DELETE FROM news_items WHERE day < CURRENT_DATE - INTERVAL '30 days'").catch(function () {});
   return { ok: true, inserted: n, day: day };
 }
@@ -159,7 +168,7 @@ async function startScheduler(pool) {
     title_zh text, summary_zh text, title_bm text, summary_bm text,
     published_at timestamptz, day date NOT NULL, created_at timestamptz DEFAULT now())`).catch(function (e) { console.error("news table", e.message); });
   const run = function () { refresh(pool).then(function (r) { console.log("news refreshed", JSON.stringify(r)); }).catch(function (e) { console.error("news refresh", e.message); }); };
-  pool.query("SELECT count(*)::int AS n FROM news_items WHERE day = CURRENT_DATE").then(function (q) { if (!q.rows[0] || !q.rows[0].n) run(); }).catch(function () { run(); });
+  run();
   const tick = function () {
     const now = new Date();
     const myt = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kuala_Lumpur" }));
