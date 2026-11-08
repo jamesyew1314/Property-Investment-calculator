@@ -32,7 +32,7 @@ function card(p, lang) {
     '<div class="pcard-media">' + (p.cover_url ? '<img class="pcard-img" src="' + esc(p.cover_url.replace(/\.jpg$/i, "_t.jpg")) + '" data-full="' + esc(p.cover_url) + '" onerror="this.onerror=null;this.src=this.dataset.full" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">' : '<div class="ph"><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="rgba(226,200,143,.5)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></div>') +
     '<span class="pcard-tag">' + (p.intent === "rent" ? (lang === "bm" ? "Untuk disewa" : (en ? "For rent" : "出租")) : (lang === "bm" ? "Untuk dijual" : (en ? "For sale" : "出售"))) + "</span></div>" +
     '<div class="pcard-body"><div class="pcard-title">' + esc(title) + "</div>" +
-    '<div class="pcard-sub">' + esc(areaName(p.area_code, en)) + " · " + esc([p.bedrooms, p.bathrooms].filter(function (x) { return x != null; }).join("/")) +
+    '<div class="pcard-sub">' + esc(areaName(p.area_code, lang !== "zh")) + " · " + esc([p.bedrooms, p.bathrooms].filter(function (x) { return x != null; }).join("/")) +
     (p.built_up ? " · " + Number(p.built_up).toLocaleString("en-MY") + " sqft" : "") + "</div>" +
     '<div class="pcard-price">' + money(price, p.intent === "rent", lang) + "</div></div></a>";
 }
@@ -52,7 +52,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
         reviewNone: "Belum ada ulasan.", mandateTitle: "Serah hartanah anda",
         mName: "Nama", mPhone: "Telefon / WhatsApp", mArea: "Kawasan", mType: "Jenis", mPrice: "Harga jangkaan", mNotes: "Nota", mSend: "Hantar", mOk: "Diterima, ejen akan hubungi anda.", mErr: "Gagal, cuba lagi." }
     : (en
-    ? { home: "Home", find: "Listing pool", agents: "Agents", join: "For agents", calc: "Calculator", login: "Agent login",
+    ? { home: "Home", find: "Listing pool", agents: "Agent profiles", join: "Agent registration", calc: "Calculator", login: "Agent login",
         listings: "Listings", verified: "Verified agent", call: "Call", wa: "WhatsApp", share: "Share",
         copy: "Copy link", copied: "Link copied", consult: "Ask the agent", mandate: "List my property",
         about: "About", areas: "Areas covered", none: "No public listings yet.", back: "Back to RoofX",
@@ -70,7 +70,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
         mName: "姓名", mPhone: "电话 / WhatsApp", mArea: "区域", mType: "房型", mPrice: "期望价格", mNotes: "备注", mSend: "提交委托", mOk: "已收到，中介会联系你。", mErr: "提交失败，请重试。" });
 
   const name = agent.name || "Agent";
-  const areas = (agent.areas || []).map(function (a) { return areaName(a, en); }).filter(Boolean);
+  const areas = (agent.areas || []).map(function (a) { return areaName(a, lang !== "zh"); }).filter(Boolean);
   const wa = String(agent.phone || "").replace(/[^0-9]/g, "").replace(/^0/, "60");
   const slug = encodeURIComponent(agent.slug || "");
   const pageUrl = "https://kwongthye.com/a/" + slug;

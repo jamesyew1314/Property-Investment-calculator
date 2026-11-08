@@ -40,7 +40,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
 
   const title = (lang === "zh" ? (p.project_title_zh || p.project_title || p.project_name) : (p.project_title || p.project_name)) || p.code;
   const price = p.intent === "rent" ? p.rent_price : p.asking_price;
-  const area = areaName(p.area_code, en);
+  const area = areaName(p.area_code, lang !== "zh");
   const photos = (p.photos || []).filter(function (x) { return /^\/uploads\/props\/[A-Za-z0-9._-]+$/.test(x); });
   const main = photos[0] || p.cover_url;
   const waNum = String(agent.phone || "").replace(/[^0-9]/g, "").replace(/^0/, "60");
@@ -82,7 +82,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
     "@media(max-width:820px){.pd-grid{grid-template-columns:1fr}}" +
     "</style></head><body>" +
     '<header class="site-head"><div class="wrap bar"><a class="brand" href="/"><img src="/logo-white.png" alt="RoofX"><span>ROOFX</span></a>' +
-    '<nav class="site-nav"><a href="/properties/">' + (lang === "zh" ? "房源池" : (en ? "Listing pool" : "Kolam Senarai")) + '</a><a href="/agents/">' + (lang === "zh" ? "中介目录" : (en ? "Agents" : "Ejen")) + '</a><a href="/join/">' + (lang === "zh" ? "给中介" : (en ? "For agents" : "Untuk Ejen")) + '</a><a class="login" href="/agent/">' + (lang === "zh" ? "中介登录" : (en ? "Agent login" : "Log Masuk Ejen")) + "</a></nav></div></header>" +
+    '<nav class="site-nav"><a href="/properties/">' + (lang === "zh" ? "房源池" : (en ? "Listing pool" : "Semua Senarai RoofX")) + '</a><a href="/agents/">' + (lang === "zh" ? "中介简介" : (en ? "Agent profiles" : "Profil ejen")) + '</a><a href="/join/">' + (lang === "zh" ? "中介注册" : (en ? "Agent registration" : "Pendaftaran ejen")) + '</a><a class="login" href="/agent/">' + (lang === "zh" ? "中介登录" : (en ? "Agent login" : "Log Masuk Ejen")) + "</a></nav></div></header>" +
     '<main class="wrap pd"><a class="pd-back" href="/a/' + encodeURIComponent(agent.slug || "") + '?lang=' + lang + '">← ' + T.back + "</a>" +
     '<div class="pd-grid"><div><div class="pd-photo">' + (main ? '<img src="' + esc(main) + '" alt="' + esc(title) + '">' : "") + "</div>" +
     (photos.length > 1 ? '<div class="pd-thumbs">' + photos.slice(0, 8).map(function (u) { return '<img src="' + esc(u.replace(/\.jpg$/i, "_t.jpg")) + '" data-full="' + esc(u) + '" onclick="var m=document.querySelector(\'.pd-photo img\');if(m)m.src=this.dataset.full" alt="">'; }).join("") + "</div>" : "") +
