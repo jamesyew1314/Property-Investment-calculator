@@ -15,7 +15,15 @@ function score(client, listing) {
   const types = client.property_types || [];
   if (types.length && types.indexOf(listing.property_type) < 0) return -1;
   if (client.bedrooms_min && Number(listing.bedrooms || 0) < Number(client.bedrooms_min)) return -1;
+  if (client.bathrooms_min && Number(listing.bathrooms || 0) < Number(client.bathrooms_min)) return -1;
+  if (client.built_up_min && Number(listing.built_up || 0) < Number(client.built_up_min)) return -1;
   let s = 0;
+  ["furnishing", "tenure", "bumi", "condition", "security"].forEach(function (k) {
+    if (client[k] && listing[k]) s += client[k] === listing[k] ? 5 : -3;
+  });
+  ["facing", "lot_position"].forEach(function (k) {
+    if (client[k] && listing[k] && client[k] === listing[k]) s += 3;
+  });
   if (client.budget_max) s += 30 - Math.min(30, Math.abs(Number(client.budget_max) - price) / Number(client.budget_max) * 30);
   if (areas.length) s += 40;
   if (types.length) s += 10;

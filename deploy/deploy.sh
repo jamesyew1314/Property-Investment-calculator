@@ -37,7 +37,8 @@ $SCP work/migrations/031_listing_fields.sql "$USER_@$HOST:/tmp/031_listing_field
 $SCP work/migrations/032_form_v3.sql "$USER_@$HOST:/tmp/032_form_v3.sql"
 $SCP work/migrations/033_pool_integrity.sql "$USER_@$HOST:/tmp/033_pool_integrity.sql"
 $SCP work/migrations/034_cobroke.sql "$USER_@$HOST:/tmp/034_cobroke.sql"
-$SSH "$USER_@$HOST" 'sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/030_brand.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/031_listing_fields.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/032_form_v3.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/033_pool_integrity.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/034_cobroke.sql >/dev/null && echo "  migrations ok"'
+$SCP work/migrations/035_client_prefs.sql "$USER_@$HOST:/tmp/035_client_prefs.sql"
+$SSH "$USER_@$HOST" 'sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/030_brand.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/031_listing_fields.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/032_form_v3.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/033_pool_integrity.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/034_cobroke.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/035_client_prefs.sql >/dev/null && echo "  migrations ok"'
 
 echo "▸ 4/5 修正权限并重启"
 $SSH "$USER_@$HOST" '

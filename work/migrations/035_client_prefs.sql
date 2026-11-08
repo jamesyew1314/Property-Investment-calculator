@@ -1,0 +1,9 @@
+ALTER TABLE lib_clients ADD COLUMN IF NOT EXISTS bathrooms_min integer;
+ALTER TABLE lib_clients ADD COLUMN IF NOT EXISTS built_up_min numeric(18,2);
+ALTER TABLE lib_clients ADD COLUMN IF NOT EXISTS furnishing text;
+ALTER TABLE lib_clients ADD COLUMN IF NOT EXISTS tenure text;
+ALTER TABLE lib_clients ADD COLUMN IF NOT EXISTS bumi text;
+ALTER TABLE lib_clients ADD COLUMN IF NOT EXISTS facing text;
+ALTER TABLE lib_clients ADD COLUMN IF NOT EXISTS lot_position text;
+ALTER TABLE lib_clients ADD COLUMN IF NOT EXISTS condition text;
+ALTER TABLE lib_clients ADD COLUMN IF NOT EXISTS security text;

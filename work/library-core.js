@@ -174,6 +174,9 @@ function normalizeClient(input, { partial = false } = {}) {
   if (b.has("area_codes")) b.put("area_codes", listOfEnums("areas", input.area_codes));
   if (b.has("property_types")) b.put("property_types", listOfEnums("property_types", input.property_types));
   b.numField("bedrooms_min", whole, { min: 0, max: 20 });
+  b.numField("bathrooms_min", whole, { min: 0, max: 20 });
+  b.numField("built_up_min", money);
+  ["furnishing", "tenure", "bumi", "facing", "lot_position", "condition", "security"].forEach(function (k) { b.text(k, 40); });
   b.choice("timeline", "timelines");
   b.choice("source", "sources");
   b.choice("status", "client_statuses");
