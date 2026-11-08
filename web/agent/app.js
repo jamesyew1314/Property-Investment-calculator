@@ -353,7 +353,7 @@
       S.stats = st; renderNav();
       var h = '<div class="stats">' +
         '<a class="stat" href="#/listings"><b>' + st.listings + "</b><span>" + t("我的房源", "My listings") + "</span></a>" +
-        '<a class="stat" href="#/listings"><b>' + st.published + "</b><span>" + t("已公开官网", "Public on site") + "</span></a>" +
+
         '<a class="stat" href="#/clients"><b>' + st.clients + "</b><span>" + t("我的客户", "Clients") + "</span></a>" +
         '<a class="stat" href="#/inquiries"><b>' + st.new_inquiries + "</b><span>" + t("待处理询盘", "New inquiries") + "</span></a></div>";
       h += '<div class="card"><h3>' + t("最近询盘", "Latest inquiries") + "</h3>" +
@@ -406,19 +406,17 @@
       }
       h += '<div class="card" style="padding:0;overflow:auto"><table class="table"><thead><tr><th>' + t("编号", "Code") +
         "</th><th>" + t("房源", "Listing") + "</th><th>" + t("区域", "Area") + "</th><th class='num'>" + t("价格", "Price") +
-        "</th><th>" + t("状态", "Status") + "</th><th>" + t("公开", "Visibility") + "</th><th class='num'>" + t("询盘", "Inq.") +
+        "</th><th>" + t("状态", "Status") + "</th><th class='num'>" + t("询盘", "Inq.") +
         "</th><th>" + t("操作", "Actions") + "</th></tr></thead><tbody>" +
         d.rows.map(function (r) {
           var price = r.intent === "rent" ? r.rent_price : r.asking_price;
           return '<tr data-act="view-listing" data-id="' + r.id + '" style="cursor:pointer"><td class="mono">' + esc(r.code) + "</td><td><b>" + esc(r.project_title || r.project_name || "—") + "</b>" +
             (r.unit_no ? '<span class="muted"> · ' + esc([r.block, r.unit_no].filter(Boolean).join(" ")) + "</span>" : "") +
-            "</td><td>" + esc(areaName(r.area_code)) + "</td><td class='num'>" + money(price, r.intent === "rent") + "</td><td>" + pill(r.status) +
-            "</td><td>" + visPill(r.visibility) + "</td><td class='num'>" + (r.inquiries || 0) + "</td>" +
+            "</td><td>" + esc(areaName(r.area_code)) + "</td><td class='num'>" + money(price, r.intent === "rent") + "</td><td>" + pill(r.status) + "</td><td class='num'>" + (r.inquiries || 0) + "</td>" +
             '<td><button class="btn line sm" data-act="view-listing" data-id="' + r.id + '">' + t("查看", "View") + "</button> " +
             '<button class="btn line sm" data-act="edit-listing" data-id="' + r.id + '">' + t("编辑", "Edit") + "</button> " +
             '<button class="btn line sm" data-act="share" data-id="' + r.id + '">' + t("分享到群", "Share") + "</button> " +
-            '<button class="btn ' + (r.visibility === "public" ? "line" : "gold") + ' sm" data-act="toggle-publish" data-id="' + r.id + '" data-pub="' + (r.visibility === "public" ? "0" : "1") + '">' +
-            (r.visibility === "public" ? t("取消公开", "Unpublish") : t("公开官网", "Publish")) + "</button></td></tr>";
+            "</td></tr>";
         }).join("") + "</tbody></table></div>";
       $("#view").innerHTML = h;
       bindListingToolbar();
@@ -521,7 +519,7 @@
     }
     var price = row.intent === "rent" ? row.rent_price : row.asking_price;
     var photos = Array.isArray(row.photos) ? row.photos : [];
-    var body = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><b style="font-family:Georgia,serif;font-size:20px;color:#0E2438">' + esc(row.code) + "</b>" + pill(row.status) + visPill(row.visibility) + "</div>" +
+    var body = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><b style="font-family:Georgia,serif;font-size:20px;color:#0E2438">' + esc(row.code) + "</b>" + pill(row.status) + "</div>" +
       (row.headline ? '<div style="font-weight:700;color:#0E2438;margin-bottom:8px">' + esc(row.headline) + "</div>" : "") +
       (photos.length ? '<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:12px">' + photos.slice(0, 8).map(function (u) { return '<img src="' + esc(u) + '" style="width:96px;height:72px;object-fit:cover;border-radius:8px;flex:0 0 auto">'; }).join("") + "</div>" : "") +
       row2(t("售价 / 租金", "Price"), price ? money(price, row.intent === "rent") + (row.negotiable ? " · " + t("可议价", "Negotiable") : "") : "") +
