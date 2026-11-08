@@ -126,7 +126,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     "</div></div></header>" +
     '<section class="agentHero"><div class="wrap">' +
     '<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">' +
-    '<div class="avatar">' + esc(name.slice(0, 2).toUpperCase()) + "</div>" +
+    '<div class="avatar">' + (agent.photo_url ? '<img src="' + esc(agent.photo_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">' : esc(name.slice(0, 2).toUpperCase())) + "</div>" +
     "<div><h1>" + esc(name) + (agent.verified_at ? ' <span style="font-size:13px;color:#8FD3B4;vertical-align:middle">✓ ' + L.verified + "</span>" : "") + "</h1>" +
     '<div class="meta">' + esc(agent.team || "RoofX") + (agent.ren_no ? " · " + esc(agent.ren_no) : "") + "</div></div></div>" +
     (agent.bio ? '<p class="bio">' + esc(agent.bio) + "</p>" : "") +

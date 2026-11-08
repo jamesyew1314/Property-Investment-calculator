@@ -92,7 +92,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
     (p.description ? '<div style="margin:0 0 18px;color:#41505F;line-height:1.8;white-space:pre-wrap">' + esc(p.description) + "</div>" : "") +
     "</div>" +
     '<aside class="agentBox"><div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#8A97A6">' + T.agent + "</div>" +
-    '<div style="display:flex;gap:12px;align-items:center;margin:10px 0 14px"><div class="av">' + esc((agent.name || "A").slice(0, 2).toUpperCase()) + '</div><div><b style="color:#0E2438">' + esc(agent.name || "") + '</b><div style="font-size:12px;color:#5D6B7A">' + esc(agent.team || "RoofX") + (agent.ren_no ? " · " + esc(agent.ren_no) : "") + "</div></div></div>" +
+    '<div style="display:flex;gap:12px;align-items:center;margin:10px 0 14px"><div class="av">' + (agent.photo_url ? '<img src="' + esc(agent.photo_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">' : esc((agent.name || "A").slice(0, 2).toUpperCase())) + '</div><div><b style="color:#0E2438">' + esc(agent.name || "") + '</b><div style="font-size:12px;color:#5D6B7A">' + esc(agent.team || "RoofX") + (agent.ren_no ? " · " + esc(agent.ren_no) : "") + "</div></div></div>" +
     (wa ? '<a class="btn gold" style="width:100%;text-align:center" href="' + wa + '" target="_blank" rel="noopener">' + T.wa + "</a>" : "") +
     (agent.phone ? '<a class="btn line" style="width:100%;text-align:center;margin-top:8px" href="tel:' + esc(agent.phone) + '">' + T.call + "</a>" : "") +
     '<a class="btn line" style="width:100%;text-align:center;margin-top:8px" href="/a/' + encodeURIComponent(agent.slug || "") + '?lang=' + lang + '">' + T.more + "</a>" +

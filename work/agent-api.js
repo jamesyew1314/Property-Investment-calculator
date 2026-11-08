@@ -221,6 +221,33 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
     } catch (e) { next(e); }
   });
 
+  // ---------- 个人照片 ----------
+  r.post("/me/photo", requireAgent, express.raw({ type: ["image/jpeg", "image/png", "image/webp"], limit: "8mb" }), async function (req, res, next) {
+    try {
+      const buf = req.body;
+      const ext = sniffImage(buf);
+      if (!ext) return res.status(415).json({ ok: false, error: "unsupported_image" });
+      fs.mkdirSync(UPLOADS, { recursive: true });
+      const baseName = "agent-" + req.agent.id + "-" + Date.now().toString(36) + "-" + crypto.randomBytes(3).toString("hex");
+      let name;
+      if (sharp) {
+        name = baseName + ".jpg";
+        const out = await sharp(buf).rotate().resize(600, 600, { fit: "cover" }).jpeg({ quality: 85 }).toBuffer();
+        fs.writeFileSync(pathMod.join(UPLOADS, name), out);
+      } else {
+        name = baseName + "." + ext;
+        fs.writeFileSync(pathMod.join(UPLOADS, name), buf);
+      }
+      const url = "/uploads/props/" + name;
+      const old = req.agent.photo_url;
+      await pool.query("UPDATE lib_agents SET photo_url=$1, updated_at=now() WHERE id=$2", [url, req.agent.id]);
+      if (old && /^\/uploads\/props\/agent-\d+-[A-Za-z0-9._-]+$/.test(old)) {
+        try { fs.unlinkSync(pathMod.join(UPLOADS, pathMod.basename(old))); } catch (e) {}
+      }
+      res.status(201).json({ ok: true, url: url });
+    } catch (e) { next(e); }
+  });
+
   r.post("/verify-email", limit(20, 600000), async function (req, res, next) {
     try {
       const token = core.str((req.body || {}).token, 100);

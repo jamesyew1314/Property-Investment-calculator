@@ -1193,6 +1193,12 @@
     var a = S.me || {};
     var areaSel = areaPicker(a.areas || []);
     var h = '<div class="card"><h3>' + t("账号", "Account") + "</h3>" +
+      '<div style="display:flex;align-items:center;gap:14px;margin:0 0 16px">' +
+      '<div id="pfAvatar" style="width:72px;height:72px;border-radius:50%;overflow:hidden;background:#0E2438;color:#E2C88F;display:grid;place-items:center;font:700 24px Georgia,serif;flex-shrink:0">' +
+      (a.photo_url ? '<img src="' + esc(a.photo_url) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : esc((a.name || "A").slice(0, 2).toUpperCase())) + "</div>" +
+      '<div><button class="btn line sm" id="pfPhotoBtn" type="button">' + t("上传个人照片", "Upload photo") + "</button>" +
+      '<input id="pfPhoto" type="file" accept="image/jpeg,image/png,image/webp" hidden>' +
+      '<div class="muted" style="font-size:12px;margin-top:6px">' + t("JPG / PNG，建议使用方形照片", "JPG / PNG, square photo recommended") + "</div></div></div>" +
       '<div class="grid2">' + field(t("姓名", "Name"), '<input id="pfName" value="' + esc(a.name || "") + '">') +
       field(t("电话 / WhatsApp", "Phone"), '<input id="pfPhone" type="tel" inputmode="tel" autocomplete="tel" value="' + esc(a.phone || "") + '">') + "</div>" +
       '<div class="grid3">' +
@@ -1248,6 +1254,27 @@
           '<br><button class="btn line sm" id="resend" style="margin-top:8px">' + t("重新发送验证邮件", "Resend email") + "</button></p>") + "</div>";
     $("#view").innerHTML = '<div class="profileWrap">' + h + "</div>";
     bindAreaPicker($("#view"));
+    var _ph = $("#pfPhoto"), _av = $("#pfAvatar");
+    if (_ph) {
+      $("#pfPhotoBtn").addEventListener("click", function () { _ph.click(); });
+      _ph.addEventListener("change", function () {
+        var f = (this.files || [])[0];
+        if (!f) return;
+        if (f.size > 8 * 1024 * 1024) return toast(t("图片不能超过 8MB", "Image must be under 8MB"), true);
+        if (["image/jpeg", "image/png", "image/webp"].indexOf(f.type) < 0) return toast(t("只支持 JPG / PNG / WebP", "Only JPG / PNG / WebP"), true);
+        $("#pfPhotoBtn").disabled = true;
+        fetch("/api/agent/me/photo", { method: "POST", credentials: "same-origin", headers: { "Content-Type": f.type }, body: f })
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            if (!j.ok) throw new Error(j.error || "failed");
+            if (S.me) S.me.photo_url = j.url;
+            _av.innerHTML = '<img src="' + j.url + '" alt="" style="width:100%;height:100%;object-fit:cover">';
+            toast(t("照片已更新", "Photo updated"));
+          })
+          .catch(function (e) { toast(e.message || t("上传失败", "Upload failed"), true); })
+          .then(function () { $("#pfPhotoBtn").disabled = false; _ph.value = ""; });
+      });
+    }
     $("#view").addEventListener("click", function (e) {
       var rm = e.target.closest("[data-rm-area]");
       if (rm) { var chip = rm.closest("[data-area-chip]"); if (chip) chip.remove(); }
