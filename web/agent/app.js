@@ -389,10 +389,13 @@
 
   // ---------- 我的房源 ----------
   function listings(q) {
-    setTitle(t("我的房源", "My listings"), t("发布、公开到官网、管理询盘", "Publish, expose to the site, track inquiries"));
+    setTitle(t("我的房源", "My listings"), t("发布与管理房源、客户与匹配", "Manage listings, clients and matches"));
     $("#topActs").innerHTML = '<button class="btn line sm" data-act="import">' + t("一键导入", "Import") + '</button> <button class="btn line sm" data-act="copy-all">' + t("复制全部在售", "Copy all active") + '</button> <button class="btn gold sm" data-act="new-listing">+ ' + t("新增房源", "New listing") + "</button>";
     var qs = new URLSearchParams(); ["q", "status"].forEach(function (k) { if (q[k]) qs.set(k, q[k]); });
-    return api("/listings?" + qs.toString()).then(function (d) {
+    return api("/matches").catch(function () { return { clients: [] }; }).then(function (md) {
+      var mc = {};
+      (md.clients || []).forEach(function (c) { (c.matches || []).forEach(function (m) { mc[m.code] = (mc[m.code] || 0) + 1; }); });
+      return api("/listings?" + qs.toString()).then(function (d) {
       var h = '<div class="toolbar"><input id="lq" type="search" placeholder="' + t("搜索编号 / 楼盘", "Search code / project") + '" value="' + esc(q.q || "") + '">' +
         '<select id="lst"><option value="">' + t("全部状态", "All status") + "</option>" +
         ["available", "reserved", "sold", "rented", "off_market"].map(function (s) {
@@ -400,19 +403,17 @@
         }).join("") + "</select>" +
         '<span class="count">' + d.total + t(" 条", " listings") + "</span></div>";
       if (!d.rows.length) {
-        h += '<div class="empty"><b>' + t("还没有房源", "No listings yet") + "</b>" + t("先发第一条，再勾选公开到官网。", "Publish your first listing, then choose to expose it on the site.") +
+        h += '<div class="empty"><b>' + t("还没有房源", "No listings yet") + "</b>" + t("先发第一条房源。", "Publish your first listing.") +
           '<div style="margin-top:12px"><button class="btn gold" data-act="new-listing">+ ' + t("新增房源", "New listing") + "</button></div></div>";
         $("#view").innerHTML = h; bindListingToolbar(); return;
       }
       h += '<div class="card" style="padding:0;overflow:auto"><table class="table"><thead><tr><th>' + t("编号", "Code") +
-        "</th><th>" + t("房源", "Listing") + "</th><th>" + t("区域", "Area") + "</th><th class='num'>" + t("价格", "Price") +
-        "</th><th>" + t("状态", "Status") + "</th><th class='num'>" + t("询盘", "Inq.") +
+        "</th><th>" + t("区域", "Area") + "</th><th class='num'>" + t("价格", "Price") +
+        "</th><th>" + t("状态", "Status") + "</th><th class='num'>" + t("匹配数量", "Matches") +
         "</th><th>" + t("操作", "Actions") + "</th></tr></thead><tbody>" +
         d.rows.map(function (r) {
           var price = r.intent === "rent" ? r.rent_price : r.asking_price;
-          return '<tr data-act="view-listing" data-id="' + r.id + '" style="cursor:pointer"><td class="mono">' + esc(r.code) + "</td><td><b>" + esc(r.project_title || r.project_name || "—") + "</b>" +
-            (r.unit_no ? '<span class="muted"> · ' + esc([r.block, r.unit_no].filter(Boolean).join(" ")) + "</span>" : "") +
-            "</td><td>" + esc(areaName(r.area_code)) + "</td><td class='num'>" + money(price, r.intent === "rent") + "</td><td>" + pill(r.status) + "</td><td class='num'>" + (r.inquiries || 0) + "</td>" +
+          return '<tr data-act="view-listing" data-id="' + r.id + '" style="cursor:pointer"><td class="mono">' + esc(r.code) + "</td><td>" + esc(areaName(r.area_code)) + "</td><td class='num'>" + money(price, r.intent === "rent") + "</td><td>" + pill(r.status) + "</td><td class='num'>" + (mc[r.code] || 0) + "</td>" +
             '<td><button class="btn line sm" data-act="view-listing" data-id="' + r.id + '">' + t("查看", "View") + "</button> " +
             '<button class="btn line sm" data-act="edit-listing" data-id="' + r.id + '">' + t("编辑", "Edit") + "</button> " +
             '<button class="btn line sm" data-act="share" data-id="' + r.id + '">' + t("分享到群", "Share") + "</button> " +
@@ -420,6 +421,7 @@
         }).join("") + "</tbody></table></div>";
       $("#view").innerHTML = h;
       bindListingToolbar();
+      });
     });
   }
   function bindListingToolbar() {
