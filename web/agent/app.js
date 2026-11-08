@@ -292,7 +292,7 @@
   var NAV = [
     { key: "", zh: "概览", en: "Overview", ico: "▦" },
     { key: "listings", zh: "我的房源", en: "My listings", ico: "🏠" },
-    { key: "pool", zh: "中心池", en: "Pool", ico: "◈" },
+    { key: "pool", zh: "全部房源", en: "All RoofX Listing", ico: "◈" },
     { key: "clients", zh: "我的客户", en: "Clients", ico: "👤" },
     { key: "matches", zh: "自动匹配", en: "Matches", ico: "⇄" },
     { key: "plan", zh: "套餐", en: "Plan", ico: "◆" },
@@ -359,7 +359,7 @@
         '<a class="stat" href="#/clients"><b>' + st.clients + "</b><span>" + t("我的客户", "Clients") + "</span></a></div>";
       h += '<div class="card"><h3>' + t("快速开始", "Quick start") + "</h3><div style='display:flex;gap:8px;flex-wrap:wrap'>" +
         '<a class="btn dark sm" href="#/listings">' + t("管理房源", "Manage listings") + "</a>" +
-        '<a class="btn line sm" href="#/pool">' + t("逛中心池", "Browse pool") + "</a>" +
+        '<a class="btn line sm" href="#/pool">' + t("全部房源", "All RoofX Listing") + "</a>" +
         '<a class="btn line sm" href="#/matches">' + t("自动匹配", "Matches") + "</a>" +
         '<a class="btn line sm" href="https://calc.kwongthye.com/" target="_blank" rel="noopener">' + t("投资计算器", "Calculator") + "</a></div></div>";
       $("#view").innerHTML = h;
@@ -888,7 +888,7 @@
 
   // ---------- 中心池 ----------
   function pool(q) {
-    setTitle(t("中心池", "Pool"), t("柔佛同行发布的货源；联系对方带客看房", "Listings from agents across Johor"));
+    setTitle(t("全部房源", "All RoofX Listing"), t("柔佛同行发布的货源；联系对方带客看房", "Listings from agents across Johor"));
     var qs = new URLSearchParams();
     ["q", "state", "area", "type", "intent"].forEach(function (k) { if (q[k]) qs.set(k, q[k]); });
     return api("/pool?" + qs.toString()).then(function (d) {

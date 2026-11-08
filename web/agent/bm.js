@@ -401,5 +401,7 @@ window.BM_MAP = {
   "Publish your first listing.": "Terbitkan senarai pertama anda.",
   "View details": "Lihat butiran",
   "Min bathrooms": "Bilangan bilik air minimum",
-  "Min built-up (sqft)": "Keluasan binaan minimum (sqft)"
+  "Min built-up (sqft)": "Keluasan binaan minimum (sqft)",
+  "All RoofX Listing": "Semua Senarai RoofX",
+  "Browse pool": "Semua senarai"
 };
