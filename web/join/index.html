@@ -58,9 +58,9 @@
           <div><b style="color:#0E2438" data-i18n="apply.b4t">04 · 智能匹配与 Co-Broke 合作</b><p style="margin:4px 0 0;color:var(--muted)" data-i18n="apply.b4d">根据买家或租客需求，快速寻找合适房源，联系 Listing Agent，促成更多合作与成交。</p></div>
         </div>
         <hr style="border:none;border-top:1px solid #E3E8F0;margin:22px 0">
-        <h2 data-i18n="apply.open">申请开通 RoofX</h2>
+        <h2 data-i18n="apply.open">创建你的 RoofX 账号</h2>
         <p style="font-weight:600;color:#0E2438;margin:6px 0 4px" data-i18n="apply.openSub">从你的第一间 Listing，开启更多可能。</p>
-        <p style="color:var(--muted);margin:0" data-i18n="apply.note">填写以下资料，我们将在 1 个工作日内与你联系，协助开通账号并开始建立你的房源数据库。</p>
+        <p style="color:var(--muted);margin:0" data-i18n="apply.note">填写资料并设置密码，立即创建账号，开始建立你的房源数据库。</p>
       </div>
 
       <div class="vcard">
@@ -70,20 +70,24 @@
             <div class="field"><label data-i18n="f.phone">电话 / WhatsApp *</label><input name="phone" inputmode="tel" autocomplete="tel" placeholder="012-345 6789"></div>
           </div>
           <div class="form-grid">
-            <div class="field"><label data-i18n="f.email">邮箱</label><input name="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+            <div class="field"><label data-i18n="f.email">邮箱 *</label><input name="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
             <div class="field"><label data-i18n="f.ren">REN 编号</label><input name="ren_no" placeholder="REN 12345"></div>
           </div>
           <div class="field"><label data-i18n="f.team">团队 / 公司</label><input name="team" placeholder="THE ROOF REALTY"></div>
+          <div class="form-grid">
+            <div class="field"><label data-i18n="f.pass">密码 *</label><input name="password" type="password" autocomplete="new-password" minlength="8" placeholder="至少 8 位" data-i18n-ph="ph.pass"></div>
+            <div class="field"><label data-i18n="f.pass2">确认密码 *</label><input name="password2" type="password" autocomplete="new-password" minlength="8" placeholder="再输入一次" data-i18n-ph="ph.pass2"></div>
+          </div>
           <div class="field"><label data-i18n="f.msg">想解决的问题（选填）</label><textarea name="message" data-i18n-ph="ph.msg" placeholder="例：手下有 30 个盘，想统一管理并让同行帮忙找买家"></textarea></div>
           <button class="btn dark" type="submit" id="leadBtn" data-i18n="f.submit" style="width:100%">立即加入 RoofX</button>
           <div class="msg" id="leadMsg" role="status"></div>
-          <p class="form-note" style="margin-top:10px" data-i18n="f.note">提交即表示同意我们通过电话/WhatsApp 联系你。资料只用于加入与联系，不对外公开。</p>
+          <p class="form-note" style="margin-top:10px" data-i18n="f.note">提交即创建账号；资料只用于平台联系，不对外公开。</p>
         </form>
         <div id="leadDone" hidden style="text-align:center;padding:24px 6px">
           <div style="font-size:40px;line-height:1">✅</div>
           <h3 style="margin-top:8px" data-i18n="f.done">已加入 RoofX</h3>
-          <p class="muted" data-i18n="f.doneSub">用你的手机号登录工作台，开始上传第一间房源。</p>
-          <a class="btn gold" href="/agent/">登录工作台</a>
+          <p class="muted" data-i18n="f.doneSub">账号已创建，正在进入工作台…</p>
+          <a class="btn gold" href="/agent/" data-i18n="f.goWorkspace">进入工作台</a>
         </div>
       </div>
     </div>
@@ -109,16 +113,23 @@ window.PAGE_I18N = {
   "join.title": ["你的房源，你做主。更多资源，更多成交！", "Your listings, your call. More resources, more deals!", "Senarai anda, keputusan anda. Lebih sumber, lebih urus niaga!"],
   "join.lead": ["一个平台，有效管理你的资源，稳定拓展你的商机。", "One platform to manage your resources effectively and grow your business steadily.", "Satu platform untuk mengurus sumber anda dengan berkesan dan mengembangkan perniagaan secara stabil."],
   "join.cta": ["立即加入", "Join now", "Sertai sekarang"],
-  
-  
-  
-    "Join now — every feature is free. We will give at least 30 days' notice before charging."],
   "j1.t": ["个人站", "Your own page"], "j1.d": ["kwongthye.com/a/你的名字，一个链接就是你的品牌页。", "kwongthye.com/a/your-name — one link that is your brand."],
   "j2.t": ["房源池", "Listing pool"], "j2.d": ["发布一次，全团队帮你找买家；货源标注不可篡改。", "Publish once; the whole team helps find buyers. The credit stays yours."],
   "j3.t": ["合作有据", "On record"], "j3.d": ["带看申请、成交记录、分佣比例，系统留痕。", "Viewing requests, deals and splits — recorded."],
   "apply.kicker": ["加入", "Join", "Sertai"],
+  "apply.open": ["创建你的 RoofX 账号", "Create your RoofX account", "Cipta akaun RoofX anda"],
+  "apply.openSub": ["从你的第一间 Listing，开启更多可能。", "Start with your first listing — and open more possibilities.", "Mulakan dengan senarai pertama anda — dan buka lebih banyak kemungkinan."],
+  "apply.note": ["填写资料并设置密码，立即创建账号，开始建立你的房源数据库。", "Fill in your details and set a password to create your account and start building your listing database.", "Isi butiran anda dan tetapkan kata laluan untuk mencipta akaun dan mula membina pangkalan data senarai anda."],
   "apply.title": ["加入 RoofX，你将获得", "Join RoofX — what you get", "Sertai RoofX — apa yang anda dapat"],
-  "apply.sub": ["填好后用同一手机号登录工作台，立即开始建立你的房源数据库。", "After submitting, log in to the workspace with the same phone number and start building your database.", "Selepas hantar, log masuk ke ruang kerja dengan nombor telefon yang sama dan mula bina pangkalan data anda."],
+  "apply.b1t": ["01 · 个人房源管理中心", "01 · Your listing hub", "01 · Hab senarai peribadi"],
+  "apply.b1d": ["集中管理住宅、店屋、工厂、土地及出租房源，建立属于自己的 Listing 数据库。", "Manage residential, shop, factory, land and rental listings in one place — build your own listing database.", "Urus senarai kediaman, kedai, kilang, tanah dan sewaan di satu tempat — bina pangkalan data senarai anda sendiri."],
+  "apply.b2t": ["02 · 专属个人页面与房源分享", "02 · Your own agent page and listing sharing", "02 · Halaman ejen sendiri dan perkongsian senarai"],
+  "apply.b2d": ["拥有自己的 Agent 专属页面，轻松分享房源链接给客户，让房源展示更方便、更专业。", "Get your own agent page, share listing links with clients easily, and present properties more professionally.", "Dapatkan halaman ejen sendiri, kongsi pautan senarai dengan klien dengan mudah, dan paparkan hartanah secara lebih profesional."],
+  "apply.b3t": ["03 · 自由选择共享权限", "03 · You control sharing", "03 · Anda kawal perkongsian"],
+  "apply.b3d": ["你的 Listing 由你决定。保留私人房源，或选择共享至 RoofX 房源池，寻找更多合作机会。", "Your listings, your call. Keep them private or share to the RoofX pool to find more co-broke opportunities.", "Senarai anda, keputusan anda. Kekalkan peribadi atau kongsi ke kolam RoofX untuk lebih banyak peluang kerjasama."],
+  "apply.b4t": ["04 · 智能匹配与 Co-Broke 合作", "04 · Smart matching and co-broke", "04 · Padanan pintar dan co-broke"],
+  "apply.b4d": ["根据买家或租客需求，快速寻找合适房源，联系 Listing Agent，促成更多合作与成交。", "Match buyer or tenant requirements to suitable listings, contact the listing agent, and close more deals.", "Padankan keperluan pembeli atau penyewa dengan senarai yang sesuai, hubungi ejen senarai, dan tutup lebih banyak urus niaga."],
+  "apply.sub": ["填好后用你设置的邮箱和密码登录，立即开始建立你的房源数据库。", "After signing up, log in with your email and password and start building your database.", "Selepas mendaftar, log masuk dengan e-mel dan kata laluan anda dan mula membina pangkalan data anda."],
   "apply.get": ["加入后你会拿到", "What you get after joining"],
   "apply.g1": ["个人工作台（房源 / 客户 / 计算器）", "Your workspace (listings / clients / calculator)"],
   "apply.g2": ["个人站链接与分享卡片", "Your own page and share cards"],
@@ -127,17 +138,28 @@ window.PAGE_I18N = {
   "apply.freeTitle": ["加入后可用", "What you get"],
   
   "apply.priceCta": ["查看完整价格 →", "Full pricing →"],
-  "f.name": ["姓名 *", "Name *"], "f.phone": ["电话 / WhatsApp *", "Phone / WhatsApp *"],
-  "f.email": ["邮箱", "Email"], "f.ren": ["REN 编号", "REN number"], "f.team": ["团队 / 公司", "Team / company"],
-  "f.msg": ["想解决的问题（选填）", "What do you want to solve? (optional)"],
-  "ph.msg": ["例：手下有 30 个盘，想统一管理并让同行帮忙找买家", "e.g. I have 30 listings and want the team to help find buyers"],
-  "f.submit": ["申请开通 RoofX", "Apply to activate RoofX", "Mohon aktifkan RoofX"],
-  "f.note": ["提交即表示同意我们通过电话/WhatsApp 联系你。资料只用于加入与联系，不对外公开。",
-    "By submitting you agree to be contacted by phone/WhatsApp. Your details are used only for onboarding and contact."],
-  "f.done": ["已提交申请", "Application received", "Permohonan diterima"],
-  "f.doneSub": ["我们会在 1 个工作日内联系你，协助开通账号。", "We will contact you within one working day to activate your account.", "Kami akan hubungi anda dalam satu hari bekerja untuk mengaktifkan akaun anda."],
-  "f.required": ["请填写", "Required"], "f.badPhone": ["电话格式不对", "Invalid phone number"],
-  "f.sending": ["提交中…", "Sending…"], "f.failed": ["提交失败，请稍后再试", "Failed, please try again"],
+  "f.name": ["姓名 *", "Name *", "Nama *"], "f.phone": ["电话 / WhatsApp *", "Phone / WhatsApp *", "Telefon / WhatsApp *"],
+  "f.email": ["邮箱 *", "Email *", "E-mel *"], "f.ren": ["REN 编号", "REN number", "Nombor REN"], "f.team": ["团队 / 公司", "Team / company", "Pasukan / syarikat"],
+  "f.pass": ["密码 *", "Password *", "Kata laluan *"], "f.pass2": ["确认密码 *", "Confirm password *", "Sahkan kata laluan *"],
+  "ph.pass": ["至少 8 位", "At least 8 characters", "Sekurang-kurangnya 8 aksara"],
+  "ph.pass2": ["再输入一次", "Re-enter password", "Masukkan semula kata laluan"],
+  "f.msg": ["想解决的问题（选填）", "What do you want to solve? (optional)", "Apa yang ingin anda selesaikan? (pilihan)"],
+  "ph.msg": ["例：手下有 30 个盘，想统一管理并让同行帮忙找买家", "e.g. I have 30 listings and want the team to help find buyers", "cth. Saya ada 30 senarai dan mahu pasukan membantu mencari pembeli"],
+  "f.submit": ["立即加入 RoofX", "Join RoofX now", "Sertai RoofX sekarang"],
+  "f.note": ["提交即创建账号；资料只用于平台联系，不对外公开。",
+    "Submitting creates your account. Your details are used only for platform contact and are not public.",
+    "Menghantar akan mencipta akaun anda. Maklumat anda hanya digunakan untuk hubungan platform dan tidak awam."],
+  "f.done": ["已加入 RoofX", "You're in RoofX", "Anda dalam RoofX"],
+  "f.doneSub": ["账号已创建，正在进入工作台…", "Account created — taking you to your workspace…", "Akaun dicipta — membawa anda ke ruang kerja…"],
+  "f.goWorkspace": ["进入工作台", "Go to workspace", "Pergi ke ruang kerja"],
+  "f.hasAccount": ["已有账号？直接登录", "Already have an account? Sign in", "Sudah ada akaun? Log masuk"],
+  "f.login": ["登录", "sign in", "log masuk"],
+  "f.emailExists": ["这个邮箱已经注册", "This email is already registered", "E-mel ini sudah didaftarkan"],
+  "f.badEmail": ["邮箱格式不对", "Invalid email address", "Alamat e-mel tidak sah"],
+  "f.pwdShort": ["密码至少 8 位", "Password must be at least 8 characters", "Kata laluan mesti sekurang-kurangnya 8 aksara"],
+  "f.pwdMismatch": ["两次密码不一致", "Passwords do not match", "Kata laluan tidak sepadan"],
+  "f.required": ["请填写", "Required", "Wajib diisi"], "f.badPhone": ["电话格式不对", "Invalid phone number", "Nombor telefon tidak sah"],
+  "f.sending": ["提交中…", "Sending…", "Menghantar…"], "f.creating": ["创建账号中…", "Creating account…", "Mencipta akaun…"], "f.failed": ["提交失败，请稍后再试", "Failed, please try again", "Gagal, sila cuba lagi"],
   "foot.tag": ["柔佛房源与中介网络。房源被看见，合作有记录。", "Malaysia listings and agent network."],
   "foot.platform": ["平台", "Platform"], "foot.company": ["公司", "Company"],
   "foot.pricing": ["价格", "Pricing"], "foot.privacy": ["隐私政策", "Privacy"], "foot.terms": ["使用条款", "Terms"]
@@ -148,35 +170,114 @@ window.PAGE_I18N = {
 <script>
 (function () {
   "use strict";
-  KT.init(window.PAGE_I18N);
+  var DICT = window.PAGE_I18N || {};
+  function T(key) {
+    var v = DICT[key];
+    if (!v) return key;
+    if (KT.lang === "bm") return v[2] || v[1] || v[0];
+    return KT.lang === "en" ? (v[1] || v[0]) : v[0];
+  }
+  KT.init(DICT);
+  var TITLES = {
+    zh: "给中介：加入 RoofX | RoofX",
+    en: "Join RoofX — Agent registration | RoofX",
+    bm: "Sertai RoofX — Pendaftaran ejen | RoofX"
+  };
+  function setTitle() { document.title = TITLES[KT.lang] || TITLES.zh; }
+  setTitle();
+  document.addEventListener("kt:lang", setTitle);
   KT.fetchJSON("/api/public/config").then(function (cfg) { KT.setFree(!!cfg.platformFree); }).catch(function () {});
+
   var form = document.getElementById("leadForm");
+  var msg = document.getElementById("leadMsg");
+  var btn = document.getElementById("leadBtn");
+
+  function showError(text) {
+    msg.className = "msg err";
+    msg.textContent = text;
+  }
+  function clearError() {
+    msg.className = "msg";
+    msg.textContent = "";
+  }
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    var msg = document.getElementById("leadMsg");
-    var btn = document.getElementById("leadBtn");
+    clearError();
     var data = {};
     Array.prototype.forEach.call(form.elements, function (el) {
-      if (el.name) data[el.name] = el.value.trim();
+      if (!el.name) return;
+      data[el.name] = el.name.indexOf("password") === 0 ? el.value : el.value.trim();
     });
-    msg.className = "msg"; msg.textContent = "";
-    var bad = false;
-    if (!data.name || data.name.length < 2) { msg.className = "msg err"; msg.textContent = KT.t("f.required") + " " + KT.t("f.name").replace(" *", ""); bad = true; }
+
+    if (!data.name || data.name.length < 2) return showError(T("f.required") + " " + T("f.name").replace(" *", ""));
     var digits = (data.phone || "").replace(/\D/g, "");
-    if (digits.length < 8 || digits.length > 15) { msg.className = "msg err"; msg.textContent = KT.t("f.required") + " " + KT.t("f.phone").replace(" *", "") + " · " + KT.t("f.badPhone"); bad = true; }
-    if (bad) return;
-    btn.disabled = true; btn.textContent = KT.t("f.sending");
-    fetch("/api/public/leads", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    }).then(function (r) { return r.json(); }).then(function (j) {
-      if (!j.ok) throw new Error(j.error || "failed");
+    if (digits.length < 8 || digits.length > 15) return showError(T("f.required") + " " + T("f.phone").replace(" *", "") + " · " + T("f.badPhone"));
+    if (!data.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) return showError(T("f.badEmail"));
+    if (!data.password || data.password.length < 8) return showError(T("f.pwdShort"));
+    if (data.password !== data.password2) return showError(T("f.pwdMismatch"));
+
+    btn.disabled = true;
+    btn.textContent = T("f.creating");
+
+    fetch("/api/agent/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        team: data.team,
+        ren_no: data.ren_no,
+        password: data.password
+      })
+    }).then(function (r) {
+      return r.json().catch(function () { return { ok: false, error: "failed" }; }).then(function (j) {
+        return { status: r.status, body: j };
+      });
+    }).then(function (res) {
+      var j = res.body || {};
+      if (!j.ok) {
+        btn.disabled = false;
+        btn.textContent = T("f.submit");
+        if (j.error === "email_exists") {
+          msg.className = "msg err";
+          msg.innerHTML = KT.esc(T("f.emailExists")) + ' · <a href="/agent/">' + KT.esc(T("f.login")) + "</a>";
+          return;
+        }
+        if (j.error === "invalid_input" && j.fields) {
+          var fieldMap = { name: "f.name", email: "f.badEmail", password: "f.pwdShort" };
+          var first = Object.keys(j.fields)[0];
+          return showError(fieldMap[first] ? T(fieldMap[first]) : T("f.failed"));
+        }
+        return showError(T("f.failed"));
+      }
+
+      if (data.message) {
+        fetch("/api/public/leads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: data.name,
+            phone: data.phone,
+            email: data.email,
+            ren_no: data.ren_no,
+            team: data.team,
+            message: data.message
+          })
+        }).catch(function () {});
+      }
+
       form.hidden = true;
-      document.getElementById("leadDone").hidden = false;
-      document.getElementById("leadDone").scrollIntoView({ behavior: "smooth", block: "center" });
+      var done = document.getElementById("leadDone");
+      done.hidden = false;
+      done.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(function () { window.location.href = "/agent/"; }, 1800);
     }).catch(function () {
-      btn.disabled = false; btn.textContent = KT.t("f.submit");
-      msg.className = "msg err"; msg.textContent = KT.t("f.failed");
+      btn.disabled = false;
+      btn.textContent = T("f.submit");
+      showError(T("f.failed"));
     });
   });
 })();
