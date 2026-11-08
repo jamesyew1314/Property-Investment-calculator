@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="google" content="notranslate">
+<title>每日房产新闻 | RoofX</title>
+<meta name="description" content="柔佛与马来西亚房产每日新闻，RoofX 每个工作日自动更新。">
+<link rel="icon" type="image/png" href="/icon-256.png">
+<link rel="stylesheet" href="/site.css">
+<style>
+.newsWrap{max-width:900px;margin:0 auto;padding:28px 0 60px}
+.newsHead h1{font-family:Georgia,serif;color:#0E2438;font-size:clamp(24px,4vw,34px);margin:0 0 6px}
+.newsHead p{color:#5D6B7A;margin:0 0 22px}
+.nItem{display:block;background:#fff;border:1px solid #E3E8F0;border-radius:14px;padding:18px 20px;margin-bottom:14px;text-decoration:none}
+.nItem:hover{border-color:#C9A45C}
+.nSrc{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#B8862F;font-weight:700}
+.nTitle{font-size:18px;color:#0E2438;font-weight:700;margin:6px 0 6px;line-height:1.45}
+.nSum{font-size:15px;color:#41505F;line-height:1.7;margin:0}
+.nMore{display:inline-block;margin-top:10px;color:#2E5496;font-size:14px;font-weight:700}
+.nEmpty{padding:30px;text-align:center;color:#5D6B7A}
+@media(max-width:760px){.newsWrap{padding:18px 16px 40px}.nTitle{font-size:17px}}
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap bar">
+    <a class="brand" href="/"><img src="/logo-white.png?v=tr1" alt="RoofX"><span>RoofX</span></a>
+    <nav class="site-nav">
+      <a href="/pool/" data-i18n="nav.find">房源池</a>
+      <a href="/news/" class="on" data-i18n="nav.news">每日新闻</a>
+      <a href="/agents/" data-i18n="nav.agents">中介简介</a>
+      <a href="/join/" data-i18n="nav.join">中介注册</a>
+      <a href="/about/" data-i18n="nav.about">关于</a>
+    </nav>
+    <a class="calcTop" href="https://calc.kwongthye.com/"><span data-i18n="nav.calc">ROI 计算器</span></a>
+    <button class="menu-btn" aria-label="menu">☰</button>
+  </div>
+</header>
+<main class="wrap newsWrap">
+  <div class="newsHead">
+    <h1 data-i18n="news.title">每日房产新闻</h1>
+    <p id="newsDay"></p>
+  </div>
+  <div id="newsList"><div class="nEmpty" data-i18n="news.loading">加载中…</div></div>
+</main>
+<footer class="site-foot"><div class="wrap"><p>© RoofX · THE ROOF PROPERTY EXCHANGE</p></div></footer>
+<script>
+(function(){
+  var L = new URLSearchParams(location.search).get("lang") || (function(){try{return localStorage.getItem("kt_lang")}catch(e){return null}})() || "zh";
+  if (["zh","en","bm"].indexOf(L) < 0) L = "zh";
+  var T = {
+    title: {zh:"每日房产新闻", en:"Daily property news", bm:"Berita hartanah harian"},
+    today: {zh:"今日更新", en:"Updated today", bm:"Dikemas kini hari ini"},
+    latest: {zh:"最新一期", en:"Latest edition", bm:"Edisi terkini"},
+    read: {zh:"阅读原文 →", en:"Read article →", bm:"Baca artikel →"},
+    empty: {zh:"今天还没有新闻，稍后会自动更新。", en:"No news yet today. It updates automatically.", bm:"Belum ada berita hari ini. Akan dikemas kini automatik."},
+    loading: {zh:"加载中…", en:"Loading…", bm:"Memuatkan…"}
+  };
+  function t(k){ return (T[k]&&T[k][L]) || k; }
+  function apply(){
+    document.documentElement.lang = L==="bm"?"ms":(L==="en"?"en":"zh-CN");
+    document.querySelectorAll("[data-i18n]").forEach(function(el){ var k=el.getAttribute("data-i18n").replace("nav.",""); var map={find:"房源池",news:"每日新闻",agents:"中介简介",join:"中介注册",about:"关于",calc:"ROI 计算器"}; var zh=map[k]||el.textContent; el.textContent = L==="zh"?zh:(L==="en"?({find:"Listing pool",news:"Daily news",agents:"Agent profiles",join:"Agent registration",about:"About",calc:"ROI calculator"}[k]||zh):({find:"Kolam senarai",news:"Berita harian",agents:"Profil ejen",join:"Pendaftaran ejen",about:"Tentang",calc:"Kalkulator ROI"}[k]||zh)); });
+    document.querySelectorAll("[data-i18n='news.title']").forEach(function(el){el.textContent=t("title")});
+  }
+  function render(d){
+    var list=document.getElementById("newsList"), day=document.getElementById("newsDay");
+    var dt = d.day ? new Date(d.day+"T00:00:00") : null;
+    day.textContent = (d.today?t("today"):t("latest")) + (dt?" · "+dt.toLocaleDateString(L==="zh"?"zh-CN":(L==="bm"?"ms-MY":"en-MY"),{year:"numeric",month:"long",day:"numeric"}):"");
+    if(!d.items || !d.items.length){ list.innerHTML='<div class="nEmpty">'+t("empty")+"</div>"; return; }
+    list.innerHTML = d.items.map(function(x){
+      var when = x.published_at ? new Date(x.published_at).toLocaleDateString(L==="zh"?"zh-CN":(L==="bm"?"ms-MY":"en-MY"),{month:"short",day:"numeric"}) : "";
+      return '<a class="nItem" href="'+x.url+'" target="_blank" rel="noopener"><div class="nSrc">'+x.source+(when?" · "+when:"")+'</div><div class="nTitle">'+x.title+'</div><p class="nSum">'+(x.summary||"")+'</p><span class="nMore">'+t("read")+"</span></a>";
+    }).join("");
+  }
+  function load(){
+    fetch("/api/public/news?lang="+L+"&limit=12",{cache:"no-store"}).then(function(r){return r.json()}).then(render).catch(function(){render({items:[]})});
+  }
+  window.__pnSetLang=function(l){ if(["zh","en","bm"].indexOf(l)<0)return; L=l; try{localStorage.setItem("kt_lang",l)}catch(e){}; apply(); load(); };
+  apply(); load();
+})();
+</script>
+<script src="/lang3.js"></script>
+</body>
+</html>

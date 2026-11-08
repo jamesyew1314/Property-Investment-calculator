@@ -74,6 +74,7 @@
     <button class="menu-btn" aria-label="Menu">☰</button>
     <nav class="site-nav">
       <a href="/pool/" data-i18n="nav.find">房源池</a>
+      <a href="/news/" data-i18n="nav.news">每日新闻</a>
       
       <a href="/agents/" data-i18n="nav.agents">中介简介</a>
       <a href="/join/" data-i18n="nav.join">中介注册</a>
@@ -149,6 +150,17 @@
     </div>
   </section>
 
+  <section class="sec" id="newsHome">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 data-i18n="news.home">每日房产新闻</h2>
+        <p data-i18n="news.homeSub">柔佛与马来西亚房产动态，每天自动更新。</p>
+      </div>
+      <div id="homeNews" class="grid-3" style="margin-top:18px"></div>
+      <p style="margin:18px 0 0"><a href="/news/" style="color:#2E5496;font-weight:700" data-i18n="news.more">查看全部新闻 →</a></p>
+    </div>
+  </section>
+
   <section class="sec" id="how">
     <div class="wrap">
       <div class="sec-head">
@@ -213,6 +225,10 @@
 <script>
 window.PAGE_I18N = {
   "nav.find": ["房源池", "Listing pool"],
+  "nav.news": ["每日新闻", "Daily news", "Berita harian"],
+  "news.home": ["每日房产新闻", "Daily property news", "Berita hartanah harian"],
+  "news.homeSub": ["柔佛与马来西亚房产动态，每天自动更新。", "Johor and Malaysia property updates, refreshed daily.", "Berita hartanah Johor dan Malaysia, dikemas kini setiap hari."],
+  "news.more": ["查看全部新闻 →", "See all news →", "Lihat semua berita →"],
   "nav.agents": ["中介简介", "Agent profiles", "Profil ejen"],
   "nav.join": ["中介注册", "Agent registration", "Pendaftaran ejen"],
   "nav.about": ["关于", "About"],
@@ -468,5 +484,18 @@ window.PAGE_I18N = {
 })();
 </script>
 <script src="/lang3.js"></script>
+<script>
+(function(){
+  var L = new URLSearchParams(location.search).get("lang") || (function(){try{return localStorage.getItem("kt_lang")}catch(e){return null}})() || "zh";
+  if(["zh","en","bm"].indexOf(L)<0) L="zh";
+  fetch("/api/public/news?lang="+L+"&limit=3",{cache:"no-store"}).then(function(r){return r.json()}).then(function(d){
+    var box=document.getElementById("homeNews");
+    if(!d.items || !d.items.length){ box.innerHTML=""; return; }
+    box.innerHTML=d.items.map(function(x){
+      return '<a class="vcard" href="'+x.url+'" target="_blank" rel="noopener" style="text-decoration:none"><div style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:#B8862F;font-weight:700">'+x.source+'</div><h3 style="margin:8px 0 6px;color:#0E2438;font-size:16px;line-height:1.45">'+x.title+'</h3><p style="margin:0;color:#5D6B7A;font-size:14px">'+(x.summary||"").slice(0,90)+'…</p></a>';
+    }).join("");
+  }).catch(function(){});
+})();
+</script>
 </body>
 </html>

@@ -8,6 +8,7 @@ const mailLayout = require("./mail-layout");
 const { buildReportPdf } = require("./report-pdf");
 const createLibraryApi = require("./library-api");
 const createPublicApi = require("./public-api");
+const { createNewsApi, startScheduler: startNewsScheduler } = require("./news");
 const createAgentApi = require("./agent-api");
 const renderAgentPage = require("./agent-page");
 const renderPublicListing = require("./public-page");
@@ -1416,6 +1417,9 @@ app.patch("/api/admin/leads/:id", requireAdmin, requireWrite, async function (re
   } catch (e) { next(e); }
 });
 
+// ---------- 每日房产新闻 ----------
+app.use("/api/public/news", createNewsApi({ pool: pool }));
+
 // ---------- 官网公开接口（无需登录） ----------
 app.use("/api/public", createPublicApi({
   pool: pool,
@@ -1541,3 +1545,4 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(PORT, "127.0.0.1", function () { console.log("api listening on " + PORT); });
+startNewsScheduler(pool).catch(function (e) { console.error("news scheduler", e.message); });
