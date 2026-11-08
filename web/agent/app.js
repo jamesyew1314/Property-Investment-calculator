@@ -1256,16 +1256,24 @@
       var btn = this; btn.disabled = true;
       var body = {
         name: $("#pfName").value.trim(), phone: $("#pfPhone").value.trim(), team: $("#pfTeam").value.trim(),
-        ren_no: $("#pfRen").value.trim(), bio: $("#pfBio").value.trim(), slug: $("#pfSlug").value.trim(), lang: $("#pfLang").value,
+        ren_no: $("#pfRen").value.trim(), bio: $("#pfBio").value.trim(), lang: $("#pfLang").value,
         cobroke_note: ($("#pfCobroke") || {}).value || "",
         years_exp: $("#pfYears").value === "" ? null : Number($("#pfYears").value),
         deals_count: $("#pfDeals").value === "" ? null : Number($("#pfDeals").value),
         deals_value: $("#pfValue").value === "" ? null : Number($("#pfValue").value),
         areas: collectAreas($("#view"))
       };
+      var _slug = $("#pfSlug").value.trim();
+      if (_slug) body.slug = _slug;
       api("/me", { method: "PATCH", body: body }).then(function (j) {
         S.me = j.agent; renderNav(); toast(t("已保存", "Saved")); btn.disabled = false;
-      }).catch(function (e) { btn.disabled = false; toast(e.message === "slug_taken" ? t("这个地址已被使用", "Slug taken") : e.message, true); });
+      }).catch(function (e) {
+        btn.disabled = false;
+        var msg = e.message;
+        if (msg === "slug_taken") msg = t("这个地址已被使用", "Slug taken");
+        else if (msg === "invalid_input") msg = t("资料格式不正确：个人页地址只能用小写字母、数字和 -", "Invalid input: page address may only use lowercase letters, numbers and -");
+        toast(msg, true);
+      });
     });
     var rs = $("#resend");
     if (rs) rs.addEventListener("click", function () {

@@ -205,7 +205,7 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       if (b.bio !== undefined) v.bio = core.str(b.bio, 1000);
       if (b.cobroke_note !== undefined) v.cobroke_note = core.str(b.cobroke_note, 300);
       if (b.areas !== undefined) v.areas = core.listOfEnums("areas", b.areas, 12);
-      if (b.slug !== undefined) {
+      if (b.slug !== undefined && String(b.slug).trim() !== "") {
         const s = String(b.slug).toLowerCase().trim();
         if (!/^[a-z0-9][a-z0-9-]{2,39}$/.test(s)) return res.status(400).json({ ok: false, error: "invalid_input", fields: { slug: "invalid" } });
         const dup = await pool.query("SELECT id FROM lib_agents WHERE lower(slug)=$1 AND id<>$2", [s, req.agent.id]);
