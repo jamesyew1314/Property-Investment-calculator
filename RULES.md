@@ -162,6 +162,7 @@
 | 2026-11-08 | 房源表单统一单列（对齐同业）：所有 grid2/grid3/grid4 与 nums 行强制 1 列，字段整行、标题留白，修复窄屏字段挤压重叠。手机端与桌面共用，已验证 |
 | 2026-11-08 | /join/ 表单区改为「加入 RoofX，你将获得」四项（房源中心/个人页分享/共享权限/匹配合作）+「申请开通 RoofX」说明，按钮改申请开通，提交后提示 1 个工作日内联系；三语。手机端已验证 |
 | 2026-11-08 | /join/ Hero 文案改为「你的房源，你做主。更多资源，更多成交！」+「一个平台，有效管理你的资源，稳定拓展你的商机。」三语。手机端已验证 |
+| 2026-11-08 | 个人资料保存报 `invalid_input`：根因是页面每次都提交 slug，空/非法 slug 触发后端校验，与电话无关；改为空 slug 不提交、后端忽略空值，错误提示改为可读文案；电话输入补 type=tel/autocomplete。已用测试账号验证电话 0111111111→0123456789 保存成功。手机端已验证 |
 | 2026-11-08 | 全站深度审计修复：① `/api/public/agents` 误加登录校验导致首页 401，已改公开目录并移除电话/邮箱字段；② `/pricing/` 旧价格页改 `/join/` 重定向、`/company/` 改 `/about/` 重定向；③ sitemap 移除 pricing/company，补 news/pool/agents；④ admin/receipt 内联 JS 引号语法错误导致脚本全挂，已修；⑤ SSR 详情页 BM 区域名不再显示中文、导航改为中介简介/注册、品牌 ROOFX→RoofX；⑥ 补 `favicon.ico` 与房源池 icon，消除 404；⑦ 加 BM `ROI calculator`。浏览器实测首页/新闻/中介/加入/房源池无 JS 报错；全站主要路由 200，内部链接无真实 404 |
 | 2026-11-08 | 每日新闻修正：只取正规媒体（The Star / The Edge / NST / Malay Mail / FMT / Bernama 等），排除 EdgeProp、PropertyGuru、Mudah 等房源/中介帖；标题须含房产词且带本地语境（Johor/Iskandar/Malaysia 等）；修复 RTS 误匹配 reports 的问题；每日快照先删后写。手机端已验证 |
 | 2026-11-08 | 新增每日房产新闻：`work/news.js` 抓取 Google News（柔佛/马来西亚房产 4 组），DeepSeek 翻中/BM，入库 `news_items`；每日 06:30 MYT 自动刷新，启动时若当天无数据立即抓取；`/api/public/news` 输出三语；新增 `/news/` 页面 + 首页「每日房产新闻」3 条；失败时显示最新一期。手机端已验证 |
