@@ -174,10 +174,15 @@
     });
     return h;
   }
+  function choiceLabel(x) {
+    if (S.lang === "en") return x.en;
+    if (S.lang === "bm") return (window.BM_MAP || {})[x.en] || x.en;
+    return x.zh && x.zh !== x.en ? (x.en + "（" + x.zh + "）") : x.en;
+  }
   function optList(list, sel, blank) {
     var h = blank === false ? "" : '<option value="">' + esc(blank || "—") + "</option>";
     (list || []).forEach(function (x) {
-      var lab = S.lang === "en" ? x.en : (S.lang === "bm" ? ((window.BM_MAP || {})[x.en] || x.en) : (x.zh && x.zh !== x.en ? (x.en + "（" + x.zh + "）") : x.en));
+      var lab = choiceLabel(x);
       h += '<option value="' + x.key + '"' + (x.key === sel ? " selected" : "") + ">" + esc(lab) + "</option>";
     });
     return h;
@@ -989,7 +994,7 @@
     var body = '<form id="cf"><div class="grid2">' +
       field(t("姓名 *", "Name *"), '<input name="name" value="' + esc(row.name || "") + '">') +
       field(t("电话", "Phone"), '<input name="phone" value="' + esc(row.phone || "") + '">') + "</div>" +
-      '<div class="grid2">' + field(t("买 / 租", "Buy / Rent"), '<select name="intent"><option value="buy"' + (row.intent !== "rent" ? " selected" : "") + '>买房</option><option value="rent"' + (row.intent === "rent" ? " selected" : "") + ">租房</option></select>") +
+      '<div class="grid2">' + field(t("买 / 租", "Buy / Rent"), '<select name="intent">' + optList([{ key: "buy", zh: "买房", en: "Buy" }, { key: "rent", zh: "租房", en: "Rent" }], row.intent || "buy", false) + "</select>") +
       field(t("状态", "Status"), '<select name="status">' + optList([{ key: "new", zh: "新客户", en: "New" }, { key: "active", zh: "跟进中", en: "Active" }, { key: "viewing", zh: "看房中", en: "Viewing" }, { key: "offer", zh: "谈价", en: "Offer" }, { key: "won", zh: "已成交", en: "Won" }, { key: "lost", zh: "已流失", en: "Lost" }], row.status || "new", false) + "</select>") + "</div>" +
       '<div class="grid2">' + field(t("预算下限", "Budget min"), '<input name="budget_min" inputmode="numeric" value="' + esc(row.budget_min || "") + '">') +
       field(t("预算上限", "Budget max"), '<input name="budget_max" inputmode="numeric" value="' + esc(row.budget_max || "") + '">') + "</div>" +

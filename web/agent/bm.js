@@ -394,5 +394,12 @@ window.BM_MAP = {
   "Malay Reserve": "Tanah Simpanan Melayu",
   "Studio": "Studio",
   "Back to home": "Kembali ke utama",
-  "Home": "Utama"
+  "Home": "Utama",
+  /* i18n audit */
+  "Your listings and clients": "Senarai dan klien anda",
+  "Manage listings, clients and matches": "Urus senarai, klien dan padanan",
+  "Publish your first listing.": "Terbitkan senarai pertama anda.",
+  "View details": "Lihat butiran",
+  "Min bathrooms": "Bilangan bilik air minimum",
+  "Min built-up (sqft)": "Keluasan binaan minimum (sqft)"
 };
