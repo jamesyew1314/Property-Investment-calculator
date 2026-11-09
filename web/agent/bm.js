@@ -1,5 +1,16 @@
 /* RoofX BM — 以英文为键的马来语词典（工作台） */
 window.BM_MAP = {
+  "Enter land area to calculate total": "Masukkan luas tanah untuk kira jumlah",
+  "Land area (required for land)": "Luas tanah (wajib untuk tanah)",
+  "Area note": "Nota luas",
+  "Upload photo": "Muat naik foto",
+  "JPG / PNG, square photo recommended": "JPG / PNG, foto segi empat disyorkan",
+  "Image must be under 8MB": "Imej mesti bawah 8MB",
+  "Only JPG / PNG / WebP": "Hanya JPG / PNG / WebP",
+  "Photo updated": "Foto dikemas kini",
+  "Upload failed": "Muat naik gagal",
+  "Invalid input: page address may only use lowercase letters, numbers and -": "Input tidak sah: alamat halaman hanya boleh guna huruf kecil, nombor dan -",
+
   "Sign in": "Log Masuk",
   "Create your account": "Daftar Akaun",
   "Manage your listings, clients and viewings. List once — the network helps you sell.": "Urus senarai, klien dan tontonan anda. Senaraikan sekali — rangkaian membantu anda menjual.",
