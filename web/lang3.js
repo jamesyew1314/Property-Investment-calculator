@@ -58,6 +58,15 @@
         var nav = document.querySelector(".site-nav");
         if (nav) { nav.insertBefore(wrap, nav.firstChild); wrap.className += " in-nav"; }
       }
+      var navLogin = document.querySelector(".site-nav .login");
+      var bar = document.querySelector(".site-head .bar");
+      if (navLogin && bar && !document.querySelector(".mobile-login")) {
+        var ml = navLogin.cloneNode(true);
+        ml.className = "mobile-login";
+        ml.removeAttribute("data-i18n");
+        ml.textContent = navLogin.textContent;
+        bar.appendChild(ml);
+      }
     } catch (e) {}
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

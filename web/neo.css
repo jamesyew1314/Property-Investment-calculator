@@ -398,3 +398,15 @@ body.neo .agentBox{max-width:100%!important;box-sizing:border-box}
 
 /* marquee real photos */
 body.neo .neoMCard img.ph{width:100%;height:82px;object-fit:cover;border-radius:10px;margin-bottom:10px;display:block;background:#0B1F31}
+
+/* mobile header login button */
+.mobile-login{display:none}
+@media(max-width:760px){
+  body.neo .site-head .bar{position:relative}
+  body.neo .mobile-login{display:inline-flex!important;align-items:center;justify-content:center;
+    position:absolute!important;right:10px;top:6px;z-index:5;
+    padding:8px 12px!important;border-radius:999px!important;
+    border:1px solid rgba(125,211,252,.35)!important;background:rgba(17,24,39,.85)!important;
+    color:#BAE6FD!important;font-size:12px!important;font-weight:600;text-decoration:none!important}
+  body.neo .mobile-login:hover{background:rgba(125,211,252,.15)!important}
+}
