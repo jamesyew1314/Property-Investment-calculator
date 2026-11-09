@@ -22,7 +22,7 @@ for (const p of ["index.html","agents/index.html","join/index.html","about/index
   ok(s.includes('class="mobile-login"'), p + " has static mobile login");
 }
 
-const jsFiles = ["web/site.js","web/lang3.js","web/neo-home.js","web/agent/app.js","work/public-page.js","work/agent-page.js","work/public-api.js","work/agent-api.js","work/api-server.js"];
+const jsFiles = ["web/site.js","web/lang3.js","web/neo-home.js","web/ai-console.js","web/agent/app.js","work/public-page.js","work/agent-page.js","work/public-api.js","work/agent-api.js","work/api-server.js"];
 for (const f of jsFiles) {
   try { cp.execFileSync(process.execPath, ["--check", f], { stdio: "pipe" }); ok(true, f + " syntax"); }
   catch (e) { ok(false, f + " syntax: " + String(e.stderr || e.message).split("\n")[0]); }
