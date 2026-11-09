@@ -323,3 +323,10 @@ body.neo a.neoMCard:hover b{color:#00E5FF}
 body.neo #l3{background:rgba(10,14,23,.88)!important;border:1px solid rgba(0,229,255,.2)!important;backdrop-filter:blur(12px)}
 body.neo #l3 a{color:#94A3B8!important}
 body.neo #l3 a[style*="background:#0E2438"]{background:linear-gradient(135deg,#00E5FF,#7C3AED)!important;color:#06121A!important}
+
+/* agent directory cards */
+body.neo .agent-card b{color:#F9FAFB!important}
+body.neo .agent-card small{color:#94A3B8!important}
+body.neo .agent-card .n{color:#67E8F9!important}
+body.neo .agent-card .avatar{background:linear-gradient(135deg,rgba(0,229,255,.22),rgba(124,58,237,.32))!important;color:#E0FBFF!important;border:1px solid rgba(0,229,255,.35);box-shadow:0 0 20px rgba(0,229,255,.15)}
+body.neo .agent-card .btn.line.sm{background:rgba(0,229,255,.08)!important;border-color:rgba(0,229,255,.35)!important;color:#A5F3FC!important}

@@ -224,7 +224,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
       if (max > 0) add("(CASE WHEN p.intent='rent' THEN p.rent_price ELSE p.asking_price END) <= ?", [max]);
       const w = where.length ? " AND " + where.join(" AND ") : "";
       const total = await pool.query(
-        "SELECT count(*)::int AS n FROM lib_properties p LEFT JOIN lib_projects pr ON pr.id=p.project_id WHERE p.visibility='public' AND p.status IN ('available','reserved')" + w,
+        "SELECT count(*)::int AS n FROM lib_properties p LEFT JOIN lib_projects pr ON pr.id=p.project_id WHERE p.visibility IN ('pool','public') AND p.status IN ('available','reserved')" + w,
         args);
       const rows = await pool.query(
         `${PUBLIC_SELECT}${w} ORDER BY p.published_at DESC NULLS LAST, p.updated_at DESC LIMIT $${args.length + 1} OFFSET $${args.length + 2}`,
@@ -254,7 +254,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
       const out = await pool.query(`
         SELECT a.id, a.name, a.slug, a.ren_no, a.bio, a.photo_url, a.areas, a.verified_at,
                (SELECT count(*) FROM lib_properties p
-                 WHERE p.visibility='public' AND p.status IN ('available','reserved')
+                 WHERE p.visibility IN ('pool','public') AND p.status IN ('available','reserved')
                    AND lower(p.agent)=lower(a.name))::int AS listings
         FROM lib_agents a
         WHERE a.public = true AND a.active = true
