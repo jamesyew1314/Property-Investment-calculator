@@ -144,7 +144,8 @@
   function cardHTML(x){
     var area = x.area_name || x.area || x.area_code || "Johor";
     var code = x.code || "";
-    return '<div class="neoMCard"><div class="ph" aria-hidden="true"></div><b>'+area+'</b><small>'+code+' · '+(lang==="bm"?"Co-Broke tersedia":(lang==="en"?"Co-broke available":"可 Co-Broke"))+'</small><span class="tag">'+(lang==="bm"?"Sedia untuk padanan":(lang==="en"?"Match ready":"智能匹配就绪"))+'</span></div>';
+    var href = code ? ("/p/" + encodeURIComponent(code)) : "/pool/";
+    return '<a class="neoMCard" href="'+href+'"><div class="ph" aria-hidden="true"></div><b>'+area+'</b><small>'+code+' · '+(lang==="bm"?"Co-Broke tersedia":(lang==="en"?"Co-broke available":"可 Co-Broke"))+'</small><span class="tag">'+(lang==="bm"?"Sedia untuk padanan":(lang==="en"?"Match ready":"智能匹配就绪"))+'</span></a>';
   }
   function renderMarquee(rows){
     if(!track) return;
