@@ -27,6 +27,7 @@ function areaName(code, en) {
 function card(p, lang) {
   const en = lang === "en";
   const price = p.intent === "rent" ? p.rent_price : p.asking_price;
+  const psfTotal = p.price_unit === "psf" && Number(p.price_total) > 0 ? Number(p.price_total) : 0;
   const title = (lang === "zh" ? (p.project_title_zh || p.project_title || p.project_name) : (p.project_title || p.project_name)) || "—";
   return '<a class="pcard" href="/p/' + encodeURIComponent(p.code) + '?lang=' + lang + '">' +
     '<div class="pcard-media">' + (p.cover_url ? '<img class="pcard-img" src="' + esc(p.cover_url.replace(/\.jpg$/i, "_t.jpg")) + '" data-full="' + esc(p.cover_url) + '" onerror="this.onerror=null;this.src=this.dataset.full" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">' : '<div class="ph"><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="rgba(226,200,143,.5)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></div>') +

@@ -1444,7 +1444,10 @@ app.get("/p/:code", async function (req, res, next) {
     const lang = ["zh", "en", "bm"].indexOf(req.query.lang) >= 0 ? req.query.lang : "zh";
     const code = String(req.params.code || "").slice(0, 20);
     const out = await pool.query(
-      `SELECT p.*, pr.name AS project_title, pr.name_zh AS project_title_zh
+      `SELECT p.*,
+              (CASE WHEN p.price_unit='psf' AND COALESCE(p.land_area,p.built_up) > 0
+                    THEN p.asking_price * COALESCE(p.land_area,p.built_up) END)::float8 AS price_total,
+              pr.name AS project_title, pr.name_zh AS project_title_zh
        FROM lib_properties p LEFT JOIN lib_projects pr ON pr.id = p.project_id
        WHERE p.code=$1 AND p.visibility IN ('pool','public') AND p.status IN ('available','reserved')`, [code]);
     const p = out.rows[0];
@@ -1471,6 +1474,9 @@ app.get("/a/:slug", async function (req, res, next) {
     const rows = await pool.query(`
       SELECT p.code, p.project_name, p.area_code, p.intent, p.cover_url,
              p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
+             p.price_unit, p.land_area::float8 AS land_area,
+             (CASE WHEN p.price_unit='psf' AND COALESCE(p.land_area,p.built_up) > 0
+                   THEN p.asking_price * COALESCE(p.land_area,p.built_up) END)::float8 AS price_total,
              p.block, p.unit_no, p.bedrooms, p.bathrooms, p.built_up::float8 AS built_up,
              pr.name AS project_title, pr.name_zh AS project_title_zh
       FROM lib_properties p LEFT JOIN lib_projects pr ON pr.id = p.project_id
