@@ -65,7 +65,9 @@
 }
 </script>
 </head>
-<body>
+<body class="neo">
+<canvas id="neoParticles" aria-hidden="true"></canvas>
+<div id="neoLoader" aria-hidden="true"><div class="mark">Roof<span>X</span></div><div class="bars"><i></i><i></i><i></i></div></div>
 
 <header class="site-head">
   <div class="wrap bar">
@@ -95,12 +97,13 @@
         <h1 class="heroTitle" data-i18n="hero.title">你的房源，你的数据库。<br>共享资源，创造无限商机。</h1>
         <p class="heroIntro" data-i18n="hero.lead">RoofX 是专为 The Roof Johor 中介打造的房地产资源管理与合作平台。</p>
         <p class="heroDesc" data-i18n="hero.desc">轻松建立属于自己的房源数据库，自由选择共享 Listing，透过智能匹配连接其他中介的房源与买家需求，让每一份资源创造更多合作与成交机会。</p>
+        <div id="neoType" class="neoType" aria-live="polite"></div>
         <a class="heroCta" href="/join/" data-i18n="hero.cta">立刻开始 RoofX</a>
         <p class="heroSlogan" data-i18n="hero.slogan">Build Your Database. Share Opportunities. Grow Together.</p>
         <div class="techRow">
-          <span class="techPill" data-i18n="tech.match">⚡ 智能匹配</span>
-          <span class="techPill" data-i18n="tech.live">🛰 实时房源池</span>
-          <span class="techPill" data-i18n="tech.lang">🔐 三语平台</span>
+          <span class="techPill" data-i18n="tech.match">智能匹配</span>
+          <span class="techPill" data-i18n="tech.live">实时房源池</span>
+          <span class="techPill" data-i18n="tech.lang">三语平台</span>
         </div>
       </div>
 
@@ -139,6 +142,42 @@
 
   
 
+  <section class="sec" id="matchDemo">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow" data-i18n="match.kicker">SMART MATCH</div>
+        <h2 data-i18n="match.title">智能匹配，一眼看懂</h2>
+        <p data-i18n="match.sub">房源与买家需求自动配对，合作机会即时浮现。</p>
+      </div>
+      <div class="neoMatch">
+        <div class="neoMatchGrid">
+          <div class="neoMatchCard">
+            <div class="tagline" data-i18n="match.sellTag">LISTING · 房源</div>
+            <h4 data-i18n="match.sellTitle">Mount Austin · 公寓</h4>
+            <ul>
+              <li data-i18n="match.sell1">3 房 · 2 浴 · 1,150 sqft</li>
+              <li data-i18n="match.sell2">RM 520,000 · Freehold</li>
+              <li data-i18n="match.sell3">可 Co-Broke · 业主委托</li>
+            </ul>
+          </div>
+          <div class="neoMatchLink" aria-hidden="true">
+            <span class="neoMatchScore">92%</span>
+            <svg viewBox="0 0 120 80"><path d="M4 40 C 34 8, 86 8, 116 40"/></svg>
+          </div>
+          <div class="neoMatchCard">
+            <div class="tagline" data-i18n="match.buyTag">BUYER · 买家需求</div>
+            <h4 data-i18n="match.buyTitle">JB 买家 · 首购</h4>
+            <ul>
+              <li data-i18n="match.buy1">预算 RM 450,000 – 550,000</li>
+              <li data-i18n="match.buy2">区域：Mount Austin / Johor Bahru</li>
+              <li data-i18n="match.buy3">3 房 · 接受 Freehold</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="sec" id="core">
     <div class="wrap">
       <div class="sec-head">
@@ -146,11 +185,11 @@
         <h2 data-i18n="core.title">建立 · 共享 · 匹配 · 共赢</h2>
         <p data-i18n="core.lead">你的数据库，属于你；共享的资源，成就大家。</p>
       </div>
-      <div class="grid-2" style="margin-top:22px">
-        <div class="vcard"><div class="ic">01</div><h3 data-i18n="core.c1t">建立 Build</h3><p data-i18n="core.c1d">建立自己的私人 Listing 数据库，集中管理房源资料。</p></div>
-        <div class="vcard"><div class="ic">02</div><h3 data-i18n="core.c2t">共享 Share</h3><p data-i18n="core.c2d">自主选择共享房源，让更多合作中介看见你的 Listing。</p></div>
-        <div class="vcard"><div class="ic">03</div><h3 data-i18n="core.c3t">匹配 Match</h3><p data-i18n="core.c3d">连接房源与买家需求，更容易找到潜在合作机会。</p></div>
-        <div class="vcard"><div class="ic">04</div><h3 data-i18n="core.c4t">共赢 Grow</h3><p data-i18n="core.c4d">跨团队共享资源，增加 Co-Broke 与成交机会。</p></div>
+      <div class="neoCore" style="margin-top:22px">
+        <div class="vcard"><div class="ic">01</div><h3 data-i18n="core.c1t">建立 Build</h3><p data-i18n="core.c1d">建立自己的私人 Listing 数据库，集中管理房源资料。</p><span class="nodeExtra" data-i18n="core.c1x">把散在 WhatsApp / Excel 的房源收进一个库。</span></div>
+        <div class="vcard"><div class="ic">02</div><h3 data-i18n="core.c2t">共享 Share</h3><p data-i18n="core.c2d">自主选择共享房源，让更多合作中介看见你的 Listing。</p><span class="nodeExtra" data-i18n="core.c2x">决定哪些公开、哪些只给自己看。</span></div>
+        <div class="vcard"><div class="ic">03</div><h3 data-i18n="core.c3t">匹配 Match</h3><p data-i18n="core.c3d">连接房源与买家需求，更容易找到潜在合作机会。</p><span class="nodeExtra" data-i18n="core.c3x">按预算、区域、房型自动配对买家。</span></div>
+        <div class="vcard"><div class="ic">04</div><h3 data-i18n="core.c4t">共赢 Grow</h3><p data-i18n="core.c4d">跨团队共享资源，增加 Co-Broke 与成交机会。</p><span class="nodeExtra" data-i18n="core.c4x">联系 Listing Agent，合作成交有记录。</span></div>
       </div>
     </div>
   </section>
@@ -172,7 +211,7 @@
         <h2 data-i18n="how.title">如何开始使用 RoofX？</h2>
         <p data-i18n="how.sub">只需四个步骤，开启你的房地产合作网络。</p>
       </div>
-      <div class="grid-2" style="margin-top:22px">
+      <div class="neoSteps" style="margin-top:22px">
         <div class="vcard"><div class="ic">01</div><h3 data-i18n="how.s1t">注册账号</h3><p data-i18n="how.s1d">使用你的中介资料注册 RoofX，建立属于自己的个人账号与专属页面。</p></div>
         <div class="vcard"><div class="ic">02</div><h3 data-i18n="how.s2t">建立自己的数据库</h3><p data-i18n="how.s2d">上传你的 Listing，集中管理房源资料。无论住宅、店屋、工厂、土地或出租单位，都可以分类整理。</p></div>
         <div class="vcard"><div class="ic">03</div><h3 data-i18n="how.s3t">选择共享资源</h3><p data-i18n="how.s3d">你的数据库由你管理。你可以选择哪些房源保留私人使用，哪些分享到 RoofX 共享房源池，让更多中介有机会与你合作。</p></div>
@@ -197,6 +236,15 @@
   
 
   
+  <section class="neoMarquee" id="livePool" aria-label="Live listing pool">
+    <div class="wrap" style="text-align:center;margin-bottom:8px">
+      <div class="eyebrow" data-i18n="live.kicker">LIVE POOL</div>
+      <h2 style="font-family:Space Grotesk,Sora,sans-serif;font-size:22px;margin:4px 0 0" data-i18n="live.title">实时房源池</h2>
+      <p style="color:#94A3B8;font-size:13px;margin:4px 0 0" data-i18n="live.sub">来自全柔佛中介的最新货源</p>
+    </div>
+    <div class="neoMarqueeTrack" id="neoMarqueeTrack"></div>
+  </section>
+
 </main>
 
 <footer class="site-foot">
@@ -254,6 +302,26 @@ window.PAGE_I18N = {
   "how.close3": ["先建立自己的数据库，再让你的资源创造更多机会。", "Build your database first, then let your resources create more opportunities.", "Bina pangkalan data anda dahulu, kemudian biarkan sumber anda mencipta lebih banyak peluang."],
   "how.cta1": ["立即注册 RoofX", "Register with RoofX", "Daftar RoofX"],
   "how.cta2": ["上传我的第一间房源", "Upload my first listing", "Muat naik senarai pertama saya"],
+  "match.kicker": ["SMART MATCH", "SMART MATCH", "SMART MATCH"],
+  "match.title": ["智能匹配，一眼看懂", "Smart matching at a glance", "Padanan pintar sekilas pandang"],
+  "match.sub": ["房源与买家需求自动配对，合作机会即时浮现。", "Listings and buyer needs pair automatically — opportunities surface instantly.", "Senarai dan keperluan pembeli dipadankan automatik — peluang muncul segera."],
+  "match.sellTag": ["LISTING · 房源", "LISTING", "SENARAI"],
+  "match.sellTitle": ["Mount Austin · 公寓", "Mount Austin · Condo", "Mount Austin · Kondominium"],
+  "match.sell1": ["3 房 · 2 浴 · 1,150 sqft", "3 bed · 2 bath · 1,150 sqft", "3 bilik · 2 bilik air · 1,150 sqft"],
+  "match.sell2": ["RM 520,000 · Freehold", "RM 520,000 · Freehold", "RM 520,000 · Hak milik kekal"],
+  "match.sell3": ["可 Co-Broke · 业主委托", "Co-broke available · Owner listing", "Co-broke tersedia · Senarai pemilik"],
+  "match.buyTag": ["BUYER · 买家需求", "BUYER NEED", "KEPERLUAN PEMBELI"],
+  "match.buyTitle": ["JB 买家 · 首购", "JB buyer · First home", "Pembeli JB · Rumah pertama"],
+  "match.buy1": ["预算 RM 450,000 – 550,000", "Budget RM 450,000 – 550,000", "Bajet RM 450,000 – 550,000"],
+  "match.buy2": ["区域：Mount Austin / Johor Bahru", "Area: Mount Austin / Johor Bahru", "Kawasan: Mount Austin / Johor Bahru"],
+  "match.buy3": ["3 房 · 接受 Freehold", "3 bed · Freehold accepted", "3 bilik · Hak milik kekal diterima"],
+  "live.kicker": ["LIVE POOL", "LIVE POOL", "LIVE POOL"],
+  "live.title": ["实时房源池", "Live listing pool", "Kolam senarai langsung"],
+  "live.sub": ["来自全柔佛中介的最新货源", "Latest listings from agents across Johor", "Senarai terbaru daripada ejen seluruh Johor"],
+  "core.c1x": ["把散在 WhatsApp / Excel 的房源收进一个库。", "Bring listings scattered across WhatsApp and Excel into one database.", "Kumpulkan senarai bertaburan di WhatsApp dan Excel ke satu pangkalan data."],
+  "core.c2x": ["决定哪些公开、哪些只给自己看。", "Choose what is public and what stays private.", "Pilih apa yang awam dan apa yang peribadi."],
+  "core.c3x": ["按预算、区域、房型自动配对买家。", "Match buyers automatically by budget, area and type.", "Padankan pembeli secara automatik mengikut bajet, kawasan dan jenis."],
+  "core.c4x": ["联系 Listing Agent，合作成交有记录。", "Contact the listing agent and close co-broke deals with a record.", "Hubungi ejen senarai dan tutup urus niaga co-broke dengan rekod."],
   "core.kicker": ["RoofX 核心", "The RoofX core", "Teras RoofX"],
   "core.title": ["建立 · 共享 · 匹配 · 共赢", "Build · Share · Match · Grow", "Bina · Kongsi · Padan · Tumbuh"],
   "core.lead": ["你的数据库，属于你；共享的资源，成就大家。", "Your database belongs to you; shared resources grow everyone.", "Pangkalan data anda milik anda; sumber dikongsi membesarkan semua."],
@@ -265,9 +333,9 @@ window.PAGE_I18N = {
   "core.c3d": ["连接房源与买家需求，更容易找到潜在合作机会。", "Connect listings with buyer needs to find more collaboration opportunities.", "Hubungkan senarai dengan keperluan pembeli untuk lebih banyak peluang kerjasama."],
   "core.c4t": ["共赢 Grow", "Grow", "Tumbuh"],
   "core.c4d": ["跨团队共享资源，增加 Co-Broke 与成交机会。", "Share resources across teams to increase co-broke and closing opportunities.", "Kongsi sumber merentas pasukan untuk meningkatkan co-broke dan peluang tutup jualan."],
-  "tech.match": ["⚡ 智能匹配", "⚡ Smart matching", "⚡ Padanan pintar"],
-  "tech.live": ["🛰 实时房源池", "🛰 Live listing pool", "🛰 Kolam senarai langsung"],
-  "tech.lang": ["🔐 三语平台", "🔐 Trilingual platform", "🔐 Platform tiga bahasa"],
+  "tech.match": ["智能匹配", "Smart matching", "Padanan pintar"],
+  "tech.live": ["实时房源池", "Live listing pool", "Kolam senarai langsung"],
+  "tech.lang": ["三语平台", "Trilingual platform", "Platform tiga bahasa"],
   "hero.kicker": ["YOUR PROPERTY NETWORK", "YOUR PROPERTY NETWORK", "RANGKAIAN HARTANAH ANDA"],
   "hero.slogan": ["Build Your Database. Share Opportunities. Grow Together.", "Build Your Database. Share Opportunities. Grow Together.", "Bina Pangkalan Data. Kongsi Peluang. Tumbuh Bersama."],
   "hero.title": ["你的房源，你的数据库。<br>共享资源，创造无限商机。", "Your listings. Your database.<br>Share resources. Create endless opportunities.", "Senarai anda. Pangkalan data anda.<br>Kongsi sumber. Cipta peluang tanpa had."],
@@ -492,6 +560,7 @@ window.PAGE_I18N = {
 })();
 </script>
 <script src="/lang3.js"></script>
+<script src="/neo-home.js"></script>
 <script>
 (function(){
   var L = new URLSearchParams(location.search).get("lang") || (function(){try{return localStorage.getItem("kt_lang")}catch(e){return null}})() || "zh";

@@ -1,0 +1,184 @@
+/* RoofX NEO — dark tech homepage */
+body.neo{
+  --neo-bg:#0A0E17;--neo-panel:#111827;--neo-cyan:#00E5FF;--neo-purple:#7C3AED;
+  --neo-text:#F9FAFB;--neo-muted:#94A3B8;--neo-line:rgba(0,229,255,.15);
+  background:var(--neo-bg)!important;color:var(--neo-text)!important;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;
+  overflow-x:hidden;
+}
+body.neo:before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:48px 48px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 92%)}
+body.neo #neoParticles{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
+body.neo main,body.neo .site-foot,body.neo .site-head{position:relative;z-index:1}
+body.neo .site-head{background:rgba(10,14,23,.72)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(0,229,255,.12)!important;box-shadow:none!important;transition:background .25s ease,box-shadow .25s ease}
+body.neo .site-head.scrolled{background:rgba(10,14,23,.94)!important;box-shadow:0 10px 40px rgba(0,0,0,.45)!important}
+body.neo .brand span{color:#E2E8F0!important;border-left-color:rgba(0,229,255,.25)!important;font-family:"Space Grotesk",Sora,Inter,sans-serif}
+body.neo .site-nav a{color:#CBD5E1!important;font-weight:500}
+body.neo .site-nav a:hover,body.neo .site-nav a.on{color:var(--neo-cyan)!important}
+body.neo .calcTop{border-color:rgba(0,229,255,.35)!important;color:var(--neo-cyan)!important;background:rgba(0,229,255,.05)!important}
+.neoOnline{display:inline-flex;align-items:center;gap:6px;margin-left:10px;font-size:10.5px;letter-spacing:.12em;color:#7DE9F7;text-transform:uppercase}
+.neoOnline i{width:7px;height:7px;border-radius:50%;background:#00E5FF;box-shadow:0 0 0 0 rgba(0,229,255,.6);animation:neoPulse 2s infinite}
+@keyframes neoPulse{0%{box-shadow:0 0 0 0 rgba(0,229,255,.55)}70%{box-shadow:0 0 0 8px rgba(0,229,255,0)}100%{box-shadow:0 0 0 0 rgba(0,229,255,0)}}
+/* hero */
+body.neo .hero{background:radial-gradient(900px 520px at 20% 0%,rgba(0,229,255,.18),transparent 60%),
+  radial-gradient(800px 500px at 85% 20%,rgba(124,58,237,.22),transparent 62%),
+  linear-gradient(180deg,#070B13 0%,#0A0E17 60%,#0A0E17 100%)!important}
+.neoGlow{position:absolute;inset:-20% -10%;pointer-events:none;z-index:0;filter:blur(10px);
+  background:radial-gradient(420px 420px at var(--mx,50%) var(--my,40%),rgba(0,229,255,.16),transparent 65%),
+             radial-gradient(520px 520px at calc(var(--mx,50%) + 18%) calc(var(--my,40%) + 22%),rgba(124,58,237,.16),transparent 68%);
+  transition:background .18s linear}
+body.neo .hero .wrap{position:relative;z-index:2}
+body.neo .heroBrand{font-family:"Space Grotesk",Sora,Inter,sans-serif!important;color:#F9FAFB!important;
+  text-shadow:0 0 34px rgba(0,229,255,.25)}
+body.neo .heroKicker{color:var(--neo-cyan)!important;letter-spacing:.34em!important}
+body.neo .hero .heroTitle{
+  background:linear-gradient(92deg,#00E5FF 0%,#67E8F9 35%,#A78BFA 70%,#7C3AED 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent!important;
+  font-family:"Space Grotesk",Sora,Inter,sans-serif!important;font-weight:700!important}
+body.neo .heroIntro{color:#E2E8F0!important}
+body.neo .heroDesc{color:var(--neo-muted)!important}
+body.neo .heroSlogan{color:#67E8F9!important;font-family:"JetBrains Mono",ui-monospace,monospace!important;font-size:12px!important}
+.neoType{min-height:26px;margin:2px 0 14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13.5px;letter-spacing:.02em;color:#7DE9F7}
+.neoType:after{content:"▋";margin-left:2px;color:#00E5FF;animation:neoBlink 1s steps(1) infinite}
+@keyframes neoBlink{50%{opacity:0}}
+/* CTA */
+body.neo .heroCta{position:relative;overflow:hidden;border:1px solid rgba(0,229,255,.6)!important;
+  background:linear-gradient(100deg,rgba(0,229,255,.22),rgba(124,58,237,.35))!important;
+  color:#F9FAFB!important;box-shadow:0 0 26px rgba(0,229,255,.25),inset 0 0 18px rgba(124,58,237,.18)!important;
+  font-family:"Space Grotesk",Sora,Inter,sans-serif!important;letter-spacing:.02em}
+body.neo .heroCta:before{content:"";position:absolute;top:0;left:-140%;width:60%;height:100%;
+  background:linear-gradient(115deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);transition:left .6s ease}
+body.neo .heroCta:hover:before{left:150%}
+body.neo .heroCta:hover{box-shadow:0 0 36px rgba(0,229,255,.45)!important;transform:translateY(-1px)}
+/* badges */
+body.neo .techPill{background:rgba(0,229,255,.06)!important;border:1px solid rgba(0,229,255,.4)!important;color:#A5F3FC!important;
+  box-shadow:0 0 14px rgba(0,229,255,.14),inset 0 0 10px rgba(0,229,255,.05);letter-spacing:.04em;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px}
+/* glass cards */
+body.neo .vcard,body.neo .agent-card,body.neo .rules,body.neo .searchbar,body.neo .nItem{
+  background:rgba(17,24,39,.6)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(0,229,255,.15)!important;border-radius:16px!important;box-shadow:0 18px 48px rgba(0,0,0,.35)!important;
+  color:var(--neo-text)!important;transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease}
+body.neo .vcard:hover,body.neo .agent-card:hover,body.neo .nItem:hover{transform:translateY(-4px);border-color:rgba(0,229,255,.55)!important;
+  box-shadow:0 0 0 1px rgba(0,229,255,.2),0 22px 60px rgba(0,229,255,.12)!important}
+body.neo .vcard h3,body.neo .vcard p,body.neo .sec-head h2,body.neo .sec-head p{color:var(--neo-text)}
+body.neo .vcard p,body.neo .sec-head p{color:var(--neo-muted)}
+body.neo .vcard .ic{background:linear-gradient(145deg,rgba(0,229,255,.18),rgba(124,58,237,.28))!important;
+  color:#A5F3FC!important;border:1px solid rgba(0,229,255,.35);box-shadow:0 0 18px rgba(0,229,255,.2)}
+body.neo .sec-head h2{font-family:"Space Grotesk",Sora,Inter,sans-serif!important}
+body.neo .sec-head h2:after{background:linear-gradient(90deg,#00E5FF,#7C3AED)!important}
+body.neo .eyebrow{color:#67E8F9!important}
+/* search */
+body.neo .searchbar{background:rgba(17,24,39,.72)!important}
+body.neo .searchbar .f label{color:#94A3B8!important}
+body.neo .searchbar input,body.neo .searchbar select{background:rgba(10,14,23,.75)!important;border:1px solid rgba(0,229,255,.18)!important;
+  color:#F9FAFB!important;border-radius:10px!important}
+body.neo .btn.gold{background:linear-gradient(100deg,#00E5FF,#7C3AED)!important;color:#06121A!important;
+  border:1px solid rgba(0,229,255,.5)!important;box-shadow:0 0 22px rgba(0,229,255,.28)!important;font-weight:800}
+body.neo .btn.gold:hover{filter:brightness(1.08)}
+/* stats rings */
+body.neo .hero-stats{justify-content:center;gap:18px;flex-wrap:wrap}
+body.neo .hero-stats>div{display:flex;align-items:center;gap:12px;background:rgba(17,24,39,.6)!important;
+  border:1px solid rgba(0,229,255,.16)!important;border-radius:16px!important;padding:12px 16px!important;min-width:150px;backdrop-filter:blur(12px)}
+body.neo .hero-stats .neoRing{width:46px;height:46px;flex:0 0 46px;position:relative}
+body.neo .hero-stats .neoRing svg{transform:rotate(-90deg);width:46px;height:46px}
+body.neo .hero-stats .neoRing circle{fill:none;stroke-width:3.5}
+body.neo .hero-stats .neoRing .track{stroke:rgba(148,163,184,.22)}
+body.neo .hero-stats .neoRing .bar{stroke:url(#neoGrad);stroke-linecap:round;stroke-dasharray:126;stroke-dashoffset:126;transition:stroke-dashoffset 1.4s ease}
+body.neo .hero-stats b{font-family:"JetBrains Mono",ui-monospace,monospace!important;color:#00E5FF!important;font-size:24px!important;text-shadow:0 0 20px rgba(0,229,255,.35)}
+body.neo .hero-stats span{color:#94A3B8!important;text-transform:uppercase;letter-spacing:.16em;font-size:10px!important}
+/* core timeline */
+body.neo .neoCore{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:0!important;position:relative;margin-top:32px!important}
+body.neo .neoCore:before{content:"";position:absolute;left:7%;right:7%;top:34px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.5),rgba(124,58,237,.5),transparent)}
+body.neo .neoCore .vcard{background:transparent!important;border:none!important;box-shadow:none!important;backdrop-filter:none!important;text-align:center;padding:0 14px;position:relative;overflow:visible}
+body.neo .neoCore .vcard:hover{transform:none}
+body.neo .neoCore .ic{width:68px;height:68px;margin:0 auto 14px!important;border-radius:50%!important;display:grid;place-items:center;
+  background:radial-gradient(circle at 30% 30%,rgba(0,229,255,.25),rgba(17,24,39,.9))!important;border:1px solid rgba(0,229,255,.45)!important;
+  box-shadow:0 0 22px rgba(0,229,255,.25)!important;font-family:"JetBrains Mono",monospace;color:#A5F3FC!important;position:relative;z-index:1}
+body.neo .neoCore .vcard:after{content:"";position:absolute;top:34px;right:-50%;width:100%;height:2px;background:linear-gradient(90deg,rgba(0,229,255,.5),rgba(124,58,237,.4));z-index:0;opacity:.5}
+body.neo .neoCore .vcard:last-child:after{display:none}
+body.neo .neoCore .nodeExtra{display:block;max-height:0;opacity:0;overflow:hidden;transition:max-height .3s ease,opacity .3s ease;color:#7DE9F7;font-size:12.5px;margin-top:6px}
+body.neo .neoCore .vcard:hover .nodeExtra{max-height:70px;opacity:1}
+/* steps vertical timeline */
+body.neo .neoSteps{display:flex!important;flex-direction:column!important;gap:16px!important;position:relative;margin-top:26px}
+body.neo .neoSteps:before{content:"";position:absolute;left:26px;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,rgba(0,229,255,.5),rgba(124,58,237,.5))}
+body.neo .neoSteps .vcard{display:grid!important;grid-template-columns:56px 1fr;gap:16px;align-items:start;margin-left:0;padding:18px 20px;text-align:left}
+body.neo .neoSteps .ic{width:52px;height:52px;margin:0!important;font-family:"JetBrains Mono",monospace;font-size:18px;border-radius:12px!important}
+/* smart match demo */
+.neoMatch{max-width:1000px;margin:0 auto;position:relative}
+.neoMatchGrid{display:grid;grid-template-columns:1fr 120px 1fr;gap:14px;align-items:center;margin-top:24px}
+.neoMatchCard{background:rgba(17,24,39,.66);border:1px solid rgba(0,229,255,.18);border-radius:16px;padding:18px;backdrop-filter:blur(12px);text-align:left}
+.neoMatchCard h4{margin:0 0 4px;color:#F9FAFB;font-family:"Space Grotesk",Sora,sans-serif;font-size:16px}
+.neoMatchCard .tagline{font-family:"JetBrains Mono",monospace;font-size:11px;color:#67E8F9;letter-spacing:.06em;text-transform:uppercase}
+.neoMatchCard ul{margin:10px 0 0;padding-left:16px;color:#94A3B8;font-size:13px;line-height:1.8}
+.neoMatchLink{position:relative;height:100px;display:grid;place-items:center}
+.neoMatchLink svg{width:100%;height:80px;overflow:visible}
+.neoMatchLink path{stroke:#00E5FF;stroke-width:1.6;stroke-dasharray:6 6;fill:none;animation:neoDash 1.6s linear infinite}
+@keyframes neoDash{to{stroke-dashoffset:-24}}
+.neoMatchScore{position:absolute;left:50%;top:4px;transform:translateX(-50%);font-family:"JetBrains Mono",monospace;font-size:12px;
+  color:#06121A;background:linear-gradient(90deg,#00E5FF,#A78BFA);padding:5px 10px;border-radius:999px;font-weight:800;white-space:nowrap;box-shadow:0 0 20px rgba(0,229,255,.4)}
+/* marquee */
+.neoMarquee{overflow:hidden;position:relative;padding:26px 0;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.neoMarqueeTrack{display:flex;gap:14px;width:max-content;animation:neoScroll 36s linear infinite}
+.neoMarquee:hover .neoMarqueeTrack{animation-play-state:paused}
+@keyframes neoScroll{to{transform:translateX(-50%)}}
+.neoMCard{width:250px;flex:0 0 250px;background:rgba(17,24,39,.66);border:1px solid rgba(0,229,255,.16);border-radius:14px;padding:14px;color:#F9FAFB}
+.neoMCard .ph{height:82px;border-radius:10px;background:linear-gradient(135deg,rgba(0,229,255,.16),rgba(124,58,237,.22));margin-bottom:10px}
+.neoMCard b{display:block;font-size:14px;margin-bottom:4px}
+.neoMCard small{color:#94A3B8;font-size:11.5px;display:block}
+.neoMCard .tag{display:inline-block;margin-top:8px;font-size:10.5px;letter-spacing:.05em;color:#67E8F9;border:1px solid rgba(0,229,255,.35);border-radius:999px;padding:3px 8px}
+/* reveal */
+.neoReveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.neoReveal.in{opacity:1;transform:none}
+/* loader */
+#neoLoader{position:fixed;inset:0;z-index:9999;background:#0A0E17;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .5s ease}
+#neoLoader.done{opacity:0;pointer-events:none}
+#neoLoader .mark{font-family:"Space Grotesk",Sora,serif;font-size:30px;color:#F9FAFB;letter-spacing:.04em}
+#neoLoader .mark span{color:#00E5FF}
+#neoLoader .bars{display:flex;gap:5px}
+#neoLoader .bars i{width:4px;height:22px;background:linear-gradient(180deg,#00E5FF,#7C3AED);border-radius:2px;animation:neoBar 1s ease-in-out infinite}
+#neoLoader .bars i:nth-child(2){animation-delay:.12s}#neoLoader .bars i:nth-child(3){animation-delay:.24s}
+@keyframes neoBar{50%{transform:scaleY(.35);opacity:.5}}
+/* responsive */
+@media(max-width:900px){
+  body.neo .neoCore{grid-template-columns:1fr!important;gap:10px!important}
+  body.neo .neoCore:before{display:none}
+  body.neo .neoCore .vcard{display:grid;grid-template-columns:60px 1fr;text-align:left;padding:10px 0;gap:10px}
+  body.neo .neoCore .vcard:after{display:none}
+  body.neo .neoCore .ic{margin:0!important;width:54px;height:54px}
+  .neoMatchGrid{grid-template-columns:1fr}
+  .neoMatchLink{height:70px}
+  .neoMatchLink svg{transform:rotate(90deg);height:60px;width:120px}
+}
+@media(max-width:760px){
+  body.neo .hero-stats>div{min-width:44%;flex:1 1 44%;padding:10px 12px!important}
+  body.neo .hero-stats b{font-size:20px!important}
+  body.neo .heroCta{min-height:48px}
+  body.neo .neoSteps .vcard{grid-template-columns:44px 1fr;padding:14px}
+  body.neo .neoSteps .ic{width:42px;height:42px;font-size:15px}
+}
+@media(prefers-reduced-motion:reduce){
+  body.neo *,body.neo *:before,body.neo *:after{animation:none!important;transition:none!important}
+  .neoReveal{opacity:1!important;transform:none!important}
+  #neoParticles{display:none!important}
+  #neoLoader{display:none!important}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  body.neo .vcard,body.neo .searchbar,body.neo .neoMatchCard,body.neo .neoMCard{background:#111827!important}
+}
+
+/* inline dark text overrides */
+body.neo #how p[data-i18n="how.close1"]{color:#F9FAFB!important}
+body.neo #how p[data-i18n="how.close2"],body.neo #how p[data-i18n="how.close3"]{color:#94A3B8!important}
+body.neo #newsHome a{color:#67E8F9!important}
+body.neo .btn.line{background:rgba(17,24,39,.6)!important;border:1px solid rgba(0,229,255,.35)!important;color:#A5F3FC!important}
+body.neo .site-foot{background:#070B13!important;border-top:1px solid rgba(0,229,255,.12)}
+body.neo .site-foot a,body.neo .site-foot p{color:#94A3B8!important}
+body.neo #matchDemo{background:transparent}
+
+/* stats layout fix */
+body.neo .hero-stats>div{display:grid!important;grid-template-columns:48px 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;text-align:left;flex:none!important}
+body.neo .hero-stats .neoRing{grid-row:1/3;grid-column:1}
+body.neo .hero-stats b{grid-column:2;line-height:1.1}
+body.neo .hero-stats span{grid-column:2}
