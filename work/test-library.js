@@ -142,7 +142,7 @@ eq(core.sortOf({ sort: "asking_price", dir: "asc" }, { asking_price: "p.asking_p
 eq(core.sortOf({ sort: "drop table", dir: "asc" }, { asking_price: "p.asking_price" }, "p.id DESC"), "p.id DESC", "排序拒绝注入");
 
 // ---------- 字典 ----------
-eq(tax.AREAS.length, 123, "全国区域 123 个");
+eq(tax.AREAS.length, 124, "全国区域 124 个");
 eq(tax.STATES.length, 16, "16 个州 / 直辖区");
 eq(tax.stateOfArea("mont_kiara"), "kl", "区域反查州（KL）");
 eq(tax.stateOfArea("sutera_utama"), "johor", "区域反查州（柔佛）");
