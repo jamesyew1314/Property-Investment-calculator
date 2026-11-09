@@ -100,27 +100,39 @@
     });
   })();
 
-  /* typewriter */
+  /* typewriter (reactive to instant language switch) */
   var typeEl = document.getElementById("neoType");
   if (typeEl) {
-    var phrases = {
+    var TYPE_ALL = {
       zh: ["智能匹配中…","实时同步房源池…","连接 Co-Broke 机会…"],
       en: ["Smart matching in progress…","Syncing live listings…","Connecting co-broke opportunities…"],
       bm: ["Padanan pintar sedang berjalan…","Menyegerakkan senarai langsung…","Menghubungkan peluang co-broke…"]
-    }[lang];
-    typeEl.textContent = phrases[0];
-    if (reduce) { /* static */ }
-    else {
-      var pi=0, ci=phrases[0].length, del=false;
-      setTimeout(function(){
-      (function type(){ var s=phrases[pi]; typeEl.textContent = s.slice(0,ci);
-        if(!del && ci<s.length){ ci++; setTimeout(type,55); }
-        else if(!del){ del=true; setTimeout(type,1300); }
-        else if(ci>0){ ci--; setTimeout(type,28); }
-        else { del=false; pi=(pi+1)%phrases.length; setTimeout(type,350); }
-      })();
-      }, 1200);
+    };
+    var typeTimer = null;
+    function typeStart(l){
+      var phrases = TYPE_ALL[l] || TYPE_ALL.zh;
+      clearTimeout(typeTimer);
+      typeEl.textContent = phrases[0];
+      if (reduce) return;
+      var pi = 0, ci = phrases[0].length, del = false;
+      function step(){
+        var word = phrases[pi];
+        typeEl.textContent = word.slice(0, ci);
+        var wait;
+        if (!del && ci < word.length) { ci++; wait = 55; }
+        else if (!del) { del = true; wait = 1300; }
+        else if (ci > 0) { ci--; wait = 28; }
+        else { del = false; pi = (pi + 1) % phrases.length; wait = 350; }
+        typeTimer = setTimeout(step, wait);
+      }
+      typeTimer = setTimeout(step, 1200);
     }
+    typeStart(lang);
+    document.addEventListener("kt:lang", function(e){
+      var l = (e && e.detail) || (window.KT && window.KT.lang) || "zh";
+      var n = (e && e.detail && e.detail.lang) || l;
+      if (n && n !== lang) { lang = n; typeStart(n); }
+    });
   }
 
   /* marquee from pool */
