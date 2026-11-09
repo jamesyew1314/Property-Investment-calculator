@@ -46,7 +46,8 @@
 
   function lang() {
     try {
-      var l = localStorage.getItem("kwongthye_lang") || localStorage.getItem("fangchan_lang") || "zh";
+      var q = new URLSearchParams(location.search).get("lang");
+      var l = (["zh","en","bm"].indexOf(q) >= 0 ? q : null) || localStorage.getItem("kwongthye_lang") || localStorage.getItem("fangchan_lang") || "zh";
       return l === "en" ? "en" : (l === "bm" ? "bm" : "zh");
     } catch (e) { return "zh"; }
   }
