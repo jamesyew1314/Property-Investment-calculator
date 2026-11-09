@@ -55,7 +55,7 @@
   if (canvas && !reduce && !mobile) {
     var ctx = canvas.getContext("2d"), pts = [], W = 0, H = 0, raf = 0, last = 0;
     function size(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-    function init(){ pts = []; var n = Math.min(70, Math.floor(W / 22)); for (var i=0;i<n;i++) pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.18,r:Math.random()*1.6+.5,c:Math.random()>.5?"0,229,255":"124,58,237"}); }
+    function init(){ pts = []; var n = Math.min(70, Math.floor(W / 22)); for (var i=0;i<n;i++) pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.18,r:Math.random()*1.6+.5,c:Math.random()>.5?"125,211,252":"124,58,237"}); }
     function draw(ts){ if (ts - last < 33) { raf = requestAnimationFrame(draw); return; } last = ts; ctx.clearRect(0,0,W,H);
       for (var i=0;i<pts.length;i++){ var p=pts[i]; p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>W)p.vx*=-1; if(p.y<0||p.y>H)p.vy*=-1;
         ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.283); ctx.fillStyle="rgba("+p.c+",.55)"; ctx.fill(); }
@@ -77,7 +77,7 @@
   (function(){
     var defs = document.createElementNS("http://www.w3.org/2000/svg","svg");
     defs.setAttribute("width","0"); defs.setAttribute("height","0"); defs.setAttribute("aria-hidden","true");
-    defs.innerHTML = '<defs><linearGradient id="neoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00E5FF"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs>';
+    defs.innerHTML = '<defs><linearGradient id="neoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7DD3FC"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs>';
     document.body.appendChild(defs);
     document.querySelectorAll(".hero-stats > div").forEach(function(box, idx){
       var b = box.querySelector("b"); if (!b) return;
