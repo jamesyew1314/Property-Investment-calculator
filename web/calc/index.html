@@ -12,8 +12,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="KWTHYE">
-<title>房地产投资快速计算器 | Property Investment Calculator</title>
-<meta name="description" content="马来西亚房地产投资计算器：买入费用、贷款月供、年度持有费用、出租回报、RPGT 与出售利润，一键算清。">
+<title>RoofX 房地产投资计算器 | RoofX Property Investment Calculator</title>
+<meta name="description" content="RoofX 马来西亚房地产投资计算器：买入费用、贷款月供、年度持有费用、出租回报、RPGT 与出售利润，一键算清。">
 <style>
   :root {
     --navy:#1F3864; --blue:#2E5496; --light:#EAF0FA; --ink:#222; --grey:#68707C;
@@ -25,7 +25,10 @@
   header { background:var(--navy); color:#fff; padding:14px 16px; }
   .headrow { display:flex; align-items:center; justify-content:space-between; gap:10px; }
   header h1 { margin:0; font-size:18px; font-weight:700; }
-  .logo { height:30px; width:auto; vertical-align:-7px; border-radius:6px; margin-right:8px; }
+  .logo { height:34px; width:auto; vertical-align:-8px; border-radius:8px; margin-right:9px; }
+  .brandWord{font-family:Georgia,"Times New Roman",serif;font-size:23px;letter-spacing:.02em;color:#fff;vertical-align:-4px}
+  .brandSep{opacity:.45;margin:0 8px;font-weight:400;vertical-align:-3px}
+  .calcBrand{display:flex;align-items:center;flex-wrap:wrap;gap:2px}
   header p { margin:4px 0 0; font-size:12px; opacity:.8; }
   #langBtn { flex:none; border:1px solid rgba(255,255,255,.6); background:transparent; color:#fff;
        border-radius:9px; padding:6px 12px; font-size:14px; font-weight:600; cursor:pointer; }
@@ -215,7 +218,7 @@
 <style id="printCfg"></style>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="RoofX">
-<meta property="og:title" content="房地产投资快速计算器 | Malaysia Property Investment Calculator">
+<meta property="og:title" content="RoofX 房地产投资计算器 | RoofX Property Investment Calculator">
 <meta property="og:description" content="买入费用、贷款月供、持有费用、租金回报、RPGT 与出售利润，一间房从买到卖一次算清。立即使用。">
 <meta property="og:url" content="https://kwongthye.com/calc/">
 <meta property="og:image" content="https://kwongthye.com/og-image.png">
@@ -224,14 +227,14 @@
 <meta property="og:locale" content="zh_MY">
 <meta property="og:locale:alternate" content="en_MY">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="房地产投资快速计算器 | Malaysia Property Investment Calculator">
+<meta name="twitter:title" content="RoofX 房地产投资计算器 | RoofX Property Investment Calculator">
 <meta name="twitter:description" content="买入费用、贷款月供、持有费用、租金回报、RPGT 与出售利润，一间房从买到卖一次算清。立即使用。">
 <meta name="twitter:image" content="https://kwongthye.com/og-image.png">
 </head>
 <body>
 <header>
   <div class="headrow">
-    <h1><img src="logo-white.png?v=tr1" alt="logo" class="logo"><span data-i18n="appName">房地产投资快速计算器</span></h1>
+    <h1 class="calcBrand"><img src="roofx-mark.png?v=2" alt="RoofX" class="logo"><span class="brandWord">RoofX</span><span class="brandSep">|</span><span data-i18n="appName">房地产投资计算器</span></h1>
     <div class="headbtns">
       <button id="helpBtn" class="hbtn" data-i18n="btnHelp">口径说明</button>
       <button id="acctBtn" class="hbtn">👤 <span id="acctBtnTxt">登录</span></button>
@@ -241,9 +244,9 @@
   <p data-i18n="appSub">个人买入 → 持有 1–5 年 → 卖出 · 所有金额 RM</p>
 </header>
 <div class="printhead">
-  <img class="phLogo" src="logo.png?v=tr1" alt="logo">
+  <img class="phLogo" src="roofx-mark.png?v=2" alt="RoofX">
   <div class="phMain">
-    <div class="phCo" id="phCo">房地产投资快速计算器</div>
+    <div class="phCo" id="phCo">RoofX · 房地产投资计算器</div>
     <div class="phContact" id="phContact"></div>
   </div>
   <div class="phMeta">
@@ -616,7 +619,7 @@
 
   var I18N = {
     zh: {
-      appName: "房地产投资快速计算器",
+      appName: "房地产投资计算器",
       appSub: "个人买入 → 持有 1–5 年 → 卖出 · 所有金额 RM",
       legendFill: "✍️ 自己填 · ⚙️ 自动算",
       p1Title: "Part 1 · 买入（第一次要出的费用）",
@@ -920,7 +923,7 @@
   }
   function applyLang() {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-    document.title = t("appName") + (lang === "zh" ? "" : " | Kwong Thye");
+    document.title = "RoofX · " + t("appName");
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       el.textContent = t(el.getAttribute("data-i18n"));
     });
