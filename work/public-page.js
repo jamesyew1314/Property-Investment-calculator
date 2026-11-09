@@ -36,10 +36,12 @@ module.exports = function renderPublicListing(p, agent, opts) {
         tenure: "Tenure", price: "Price", agent: "Listing agent", more: "See all listings from this agent", forRent: "For rent", forSale: "For sale" }
     : { home: "首页", back: "返回中介主页", contact: "联系中介", wa: "WhatsApp", call: "打电话",
         specs: "房源资料", area: "区域", type: "房型", beds: "卧室", baths: "浴室", built: "建筑面积",
-        tenure: "产权", price: "价格", agent: "货源中介", more: "查看该中介全部房源", forRent: "出租", forSale: "出售" });
+        tenure: "产权", price: "价格", agent: "货源中介", more: "查看该中介全部房源", forRent: "出租", forSale: "出售", total: "总价" });
 
   const title = (lang === "zh" ? (p.project_title_zh || p.project_title || p.project_name) : (p.project_title || p.project_name)) || p.code;
   const price = p.intent === "rent" ? p.rent_price : p.asking_price;
+  const psf = p.price_unit === "psf";
+  const total = psf && p.price_total ? Number(p.price_total) : null;
   const area = areaName(p.area_code, lang !== "zh");
   const photos = (p.photos || []).filter(function (x) { return /^\/uploads\/props\/[A-Za-z0-9._-]+$/.test(x); });
   const main = photos[0] || p.cover_url;
@@ -87,7 +89,8 @@ module.exports = function renderPublicListing(p, agent, opts) {
     '<div class="pd-grid"><div><div class="pd-photo">' + (main ? '<img src="' + esc(main) + '" alt="' + esc(title) + '">' : "") + "</div>" +
     (photos.length > 1 ? '<div class="pd-thumbs">' + photos.slice(0, 8).map(function (u) { return '<img src="' + esc(u.replace(/\.jpg$/i, "_t.jpg")) + '" data-full="' + esc(u) + '" onclick="var m=document.querySelector(\'.pd-photo img\');if(m)m.src=this.dataset.full" alt="">'; }).join("") + "</div>" : "") +
     "<h1>" + esc(title) + "</h1><div style=\"color:#5D6B7A;font-size:13.5px\">" + esc(p.code) + " · " + esc(area) + "</div>" +
-    '<div class="price">' + money(price, p.intent === "rent", lang) + ' <span style="font:600 12px/1 sans-serif;padding:4px 9px;border-radius:999px;background:#F3EAD8;color:#8A6420;vertical-align:middle">' + (p.intent === "rent" ? T.forRent : T.forSale) + "</span></div>" +
+    '<div class="price">' + (total ? money(total, false, lang) + ' <span style="font:600 12px/1 sans-serif;padding:4px 9px;border-radius:999px;background:#F3EAD8;color:#8A6420;vertical-align:middle">' + T.total + "</span>" : money(price, p.intent === "rent", lang) + (psf ? '<span style="font-size:13px;color:#94A3B8"> /psf</span>' : '') + ' <span style="font:600 12px/1 sans-serif;padding:4px 9px;border-radius:999px;background:#F3EAD8;color:#8A6420;vertical-align:middle">' + (p.intent === "rent" ? T.forRent : T.forSale) + "</span>") + "</div>" +
+    (total ? '<div style="font-size:12.5px;color:#94A3B8;margin:-2px 0 8px">' + money(price, false, lang) + " /psf · " + T.total + (p.land_area ? " (" + Number(p.land_area).toLocaleString("en-MY") + " sqft)" : "") + "</div>" : (psf ? '<div style="font-size:12.5px;color:#94A3B8;margin:-2px 0 8px">' + (en ? "Enter land area to calculate total" : lang === "bm" ? "Isi luas tanah untuk kira jumlah" : "填写土地面积后可计算总价") + "</div>" : "")) +
     '<div class="specs">' + specs + "</div>" +
     (p.description ? '<div style="margin:0 0 18px;color:#41505F;line-height:1.8;white-space:pre-wrap">' + esc(p.description) + "</div>" : "") +
     "</div>" +
