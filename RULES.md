@@ -8,6 +8,7 @@
 4. **发布前检查**：至少检查 `/`、`/pool/`、`/news/`、`/agents/`、`/join/`、`/about/`、`/privacy/`、`/terms/`、`/favorites/`、`/p/`、`/a/`、`/agent/` 的 BM/EN；发现中文即阻断发布。
 5. **手机端**：390px 宽度逐页检查，三语切换条不得遮挡内容。
 6. 每次修复必须在 `RULES.md` 记录日期、根因、修复、验证结果。
+7. **静态资源必须带版本号**：修改 `site.js` / `lang3.js` / `neo-home.js` / `app.js` / CSS 后必须同步 bump `?v=`，否则浏览器缓存会导致 BM/EN 仍是旧文案。
 
 # RoofX 产品规则与修复记录（持续更新）
 
