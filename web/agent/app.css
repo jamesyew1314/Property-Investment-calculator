@@ -304,3 +304,16 @@ body.neo .authCard{background:rgba(17,24,39,.8)!important;border:1px solid rgba(
 body.neo .authCard h1,body.neo .authCard .brand b{color:#F9FAFB!important}
 body.neo .authCard p,body.neo .authCard .muted{color:#94A3B8!important}
 body.neo #app{background:#0A0E17!important}
+
+/* workspace pool cards consistency */
+body.neo .pcard{background:rgba(17,24,39,.72)!important;border:1px solid rgba(0,229,255,.16)!important;box-shadow:0 12px 30px rgba(0,0,0,.28)!important;color:#F9FAFB!important}
+body.neo .pcard:hover{border-color:rgba(0,229,255,.45)!important}
+body.neo .pcard .t{color:#F9FAFB!important}
+body.neo .pcard .price{color:#00E5FF!important;font-family:"JetBrains Mono",ui-monospace,monospace!important}
+body.neo .pcard .meta{color:#94A3B8!important}
+body.neo .pcard .mono{color:#B6C2D1!important;font-family:"JetBrains Mono",ui-monospace,monospace!important}
+body.neo .pcard .foot{border-top:1px dashed rgba(255,255,255,.1)!important}
+body.neo .pcard .btn.line{background:rgba(0,229,255,.08)!important;border:1px solid rgba(0,229,255,.4)!important;color:#A5F3FC!important}
+body.neo .pcard .btn.line:hover{background:rgba(0,229,255,.2)!important;color:#FFFFFF!important;border-color:rgba(0,229,255,.7)!important}
+body.neo .toolbar .count{color:#94A3B8!important}
+body.neo .pill.grey{background:rgba(148,163,184,.14)!important;color:#CBD5E1!important;border:1px solid rgba(148,163,184,.3)!important}
