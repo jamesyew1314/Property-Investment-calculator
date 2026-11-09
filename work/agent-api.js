@@ -483,6 +483,8 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
   // ---------- 我的房源 ----------
   const OWN_SELECT = `
     SELECT p.*, p.asking_price::float8 AS asking_price, p.rent_price::float8 AS rent_price,
+           (CASE WHEN p.price_unit='psf' AND COALESCE(p.land_area,p.built_up) > 0
+                 THEN p.asking_price * COALESCE(p.land_area,p.built_up) END)::float8 AS price_total,
            p.built_up::float8 AS built_up, p.land_area::float8 AS land_area,
            p.listed_on::text AS listed_on, pr.name AS project_title, pr.name_zh AS project_title_zh,
            (SELECT count(*) FROM pool_inquiries i WHERE i.property_id=p.id)::int AS inquiries
