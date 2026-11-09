@@ -22,6 +22,16 @@
       mkt: "营销 Cookie（广告效果统计）",
       saved: "已保存你的选择", open: "Cookie 设置"
     },
+    bm: {
+      title: "Keutamaan Cookie",
+      body: "Cookie penting diperlukan untuk log masuk dan keselamatan dan tidak boleh dimatikan. Cookie analitik membantu kami memahami penggunaan; cookie pemasaran mengukur prestasi iklan. Anda boleh pilih.",
+      need: "Hanya penting", all: "Terima semua", set: "Tetapan", more: "Dasar Privasi",
+      mTitle: "Tetapan Cookie", mSave: "Simpan pilihan", mCancel: "Batal",
+      nec: "Cookie penting (log masuk, keselamatan)", necNote: "Sentiasa aktif",
+      ana: "Cookie analitik (penggunaan halaman, membantu kami menambah baik)",
+      mkt: "Cookie pemasaran (prestasi iklan)",
+      saved: "Pilihan anda telah disimpan", open: "Tetapan Cookie"
+    },
     en: {
       title: "Cookie preferences",
       body: "Essential cookies keep you signed in and secure and cannot be turned off. Analytics cookies help us understand usage; marketing cookies measure ad performance. You choose.",
@@ -37,7 +47,7 @@
   function lang() {
     try {
       var l = localStorage.getItem("kwongthye_lang") || localStorage.getItem("fangchan_lang") || "zh";
-      return l === "en" ? "en" : "zh";
+      return l === "en" ? "en" : (l === "bm" ? "bm" : "zh");
     } catch (e) { return "zh"; }
   }
   function t(k) { return (T[lang()] && T[lang()][k]) || T.zh[k] || k; }
