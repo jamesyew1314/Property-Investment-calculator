@@ -395,3 +395,8 @@ input,select,textarea{font-size:16px!important}
 .agentHero .avatar{box-shadow:0 0 0 4px rgba(198,161,91,.2),0 14px 30px rgba(0,0,0,.25)}
 .pcard{background:rgba(255,255,255,.95)!important;border:1px solid rgba(198,161,91,.18)!important;border-radius:16px!important;box-shadow:0 14px 30px rgba(14,36,56,.07)!important;transition:transform .2s ease,box-shadow .2s ease}
 .pcard:hover{transform:translateY(-4px);box-shadow:0 22px 44px rgba(14,36,56,.14)!important}
+
+/* News page tech cards */
+.nItem{background:rgba(255,255,255,.9)!important;backdrop-filter:blur(12px);border:1px solid rgba(198,161,91,.18)!important;box-shadow:0 14px 32px rgba(14,36,56,.07);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.nItem:hover{transform:translateY(-3px);border-color:rgba(198,161,91,.45)!important;box-shadow:0 22px 44px rgba(14,36,56,.13)}
+.nSrc{color:#B8862F!important}
