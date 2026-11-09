@@ -175,6 +175,7 @@
 | 2026-11-08 | /join/ 表单区改为「加入 RoofX，你将获得」四项（房源中心/个人页分享/共享权限/匹配合作）+「申请开通 RoofX」说明，按钮改申请开通，提交后提示 1 个工作日内联系；三语。手机端已验证 |
 | 2026-11-08 | /join/ Hero 文案改为「你的房源，你做主。更多资源，更多成交！」+「一个平台，有效管理你的资源，稳定拓展你的商机。」三语。手机端已验证 |
 | 2026-11-09 | 工作台手机表格复核：`.table` 深色透明表体+白字在 390 视口已可读（编号/区域/价格/状态），表格保留横向滑动；三语条移左下角不挡价格列。测试账号/房源已清理 |
+| 2026-11-09 | 工作台「我的房源」只显示 20/31：API 默认分页 20 且前端无翻页；改为自动逐页拉取（pageSize 50，最多 20 页）后一次性渲染，31 条全部可见；「全部房源」同样改为自动拉全（pageSize 48）。app.js 版本号 bump |
 | 2026-11-09 | 发布加固：新增 `work/test-static.js`（页面 neo/body、lang3 版本号、手机登录入口、JS 语法、CSS 括号）、`work/test-i18n.js`（data-i18n key 必须存在、核心 ag.* 三语）、`work/test-smoke.js`（9 个关键页面 200、BM 新闻无中文、首页登录/语言资源）。已接入 `deploy/deploy.sh`：发布前跑 static+i18n，发布后跑 smoke，任一失败即阻断。三项本地/线上均 PASS |
 | 2026-11-09 | 手机「中介登录」丢失：原 `.site-nav .login` 带 inline `display:none`，JS clone 又依赖 lang3 执行/缓存；首页/中介/加入/关于增加静态 `.mobile-login` 链接（仅 ≤760px 显示，data-i18n 跟随语言），不依赖 JS。核查顶部导航、搜索、CTA、三语条均正常 |
 | 2026-11-09 | BM 首页房源池仍显示中文：浏览器缓存旧 `neo-home.js`（无版本号），且动态卡片未随语言重绘。已给 site.js/lang3.js/neo-home.js 统一加 `?v=20261109i18n`，并写死规则 7「改 JS/CSS 必须 bump 版本号」。验证 BM marquee：`Permas Jaya · Co-Broke tersedia · Sedia untuk padanan`，无中文 |
