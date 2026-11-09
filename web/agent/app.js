@@ -94,6 +94,18 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
+  function psfInfo(row, price) {
+    if (!row || row.price_unit !== "psf") return null;
+    var area = Number(row.land_area || row.built_up || 0);
+    var psf = Number(price || 0);
+    return { psf: psf, area: area, total: area > 0 ? psf * area : 0 };
+  }
+  function priceText(row, price, monthly) {
+    var pf = psfInfo(row, price);
+    if (pf && pf.total) return money(pf.total) + ' <span class="muted" style="font-size:11px">(' + money(pf.psf) + '/psf)</span>';
+    if (pf) return money(pf.psf) + '/psf';
+    return money(price, monthly);
+  }
   function money(n, monthly) {
     var v = Number(n);
     if (!isFinite(v) || v === 0) return "—";
@@ -404,7 +416,9 @@
         "</th><th>" + t("操作", "Actions") + "</th></tr></thead><tbody>" +
         d.rows.map(function (r) {
           var price = r.intent === "rent" ? r.rent_price : r.asking_price;
-          return '<tr data-act="view-listing" data-id="' + r.id + '" style="cursor:pointer"><td class="mono">' + esc(r.code) + "</td><td>" + esc(areaName(r.area_code)) + "</td><td class='num'>" + money(price, r.intent === "rent") + "</td><td>" + pill(r.status) + "</td><td class='num'>" + (mc[r.code] || 0) + "</td>" +
+          var pm = psfInfo(r, price);
+          var priceCell = pm && pm.total ? money(pm.total) + '<div class="muted" style="font-size:11px">' + money(pm.psf) + '/psf</div>' : (pm ? money(pm.psf) + '/psf' : money(price, r.intent === "rent"));
+          return '<tr data-act="view-listing" data-id="' + r.id + '" style="cursor:pointer"><td class="mono">' + esc(r.code) + "</td><td>" + esc(areaName(r.area_code)) + "</td><td class='num'>" + priceCell + "</td><td>" + pill(r.status) + "</td><td class='num'>" + (mc[r.code] || 0) + "</td>" +
             '<td><button class="btn line sm" data-act="view-listing" data-id="' + r.id + '">' + t("查看", "View") + "</button> " +
             '<button class="btn line sm" data-act="edit-listing" data-id="' + r.id + '">' + t("编辑", "Edit") + "</button> " +
             '<button class="btn line sm" data-act="share" data-id="' + r.id + '">' + t("分享到群", "Share") + "</button> " +
@@ -511,11 +525,14 @@
       return '<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid #F1F3F7"><span style="flex:0 0 112px;color:#6B7A8D;font-size:12px">' + esc(label) + '</span><span style="font-size:13px;color:#0E2438;word-break:break-word">' + val + "</span></div>";
     }
     var price = row.intent === "rent" ? row.rent_price : row.asking_price;
+    var pf = psfInfo(row, price);
+    var priceLine = pf ? (pf.total ? money(pf.total) + " · " + money(pf.psf) + "/psf" : money(pf.psf) + "/psf · " + t("请填写土地面积以计算总价", "Enter land area to calculate total")) : (price ? money(price, row.intent === "rent") : "");
+    if (priceLine && row.negotiable) priceLine += " · " + t("可议价", "Negotiable");
     var photos = Array.isArray(row.photos) ? row.photos : [];
     var body = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><b style="font-family:Georgia,serif;font-size:20px;color:#0E2438">' + esc(row.code) + "</b>" + pill(row.status) + "</div>" +
       (row.headline ? '<div style="font-weight:700;color:#0E2438;margin-bottom:8px">' + esc(row.headline) + "</div>" : "") +
       (photos.length ? '<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:12px">' + photos.slice(0, 8).map(function (u) { return '<img src="' + esc(u) + '" style="width:96px;height:72px;object-fit:cover;border-radius:8px;flex:0 0 auto">'; }).join("") + "</div>" : "") +
-      row2(t("售价 / 租金", "Price"), price ? money(price, row.intent === "rent") + (row.negotiable ? " · " + t("可议价", "Negotiable") : "") : "") +
+      row2(t("售价 / 租金", "Price"), priceLine) +
       row2(t("银行估价", "Bank value"), row.bank_value ? money(row.bank_value) : "") +
       row2(t("项目 / 地址", "Project / address"), esc([row.project_name, row.address].filter(Boolean).join(" · "))) +
       row2(t("花园名", "Address text"), esc(row.address_text || "")) +
@@ -591,6 +608,8 @@
       '<h4 style="margin:14px 0 8px;color:#0E2438">' + t("规格", "Specifications") + "</h4>" +
       '<div class="grid2 nums">' + field(t("Land size 土地面积（如 22x70）", "Land size (e.g. 22x70)"), '<input name="land_size" value="' + esc(row.land_size || "") + '" placeholder="22x70">') +
       field(t("Built-up 建筑面积（sqft）", "Built-up (sqft)"), '<input name="built_up" inputmode="numeric" value="' + esc(row.built_up || "") + '">') + "</div>" +
+      '<div class="grid2 nums">' + field(t("土地面积（地皮必填）", "Land area (required for land)"), '<div style="display:flex;gap:6px"><input name="land_area" inputmode="decimal" value="' + esc(row.land_area || "") + '" style="flex:1"><select name="land_area_unit" style="width:auto"><option value="sqft">sqft</option><option value="acre">acre</option></select></div>') +
+      field(t("面积换算", "Area note"), '<div class="muted" style="font-size:12px;padding-top:8px">1 acre = 43,560 sqft</div>') + "</div>" +
       '<div class="grid2 nums">' + field(t("Bedrooms 房间", "Bedrooms"), '<select name="bedrooms">' + optList([{key:"0",zh:"Studio",en:"Studio"}].concat([1,2,3,4,5,6,7,8,9,10].map(function(n){return {key:String(n),zh:String(n),en:String(n)}})), row.bedrooms != null ? String(row.bedrooms) : "", "—") + "</select>") +
       field(t("Extra rooms 额外房间", "Extra rooms"), '<select name="extra_rooms">' + optList([1,2,3].map(function(n){return {key:String(n),zh:"+"+n,en:"+"+n}}), row.extra_rooms != null ? String(row.extra_rooms) : "", "—") + "</select>") + "</div>" +
       '<div class="grid2 nums">' + field(t("Bathrooms 浴室", "Bathrooms"), '<select name="bathrooms">' + optList([1,2,3,4,5,6,7,8].map(function(n){return {key:String(n),zh:String(n),en:String(n)}}), row.bathrooms != null ? String(row.bathrooms) : "", "—") + "</select>") +
@@ -701,6 +720,11 @@
       var btn = this; btn.disabled = true;
       var form = $("#lf", m.root), body = {};
       $$("input,select,textarea", form).forEach(function (el) { if (el.name) body[el.name] = el.value; });
+      var lu = body.land_area_unit || "sqft"; delete body.land_area_unit;
+      if (body.land_area !== undefined && body.land_area !== "") {
+        var la = Number(body.land_area);
+        if (isFinite(la) && la > 0) body.land_area = lu === "acre" ? la * 43560 : la;
+      }
       var p = row.id ? api("/listings/" + row.id, { method: "PATCH", body: body }) : api("/listings", { method: "POST", body: body });
       p.then(function () { m.close(); toast(t("已保存", "Saved")); route(); })
         .catch(function (e) {
@@ -749,7 +773,8 @@
     if (row.other_renovation) String(row.other_renovation).split("\n").filter(Boolean).forEach(function (x) { lines.push(x); });
     if (row.selling_points) { lines.push(""); String(row.selling_points).split("\n").filter(Boolean).forEach(function (x) { lines.push("• " + x); }); }
     lines.push("");
-    if (price) lines.push("*" + (rent ? "Rental " : "Selling ") + "RM " + Number(price).toLocaleString("en-MY") + (rent ? "/month" : "") + "*");
+    var pf = psfInfo(row, price);
+    if (price) lines.push("*" + (rent ? "Rental " : "Selling ") + (pf && pf.total ? "RM " + Number(pf.total).toLocaleString("en-MY") + " (RM " + Number(pf.psf).toLocaleString("en-MY") + "/psf)" : "RM " + Number(price).toLocaleString("en-MY") + (rent ? "/month" : "")) + "*");
     if (row.negotiable) lines.push("Negotiable");
     lines.push("");
     lines.push("*" + (S.me.team || "RoofX") + "*");
@@ -828,8 +853,10 @@
     ctx.fillText(sub, 86, 300 + lines.length * 82 + 30);
 
     var price = row.intent === "rent" ? row.rent_price : row.asking_price;
+    var pf = psfInfo(row, price);
     ctx.fillStyle = "#E2C88F"; ctx.font = "700 92px Georgia, serif";
-    ctx.fillText(money(price, row.intent === "rent"), 80, 300 + lines.length * 82 + 180);
+    ctx.fillText(pf && pf.total ? money(pf.total) : money(price, row.intent === "rent"), 80, 300 + lines.length * 82 + 180);
+    if (pf && pf.total) { ctx.fillStyle = "rgba(255,255,255,.65)"; ctx.font = "30px -apple-system, system-ui"; ctx.fillText(money(pf.psf) + "/psf", 84, 300 + lines.length * 82 + 230); }
 
     ctx.fillStyle = "rgba(255,255,255,.82)"; ctx.font = "30px -apple-system, system-ui";
     var bits = [];
@@ -910,13 +937,14 @@
       } else {
         h += '<div class="grid3">' + d.rows.map(function (r) {
           var price = r.intent === "rent" ? r.rent_price : r.asking_price;
+          var pm = psfInfo(r, price);
           var mine = r.tenant_id === S.me.id;
           return '<div class="pcard">' + (r.cover_url ? '<img src="' + esc(r.cover_url) + '" alt="" loading="lazy" style="width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:8px">' : "") + '<div style="display:flex;gap:8px;align-items:center"><span class="mono">' + esc(r.code) + "</span>" +
             (mine ? '<span class="pill grey">' + t("我的", "Mine") + "</span>" : "") + "</div>" +
             '<div class="t">' + esc(projName(r)) + "</div>" +
             '<div class="meta">' + esc(areaName(r.area_code)) + " · " + [r.bedrooms, r.bathrooms].filter(function (x) { return x != null; }).join("/") +
             (r.built_up ? " · " + int(r.built_up) + " sqft" : "") + "</div>" +
-            '<div class="price">' + money(price, r.intent === "rent") + "</div>" +
+            '<div class="price">' + (pm && pm.total ? money(pm.total) + ' <span class="muted" style="font-size:11px">' + money(pm.psf) + '/psf</span>' : (pm ? money(pm.psf) + '/psf' : money(price, r.intent === "rent"))) + "</div>" +
             '<div class="meta">' + t("货源：", "Listed by ") + "<b>" + esc(r.owner_name || r.agent || "—") + "</b>" +
             (r.owner_ren ? " · " + esc(r.owner_ren) : "") + (r.owner_verified ? " ✓" : "") + "</div>" +
             '<div class="foot">' + (mine ? '<span class="muted">' + t("这是你的房源", "Your listing") + "</span>" :
