@@ -127,6 +127,13 @@
     track.innerHTML = html + html;
   }
   if (track) {
-    fetch("/api/public/pool?limit=8", {cache:"no-store"}).then(function(r){return r.json()}).then(function(j){ renderMarquee((j.rows||[]).map(function(x){ x.area_name = x.area_name || x.area || x.area_code; return x; })); }).catch(function(){ renderMarquee([]); });
+    Promise.all([
+      fetch("/api/public/config", {cache:"no-store"}).then(function(r){return r.json()}).catch(function(){return {areas:[]}}),
+      fetch("/api/public/pool?limit=8", {cache:"no-store"}).then(function(r){return r.json()}).catch(function(){return {rows:[]}})
+    ]).then(function(res){
+      var map = {};
+      (res[0].areas || []).forEach(function(a){ map[a.key] = lang === "zh" ? (a.zh || a.en) : (a.en || a.zh); });
+      renderMarquee((res[1].rows || []).map(function(x){ x.area_name = map[x.area_code] || x.area_code || "Johor"; return x; }));
+    }).catch(function(){ renderMarquee([]); });
   }
 })();
