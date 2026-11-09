@@ -318,3 +318,8 @@ body.neo .neoMCard .tag{font-size:11.5px!important;margin-top:10px}
 body.neo a.neoMCard{display:block;text-decoration:none;color:inherit;cursor:pointer}
 body.neo a.neoMCard:hover{border-color:rgba(0,229,255,.6)!important;box-shadow:0 0 0 1px rgba(0,229,255,.25),0 18px 40px rgba(0,229,255,.12);transform:translateY(-3px)}
 body.neo a.neoMCard:hover b{color:#00E5FF}
+
+/* SSR language switch */
+body.neo #l3{background:rgba(10,14,23,.88)!important;border:1px solid rgba(0,229,255,.2)!important;backdrop-filter:blur(12px)}
+body.neo #l3 a{color:#94A3B8!important}
+body.neo #l3 a[style*="background:#0E2438"]{background:linear-gradient(135deg,#00E5FF,#7C3AED)!important;color:#06121A!important}
