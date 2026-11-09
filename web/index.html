@@ -110,6 +110,30 @@
         </div>
       </div>
 
+      <aside class="aiConsole" id="aiConsole" aria-label="RoofX AI match console">
+        <div class="aiConsoleTop">
+          <span class="aiOrb" aria-hidden="true"></span>
+          <b>RoofX AI</b>
+          <span class="aiLive" data-i18n="ai.live">LIVE</span>
+          <span class="aiDemo" data-i18n="ai.demo">DEMO</span>
+        </div>
+        <div class="aiScreen">
+          <div class="aiHello" data-i18n="ai.hello">描述买家需求，AI 帮你找房源。</div>
+          <div class="aiInputRow">
+            <input id="aiInput" type="text" autocomplete="off" data-i18n-ph="ai.placeholder" placeholder="例如：Mount Austin · RM500k · 3 房">
+            <button type="button" id="aiRun" data-i18n="ai.run">匹配</button>
+          </div>
+          <div class="aiChips">
+            <button type="button" data-ai="first" data-i18n="ai.chip1">首购 · 500k</button>
+            <button type="button" data-ai="invest" data-i18n="ai.chip2">投资 · 租金回报</button>
+            <button type="button" data-ai="family" data-i18n="ai.chip3">家庭 · 3 房</button>
+          </div>
+          <div class="aiStream" id="aiStream" aria-live="polite"></div>
+          <div class="aiResults" id="aiResults"></div>
+        </div>
+        <div class="aiFoot"><span data-i18n="ai.foot">AI 演示：实时房源池 + 规则匹配</span><span class="aiCursor" aria-hidden="true">▮</span></div>
+      </aside>
+
       <form class="searchbar" id="searchForm" role="search">
         <div class="f">
           <label data-i18n="search.intent">买 / 租</label>
@@ -336,6 +360,21 @@ window.PAGE_I18N = {
   "core.c3d": ["连接房源与买家需求，更容易找到潜在合作机会。", "Connect listings with buyer needs to find more collaboration opportunities.", "Hubungkan senarai dengan keperluan pembeli untuk lebih banyak peluang kerjasama."],
   "core.c4t": ["共赢 Grow", "Grow", "Tumbuh"],
   "core.c4d": ["跨团队共享资源，增加 Co-Broke 与成交机会。", "Share resources across teams to increase co-broke and closing opportunities.", "Kongsi sumber merentas pasukan untuk meningkatkan co-broke dan peluang tutup jualan."],
+  "ai.live": ["LIVE", "LIVE", "LIVE"],
+  "ai.demo": ["AI 演示", "AI DEMO", "DEMO AI"],
+  "ai.hello": ["描述买家需求，AI 帮你找房源。", "Describe your buyer's needs — AI finds the listings.", "Terangkan keperluan pembeli — AI cari senarai."],
+  "ai.placeholder": ["例如：Mount Austin · RM500k · 3 房", "e.g. Mount Austin · RM500k · 3 bed", "cth. Mount Austin · RM500k · 3 bilik"],
+  "ai.run": ["匹配", "Match", "Padan"],
+  "ai.chip1": ["首购 · 500k", "First home · 500k", "Rumah pertama · 500k"],
+  "ai.chip2": ["投资 · 租金回报", "Invest · rental yield", "Pelaburan · hasil sewa"],
+  "ai.chip3": ["家庭 · 3 房", "Family · 3 bed", "Keluarga · 3 bilik"],
+  "ai.foot": ["AI 演示：实时房源池 + 规则匹配", "AI demo: live pool + rules matching", "Demo AI: kolam langsung + padanan peraturan"],
+  "ai.s1": ["理解买家需求", "Understanding buyer needs", "Memahami keperluan pembeli"],
+  "ai.s2": ["扫描实时房源池", "Scanning live listing pool", "Mengimbas kolam senarai langsung"],
+  "ai.s3": ["计算匹配度与 Co-Broke 机会", "Scoring matches and co-broke fit", "Menilai padanan dan peluang co-broke"],
+  "ai.s4": ["找到 3 个可跟进机会", "3 opportunities found", "3 peluang ditemui"],
+  "ai.match": ["匹配", "match", "padanan"],
+  "ai.view": ["查看房源", "View listing", "Lihat senarai"],
   "tech.match": ["智能匹配", "Smart matching", "Padanan pintar"],
   "tech.live": ["实时房源池", "Live listing pool", "Kolam senarai langsung"],
   "tech.lang": ["三语平台", "Trilingual platform", "Platform tiga bahasa"],
@@ -564,6 +603,7 @@ window.PAGE_I18N = {
 </script>
 <script src="/lang3.js?v=20261109login"></script>
 <script src="/neo-home.js?v=20261109i18n"></script>
+<script src="/ai-console.js?v=20261109ai"></script>
 <script>
 (function(){
   var L = new URLSearchParams(location.search).get("lang") || (function(){try{return localStorage.getItem("kt_lang")}catch(e){return null}})() || "zh";
