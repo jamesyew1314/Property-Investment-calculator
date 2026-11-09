@@ -35,7 +35,7 @@ function card(p, lang) {
     '<div class="pcard-body"><div class="pcard-title">' + esc(title) + "</div>" +
     '<div class="pcard-sub">' + esc(areaName(p.area_code, lang !== "zh")) + " · " + esc([p.bedrooms, p.bathrooms].filter(function (x) { return x != null; }).join("/")) +
     (p.built_up ? " · " + Number(p.built_up).toLocaleString("en-MY") + " sqft" : "") + "</div>" +
-    '<div class="pcard-price">' + money(price, p.intent === "rent", lang) + "</div></div></a>";
+    '<div class="pcard-price">' + (psfTotal ? money(psfTotal, false, lang) + ' <small style="color:#94A3B8;font-size:12px">' + money(price, false, lang) + '/psf</small>' : money(price, p.intent === "rent", lang)) + "</div></div></a>";
 }
 
 module.exports = function renderAgentPage(agent, listings, opts) {
