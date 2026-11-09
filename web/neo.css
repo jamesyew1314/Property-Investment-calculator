@@ -477,3 +477,26 @@ body.neo .aiCursor{color:#7DD3FC;animation:neoBlink 1s steps(1) infinite}
   body.neo .heroTitle{font-size:clamp(30px,3vw,46px)!important;line-height:1.3!important;max-width:690px}
   body.neo .aiConsole{margin-top:132px!important;max-width:470px;justify-self:end;width:100%}
 }
+
+/* AI stream visible with reduced motion */
+body.neo .aiStream .s{opacity:1!important;transform:none!important;animation:aiStep .35s ease both}
+@keyframes aiStep{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* POOL AI SEARCH */
+body.neo .poolAI{display:flex;align-items:center;gap:8px;margin:16px 0 2px;max-width:760px;
+  background:rgba(10,18,30,.75);border:1px solid rgba(125,211,252,.28);border-radius:14px;padding:7px 8px;
+  box-shadow:0 14px 36px rgba(0,0,0,.35)}
+body.neo .poolAI .mk{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.1em;color:#06121A;
+  background:linear-gradient(135deg,#7DD3FC,#7C3AED);padding:6px 8px;border-radius:8px;font-weight:800}
+body.neo .poolAI input{flex:1;min-width:0;border:0!important;background:transparent!important;color:#F8FAFC!important;padding:8px 6px!important;font-size:13px}
+body.neo .poolAI button{border:1px solid rgba(125,211,252,.45);background:rgba(125,211,252,.12);color:#BAE6FD;
+  border-radius:9px;padding:8px 12px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap}
+body.neo .poolAI button:hover{background:rgba(125,211,252,.22)}
+
+/* DETAIL AI INSIGHT */
+body.neo .aiInsight{margin:12px 0 16px;padding:12px 14px;border-radius:14px;border:1px solid rgba(125,211,252,.22);
+  background:linear-gradient(135deg,rgba(125,211,252,.08),rgba(124,58,237,.08));position:relative;overflow:hidden}
+body.neo .aiInsight .k{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.12em;color:#7DD3FC;margin-bottom:6px}
+body.neo .aiInsight p{margin:0;color:#E2E8F0;font-size:13px;line-height:1.6}
+body.neo .aiInsight .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+body.neo .aiInsight .chips span{font-size:10.5px;color:#BAE6FD;border:1px solid rgba(125,211,252,.28);border-radius:999px;padding:3px 8px;font-family:"JetBrains Mono",monospace}
