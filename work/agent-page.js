@@ -123,7 +123,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     "</style><link rel='stylesheet' href='/fonts.css'><link rel='stylesheet' href='/neo.css'></head><body class='neo'>" +
     '<header class="site-head"><div class="wrap bar">' +
     '<a class="brand" href="/"><img src="/logo-white.png" alt="RoofX"><span>RoofX</span></a>' +
-    '<nav class="site-nav"><a href="/properties/">' + L.find + '</a><a href="/agents/">' + L.agents + '</a><a href="/join/">' + L.join + '</a><a href="https://calc.kwongthye.com/">' + L.calc + '</a>' +
+    '<nav class="site-nav"><a class="aiNav" href="/#aiConsole">AI</a><a href="/properties/">' + L.find + '</a><a href="/agents/">' + L.agents + '</a><a href="/join/">' + L.join + '</a><a href="https://calc.kwongthye.com/">' + L.calc + '</a>' +
     '<a class="login" href="/agent/">' + L.login + "</a></nav>" +
     '<div style="display:flex;gap:6px;margin-left:8px">' +
     ["zh","en","bm"].map(function (k) { return '<a href="?lang=' + k + '" style="font-size:12px;padding:3px 8px;border:1px solid rgba(255,255,255,.25);border-radius:999px;color:' + (k === lang ? "#E2C88F" : "rgba(255,255,255,.7)") + '">' + (k === "zh" ? "中文" : (k === "en" ? "EN" : "BM")) + "</a>"; }).join("") +

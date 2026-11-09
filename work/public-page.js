@@ -47,8 +47,12 @@ module.exports = function renderPublicListing(p, agent, opts) {
   if (p.bathrooms) _chips.push(p.bathrooms + (lang === "bm" ? " bilik air" : (en ? " bath" : " 卫")));
   if (p.built_up) _chips.push(Number(p.built_up).toLocaleString("en-MY") + " sqft");
   if (p.tenure) _chips.push(String(p.tenure));
+  if (Number(p.bank_value) > 0) _chips.push((en ? "Bank " : (lang === "bm" ? "Bank " : "银行估价 ")) + money(p.bank_value, false, lang));
+  if (psf) _chips.push(money(price, false, lang) + "/psf");
+  if (agent && agent.cobroke_note) _chips.push(lang === "bm" ? "Co-broke boleh" : (en ? "Co-broke available" : "可 Co-Broke"));
+  _chips = _chips.slice(0, 6);
   const insight = (lang === "bm" ? "Padanan disyorkan berdasarkan " : (en ? "Suggested fit based on " : "根据这些条件推荐：")) + _chips.join(" · ");
-  const chips = _chips.map(function(x){ return "<span>" + esc(x) + "</span>"; }).join("");
+  const chips = _chips.map(function(x){ return "<span>" + esc(x) + "</span>"; }).join("") + '<a class="aiInsightLink" href="/#aiConsole">' + (lang === "bm" ? "Cari senarai serupa dengan AI →" : (en ? "Find similar with AI →" : "用 AI 找类似房源 →")) + "</a>";
   const area = areaName(p.area_code, lang !== "zh");
   const photos = (p.photos || []).filter(function (x) { return /^\/uploads\/props\/[A-Za-z0-9._-]+$/.test(x); });
   const main = photos[0] || p.cover_url;
@@ -91,7 +95,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
     "@media(max-width:820px){.pd-grid{grid-template-columns:1fr}}" +
     "</style><link rel='stylesheet' href='/fonts.css'><link rel='stylesheet' href='/neo.css'></head><body class='neo'>" +
     '<header class="site-head"><div class="wrap bar"><a class="brand" href="/"><img src="/logo-white.png" alt="RoofX"><span>RoofX</span></a>' +
-    '<nav class="site-nav"><a href="/properties/">' + (lang === "zh" ? "房源池" : (en ? "Listing pool" : "Semua Senarai RoofX")) + '</a><a href="/agents/">' + (lang === "zh" ? "中介简介" : (en ? "Agent profiles" : "Profil ejen")) + '</a><a href="/join/">' + (lang === "zh" ? "中介注册" : (en ? "Agent registration" : "Pendaftaran ejen")) + '</a><a class="login" href="/agent/">' + (lang === "zh" ? "中介登录" : (en ? "Agent login" : "Log Masuk Ejen")) + "</a></nav></div></header>" +
+    '<nav class="site-nav"><a class="aiNav" href="/#aiConsole">AI</a><a href="/properties/">' + (lang === "zh" ? "房源池" : (en ? "Listing pool" : "Semua Senarai RoofX")) + '</a><a href="/agents/">' + (lang === "zh" ? "中介简介" : (en ? "Agent profiles" : "Profil ejen")) + '</a><a href="/join/">' + (lang === "zh" ? "中介注册" : (en ? "Agent registration" : "Pendaftaran ejen")) + '</a><a class="login" href="/agent/">' + (lang === "zh" ? "中介登录" : (en ? "Agent login" : "Log Masuk Ejen")) + "</a></nav></div></header>" +
     '<main class="wrap pd"><a class="pd-back" href="/a/' + encodeURIComponent(agent.slug || "") + '?lang=' + lang + '">← ' + T.back + "</a>" +
     '<div class="pd-grid"><div><div class="pd-photo">' + (main ? '<img src="' + esc(main) + '" alt="' + esc(title) + '">' : "") + "</div>" +
     (photos.length > 1 ? '<div class="pd-thumbs">' + photos.slice(0, 8).map(function (u) { return '<img src="' + esc(u.replace(/\.jpg$/i, "_t.jpg")) + '" data-full="' + esc(u) + '" onclick="var m=document.querySelector(\'.pd-photo img\');if(m)m.src=this.dataset.full" alt="">'; }).join("") + "</div>" : "") +

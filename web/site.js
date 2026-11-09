@@ -176,6 +176,17 @@
       var key = location.pathname.replace(/\/$/, "") || "/";
       if (TITLES[key]) document.title = TITLES[key][lang === "zh" ? 0 : (lang === "bm" ? 2 : 1)];
     } catch (e) {}
+    try {
+      if (!document.querySelector(".aiNav") && location.pathname.indexOf("/agent") !== 0) {
+        var navEl = document.querySelector(".site-nav");
+        if (navEl) {
+          var aiA = document.createElement("a");
+          aiA.className = "aiNav"; aiA.href = "/#aiConsole"; aiA.textContent = "AI";
+          aiA.setAttribute("aria-label", "RoofX AI match");
+          navEl.insertBefore(aiA, navEl.querySelector(".login") || null);
+        }
+      }
+    } catch (e) {}
     if (!document.querySelector(".lang-fab")) {
       var fab = document.createElement("button");
       fab.type = "button"; fab.className = "lang-fab"; fab.textContent = langLabel();

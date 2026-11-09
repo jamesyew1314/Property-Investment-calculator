@@ -76,7 +76,7 @@
 .rules{background:rgba(255,255,255,.92)!important;backdrop-filter:blur(12px);box-shadow:0 16px 36px rgba(14,36,56,.07)}
 </style>
 <link rel="stylesheet" href="/fonts.css">
-<link rel="stylesheet" href="/neo.css">
+<link rel="stylesheet" href="/neo.css?v=20261110ai">
 </head>
 <body class="neo">
 <header class="site-head">
@@ -87,6 +87,7 @@
       <a href="/pool/" class="on" id="navPool">房源池</a>
       <a href="/agents/" id="navAgents">中介简介</a>
       <a href="/join/" id="navJoin">中介注册</a>
+      <a class="aiNav" href="/#aiConsole">AI</a>
     </nav>
     <div class="headActs">
       <div class="langs" id="langs"><button type="button" data-l="zh">中文</button><button type="button" data-l="en">EN</button><button type="button" data-l="bm">BM</button></div>
@@ -203,7 +204,7 @@ function render(){
     var phone=String(r.agent_phone||'').replace(/[^0-9]/g,'').replace(/^0/,'60');
     var wa='https://wa.me/'+phone+'?text='+encodeURIComponent('Hi '+ (r.agent_name||'') +', 我在 RoofX 看到 '+r.code);
     return '<article class="plCard">'+(img?'<img src="'+esc(img)+'" loading="lazy" alt="">':'')+
-      '<div class="plBody"><div class="plTop"><span class="plCode">'+esc(r.code)+'</span><span class="plTag '+(rent?'rent':'')+'">'+(rent?t('rent'):t('sale'))+'</span></div>'+
+      '<div class="plBody"><div class="plTop"><span class="plCode">'+esc(r.code)+'</span><span class="plAIBadge">AI</span><span class="plTag '+(rent?'rent':'')+'">'+(rent?t('rent'):t('sale'))+'</span></div>'+
       '<div class="plTitle">'+esc(r.project_name||r.address_text||r.code)+'</div>'+
       (Number(r.bank_value)>0?'<div class="plMeta">'+t('bank')+' RM '+Number(r.bank_value).toLocaleString('en-MY')+(Number(r.asking_price)>0?' · '+(Number(r.asking_price)<=Number(r.bank_value)*0.8?t('below')+' '+Math.round((1-Number(r.asking_price)/Number(r.bank_value))*100)+'%':'') :'')+'</div>':'')+
       '<div class="plMeta">'+esc(areaLabel(r.area_code))+(r.bedrooms!=null?' · '+r.bedrooms+' '+t('bed'):'')+(r.bathrooms!=null?' / '+r.bathrooms+' '+t('bath'):'')+(r.built_up?' · '+Number(r.built_up).toLocaleString('en-MY')+' sqft':'')+'</div>'+
