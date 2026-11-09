@@ -336,3 +336,13 @@ body.neo .agent-card .n{color:#7DD3FC!important}
 body.neo .agent-card .btn.gold{background:linear-gradient(135deg,#7DD3FC,#7C3AED)!important}
 body.neo .agent-card .btn.line.sm{border-color:rgba(125,211,252,.4)!important;color:#BAE6FD!important}
 body.neo .agent-card .btn.line.sm:hover{background:rgba(125,211,252,.15)!important}
+
+/* detail page dark cards readable */
+body.neo .pd .specs{background:rgba(17,24,39,.75)!important;border:1px solid rgba(125,211,252,.2)!important}
+body.neo .pd .spec{color:#94A3B8!important}
+body.neo .pd .spec b,body.neo .pd .spec span b{color:#F9FAFB!important}
+body.neo .agentBox{background:rgba(17,24,39,.78)!important;border:1px solid rgba(125,211,252,.2)!important;color:#94A3B8!important}
+body.neo .agentBox b{color:#F9FAFB!important}
+body.neo .agentBox div{color:#94A3B8!important}
+body.neo .agentBox .av{background:#0B1F31!important;color:#BAE6FD!important}
+body.neo .agentBox .btn.line{background:rgba(17,24,39,.7)!important;border-color:rgba(125,211,252,.35)!important;color:#BAE6FD!important}
