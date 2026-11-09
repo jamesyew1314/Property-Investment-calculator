@@ -161,6 +161,19 @@
       });
     }
     $$(".lang-toggle").forEach(function (b) { b.addEventListener("click", toggle); });
+    try {
+      var TITLES = {
+        "/": ["RoofX 柔佛中介货源网络 | The Roof Property Exchange", "RoofX Johor Property Network | The Roof Property Exchange", "Rangkaian Hartanah Johor RoofX | The Roof Property Exchange"],
+        "/join": ["加入 RoofX | 中介注册", "Join RoofX | Agent registration", "Sertai RoofX | Pendaftaran ejen"],
+        "/about": ["关于 RoofX | 我们为什么为中介做这个平台", "About RoofX | Why we built this", "Tentang RoofX | Mengapa kami bina platform ini"],
+        "/agents": ["中介目录 | RoofX", "Agent directory | RoofX", "Direktori ejen | RoofX"],
+        "/privacy": ["隐私政策 | RoofX", "Privacy policy | RoofX", "Dasar privasi | RoofX"],
+        "/terms": ["使用条款 | RoofX", "Terms of use | RoofX", "Terma penggunaan | RoofX"],
+        "/favorites": ["我的收藏 | RoofX", "My saved listings | RoofX", "Senarai simpanan saya | RoofX"]
+      };
+      var key = location.pathname.replace(/\/$/, "") || "/";
+      if (TITLES[key]) document.title = TITLES[key][lang === "zh" ? 0 : (lang === "bm" ? 2 : 1)];
+    } catch (e) {}
     if (!document.querySelector(".lang-fab")) {
       var fab = document.createElement("button");
       fab.type = "button"; fab.className = "lang-fab"; fab.textContent = langLabel();

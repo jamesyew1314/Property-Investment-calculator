@@ -436,7 +436,7 @@ window.PAGE_I18N = {
     fillAreaSelect();
     var types = (state.cfg && state.cfg.taxonomy && state.cfg.taxonomy.property_types) || [];
     t.innerHTML = '<option value="">' + KT.t("search.anyType") + "</option>" + types.map(function (x) {
-      return '<option value="' + x.key + '">' + KT.esc(KT.lang === "en" ? x.en : x.zh) + "</option>";
+      return '<option value="' + x.key + '">' + KT.esc(KT.lang !== "zh" ? x.en : x.zh) + "</option>";
     }).join("");
     fillBudgets();
   }
@@ -445,7 +445,7 @@ window.PAGE_I18N = {
     var a = document.getElementById("fArea");
     var areas = (state.cfg && state.cfg.areas) || [];
     a.innerHTML = '<option value="">' + KT.t("search.anyArea") + "</option>" + areas.map(function (x) {
-      var name = x.key === "other" ? (KT.lang === "en" ? "Other area" : "其他区域") : (KT.lang === "en" ? x.en : x.zh);
+      var name = x.key === "other" ? (KT.lang === "zh" ? "其他区域" : (KT.lang === "bm" ? "Kawasan lain" : "Other area")) : (KT.lang !== "zh" ? x.en : x.zh);
       return '<option value="' + x.key + '">' + KT.esc(name) + "</option>";
     }).join("");
   }

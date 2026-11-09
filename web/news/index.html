@@ -63,7 +63,7 @@
   function apply(){
     document.documentElement.lang = L==="bm"?"ms":(L==="en"?"en":"zh-CN");
     document.querySelectorAll("[data-i18n]").forEach(function(el){ var k=el.getAttribute("data-i18n").replace("nav.",""); var map={find:"房源池",news:"每日新闻",agents:"中介简介",join:"中介注册",about:"关于",calc:"ROI 计算器"}; var zh=map[k]||el.textContent; el.textContent = L==="zh"?zh:(L==="en"?({find:"Listing pool",news:"Daily news",agents:"Agent profiles",join:"Agent registration",about:"About",calc:"ROI calculator"}[k]||zh):({find:"Kolam senarai",news:"Berita harian",agents:"Profil ejen",join:"Pendaftaran ejen",about:"Tentang",calc:"Kalkulator ROI"}[k]||zh)); });
-    document.querySelectorAll("[data-i18n='news.title']").forEach(function(el){el.textContent=t("title")});
+    document.querySelectorAll("[data-i18n='news.title']").forEach(function(el){el.textContent=t("title")}); document.title=t("title")+" | RoofX";
   }
   function render(d){
     var list=document.getElementById("newsList"), day=document.getElementById("newsDay");
