@@ -199,3 +199,14 @@ body.neo #homeNews h3{color:#F9FAFB!important}
 body.neo #homeNews p{color:#94A3B8!important}
 body.neo #newsHome a{color:#67E8F9!important}
 body.neo .nItem .nTitle{color:#F9FAFB!important}
+
+/* mobile header */
+@media(max-width:760px){
+  body.neo .calcTop{display:none!important}
+  body.neo .site-head .bar{gap:8px}
+  body.neo .site-head .brand{margin-right:auto;min-width:0}
+  body.neo .site-head .brand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+  body.neo .neoOnline{font-size:0!important;margin-left:6px!important;gap:0!important}
+  body.neo .neoOnline i{width:6px;height:6px}
+  body.neo .menu-btn{display:flex!important;margin-left:0!important}
+}
