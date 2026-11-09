@@ -469,3 +469,11 @@ body.neo .aiCursor{color:#7DD3FC;animation:neoBlink 1s steps(1) infinite}
   body.neo .aiConsoleTop b{font-size:11px}
   body.neo .aiInputRow input{font-size:12px}
 }
+
+/* AI hero typography balance */
+@media(min-width:981px){
+  body.neo .hero .wrap{grid-template-columns:minmax(0,1.22fr) minmax(360px,.78fr)!important}
+  body.neo .heroBrand{font-size:64px!important}
+  body.neo .heroTitle{font-size:clamp(30px,3vw,46px)!important;line-height:1.3!important;max-width:690px}
+  body.neo .aiConsole{margin-top:132px!important;max-width:470px;justify-self:end;width:100%}
+}
