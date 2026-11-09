@@ -362,3 +362,26 @@ input,select,textarea{font-size:16px!important}
 /* ROI 计算器入口加大 */
 .calcTop{font-size:15px!important;padding:10px 16px!important;font-weight:700!important}
 @media(max-width:760px){.calcTop{font-size:13.5px!important;padding:8px 12px!important}}
+
+/* ===== TECH UI 2.0 ===== */
+.site-head{background:rgba(10,27,43,.9)!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 8px 30px rgba(0,0,0,.22);border-bottom:1px solid rgba(226,200,143,.12)}
+.hero{background:
+  radial-gradient(800px 400px at 15% 0%,rgba(198,161,91,.22),transparent 60%),
+  radial-gradient(700px 420px at 90% 20%,rgba(46,84,150,.35),transparent 60%),
+  radial-gradient(500px 320px at 50% 110%,rgba(198,161,91,.14),transparent 65%),
+  linear-gradient(160deg,#081827 0%,#0E2438 55%,#091521 100%)!important}
+.hero:before{content:"";position:absolute;width:420px;height:420px;right:-120px;top:-140px;border-radius:50%;background:radial-gradient(circle,rgba(198,161,91,.18),transparent 65%);filter:blur(10px);pointer-events:none}
+.hero-stats>div{background:rgba(255,255,255,.055);border:1px solid rgba(226,200,143,.22);border-radius:16px;padding:14px 18px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.hero-stats b{text-shadow:0 0 26px rgba(226,200,143,.25)}
+.techRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:18px 0 0}
+.techPill{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid rgba(226,200,143,.3);background:rgba(255,255,255,.05);color:#E8D6AC;font-size:12.5px;letter-spacing:.02em;backdrop-filter:blur(10px)}
+.vcard,.agent-card,.rules,.searchbar{background:rgba(255,255,255,.88)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(198,161,91,.18)!important;box-shadow:0 18px 44px rgba(14,36,56,.09),inset 0 1px 0 rgba(255,255,255,.6);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.vcard:hover,.agent-card:hover{transform:translateY(-4px);border-color:rgba(198,161,91,.5)!important;box-shadow:0 26px 54px rgba(14,36,56,.16)}
+.vcard .ic{background:linear-gradient(145deg,#0E2438,#1E3E5C)!important;color:#E9D3A2!important;box-shadow:0 10px 22px rgba(14,36,56,.25),inset 0 1px 0 rgba(255,255,255,.12)}
+.searchbar{border-radius:20px!important;box-shadow:0 30px 70px rgba(5,16,27,.28)!important}
+.searchbar .btn.gold,.btn.gold{background:linear-gradient(135deg,#EDD49B,#C99B45)!important;box-shadow:0 12px 26px rgba(201,155,69,.32),inset 0 1px 0 rgba(255,255,255,.45)!important;border:1px solid rgba(255,255,255,.18)!important}
+.btn.gold:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.sec-head h2{position:relative;display:inline-block}
+.sec-head h2:after{content:"";display:block;width:46px;height:3px;border-radius:3px;background:linear-gradient(90deg,#C99B45,transparent);margin:10px auto 0}
+.sec-head{text-align:center}
+.sec-head p{margin-left:auto;margin-right:auto}
