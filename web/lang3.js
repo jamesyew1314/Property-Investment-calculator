@@ -53,6 +53,12 @@
     }
     wrap.appendChild(bar());
     document.body.appendChild(wrap);
+    try {
+      if (window.matchMedia("(max-width:760px)").matches && location.pathname.indexOf("/agent") !== 0) {
+        var nav = document.querySelector(".site-nav");
+        if (nav) { nav.insertBefore(wrap, nav.firstChild); wrap.className += " in-nav"; }
+      }
+    } catch (e) {}
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();

@@ -386,3 +386,12 @@ body.neo .agentBox{max-width:100%!important;box-sizing:border-box}
   body.neo:not(.workspace) .site-head .bar{padding-right:0!important}
   body.neo.workspace #lang3wrap{left:10px!important;right:auto!important;bottom:calc(10px + env(safe-area-inset-bottom,0px))!important;top:auto!important}
 }
+
+/* language switch inside mobile nav row */
+@media(max-width:760px){
+  body.neo .site-nav #lang3wrap.in-nav{position:static!important;top:auto!important;right:auto!important;left:auto!important;bottom:auto!important;
+    transform:none!important;z-index:auto!important;display:flex!important;flex:0 0 auto;margin:0 4px 0 0!important;
+    background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+  body.neo .site-nav #lang3wrap.in-nav #lang3login{display:none!important}
+  body.neo .site-nav #lang3wrap.in-nav a{font-size:12px!important;padding:5px 8px!important;border:1px solid rgba(125,211,252,.25)!important;border-radius:999px}
+}
