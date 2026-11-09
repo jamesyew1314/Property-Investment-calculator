@@ -41,6 +41,7 @@ function clean(s) {
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/\uFFFD+/g, "")
     .replace(/\s+/g, " ").trim();
 }
 
@@ -139,8 +140,8 @@ function pick(row, lang) {
   const zh = lang === "zh", bm = lang === "bm";
   return {
     url: row.url, source: row.source, published_at: row.published_at,
-    title: zh ? (row.title_zh || row.title) : bm ? (row.title_bm || row.title) : row.title,
-    summary: zh ? (row.summary_zh || row.summary) : bm ? (row.summary_bm || row.summary) : row.summary,
+    title: String(zh ? (row.title_zh || row.title) : bm ? (row.title_bm || row.title) : row.title).replace(/\uFFFD+/g, ""),
+    summary: String(zh ? (row.summary_zh || row.summary) : bm ? (row.summary_bm || row.summary) : row.summary).replace(/\uFFFD+/g, ""),
     day: row.day
   };
 }
