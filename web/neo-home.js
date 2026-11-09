@@ -11,6 +11,20 @@
   if (reduce) hideLoader(); else setTimeout(hideLoader, 650);
   window.addEventListener("load", function(){ setTimeout(hideLoader, 250); });
 
+  /* mobile nav drawer */
+  (function(){
+    var mb = document.querySelector(".menu-btn"), nav = document.querySelector(".site-nav");
+    if (!mb || !nav) return;
+    mb.addEventListener("click", function(e){
+      e.preventDefault(); e.stopImmediatePropagation();
+      nav.classList.toggle("neoOpen");
+      document.body.classList.toggle("nav-open", nav.classList.contains("neoOpen"));
+    }, true);
+    nav.addEventListener("click", function(e){
+      if (e.target.closest("a")) { nav.classList.remove("neoOpen"); document.body.classList.remove("nav-open"); }
+    });
+  })();
+
   /* online dot */
   var brand = document.querySelector(".site-head .brand");
   if (brand && !brand.querySelector(".neoOnline")) {
