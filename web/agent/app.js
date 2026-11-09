@@ -398,7 +398,16 @@
     return api("/matches").catch(function () { return { clients: [] }; }).then(function (md) {
       var mc = {};
       (md.clients || []).forEach(function (c) { (c.matches || []).forEach(function (m) { mc[m.code] = (mc[m.code] || 0) + 1; }); });
-      return api("/listings?" + qs.toString()).then(function (d) {
+      var _rows = [], _page = 1;
+      function loadAll() {
+        qs.set("page", _page); qs.set("pageSize", "50");
+        return api("/listings?" + qs.toString()).then(function (x) {
+          _rows = _rows.concat(x.rows || []);
+          if (_rows.length < x.total && _page < 20) { _page++; return loadAll(); }
+          return { rows: _rows, total: x.total };
+        });
+      }
+      return loadAll().then(function (d) {
       var h = '<div class="toolbar"><input id="lq" type="search" placeholder="' + t("搜索编号 / 楼盘", "Search code / project") + '" value="' + esc(q.q || "") + '">' +
         '<select id="lst"><option value="">' + t("全部状态", "All status") + "</option>" +
         ["available", "reserved", "sold", "rented", "off_market"].map(function (s) {
