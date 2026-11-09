@@ -346,3 +346,8 @@ body.neo .agentBox b{color:#F9FAFB!important}
 body.neo .agentBox div{color:#94A3B8!important}
 body.neo .agentBox .av{background:#0B1F31!important;color:#BAE6FD!important}
 body.neo .agentBox .btn.line{background:rgba(17,24,39,.7)!important;border-color:rgba(125,211,252,.35)!important;color:#BAE6FD!important}
+
+/* mobile detail specs */
+body.neo .pd .spec{min-width:0;flex-wrap:wrap}
+body.neo .pd .spec b{min-width:0;overflow-wrap:anywhere}
+@media(max-width:700px){body.neo .pd .specs{grid-template-columns:1fr!important}}
