@@ -43,6 +43,7 @@ const AREAS = [
   { key: "medini", zh: "Medini 美迪尼", en: "Medini", state: "johor" },
   { key: "puteri_harbour", zh: "Puteri Harbour 公主港", en: "Puteri Harbour", state: "johor" },
   { key: "kota_iskandar", zh: "Kota Iskandar 依斯干达城", en: "Kota Iskandar", state: "johor" },
+  { key: "kota_tinggi", zh: "Kota Tinggi 哥打丁宜", en: "Kota Tinggi", state: "johor" },
   { key: "forest_city", zh: "Forest City 森林城市", en: "Forest City", state: "johor" },
   { key: "skudai", zh: "Skudai 士古来", en: "Skudai", state: "johor" },
   { key: "sutera_utama", zh: "Taman Sutera Utama 五福城", en: "Taman Sutera Utama", state: "johor" },
