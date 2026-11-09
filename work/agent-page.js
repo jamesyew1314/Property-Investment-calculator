@@ -85,7 +85,10 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     areaServed: areas.length ? areas : "Johor, Malaysia",
     worksFor: agent.team ? { "@type": "Organization", name: agent.team } : undefined
   };
-  const rows = (listings || []).map(function (p) { return card(p, lang); }).join("");
+  const ordered = (listings || []).slice().sort(function (a, b) {
+    return (b.cover_url ? 1 : 0) - (a.cover_url ? 1 : 0);
+  });
+  const rows = ordered.map(function (p) { return card(p, lang); }).join("");
   const waConsult = wa ? "https://wa.me/" + wa + "?text=" + encodeURIComponent(lang === "en" ? "Hi " + name + ", I'd like to ask about a property." : (lang === "bm" ? "Hai " + name + ", saya ingin bertanya tentang hartanah." : "你好 " + name + "，我想咨询房产。")) : "";
   const waMandate = wa ? "https://wa.me/" + wa + "?text=" + encodeURIComponent(lang === "en" ? "Hi " + name + ", I have a property to list." : (lang === "bm" ? "Hai " + name + ", saya ada hartanah untuk disenaraikan." : "你好 " + name + "，我有产业要委托。")) : "";
 
