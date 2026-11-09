@@ -145,7 +145,9 @@
     var area = x.area_name || x.area || x.area_code || "Johor";
     var code = x.code || "";
     var href = code ? ("/p/" + encodeURIComponent(code)) : "/pool/";
-    return '<a class="neoMCard" href="'+href+'"><div class="ph" aria-hidden="true"></div><b>'+area+'</b><small>'+code+' · '+(lang==="bm"?"Co-Broke tersedia":(lang==="en"?"Co-broke available":"可 Co-Broke"))+'</small><span class="tag">'+(lang==="bm"?"Sedia untuk padanan":(lang==="en"?"Match ready":"智能匹配就绪"))+'</span></a>';
+    var img = x.cover_url || (x.photos && x.photos.length ? x.photos[0] : "");
+    var media = img ? '<img class="ph" src="'+String(img).replace(/"/g,"&quot;")+'" alt="" loading="lazy">' : '<div class="ph" aria-hidden="true"></div>';
+    return '<a class="neoMCard" href="'+href+'">'+media+'<b>'+area+'</b><small>'+code+' · '+(lang==="bm"?"Co-Broke tersedia":(lang==="en"?"Co-broke available":"可 Co-Broke"))+'</small><span class="tag">'+(lang==="bm"?"Sedia untuk padanan":(lang==="en"?"Match ready":"智能匹配就绪"))+'</span></a>';
   }
   function renderMarquee(rows){
     if(!track) return;
@@ -163,9 +165,13 @@
     }
     Promise.all([
       fetch("/api/public/config", {cache:"no-store"}).then(function(r){return r.json()}).catch(function(){return {areas:[]}}),
-      fetch("/api/public/pool?limit=8", {cache:"no-store"}).then(function(r){return r.json()}).catch(function(){return {rows:[]}})
+      fetch("/api/public/pool?limit=60", {cache:"no-store"}).then(function(r){return r.json()}).catch(function(){return {rows:[]}})
     ]).then(function(res){
-      _areas = res[0].areas || []; _poolRaw = res[1].rows || [];
+      _areas = res[0].areas || [];
+      var all = res[1].rows || [];
+      var withImg = all.filter(function(x){ return x.cover_url || (x.photos && x.photos.length); });
+      var without = all.filter(function(x){ return !(x.cover_url || (x.photos && x.photos.length)); });
+      _poolRaw = withImg.concat(without).slice(0, 8);
       paintMarquee();
     }).catch(function(){ renderMarquee([]); });
     document.addEventListener("kt:lang", function(e){

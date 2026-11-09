@@ -395,3 +395,6 @@ body.neo .agentBox{max-width:100%!important;box-sizing:border-box}
   body.neo .site-nav #lang3wrap.in-nav #lang3login{display:none!important}
   body.neo .site-nav #lang3wrap.in-nav a{font-size:12px!important;padding:5px 8px!important;border:1px solid rgba(125,211,252,.25)!important;border-radius:999px}
 }
+
+/* marquee real photos */
+body.neo .neoMCard img.ph{width:100%;height:82px;object-fit:cover;border-radius:10px;margin-bottom:10px;display:block;background:#0B1F31}
