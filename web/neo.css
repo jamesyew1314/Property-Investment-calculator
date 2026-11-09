@@ -307,3 +307,9 @@ body.neo .agent-page p,body.neo .agent-page li{color:#94A3B8}
 /* marquee badge contrast */
 body.neo .neoMCard .tag{background:rgba(0,229,255,.14)!important;color:#E0FBFF!important;border:1px solid rgba(0,229,255,.45)!important;font-weight:600;letter-spacing:.03em;padding:4px 9px!important}
 body.neo .neoMCard small{color:#B6C2D1!important}
+
+/* marquee card readability */
+body.neo .neoMCard{padding:16px}
+body.neo .neoMCard b{font-size:15px;line-height:1.35}
+body.neo .neoMCard small{font-size:12px;line-height:1.5;margin-top:2px}
+body.neo .neoMCard .tag{font-size:11.5px!important;margin-top:10px}
