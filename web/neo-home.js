@@ -160,7 +160,7 @@
     function paintMarquee(){
       var map = {};
       _areas.forEach(function(a){ map[a.key] = lang === "zh" ? (a.zh || a.en) : (a.en || a.zh); });
-      var rows = _poolRaw.length ? _poolRaw.map(function(x){ return {code:x.code, area_name: map[x.area_code] || x.area_code || "Johor"}; }) : [];
+      var rows = _poolRaw.length ? _poolRaw.map(function(x){ return {code:x.code, area_name: map[x.area_code] || x.area_code || "Johor", cover_url: x.cover_url, photos: x.photos}; }) : [];
       renderMarquee(rows);
     }
     Promise.all([
