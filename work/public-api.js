@@ -255,7 +255,7 @@ module.exports = function createPublicApi({ pool, rateLimit, notify, ipSalt, fre
         SELECT a.id, a.name, a.slug, a.ren_no, a.bio, a.photo_url, a.areas, a.verified_at,
                (SELECT count(*) FROM lib_properties p
                  WHERE p.visibility IN ('pool','public') AND p.status IN ('available','reserved')
-                   AND lower(p.agent)=lower(a.name))::int AS listings
+                   AND p.tenant_id=a.id)::int AS listings
         FROM lib_agents a
         WHERE a.public = true AND a.active = true
         ORDER BY listings DESC, a.name ASC LIMIT 100`);
