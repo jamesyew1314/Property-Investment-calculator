@@ -29,11 +29,11 @@ module.exports = function renderPublicListing(p, agent, opts) {
   const T = lang === "bm"
     ? { home: "Utama", back: "Kembali ke ejen", contact: "Hubungi ejen", wa: "WhatsApp", call: "Telefon",
         specs: "Butiran", area: "Kawasan", type: "Jenis", beds: "Bilik", baths: "Bilik air", built: "Luas binaan",
-        tenure: "Pegangan", price: "Harga", agent: "Ejen senarai", more: "Lihat semua senarai ejen ini", forRent: "Untuk disewa", forSale: "Untuk dijual" }
+        tenure: "Pegangan", price: "Harga", agent: "Ejen senarai", more: "Lihat semua senarai ejen ini", forRent: "Untuk disewa", forSale: "Untuk dijual", total: "Jumlah" }
     : (en
     ? { home: "Home", back: "Back to agent", contact: "Contact agent", wa: "WhatsApp", call: "Call",
         specs: "Details", area: "Area", type: "Type", beds: "Bedrooms", baths: "Bathrooms", built: "Built-up",
-        tenure: "Tenure", price: "Price", agent: "Listing agent", more: "See all listings from this agent", forRent: "For rent", forSale: "For sale" }
+        tenure: "Tenure", price: "Price", agent: "Listing agent", more: "See all listings from this agent", forRent: "For rent", forSale: "For sale", total: "Total" }
     : { home: "首页", back: "返回中介主页", contact: "联系中介", wa: "WhatsApp", call: "打电话",
         specs: "房源资料", area: "区域", type: "房型", beds: "卧室", baths: "浴室", built: "建筑面积",
         tenure: "产权", price: "价格", agent: "货源中介", more: "查看该中介全部房源", forRent: "出租", forSale: "出售", total: "总价" });
