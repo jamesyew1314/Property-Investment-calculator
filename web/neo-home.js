@@ -94,15 +94,18 @@
       en: ["Smart matching in progress…","Syncing live listings…","Connecting co-broke opportunities…"],
       bm: ["Padanan pintar sedang berjalan…","Menyegerakkan senarai langsung…","Menghubungkan peluang co-broke…"]
     }[lang];
-    if (reduce) typeEl.textContent = phrases[0];
+    typeEl.textContent = phrases[0];
+    if (reduce) { /* static */ }
     else {
-      var pi=0, ci=0, del=false;
+      var pi=0, ci=phrases[0].length, del=false;
+      setTimeout(function(){
       (function type(){ var s=phrases[pi]; typeEl.textContent = s.slice(0,ci);
         if(!del && ci<s.length){ ci++; setTimeout(type,55); }
         else if(!del){ del=true; setTimeout(type,1300); }
         else if(ci>0){ ci--; setTimeout(type,28); }
         else { del=false; pi=(pi+1)%phrases.length; setTimeout(type,350); }
       })();
+      }, 1200);
     }
   }
 

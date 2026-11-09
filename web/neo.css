@@ -187,3 +187,15 @@ body.neo .hero-stats span{grid-column:2}
 body.neo .searchbar label,body.neo .searchbar label span{color:#CBD5E1!important}
 body.neo .searchbar input[type="checkbox"]{accent-color:#00E5FF;width:16px;height:16px}
 body.neo .searchbar .f label{color:#94A3B8!important}
+
+/* fixes */
+body.neo .neoCore:before{height:2px!important;opacity:1!important;background:linear-gradient(90deg,rgba(0,229,255,.1),#00E5FF,rgba(124,58,237,.9),rgba(0,229,255,.1))!important;background-size:200% 100%!important;animation:neoFlow 4s linear infinite!important}
+@keyframes neoFlow{to{background-position:200% 0}}
+body.neo .neoSteps .vcard{display:grid!important;grid-template-columns:56px 1fr!important;grid-template-rows:auto auto!important;column-gap:14px!important;align-items:start!important}
+body.neo .neoSteps .vcard .ic{grid-row:1/3!important;grid-column:1!important}
+body.neo .neoSteps .vcard h3{grid-column:2!important;margin:2px 0 4px!important}
+body.neo .neoSteps .vcard p{grid-column:2!important;margin:0!important}
+body.neo #homeNews h3{color:#F9FAFB!important}
+body.neo #homeNews p{color:#94A3B8!important}
+body.neo #newsHome a{color:#67E8F9!important}
+body.neo .nItem .nTitle{color:#F9FAFB!important}
