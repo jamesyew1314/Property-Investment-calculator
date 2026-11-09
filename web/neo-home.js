@@ -153,13 +153,23 @@
     track.innerHTML = html + html;
   }
   if (track) {
+    var _poolRaw = [], _areas = [];
+    function paintMarquee(){
+      var map = {};
+      _areas.forEach(function(a){ map[a.key] = lang === "zh" ? (a.zh || a.en) : (a.en || a.zh); });
+      var rows = _poolRaw.length ? _poolRaw.map(function(x){ return {code:x.code, area_name: map[x.area_code] || x.area_code || "Johor"}; }) : [];
+      renderMarquee(rows);
+    }
     Promise.all([
       fetch("/api/public/config", {cache:"no-store"}).then(function(r){return r.json()}).catch(function(){return {areas:[]}}),
       fetch("/api/public/pool?limit=8", {cache:"no-store"}).then(function(r){return r.json()}).catch(function(){return {rows:[]}})
     ]).then(function(res){
-      var map = {};
-      (res[0].areas || []).forEach(function(a){ map[a.key] = lang === "zh" ? (a.zh || a.en) : (a.en || a.zh); });
-      renderMarquee((res[1].rows || []).map(function(x){ x.area_name = map[x.area_code] || x.area_code || "Johor"; return x; }));
+      _areas = res[0].areas || []; _poolRaw = res[1].rows || [];
+      paintMarquee();
     }).catch(function(){ renderMarquee([]); });
+    document.addEventListener("kt:lang", function(e){
+      var n = (e && e.detail) || (window.KT && window.KT.lang) || lang;
+      if (n && n !== lang) { lang = n; paintMarquee(); }
+    });
   }
 })();
