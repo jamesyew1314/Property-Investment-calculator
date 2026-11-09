@@ -63,7 +63,6 @@
       if (navLogin && bar && !document.querySelector(".mobile-login")) {
         var ml = navLogin.cloneNode(true);
         ml.className = "mobile-login";
-        ml.removeAttribute("data-i18n");
         ml.textContent = navLogin.textContent;
         bar.appendChild(ml);
       }
