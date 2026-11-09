@@ -284,3 +284,23 @@ input,select,textarea{font-size:16px!important}
 #modal .dlg{border-radius:22px!important;box-shadow:0 40px 90px rgba(5,16,27,.35)!important;border:1px solid rgba(198,161,91,.18)}
 .table th{background:rgba(248,245,238,.8);color:#5D6B7A;letter-spacing:.04em}
 .authCard{background:rgba(255,255,255,.94)!important;backdrop-filter:blur(16px);border:1px solid rgba(198,161,91,.2)!important;box-shadow:0 30px 70px rgba(5,16,27,.25)!important;border-radius:22px!important}
+
+/* ===== WORKSPACE NEO cyan ===== */
+body.neo #side{background:linear-gradient(180deg,#070B13,#0A1420 45%,#08111C)!important;border-right:1px solid rgba(0,229,255,.12)!important}
+body.neo #side nav a.on{background:linear-gradient(90deg,rgba(0,229,255,.16),rgba(124,58,237,.1))!important;border-left-color:#00E5FF!important}
+body.neo #top{background:rgba(10,14,23,.82)!important;border-bottom:1px solid rgba(0,229,255,.12)!important}
+body.neo #top h1,body.neo #top .sub{color:#F9FAFB!important}
+body.neo #top .sub{color:#94A3B8!important}
+body.neo .card{background:rgba(17,24,39,.66)!important;border:1px solid rgba(0,229,255,.15)!important;box-shadow:0 18px 44px rgba(0,0,0,.3)!important;color:#F9FAFB!important}
+body.neo .card h3,body.neo .card h4,body.neo .card b{color:#F9FAFB!important}
+body.neo .card p,body.neo .muted,body.neo label{color:#94A3B8!important}
+body.neo .stat{background:rgba(17,24,39,.66)!important;border:1px solid rgba(0,229,255,.16)!important}
+body.neo .stat b{color:#00E5FF!important;font-family:"JetBrains Mono",ui-monospace,monospace!important}
+body.neo .stat span{color:#94A3B8!important}
+body.neo input,body.neo select,body.neo textarea{background:rgba(10,14,23,.82)!important;border:1px solid rgba(0,229,255,.18)!important;color:#F9FAFB!important}
+body.neo .btn.gold{background:linear-gradient(135deg,#00E5FF,#7C3AED)!important;color:#06121A!important;border:1px solid rgba(0,229,255,.5)!important;box-shadow:0 0 24px rgba(0,229,255,.25)!important}
+body.neo .btn.line{background:rgba(17,24,39,.7)!important;border-color:rgba(0,229,255,.28)!important;color:#A5F3FC!important}
+body.neo .authCard{background:rgba(17,24,39,.8)!important;border:1px solid rgba(0,229,255,.2)!important;color:#F9FAFB!important;box-shadow:0 30px 80px rgba(0,0,0,.5)!important}
+body.neo .authCard h1,body.neo .authCard .brand b{color:#F9FAFB!important}
+body.neo .authCard p,body.neo .authCard .muted{color:#94A3B8!important}
+body.neo #app{background:#0A0E17!important}

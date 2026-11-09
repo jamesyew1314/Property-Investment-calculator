@@ -243,3 +243,53 @@ body.neo .site-nav.neoOpen a{padding:14px 4px;border-bottom:1px solid rgba(255,2
   body.neo .site-nav a{border:0!important;padding:6px 0!important;font-size:13px!important;white-space:nowrap;color:#CBD5E1!important}
   body.neo .site-nav a.on{color:#00E5FF!important}
 }
+
+/* ===== sitewide NEO ===== */
+body.neo{background:#0A0E17!important;color:#F9FAFB!important}
+body.neo .sec,body.neo .sec.alt{background:transparent!important;border-color:rgba(0,229,255,.08)!important}
+body.neo h1,body.neo h2,body.neo h3,body.neo h4,body.neo .newsHead h1{color:#F9FAFB!important}
+body.neo p,body.neo li,body.neo label,body.neo .muted,body.neo small{color:#94A3B8}
+body.neo a{color:#67E8F9}
+body.neo .site-foot{background:#070B13!important;border-top:1px solid rgba(0,229,255,.12)!important}
+body.neo .site-foot b,body.neo .site-foot a,body.neo .site-foot p{color:#94A3B8!important}
+body.neo input,body.neo select,body.neo textarea{background:rgba(10,14,23,.82)!important;border:1px solid rgba(0,229,255,.18)!important;color:#F9FAFB!important;border-radius:10px!important}
+body.neo input::placeholder,body.neo textarea::placeholder{color:#64748B}
+body.neo .btn.line{background:rgba(17,24,39,.7)!important;border:1px solid rgba(0,229,255,.32)!important;color:#A5F3FC!important}
+body.neo .btn.dark{background:linear-gradient(135deg,#00E5FF,#7C3AED)!important;color:#06121A!important}
+body.neo .card,body.neo .formCard,body.neo .panel{background:rgba(17,24,39,.62)!important;border:1px solid rgba(0,229,255,.15)!important;border-radius:16px!important;box-shadow:0 18px 48px rgba(0,0,0,.35)!important;color:#F9FAFB!important}
+/* pool */
+body.neo .poolHead{background:radial-gradient(700px 320px at 80% 0%,rgba(0,229,255,.16),transparent 60%),radial-gradient(600px 300px at 10% 100%,rgba(124,58,237,.2),transparent 60%),linear-gradient(180deg,#070B13,#0A0E17)!important}
+body.neo .poolHead h1{color:#F9FAFB!important}
+body.neo .poolHead p{color:#94A3B8!important}
+body.neo .poolBar input,body.neo .poolBar select{background:rgba(17,24,39,.75)!important;color:#F9FAFB!important}
+body.neo .seg{border-color:rgba(0,229,255,.25)!important;background:rgba(17,24,39,.6)!important}
+body.neo .seg button{background:transparent!important;color:#94A3B8!important;min-height:44px}
+body.neo .seg button.on{background:linear-gradient(135deg,rgba(0,229,255,.25),rgba(124,58,237,.3))!important;color:#F9FAFB!important}
+body.neo .plCard{background:rgba(17,24,39,.66)!important;border:1px solid rgba(0,229,255,.16)!important;border-radius:16px!important}
+body.neo .plCard:hover{border-color:rgba(0,229,255,.5)!important;box-shadow:0 22px 50px rgba(0,229,255,.1)!important;transform:translateY(-4px)}
+body.neo .plTitle{color:#F9FAFB!important}
+body.neo .plMeta,body.neo .plAgent{color:#94A3B8!important;border-color:rgba(255,255,255,.08)!important}
+body.neo .plCode{color:#67E8F9!important}
+body.neo .plPrice{color:#00E5FF!important;font-family:"JetBrains Mono",ui-monospace,monospace!important}
+body.neo .plTag{background:rgba(0,229,255,.08)!important;color:#A5F3FC!important;border:1px solid rgba(0,229,255,.3)!important}
+body.neo .plTag.rent{background:rgba(124,58,237,.16)!important;color:#C4B5FD!important;border-color:rgba(124,58,237,.4)!important}
+body.neo .rules{background:rgba(17,24,39,.6)!important;border:1px solid rgba(0,229,255,.15)!important}
+body.neo .rules h2,body.neo .rules .body{color:#F9FAFB!important}
+body.neo .rules .tabs button{background:rgba(17,24,39,.7)!important;color:#94A3B8!important;border-color:rgba(0,229,255,.2)!important}
+body.neo .rules .tabs button.on{background:linear-gradient(135deg,rgba(0,229,255,.25),rgba(124,58,237,.3))!important;color:#fff!important}
+body.neo .poolEmpty{color:#94A3B8!important}
+/* news */
+body.neo .newsHead h1{color:#F9FAFB!important}
+body.neo .newsHead p{color:#94A3B8!important}
+body.neo .nItem{background:rgba(17,24,39,.62)!important;border-color:rgba(0,229,255,.15)!important}
+body.neo .nItem:hover{border-color:rgba(0,229,255,.45)!important}
+body.neo .nTitle{color:#F9FAFB!important}
+body.neo .nSum{color:#94A3B8!important}
+body.neo .nMore{color:#67E8F9!important}
+/* join / static content */
+body.neo #apply b{color:#F9FAFB!important}
+body.neo #apply p,body.neo #apply li{color:#94A3B8!important}
+body.neo .form-note,body.neo .msg{color:#94A3B8!important}
+body.neo .vcard h3,body.neo .vcard b{color:#F9FAFB!important}
+body.neo .vcard p{color:#94A3B8!important}
+body.neo .lead{color:#CBD5E1!important}
