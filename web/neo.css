@@ -293,3 +293,13 @@ body.neo .form-note,body.neo .msg{color:#94A3B8!important}
 body.neo .vcard h3,body.neo .vcard b{color:#F9FAFB!important}
 body.neo .vcard p{color:#94A3B8!important}
 body.neo .lead{color:#CBD5E1!important}
+
+/* SSR pages */
+body.neo .pd .spec{color:#94A3B8!important}
+body.neo .pd .spec b{color:#F9FAFB!important}
+body.neo .pd-back{color:#67E8F9!important}
+body.neo .agentHero,body.neo .agentHero h1,body.neo .agentHero p,body.neo .agentHero b{color:#F9FAFB!important}
+body.neo .agentHero .agentStats span{color:#94A3B8!important}
+body.neo .agentHero .agentStats b{color:#00E5FF!important}
+body.neo .agent-page .card,body.neo .agent-page .pcard{background:rgba(17,24,39,.65)!important;border-color:rgba(0,229,255,.16)!important}
+body.neo .agent-page p,body.neo .agent-page li{color:#94A3B8}

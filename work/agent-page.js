@@ -116,7 +116,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     ".shareRow button,.shareRow a{font:600 12px/1 inherit;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;cursor:pointer;text-decoration:none}" +
     ".waFloat{position:fixed;right:16px;bottom:16px;z-index:60;background:#25D366;color:#fff;border-radius:999px;padding:12px 16px;font-weight:700;text-decoration:none;box-shadow:0 10px 24px rgba(0,0,0,.25);font-size:14px}" +
     "@media(max-width:760px){.agentGrid{grid-template-columns:1fr}.agentHero{padding:34px 0 28px}.agentStats{gap:20px}.waFloat{right:12px;bottom:12px}}" +
-    "</style></head><body>" +
+    "</style><link rel='stylesheet' href='/fonts.css'><link rel='stylesheet' href='/neo.css'></head><body class='neo'>" +
     '<header class="site-head"><div class="wrap bar">' +
     '<a class="brand" href="/"><img src="/logo-white.png" alt="RoofX"><span>RoofX</span></a>' +
     '<nav class="site-nav"><a href="/properties/">' + L.find + '</a><a href="/agents/">' + L.agents + '</a><a href="/join/">' + L.join + '</a><a href="https://calc.kwongthye.com/">' + L.calc + '</a>' +
