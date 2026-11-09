@@ -927,7 +927,16 @@
     setTitle(t("全部房源", "All RoofX Listing"), t("柔佛同行发布的货源；联系对方带客看房", "Listings from agents across Johor"));
     var qs = new URLSearchParams();
     ["q", "state", "area", "type", "intent"].forEach(function (k) { if (q[k]) qs.set(k, q[k]); });
-    return api("/pool?" + qs.toString()).then(function (d) {
+    var _prow = [], _ppage = 1;
+    function loadPoolAll() {
+      qs.set("page", _ppage); qs.set("pageSize", "48");
+      return api("/pool?" + qs.toString()).then(function (x) {
+        _prow = _prow.concat(x.rows || []);
+        if (_prow.length < x.total && _ppage < 20) { _ppage++; return loadPoolAll(); }
+        return { rows: _prow, total: x.total };
+      });
+    }
+    return loadPoolAll().then(function (d) {
       var states = stateList();
       var areas = ((S.meta && S.meta.areas) || []).filter(function (a) { return !q.state || a.state === q.state; });
       var h = '<div class="toolbar"><input id="pq" type="search" placeholder="' + t("搜索编号 / 楼盘", "Search code / project") + '" value="' + esc(q.q || "") + '">' +
