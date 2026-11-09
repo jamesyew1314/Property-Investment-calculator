@@ -18,6 +18,8 @@ node web/test.js | tail -1
 node work/test-import.js
 node work/test-library.js | tail -1
 node work/test-brand.js | tail -1
+node work/test-static.js
+node work/test-i18n.js
 
 echo "▸ 2/5 上传静态站点"
 rsync -az -e "ssh -i $KEY -o StrictHostKeyChecking=no" \
@@ -53,5 +55,8 @@ echo "▸ 5/5 健康检查"
 HEALTH=$($SSH "$USER_@$HOST" 'curl -s -m 8 localhost:3000/api/health')
 echo "  $HEALTH"
 echo "$HEALTH" | grep -q '"ok":true' || { echo "✗ 健康检查失败"; exit 1; }
+
+echo "▸ 线上烟雾测试"
+node work/test-smoke.js
 
 echo "✓ 发布完成：https://kwongthye.com/"
