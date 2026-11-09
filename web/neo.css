@@ -219,3 +219,9 @@ body.neo .nItem .nTitle{color:#F9FAFB!important}
   body.neo .neoCore .vcard p{grid-column:2!important;margin:0!important;min-width:0}
   body.neo .neoCore .vcard .nodeExtra{grid-column:2!important}
 }
+
+/* mobile language switcher: avoid covering headings */
+@media(max-width:760px){
+  body.neo #lang3wrap{top:auto!important;bottom:76px!important;right:10px!important;left:auto!important}
+}
+body.neo .sec{scroll-margin-top:96px}
