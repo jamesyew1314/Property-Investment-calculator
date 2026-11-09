@@ -20,7 +20,9 @@
   function t(key) {
     var v = dict[key];
     if (!v) return key;
-    return lang === "en" ? v[1] : v[0];
+    if (lang === "en") return v[1];
+    if (lang === "bm") return v[2] || (window.BM_MAP || {})[v[1]] || v[1];
+    return v[0];
   }
   function pick(v) {
     if (lang === "bm") return v[2] || (window.BM_MAP || {})[v[1]] || v[1];
