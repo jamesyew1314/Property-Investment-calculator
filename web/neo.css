@@ -368,3 +368,12 @@ body.neo .agentBox{max-width:100%!important;box-sizing:border-box}
   body.neo .pd .specs{display:block!important}
   body.neo .pd .spec{margin:8px 0}
 }
+
+/* mobile language switch: bottom-left, out of table price/status columns */
+@media(max-width:760px){
+  body.neo #lang3wrap{left:10px!important;right:auto!important;top:auto!important;
+    bottom:calc(10px + env(safe-area-inset-bottom,0px))!important;
+    transform:scale(.92);transform-origin:left bottom;
+    box-shadow:0 10px 26px rgba(0,0,0,.45)!important}
+  body.neo{padding-bottom:56px}
+}
