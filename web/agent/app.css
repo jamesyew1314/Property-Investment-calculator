@@ -317,3 +317,10 @@ body.neo .pcard .btn.line{background:rgba(0,229,255,.08)!important;border:1px so
 body.neo .pcard .btn.line:hover{background:rgba(0,229,255,.2)!important;color:#FFFFFF!important;border-color:rgba(0,229,255,.7)!important}
 body.neo .toolbar .count{color:#94A3B8!important}
 body.neo .pill.grey{background:rgba(148,163,184,.14)!important;color:#CBD5E1!important;border:1px solid rgba(148,163,184,.3)!important}
+
+/* softer cyan accents */
+body.neo .pcard .price{color:#7DD3FC!important}
+body.neo .stat b{color:#7DD3FC!important}
+body.neo .btn.gold{background:linear-gradient(135deg,#7DD3FC,#7C3AED)!important}
+body.neo .pcard .btn.line{border-color:rgba(125,211,252,.45)!important;color:#BAE6FD!important;background:rgba(125,211,252,.08)!important}
+body.neo .pcard .btn.line:hover{background:rgba(125,211,252,.18)!important;color:#E0F2FE!important}
