@@ -42,7 +42,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
   const price = p.intent === "rent" ? p.rent_price : p.asking_price;
   const psf = p.price_unit === "psf";
   const total = psf && p.price_total ? Number(p.price_total) : null;
-  const _chips = [];
+  let _chips = [];
   if (p.bedrooms) _chips.push(p.bedrooms + (lang === "bm" ? " bilik" : (en ? " bed" : " 房")));
   if (p.bathrooms) _chips.push(p.bathrooms + (lang === "bm" ? " bilik air" : (en ? " bath" : " 卫")));
   if (p.built_up) _chips.push(Number(p.built_up).toLocaleString("en-MY") + " sqft");
