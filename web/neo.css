@@ -534,3 +534,13 @@ body.neo .aiInsight .aiInsightLink{display:inline-block;margin-top:8px;font-size
     background:linear-gradient(135deg,#7DD3FC,#7C3AED)!important;color:#06121A!important;border-color:transparent!important
   }
 }
+
+/* higher-specificity override for earlier page rules */
+@media(max-width:760px){
+  body.neo:not(.workspace) #lang3wrap,
+  body.neo.workspace #lang3wrap{
+    position:fixed!important;left:50%!important;right:auto!important;top:auto!important;
+    bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;
+    transform:translateX(-50%)!important;z-index:900!important;
+  }
+}
