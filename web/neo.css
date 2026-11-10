@@ -511,3 +511,26 @@ body.neo .aiHeroCta{margin-top:12px}
 body.neo .plAIBadge{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.08em;color:#06121A;background:linear-gradient(135deg,#7DD3FC,#7C3AED);
   border-radius:999px;padding:2px 6px;font-weight:800;margin-left:auto;margin-right:6px}
 body.neo .aiInsight .aiInsightLink{display:inline-block;margin-top:8px;font-size:11px;color:#7DD3FC!important;text-decoration:none;font-family:"JetBrains Mono",monospace}
+
+/* ===== FINAL: one fixed language bar position sitewide (mobile) ===== */
+@media(max-width:760px){
+  body.neo{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important}
+  body.neo #lang3wrap{
+    position:fixed!important;left:50%!important;right:auto!important;top:auto!important;
+    bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;
+    transform:translateX(-50%)!important;z-index:900!important;
+    display:flex!important;align-items:center;gap:6px!important;
+    padding:5px 7px!important;border-radius:999px!important;
+    background:rgba(10,18,30,.94)!important;border:1px solid rgba(125,211,252,.3)!important;
+    box-shadow:0 10px 30px rgba(0,0,0,.5)!important;backdrop-filter:blur(14px)
+  }
+  body.neo #lang3wrap #lang3login{display:none!important}
+  body.neo #lang3wrap #lang3{gap:2px!important;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+  body.neo #lang3wrap #lang3 button{
+    min-width:44px!important;padding:7px 10px!important;font-size:12px!important;border-radius:999px!important;
+    border:1px solid transparent!important;background:transparent!important;color:#BAE6FD!important;font-weight:600!important
+  }
+  body.neo #lang3wrap #lang3 button.on{
+    background:linear-gradient(135deg,#7DD3FC,#7C3AED)!important;color:#06121A!important;border-color:transparent!important
+  }
+}
