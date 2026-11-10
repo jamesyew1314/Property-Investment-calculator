@@ -100,7 +100,7 @@ module.exports = function renderAgentPage(agent, listings, opts) {
     '<meta property="og:type" content="profile"><meta property="og:title" content="' + title + '">' +
     '<meta property="og:description" content="' + desc + '">' +
     '<meta property="og:url" content="' + pageUrl + '">' +
-    (listings && listings[0] && listings[0].cover_url ? '<meta property="og:image" content="https://kwongthye.com' + esc(listings[0].cover_url) + '">' : "") +
+    (function(){ var c = listings && listings[0] && listings[0].cover_url; var u = c ? (/^https?:\/\//i.test(c) ? c : "https://kwongthye.com" + c) : "https://kwongthye.com/og-share-2026.png"; return '<meta property="og:image" content="' + esc(u) + '">'; })() +
     '<link rel="icon" type="image/png" href="/icon-256.png"><link rel="stylesheet" href="/site.css">' +
     '<script type="application/ld+json">' + JSON.stringify(ld) + "</script>" +
     '<style>' +

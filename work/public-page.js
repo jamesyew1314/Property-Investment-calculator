@@ -81,7 +81,7 @@ module.exports = function renderPublicListing(p, agent, opts) {
     '<link rel="canonical" href="https://kwongthye.com/p/' + encodeURIComponent(p.code) + '">' +
     '<meta property="og:type" content="product"><meta property="og:title" content="' + esc(title) + '">' +
     '<meta property="og:description" content="' + esc(money(price, p.intent === "rent", lang) + " · " + area) + '">' +
-    (main ? '<meta property="og:image" content="https://kwongthye.com' + esc(main) + '">' : "") +
+    (function(){ var u = main ? (/^https?:\/\//i.test(main) ? main : "https://kwongthye.com" + main) : "https://kwongthye.com/og-share-2026.png"; return '<meta property="og:image" content="' + esc(u) + '">'; })() +
     '<link rel="icon" type="image/png" href="/icon-256.png"><link rel="stylesheet" href="/site.css">' +
     '<script type="application/ld+json">' + JSON.stringify(ld) + "</script>" +
     '<style>.pd{padding:26px 0 70px}.pd-back{font-size:13px;color:#2E5496;text-decoration:none}.pd-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:28px;margin-top:16px}' +
