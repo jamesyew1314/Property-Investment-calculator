@@ -965,9 +965,11 @@
             '<div class="price">' + (pm && pm.total ? money(pm.total) + ' <span class="muted" style="font-size:11px">' + money(pm.psf) + '/psf</span>' : (pm ? money(pm.psf) + '/psf' : money(price, r.intent === "rent"))) + "</div>" +
             '<div class="meta">' + t("货源：", "Listed by ") + "<b>" + esc(r.owner_name || r.agent || "—") + "</b>" +
             (r.owner_ren ? " · " + esc(r.owner_ren) : "") + (r.owner_verified ? " ✓" : "") + "</div>" +
-            '<div class="foot">' + (mine ? '<span class="muted">' + t("这是你的房源", "Your listing") + "</span>" :
-              '<a class="btn line sm" href="/p/' + encodeURIComponent(r.code) + '" target="_blank" rel="noopener">' + t("查看详情", "View details") + "</a>" +
-              (r.owner_phone ? '<a class="btn line sm" href="tel:' + esc(r.owner_phone) + '">' + esc(r.owner_phone) + "</a>" : "")) + "</div></div>";
+            '<div class="foot">' +
+              '<a class="btn line sm" href="/p/' + encodeURIComponent(r.code) + '" target="_blank" rel="noopener">' + t("查看全部详情", "View full details") + "</a>" +
+              (mine ? '<button class="btn line sm" data-act="edit-listing" data-id="' + r.id + '">' + t("编辑", "Edit") + "</button>" +
+                '<span class="muted">' + t("这是你的房源", "Your listing") + "</span>" :
+                (r.owner_phone ? '<a class="btn line sm" href="tel:' + esc(r.owner_phone) + '">' + esc(r.owner_phone) + "</a>" : "")) + "</div></div>";
         }).join("") + "</div>";
       }
       $("#view").innerHTML = h;
