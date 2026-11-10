@@ -589,3 +589,8 @@ body.neo .aiInsight .aiInsightLink{display:inline-block;margin-top:8px;font-size
   body.neo .site-head .brand{display:inline-flex!important;vertical-align:middle}
   body.neo .site-nav{display:flex!important;margin-top:6px!important;padding:0!important}
 }
+
+/* reset inherited top offset on the mobile nav row */
+@media(max-width:760px){
+  body.neo .site-nav{top:auto!important;left:auto!important;right:auto!important;bottom:auto!important}
+}
