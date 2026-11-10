@@ -576,3 +576,8 @@ body.neo .aiInsight .aiInsightLink{display:inline-block;margin-top:8px;font-size
   body.neo .site-head{position:sticky!important;top:44px!important;z-index:120!important;overflow:visible!important}
   body.neo .site-nav{position:relative!important;z-index:2!important}
 }
+
+/* reserve space for the second nav row so it never overlaps page title */
+@media(max-width:760px){
+  body.neo .site-head{padding-bottom:56px!important}
+}
