@@ -334,3 +334,12 @@ body.neo .table tbody tr:hover{background:rgba(125,211,252,.08)!important}
 body.neo .table .muted,body.neo .table small{color:#94A3B8!important}
 body.neo .table a{color:#BAE6FD!important}
 body.neo .table .pill{background:rgba(125,211,252,.12)!important;color:#BAE6FD!important;border:1px solid rgba(125,211,252,.3)!important}
+
+/* mobile workspace header: title row + scrollable action row */
+@media(max-width:760px){
+  #top{flex-wrap:wrap!important;align-items:flex-start!important}
+  #top .sp{display:none!important}
+  #topActs{width:100%!important;order:9;flex-wrap:nowrap!important;overflow-x:auto;overflow-y:hidden;
+    padding-top:8px;margin-top:2px;gap:8px!important;-webkit-overflow-scrolling:touch}
+  #topActs .btn{flex:0 0 auto;white-space:nowrap}
+}
