@@ -544,3 +544,29 @@ body.neo .aiInsight .aiInsightLink{display:inline-block;margin-top:8px;font-size
     transform:translateX(-50%)!important;z-index:900!important;
   }
 }
+
+/* ===== FINAL v2: language bar fixed at top, all pages ===== */
+@media(max-width:760px){
+  body.neo{padding-top:44px!important;padding-bottom:0!important}
+  body.neo .site-head{top:44px!important}
+  body.neo.workspace #top{top:44px!important}
+  body.neo #lang3wrap,
+  body.neo:not(.workspace) #lang3wrap,
+  body.neo.workspace #lang3wrap{
+    position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:auto!important;
+    width:100%!important;height:44px!important;transform:none!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    padding:0 8px!important;border-radius:0!important;border:0!important;border-bottom:1px solid rgba(125,211,252,.22)!important;
+    background:rgba(8,14,24,.98)!important;box-shadow:0 6px 20px rgba(0,0,0,.35)!important;
+    backdrop-filter:blur(16px);z-index:2000!important
+  }
+  body.neo #lang3wrap #lang3login{display:none!important}
+  body.neo #lang3wrap #lang3{gap:2px!important;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+  body.neo #lang3wrap #lang3 button{
+    min-width:54px!important;padding:7px 12px!important;font-size:12px!important;border-radius:999px!important;
+    border:1px solid transparent!important;background:transparent!important;color:#BAE6FD!important;font-weight:600!important
+  }
+  body.neo #lang3wrap #lang3 button.on{
+    background:linear-gradient(135deg,#7DD3FC,#7C3AED)!important;color:#06121A!important;border-color:transparent!important
+  }
+}
