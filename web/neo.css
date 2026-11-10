@@ -581,3 +581,11 @@ body.neo .aiInsight .aiInsightLink{display:inline-block;margin-top:8px;font-size
 @media(max-width:760px){
   body.neo .site-head{padding-bottom:56px!important}
 }
+
+/* mobile header: normal block flow so the nav row is included in height */
+@media(max-width:760px){
+  body.neo .site-head{padding-bottom:0!important}
+  body.neo .site-head .bar{display:block!important;height:auto!important;padding:8px 0 0!important}
+  body.neo .site-head .brand{display:inline-flex!important;vertical-align:middle}
+  body.neo .site-nav{display:flex!important;margin-top:6px!important;padding:0!important}
+}
