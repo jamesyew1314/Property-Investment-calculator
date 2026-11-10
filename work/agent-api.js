@@ -17,6 +17,7 @@ let sharp = null; try { sharp = require("sharp"); } catch (e) { sharp = null; }
 const fs = require("node:fs");
 const pathMod = require("node:path");
 const tax = require("./library-taxonomy");
+const ossStore = require("./oss");
 
 const COOKIE = "pn_sid";
 const SESSION_DAYS = 30;
@@ -238,10 +239,18 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
         name = baseName + "." + ext;
         fs.writeFileSync(pathMod.join(UPLOADS, name), buf);
       }
-      const url = "/uploads/props/" + name;
+      let url = "/uploads/props/" + name;
+      if (ossStore.enabled()) {
+        try {
+          const payload = fs.readFileSync(pathMod.join(UPLOADS, name));
+          url = await ossStore.putImage("props/" + name, payload, sharp ? "image/jpeg" : ("image/" + ext));
+        } catch (e) { console.error("oss avatar failed", e.message); }
+      }
       const old = req.agent.photo_url;
       await pool.query("UPDATE lib_agents SET photo_url=$1, updated_at=now() WHERE id=$2", [url, req.agent.id]);
-      if (old && /^\/uploads\/props\/agent-\d+-[A-Za-z0-9._-]+$/.test(old)) {
+      if (old && ossStore.isOssUrl(old)) {
+        await ossStore.removeVariants(old);
+      } else if (old && /^\/uploads\/props\/agent-\d+-[A-Za-z0-9._-]+$/.test(old)) {
         try { fs.unlinkSync(pathMod.join(UPLOADS, pathMod.basename(old))); } catch (e) {}
       }
       res.status(201).json({ ok: true, url: url });
@@ -647,6 +656,23 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
         fs.writeFileSync(pathMod.join(UPLOADS, name), buf);
       }
       url = "/uploads/props/" + name;
+      if (ossStore.enabled()) {
+        try {
+          const variants = [[name, sharp ? "image/jpeg" : ("image/" + ext)]];
+          [baseName + "_t.jpg", baseName + ".webp", baseName + "_t.webp"].forEach(function (f) {
+            variants.push([f, /\.webp$/i.test(f) ? "image/webp" : "image/jpeg"]);
+          });
+          for (const v of variants) {
+            const fp = pathMod.join(UPLOADS, v[0]);
+            if (!fs.existsSync(fp)) continue;
+            const u = await ossStore.putImage("props/" + v[0], fs.readFileSync(fp), v[1]);
+            if (v[0] === name) url = u;
+          }
+        } catch (e) {
+          console.error("oss listing photo failed", e.message);
+          url = "/uploads/props/" + name;
+        }
+      }
       const next = photos.concat([url]);
       await pool.query("UPDATE lib_properties SET photos=$1, cover_url=COALESCE(cover_url,$2), updated_at=now() WHERE id=$3 AND tenant_id=$4",
         [next, url, row.id, req.agent.id]);
@@ -662,7 +688,9 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       const next = (row.photos || []).filter(function (x) { return x !== url; });
       await pool.query("UPDATE lib_properties SET photos=$1, cover_url=$2, updated_at=now() WHERE id=$3 AND tenant_id=$4",
         [next, next[0] || null, row.id, req.agent.id]);
-      if (/^\/uploads\/props\/[A-Za-z0-9._-]+$/.test(url)) {
+      if (ossStore.isOssUrl(url)) {
+        await ossStore.removeVariants(url);
+      } else if (/^\/uploads\/props\/[A-Za-z0-9._-]+$/.test(url)) {
         const f = pathMod.join(UPLOADS, pathMod.basename(url));
         if (f.indexOf(UPLOADS) === 0 && fs.existsSync(f)) fs.unlinkSync(f);
         const t = f.replace(/\.jpg$/i, "_t.jpg");
