@@ -7,6 +7,21 @@ const path = require("path");
 const { Pool } = require("pg");
 const oss = require("./oss");
 
+// 直接运行时读取服务器 .env（不覆盖已存在的环境变量）
+(function loadEnv() {
+  try {
+    const f = "/srv/fangchan/api/.env";
+    fs.readFileSync(f, "utf8").split(/\r?\n/).forEach(function (line) {
+      if (!line || line[0] === "#") return;
+      const i = line.indexOf("=");
+      if (i < 1) return;
+      const k = line.slice(0, i).trim();
+      const v = line.slice(i + 1).trim();
+      if (!process.env[k]) process.env[k] = v;
+    });
+  } catch (e) {}
+})();
+
 const APPLY = process.argv.includes("--apply");
 const DIR = process.env.UPLOAD_DIR || "/srv/fangchan/uploads/props";
 const pool = new Pool({ connectionString: process.env.DATABASE_URL || process.env.PG_URL });
