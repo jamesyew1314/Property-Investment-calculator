@@ -1,5 +1,12 @@
 /* RoofX BM — 以英文为键的马来语词典（工作台） */
 window.BM_MAP = {
+  "RoofX listing link": "Pautan senarai RoofX",
+  "RoofX 货源链接": "Pautan senarai RoofX",
+  "RoofX listing link copied": "Pautan senarai RoofX disalin",
+  "RoofX 货源链接已复制": "Pautan senarai RoofX disalin",
+  "Set your profile slug first": "Tetapkan alamat profil anda dahulu",
+  "请先在个人资料设置页面地址": "Tetapkan alamat profil anda dahulu",
+
   "Enter land area to calculate total": "Masukkan luas tanah untuk kira jumlah",
   "Land area (required for land)": "Luas tanah (wajib untuk tanah)",
   "Area note": "Nota luas",

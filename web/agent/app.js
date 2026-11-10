@@ -393,7 +393,7 @@
   // ---------- 我的房源 ----------
   function listings(q) {
     setTitle(t("我的房源", "My listings"), t("发布与管理房源、客户与匹配", "Manage listings, clients and matches"));
-    $("#topActs").innerHTML = '<button class="btn line sm" data-act="import">' + t("一键导入", "Import") + '</button> <button class="btn line sm" data-act="copy-all">' + t("复制全部在售", "Copy all active") + '</button> <button class="btn gold sm" data-act="new-listing">+ ' + t("新增房源", "New listing") + "</button>";
+    $("#topActs").innerHTML = '<button class="btn line sm" data-act="import">' + t("一键导入", "Import") + '</button> <button class="btn line sm" data-act="copy-all">' + t("复制全部在售", "Copy all active") + '</button> <button class="btn line sm" data-act="copy-roofx-link">' + t("RoofX 货源链接", "RoofX listing link") + '</button> <button class="btn gold sm" data-act="new-listing">+ ' + t("新增房源", "New listing") + "</button>";
     var qs = new URLSearchParams(); ["q", "status"].forEach(function (k) { if (q[k]) qs.set(k, q[k]); });
     return api("/matches").catch(function () { return { clients: [] }; }).then(function (md) {
       var mc = {};
@@ -1453,11 +1453,19 @@
           if (all.length < d.total && page < 20) { page++; load(); return; }
           var rows = all.filter(function (r) { return r.status === "available" || r.status === "reserved"; });
           if (!rows.length) { toast(t("还没有在售房源", "No active listings yet"), true); return; }
-          copyText(rows.map(shareText).join("\n\n————————\n\n")).then(function () {
-            toast(t("已复制 " + rows.length + " 条在售房源", "Copied " + rows.length + " active listings"));
+          var roofxLink = S.me && S.me.slug ? (location.origin + "/a/" + encodeURIComponent(S.me.slug)) : "";
+          var text = rows.map(shareText).join("\n\n————————\n\n") + (roofxLink ? "\n\nRoofX 货源链接：\n" + roofxLink : "");
+          copyText(text).then(function () {
+            toast(t("已复制 " + rows.length + " 条在售房源 + RoofX 链接", "Copied " + rows.length + " active listings + RoofX link"));
           });
         }).catch(function (e) { toast(e.message, true); });
       })();
+    }
+    if (act === "copy-roofx-link") {
+      var slug = S.me && S.me.slug;
+      if (!slug) { toast(t("请先在个人资料设置页面地址", "Set your profile slug first"), true); return; }
+      var url = location.origin + "/a/" + encodeURIComponent(slug);
+      copyText(url).then(function () { toast(t("RoofX 货源链接已复制", "RoofX listing link copied")); });
     }
     if (act === "view-listing") api("/listings/" + id).then(function (j) { listingDetail(j.row); }).catch(function (e) { toast(e.message, true); });
     if (act === "share") api("/listings/" + id).then(function (j) { shareCard(j.row); });
