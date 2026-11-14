@@ -1,0 +1,87 @@
+name: Offsite database backup
+
+# 每天北京时间 04:45 拉取最新备份到 GitHub Artifact，保留 90 天
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "45 19 * * *"
+  push:
+    paths:
+      - ".github/workflows/backup-offsite.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: offsite-db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare SSH
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          set -e
+          [ -n "$SSH_HOST" ] && [ -n "$SSH_KEY" ]
+          mkdir -p ~/.ssh
+          printf '%s' "$SSH_KEY" | sed 's/\r$//' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keygen -y -P "" -f ~/.ssh/deploy_key >/dev/null
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Download latest dump
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          set -euo pipefail
+          DATE=$(TZ=Asia/Shanghai date +%F)
+          mkdir -p backup
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            "root@$SSH_HOST:/srv/fangchan/backups/fangchan-$DATE.dump" "backup/fangchan-$DATE.dump"
+          LOCAL=$(sha256sum "backup/fangchan-$DATE.dump" | awk '{print $1}')
+          REMOTE=$(ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no "root@$SSH_HOST" "awk '{print \$1}' /srv/fangchan/backups/fangchan-$DATE.dump.sha256")
+          [ "$LOCAL" = "$REMOTE" ] || { echo "sha256 不一致"; exit 1; }
+          ls -lh "backup/fangchan-$DATE.dump"
+          echo "BACKUP_DATE=$DATE" >> "$GITHUB_ENV"
+          echo "BACKUP_SHA=$LOCAL" >> "$GITHUB_ENV"
+          echo "BACKUP_BYTES=$(stat -c%s "backup/fangchan-$DATE.dump")" >> "$GITHUB_ENV"
+
+      - name: Upload offsite artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fangchan-db-${{ env.BACKUP_DATE }}
+          path: backup/fangchan-${{ env.BACKUP_DATE }}.dump
+          retention-days: 90
+
+      - name: Commit offsite report
+        env:
+          BACKUP_DATE: ${{ env.BACKUP_DATE }}
+          BACKUP_SHA: ${{ env.BACKUP_SHA }}
+          BACKUP_BYTES: ${{ env.BACKUP_BYTES }}
+        run: |
+          set -e
+          mkdir -p docs/audit
+          {
+            echo "# 异地备份 $BACKUP_DATE"
+            echo
+            echo "- 来源：生产服务器每日 03:30 dump"
+            echo "- 文件：fangchan-$BACKUP_DATE.dump"
+            echo "- 大小：$BACKUP_BYTES bytes"
+            echo "- SHA256：$BACKUP_SHA"
+            echo "- GitHub Artifact：fangchan-db-$BACKUP_DATE，保留 90 天"
+          } > "docs/audit/offsite-backup-$BACKUP_DATE.md"
+          git config user.name "backup-bot"
+          git config user.email "backup@kwongthye.com"
+          git add docs/audit
+          git commit -m "chore: offsite backup $BACKUP_DATE [skip ci]" || true
+          for i in 1 2 3; do
+            git pull --rebase origin main || true
+            git push && break || sleep 5
+          done

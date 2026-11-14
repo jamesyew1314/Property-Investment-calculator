@@ -1,0 +1,78 @@
+name: Restore drill
+
+# 每月 1 号北京时间 04:00 在服务器临时库恢复最新备份，校验后删除
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 20 1 * *"
+  push:
+    paths:
+      - ".github/workflows/restore-drill.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: restore-drill
+  cancel-in-progress: true
+
+jobs:
+  drill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare SSH
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          set -e
+          [ -n "$SSH_HOST" ] && [ -n "$SSH_KEY" ]
+          mkdir -p ~/.ssh
+          printf '%s' "$SSH_KEY" | sed 's/\r$//' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keygen -y -P "" -f ~/.ssh/deploy_key >/dev/null
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Restore latest dump into scratch DB
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no "root@$SSH_HOST" 'bash -s' > /tmp/restore.txt <<'REMOTE'
+          set -e
+          LATEST=$(ls -1t /srv/fangchan/backups/fangchan-*.dump | head -1)
+          BASE=$(basename "$LATEST")
+          cd /srv/fangchan/backups
+          sha256sum -c "$BASE.sha256"
+          sudo -u postgres dropdb --if-exists fangchan_restore_drill
+          sudo -u postgres createdb fangchan_restore_drill
+          trap 'sudo -u postgres dropdb --if-exists fangchan_restore_drill' EXIT
+          sudo -u postgres pg_restore --no-owner --no-privileges -d fangchan_restore_drill "$LATEST"
+          TABLES=$(sudo -u postgres psql -Atc "select count(*) from information_schema.tables where table_schema='public';" -d fangchan_restore_drill)
+          PROPERTIES=$(sudo -u postgres psql -Atc "select count(*) from lib_properties;" -d fangchan_restore_drill 2>/dev/null || echo "n/a")
+          echo "RESTORE_OK file=$BASE tables=$TABLES properties=$PROPERTIES"
+          REMOTE
+          cat /tmp/restore.txt
+
+      - name: Commit restore drill report
+        run: |
+          set -e
+          mkdir -p docs/audit
+          {
+            echo "# 恢复演练 $(date -u +'%Y-%m-%d %H:%M UTC')"
+            echo
+            echo '```'
+            cat /tmp/restore.txt
+            echo '```'
+          } > "docs/audit/restore-drill-$(date +%Y%m%d-%H%M).md"
+          git config user.name "restore-bot"
+          git config user.email "restore@kwongthye.com"
+          git add docs/audit
+          git commit -m "chore: restore drill [skip ci]" || true
+          for i in 1 2 3; do
+            git pull --rebase origin main || true
+            git push && break || sleep 5
+          done
