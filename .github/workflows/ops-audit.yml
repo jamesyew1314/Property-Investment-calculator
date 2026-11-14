@@ -1,0 +1,91 @@
+name: Production audit
+
+# 只读生产巡检：磁盘/内存/服务/备份/数据库/Nginx；结果写回 docs/audit/
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/ops-audit.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: production-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare SSH
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          set -e
+          [ -n "$SSH_HOST" ] && [ -n "$SSH_KEY" ]
+          mkdir -p ~/.ssh
+          printf '%s' "$SSH_KEY" | sed 's/\r$//' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keygen -y -P "" -f ~/.ssh/deploy_key >/dev/null
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Read-only production audit
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          set -e
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no "root@$SSH_HOST" 'bash -s' > /tmp/audit.txt <<'REMOTE'
+          set +e
+          echo "## 基本信息"
+          hostname; date; uptime
+          echo
+          echo "## 磁盘"
+          df -h /
+          echo
+          echo "## 内存"
+          free -m
+          echo
+          echo "## 服务状态"
+          for s in nginx postgresql fangchan-api; do
+            printf '%-16s ' "$s"
+            systemctl is-active "$s" 2>/dev/null || true
+          done
+          echo
+          echo "## 最新备份"
+          ls -lht /srv/fangchan/backups 2>/dev/null | head -8 || true
+          echo
+          echo "## 备份相关 cron"
+          crontab -l 2>/dev/null | grep -Ei 'backup|dump|snapshot' || true
+          echo
+          echo "## 数据库大小"
+          sudo -u postgres psql -Atc "select pg_size_pretty(pg_database_size('fangchan'));" 2>/dev/null || true
+          echo
+          echo "## Nginx 配置检查"
+          nginx -t 2>&1 || true
+          echo
+          echo "## 本机 API 健康"
+          curl -s -m 5 localhost:3000/api/health || true
+          REMOTE
+          cat /tmp/audit.txt
+
+      - name: Commit audit report
+        run: |
+          set -e
+          mkdir -p docs/audit
+          {
+            echo "# 生产审计 $(date -u +'%Y-%m-%d %H:%M UTC')"
+            echo
+            echo '```'
+            cat /tmp/audit.txt
+            echo '```'
+          } > "docs/audit/production-audit-$(date +%Y%m%d-%H%M).md"
+          git config user.name "audit-bot"
+          git config user.email "audit@kwongthye.com"
+          git add docs/audit
+          git commit -m "chore: production audit [skip ci]" || true
+          git push || true
