@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://kwongthye.com/agentsite/">
 <meta property="og:title" content="AgentSite MY｜先看网站 Demo，满意才付款">
 <meta property="og:description" content="房产中介专属三语房源站，首年 RM999 起，1–3 天上线。">
-<meta property="og:image" content="https://kwongthye.com/agentsite/img/roofx-home.png">
+<meta property="og:image" content="https://kwongthye.com/agentsite/img/agent-site-desktop.png">
 <meta property="og:type" content="website">
 <link rel="icon" type="image/png" href="/icon-256.png">
 <style>
@@ -59,7 +59,12 @@ h1 em{font-style:normal;color:var(--gold2)}
 /* mock */
 .mock{position:relative;min-height:380px;display:flex;align-items:flex-end;justify-content:center}
 .laptop{width:100%;max-width:520px;background:#081521;border:1px solid rgba(201,162,39,.35);border-radius:14px;padding:9px;box-shadow:0 32px 70px rgba(0,0,0,.38);transform:perspective(1200px) rotateY(-3deg) rotateX(2deg)}
-.laptop .screen{background:#07131F;border-radius:8px;overflow:hidden;aspect-ratio:16/10;border:1px solid rgba(255,255,255,.08)}
+.laptop .screen{background:#07131F;border-radius:8px;overflow:hidden;aspect-ratio:16/10;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column}
+.browserbar{height:24px;flex:0 0 24px;background:#0A1B2A;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:5px;padding:0 9px}
+.browserbar i{width:5px;height:5px;border-radius:50%;background:#FF5F56;display:block}
+.browserbar i:nth-child(2){background:#FFBD2E}.browserbar i:nth-child(3){background:#27C93F}
+.browserbar span{margin-left:6px;font:500 8px/1 Arial,sans-serif;color:#9FB1BF;letter-spacing:.02em}
+.laptop .screen img{flex:1;min-height:0;width:100%;height:auto;object-fit:cover;object-position:top center}
 .laptop img{width:100%;height:100%;object-fit:cover;object-position:top center}
 .laptop:after{content:"";display:block;width:112%;height:9px;background:#C8D2DA;border-radius:0 0 12px 12px;margin:7px -6% 0;opacity:.6}
 .phone{position:absolute;right:2%;bottom:-16px;width:132px;border:7px solid #07131F;border-radius:26px;overflow:hidden;box-shadow:0 24px 48px rgba(0,0,0,.5);background:#07131F}
@@ -242,8 +247,8 @@ footer{background:#07131F;color:#93A8B8;padding:30px 0;font-size:11.5px}
       <p class="hero-note" data-zh="* 免费 Demo 为模板预览；正式定制在确认订单后开始。价格未含 SST。" data-en="* Free demo is a template preview; custom build starts after order confirmation. Prices exclude SST." data-bm="* Demo percuma ialah pratonton templat; pembinaan bermula selepas pesanan disahkan. Harga tidak termasuk SST.">* 免费 Demo 为模板预览；正式定制在确认订单后开始。价格未含 SST。</p>
     </div>
     <div class="mock" aria-label="RoofX demo">
-      <div class="laptop"><div class="screen"><img src="img/roofx-home.png" alt="RoofX property platform demo"></div></div>
-      <div class="phone"><img src="img/roofx-home-mobile.png" alt="RoofX mobile demo"></div>
+      <div class="laptop"><div class="screen"><div class="browserbar"><i></i><i></i><i></i><span>andylauproperty.com</span></div><img src="img/agent-site-desktop.png" alt="Andy Lau Property agent website demo"></div></div>
+      <div class="phone"><img src="img/agent-site-mobile.png" alt="Agent website mobile demo"></div>
     </div>
   </div>
 </section>
@@ -283,7 +288,7 @@ footer{background:#07131F;color:#93A8B8;padding:30px 0;font-size:11.5px}
       <p class="sec-desc" data-zh="下面不是设计稿，是 RoofX 正在运行的房源平台。你的网站会沿用这套体验，换成你的品牌、房源和联系方式。" data-en="These are not mockups — this is the live RoofX platform. Your site uses the same experience with your brand, listings and contact details." data-bm="Ini bukan mockup — ini platform RoofX yang sedang berjalan. Laman anda menggunakan pengalaman sama dengan jenama, senarai dan kenalan anda.">下面不是设计稿，是 RoofX 正在运行的房源平台。你的网站会沿用这套体验，换成你的品牌、房源和联系方式。</p>
     </div>
     <div class="demo-grid">
-      <div class="demo-frame"><img src="img/pool-desktop.png" alt="RoofX listings demo"></div>
+      <div class="demo-frame"><img src="img/agent-site-desktop.png" alt="Andy Lau Property listings demo"></div>
       <div class="demo-copy">
         <h3 data-zh="你会得到什么" data-en="What you get" data-bm="Apa yang anda dapat">你会得到什么</h3>
         <ul class="demo-list">
