@@ -146,6 +146,24 @@ summary{list-style:none;cursor:pointer;display:flex;justify-content:space-betwee
 summary::-webkit-details-marker{display:none}summary:after{content:"+";color:var(--orange);font-size:18px;line-height:1}
 details[open] summary:after{content:"−"}
 details p{font-size:11.5px;line-height:1.8;color:#747880;margin:8px 0 0;padding-right:24px}
+/* share */
+.shareSec{background:#fff;border-top:1px solid var(--line)}
+.shareGrid{display:grid;grid-template-columns:.82fr 1.18fr;gap:28px;align-items:center}
+.shareHead .secKicker{margin-bottom:7px}
+.shareHead h2{font-size:clamp(25px,3.2vw,38px)}
+.shareHead p{font-size:12.5px;color:#747880;line-height:1.8;margin:0;max-width:420px}
+.shareBtns{display:flex;flex-wrap:wrap;gap:8px}
+.sh{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 11px 8px 8px;font:800 11.5px/1 inherit;color:var(--black);cursor:pointer;transition:.18s;text-decoration:none}
+.sh:hover{transform:translateY(-2px);border-color:#C9CBD0;box-shadow:0 8px 18px rgba(17,24,39,.08)}
+.sh i{width:25px;height:25px;border-radius:7px;display:grid;place-items:center;color:#fff;font:900 11px/1 Arial,sans-serif;font-style:normal;flex:0 0 25px}
+.sh-wa i{background:#25D366}.sh-fb i{background:#1877F2}.sh-tg i{background:#229ED9}.sh-x i{background:#111}.sh-li i{background:#0A66C2}.sh-copy i{background:var(--orange)}
+.sh-more{background:var(--black);color:#fff;border-color:var(--black)}.sh-more i{background:var(--orange)}
+.shareNote{font-size:10.5px;color:#8D9198;line-height:1.7;margin:12px 0 0}
+.shareNote b{color:#5E626A}
+#shareToast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,18px);background:#111;color:#fff;border-radius:999px;padding:10px 16px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:.22s;z-index:99;box-shadow:0 8px 22px rgba(0,0,0,.2)}
+#shareToast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:980px){.shareGrid{grid-template-columns:1fr;gap:16px}}
+@media(max-width:760px){.shareBtns{gap:7px}.sh{font-size:10.5px;padding:7px 9px 7px 7px}.sh i{width:23px;height:23px;flex-basis:23px}}
 /* final */
 .final{background:var(--orange);color:#fff;text-align:center;position:relative;overflow:hidden}
 .final:before{content:"";position:absolute;left:50%;top:-260px;transform:translateX(-50%);width:620px;height:620px;border-radius:50%;background:rgba(255,255,255,.14)}
@@ -209,6 +227,7 @@ footer{background:var(--black);color:#9EA1A8;padding:26px 0;font-size:10.5px}
    <a href="#compare" data-zh="对比" data-en="Compare" data-bm="Banding">对比</a>
    <a href="#pricing" data-zh="价格" data-en="Price" data-bm="Harga">价格</a>
    <a href="#faq" data-zh="FAQ" data-en="FAQ" data-bm="FAQ">FAQ</a>
+   <a href="#share" data-zh="分享" data-en="Share" data-bm="Kongsi">分享</a>
   </nav>
   <div class="lang"><button data-l="zh" class="on">中文</button><button data-l="en">EN</button><button data-l="bm">BM</button></div>
   <a class="navcta wa" href="https://wa.me/60165280918" target="_blank" rel="noopener" data-zh="预约 Demo" data-en="Book a demo" data-bm="Tempah demo">预约 Demo</a>
@@ -340,6 +359,30 @@ footer{background:var(--black);color:#9EA1A8;padding:26px 0;font-size:10.5px}
  </div>
 </section>
 
+<section class="shareSec" id="share">
+ <div class="wrap">
+  <div class="shareGrid">
+   <div class="shareHead">
+    <div class="secKicker">SHARE</div>
+    <h2 data-zh="分享给同行" data-en="Share with a fellow agent" data-bm="Kongsi dengan rakan ejen">分享给同行</h2>
+    <p data-zh="你身边可能也有正在被模板站报价的 agent。把这一页发给他，省下的不只是钱。" data-en="Someone you know may be quoted for a template site right now. Send them this page — they save more than money." data-bm="Mungkin ada ejen yang sedang disebut harga laman templat. Hantar halaman ini — mereka jimat lebih daripada wang.">你身边可能也有正在被模板站报价的 agent。把这一页发给他，省下的不只是钱。</p>
+   </div>
+   <div>
+    <div class="shareBtns">
+     <a class="sh sh-wa" data-share="wa" href="#" target="_blank" rel="noopener" aria-label="Share on WhatsApp"><i>WA</i><span>WhatsApp</span></a>
+     <a class="sh sh-fb" data-share="fb" href="#" target="_blank" rel="noopener" aria-label="Share on Facebook"><i>f</i><span>Facebook</span></a>
+     <a class="sh sh-tg" data-share="tg" href="#" target="_blank" rel="noopener" aria-label="Share on Telegram"><i>➤</i><span>Telegram</span></a>
+     <a class="sh sh-x" data-share="x" href="#" target="_blank" rel="noopener" aria-label="Share on X"><i>𝕏</i><span>X</span></a>
+     <a class="sh sh-li" data-share="li" href="#" target="_blank" rel="noopener" aria-label="Share on LinkedIn"><i>in</i><span>LinkedIn</span></a>
+     <button class="sh sh-copy" id="copyShare" type="button" aria-label="Copy link"><i>⧉</i><span data-copy-label data-zh="复制链接" data-en="Copy link" data-bm="Salin pautan">复制链接</span></button>
+     <button class="sh sh-more" id="nativeShare" type="button" aria-label="More sharing options"><i>⋯</i><span data-zh="更多" data-en="More" data-bm="Lagi">更多</span></button>
+    </div>
+    <p class="shareNote" data-zh-html="<b>Instagram / TikTok / 小红书</b> 没有网页分享入口，点「更多」调起手机系统分享，或复制链接粘贴到 App。" data-en-html="<b>Instagram / TikTok / RedNote</b> have no web share endpoint. Tap “More” to open your phone share sheet, or copy the link into the app." data-bm-html="<b>Instagram / TikTok / RedNote</b> tiada perkongsian web. Tekan “Lagi” untuk buka menu kongsi telefon, atau salin pautan ke app."><b>Instagram / TikTok / 小红书</b> 没有网页分享入口，点「更多」调起手机系统分享，或复制链接粘贴到 App。</p>
+   </div>
+  </div>
+ </div>
+</section>
+
 <section class="final">
  <div class="wrap"><h2 data-zh="把房产站，做成标配" data-en="Make a property site standard." data-bm="Jadikan laman hartanah standard.">把房产站，做成标配</h2><p data-zh="前 10 名 RM999。发我名字、REN、区域和房源数量，今天给你一页 Demo。" data-en="First 10 at RM999. Send your name, REN, area and listing count — get a one-page demo today." data-bm="10 pertama RM999. Hantar nama, REN, kawasan dan jumlah senarai — demo satu halaman hari ini.">前 10 名 RM999。发我名字、REN、区域和房源数量，今天给你一页 Demo。</p><a class="btn wa" href="https://wa.me/60165280918" target="_blank" rel="noopener" data-zh="WhatsApp 锁定名额" data-en="Claim on WhatsApp" data-bm="Dapatkan di WhatsApp">WhatsApp 锁定名额</a><div class="contact">+60 16-528 0918 · andylau.theroof@gmail.com · kwongthye.com/agentsite</div></div>
 </section>
@@ -368,5 +411,49 @@ footer{background:var(--black);color:#9EA1A8;padding:26px 0;font-size:10.5px}
  apply(lang);
 })();
 </script>
+<script>
+(function(){
+ var SHARE_URL='https://kwongthye.com/agentsite/xiaomi/?utm_source=share&utm_medium=social&utm_campaign=launch999';
+ function lang(){try{return localStorage.getItem('kt_lang')||'zh'}catch(e){return 'zh'}}
+ function text(){
+  var l=lang();
+  if(l==='en')return {t:'AgentSite 999 — a property website for agents, from RM999. See the demo first.',s:'AgentSite 999 — property website for agents'};
+  if(l==='bm')return {t:'AgentSite 999 — laman hartanah untuk ejen, dari RM999. Lihat demo dahulu.',s:'AgentSite 999 — laman hartanah untuk ejen'};
+  return {t:'AgentSite 999｜房产中介专属三语房源站，首年 RM999 起，先看 Demo 满意才付款。',s:'AgentSite 999｜房产中介专属三语房源站'};
+ }
+ function setLinks(){
+  var d=text(), u=encodeURIComponent(SHARE_URL), tx=encodeURIComponent(d.t);
+  var map={
+   wa:'https://wa.me/?text='+encodeURIComponent(d.t+' '+SHARE_URL),
+   fb:'https://www.facebook.com/sharer/sharer.php?u='+u,
+   tg:'https://t.me/share/url?url='+u+'&text='+tx,
+   x:'https://twitter.com/intent/tweet?url='+u+'&text='+tx,
+   li:'https://www.linkedin.com/sharing/share-offsite/?url='+u
+  };
+  document.querySelectorAll('[data-share]').forEach(function(a){if(map[a.dataset.share])a.href=map[a.dataset.share]});
+ }
+ function toast(msg){
+  var el=document.getElementById('shareToast'); if(!el)return;
+  el.textContent=msg; el.classList.add('on'); clearTimeout(window.__shareT);
+  window.__shareT=setTimeout(function(){el.classList.remove('on')},2200);
+ }
+ function copy(){
+  var l=lang();
+  var msg=l==='en'?'Link copied':(l==='bm'?'Pautan disalin':'链接已复制');
+  function done(){toast(msg)}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(SHARE_URL).then(done).catch(fallback)}else{fallback()}
+  function fallback(){var t=document.createElement('textarea');t.value=SHARE_URL;t.style.position='fixed';t.style.left='-9999px';document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){toast(SHARE_URL)}document.body.removeChild(t)}
+ }
+ setLinks();
+ document.querySelectorAll('.lang button').forEach(function(b){b.addEventListener('click',function(){setTimeout(setLinks,0)})});
+ var c=document.getElementById('copyShare'); if(c)c.addEventListener('click',copy);
+ var n=document.getElementById('nativeShare'); if(n)n.addEventListener('click',function(){
+  var d=text();
+  if(navigator.share){navigator.share({title:d.s,text:d.t,url:SHARE_URL}).catch(function(){});}
+  else{copy();}
+ });
+})();
+</script>
+<div id="shareToast" role="status" aria-live="polite"></div>
 </body>
 </html>
