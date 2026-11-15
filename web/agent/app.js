@@ -822,30 +822,57 @@
   function shareCard(row) {
     var text = shareText(row);
     var allPhotos = (Array.isArray(row.photos) ? row.photos : []).filter(Boolean).slice(0, 12);
-    var photos = allPhotos.slice(0, 4);
+    var photos = allPhotos.slice(0, 3);
     function photoUrl(i) { return "/api/agent/listings/" + encodeURIComponent(row.id) + "/photo/" + i; }
+    function loadImage(i) {
+      return fetch(photoUrl(i), { credentials: "same-origin" }).then(function (r) {
+        if (!r.ok) throw new Error("photo_fetch_failed");
+        return r.blob();
+      }).then(function (b) {
+        return new Promise(function (resolve) {
+          var u = URL.createObjectURL(b), im = new Image();
+          im.onload = function () { URL.revokeObjectURL(u); resolve(im); };
+          im.onerror = function () { URL.revokeObjectURL(u); resolve(null); };
+          im.src = u;
+        });
+      }).catch(function () { return null; });
+    }
+    function roundRect(ctx, x, y, w, h, r) {
+      r = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+    }
+    function drawCover(ctx, im, x, y, w, h) {
+      if (!im) { ctx.fillStyle = "#122A3E"; ctx.fillRect(x, y, w, h); return; }
+      var s = Math.max(w / im.width, h / im.height);
+      var sw = w / s, sh = h / s;
+      var sx = (im.width - sw) / 2, sy = (im.height - sh) / 2;
+      ctx.drawImage(im, sx, sy, sw, sh, x, y, w, h);
+    }
     var photoHtml = photos.length
       ? '<div style="display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px">' + photos.map(function (u, i) {
-          return '<img src="' + photoUrl(i) + '" alt="" style="width:84px;height:64px;object-fit:cover;border-radius:8px;flex:0 0 auto;border:1px solid var(--line)">';
+          return '<img src="' + photoUrl(i) + '" alt="" style="width:94px;height:72px;object-fit:cover;border-radius:8px;flex:0 0 auto;border:1px solid var(--line)">';
         }).join("") + "</div>"
       : '<div class="muted" style="font-size:11.5px;padding:6px 0 10px">' + t("这个房源还没有照片。", "This listing has no photos yet.") + "</div>";
     var m = modal({
       title: t("分享到群", "Share to group"),
-      body: '<p class="muted" style="margin:0 0 8px">' + t("先发照片，再贴文案：这样群里是照片在前、文案在后。点分享后文案会自动复制，发完照片回来粘贴即可。", "Photos first, text second: share the photos, then paste the copied text. This keeps the photos above the caption in WhatsApp.") + "</p>" +
+      body: '<p class="muted" style="margin:0 0 8px">' + t("分享包 = 前 3 张照片 + 1 张拼图卡片（含全部照片和资料）。文案会自动复制；先发这 4 张，再粘贴文案。", "Share pack = first 3 photos + 1 collage card (all photos and details). The text is copied automatically. Send the 4 images first, then paste the text.") + "</p>" +
         '<textarea id="shareText" readonly style="width:100%;min-height:120px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE">' + esc(text) + "</textarea>" +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px">' +
-          '<button class="btn gold" id="sharePhotos" type="button">' + t("先分享照片（文案自动复制）", "Share photos first (text copied)") + "</button>" +
+          '<button class="btn gold" id="sharePhotos" type="button">' + t("分享 3 张照片 + 拼图卡片", "Share 3 photos + collage") + "</button>" +
         "</div>" +
-        '<div style="font-size:11px;color:var(--muted);margin-bottom:5px">' + t("分享只发照片，取前 4 张；文案已自动复制。下载房源照片含全部 " + allPhotos.length + " 张。", "Sharing sends photos only (first 4); the text is copied. Download includes all " + allPhotos.length + " photos.") + "</div>" +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:5px">' + t("第 1–3 张：房源照片；第 4 张：拼图卡片。文案已自动复制。", "Images 1–3: listing photos; image 4: collage card. The text is copied.") + "</div>" +
         photoHtml +
-        '<div id="waGroups" style="margin-top:12px"></div>' +
-        '<div style="margin:12px 0 6px;font-size:12px;color:var(--muted)">' + t("分享卡（品牌卡，不含房源照片）", "Share card (brand card, no listing photos)") + "</div>" +
+        '<div style="margin:10px 0 6px;font-size:12px;color:var(--muted)">' + t("第 4 张：拼图卡片（自动生成）", "Image 4: collage card (auto-generated)") + "</div>" +
         '<canvas id="shareCanvas" width="1080" height="1350" style="width:100%;max-width:360px;border-radius:12px;border:1px solid var(--line)"></canvas>' +
-        '<div style="margin-top:8px"><button class="btn line sm" id="dlCard" type="button">' + t("下载分享卡", "Download share card") + "</button></div>",
+        '<div style="margin-top:8px"><button class="btn line sm" id="dlCard" type="button">' + t("只下载拼图卡片", "Download collage only") + "</button></div>" +
+        '<div id="waGroups" style="margin-top:12px"></div>',
       footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button>" +
         '<button class="btn line" id="copyText">' + t("复制文案", "Copy text") + "</button>" +
         '<button class="btn gold" id="openWa">' + t("打开 WhatsApp", "Open WhatsApp") + "</button>" +
-        '<button class="btn dark" id="dlPhotos">' + t("下载房源照片", "Download listing photos") + "</button>"
+        '<button class="btn dark" id="dlPhotos">' + t("下载 3 张照片 + 卡片", "Download 3 photos + card") + "</button>"
     });
     api("/wa-groups").then(function (j) {
       var box = $("#waGroups", m.root); if (!box) return;
@@ -854,7 +881,7 @@
         box.innerHTML = '<div class="muted" style="font-size:12px">' + t("还没有配置群组。到「个人资料 → WhatsApp 群组」添加群链接。", "No groups yet. Add group links in Profile → WhatsApp groups.") + "</div>";
         return;
       }
-      box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">' + t("点一个群：先复制文案并打开群；选照片发送，再粘贴文案", "Tap a group: text is copied and the group opens. Send photos first, then paste the text.") + "</div>" +
+      box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">' + t("点一个群：先复制文案并打开群；发 3 张照片 + 拼图卡片，再粘贴文案", "Tap a group: text is copied and the group opens. Send 3 photos + collage, then paste the text.") + "</div>" +
         gs.map(function (g, i) {
           return '<button type="button" class="btn line sm" data-wa="' + i + '" style="margin:0 6px 6px 0">' + esc(g.label) + " ↗</button>";
         }).join("");
@@ -869,57 +896,88 @@
     }).catch(function () {});
 
     var cv = $("#shareCanvas", m.root), ctx = cv.getContext("2d");
-    var W = 1080, H = 1350;
-    var g = ctx.createLinearGradient(0, 0, W, H);
-    g.addColorStop(0, "#0B1F31"); g.addColorStop(.55, "#0E2438"); g.addColorStop(1, "#0A1927");
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = "rgba(198,161,91,.55)"; ctx.lineWidth = 3;
-    ctx.strokeRect(44, 44, W - 88, H - 88);
-    ctx.fillStyle = "#E2C88F"; ctx.font = "600 26px Georgia, serif";
-    ctx.fillText("RoofX  ·  RoofX", 86, 132);
-    ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "20px -apple-system, system-ui";
-    ctx.fillText(t("柔佛房源网络", "Johor listings network"), 86, 168);
-    ctx.strokeStyle = "rgba(198,161,91,.35)"; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(86, 200); ctx.lineTo(W - 86, 200); ctx.stroke();
+    function drawCollage(imgs) {
+      var W = 1080, H = 1350;
+      ctx.fillStyle = "#081725"; ctx.fillRect(0, 0, W, H);
+      var grd = ctx.createLinearGradient(0, 0, W, H);
+      grd.addColorStop(0, "#0E2438"); grd.addColorStop(1, "#07131F");
+      ctx.fillStyle = grd; ctx.fillRect(0, 12, W, H - 12);
+      ctx.fillStyle = "#FF6900"; ctx.fillRect(0, 0, W, 12);
+      ctx.fillStyle = "#FF8A33"; ctx.font = "800 22px -apple-system, system-ui, sans-serif";
+      ctx.fillText("AGENTSITE · 房源分享", 56, 66);
+      ctx.fillStyle = "#FFFFFF"; ctx.font = "900 42px -apple-system, system-ui, sans-serif";
+      ctx.fillText(String(row.code || ""), 56, 116);
+      ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "22px -apple-system, system-ui, sans-serif";
+      ctx.fillText([projName(row), areaName(row.area_code)].filter(Boolean).join(" · "), 56, 152);
 
-    var title = projName(row);
-    ctx.fillStyle = "#fff"; ctx.font = "700 66px Georgia, 'Songti SC', serif";
-    var lines = wrapText(ctx, title, W - 172, 2);
-    lines.forEach(function (ln, i) { ctx.fillText(ln, 86, 300 + i * 82); });
+      var n = Math.max(1, allPhotos.length);
+      var cols = 3, gap = 12, left = 56, top = 178, gridW = W - left * 2;
+      var rows = Math.ceil(n / cols);
+      var cellW = (gridW - gap * (cols - 1)) / cols;
+      var cellH = rows === 1 ? 340 : rows === 2 ? 260 : Math.min(210, (620 - gap * (rows - 1)) / rows);
+      for (var i = 0; i < n; i++) {
+        var x = left + (i % cols) * (cellW + gap);
+        var y = top + Math.floor(i / cols) * (cellH + gap);
+        ctx.save(); roundRect(ctx, x, y, cellW, cellH, 14); ctx.clip();
+        drawCover(ctx, imgs[i] || null, x, y, cellW, cellH);
+        ctx.restore();
+        if (!imgs[i]) {
+          ctx.fillStyle = "rgba(255,255,255,.45)"; ctx.font = "18px -apple-system, system-ui, sans-serif";
+          ctx.fillText(t("照片", "Photo"), x + 16, y + cellH - 18);
+        }
+      }
 
-    ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.font = "28px -apple-system, system-ui";
-    var sub = [areaName(row.area_code), [row.block, row.unit_no].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
-    ctx.fillText(sub, 86, 300 + lines.length * 82 + 30);
+      var dy = Math.min(820, top + rows * cellH + gap * (rows - 1) + 50);
+      ctx.fillStyle = "#fff"; ctx.font = "800 36px -apple-system, system-ui, sans-serif";
+      var title = projName(row) || areaName(row.area_code) || "";
+      var titleLines = wrapText(ctx, title, W - 112, 1);
+      if (titleLines[0]) ctx.fillText(titleLines[0], 56, dy);
+      var price = row.intent === "rent" ? row.rent_price : row.asking_price;
+      ctx.fillStyle = "#FF8A33"; ctx.font = "900 60px -apple-system, system-ui, sans-serif";
+      ctx.fillText(price ? money(price, row.intent === "rent") : t("价格待定", "Price on request"), 56, dy + 78);
+      var bits = [];
+      if (row.bedrooms) bits.push(row.bedrooms + " " + t("房", "beds"));
+      if (row.bathrooms) bits.push(row.bathrooms + " " + t("卫", "baths"));
+      if (row.built_up) bits.push(Number(row.built_up).toLocaleString("en-MY") + " sqft");
+      ctx.fillStyle = "rgba(255,255,255,.88)"; ctx.font = "26px -apple-system, system-ui, sans-serif";
+      ctx.fillText(bits.join("   ·   "), 56, dy + 126);
+      ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "22px -apple-system, system-ui, sans-serif";
+      var addr = [row.address_text, row.address].filter(Boolean).join(" · ");
+      var addrLines = wrapText(ctx, addr, W - 112, 2);
+      addrLines.forEach(function (ln, i) { ctx.fillText(ln, 56, dy + 166 + i * 30); });
 
-    var price = row.intent === "rent" ? row.rent_price : row.asking_price;
-    var pf = psfInfo(row, price);
-    ctx.fillStyle = "#E2C88F"; ctx.font = "700 92px Georgia, serif";
-    ctx.fillText(pf && pf.total ? money(pf.total) : money(price, row.intent === "rent"), 80, 300 + lines.length * 82 + 180);
-    if (pf && pf.total) { ctx.fillStyle = "rgba(255,255,255,.65)"; ctx.font = "30px -apple-system, system-ui"; ctx.fillText(money(pf.psf) + "/psf", 84, 300 + lines.length * 82 + 230); }
+      ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.beginPath(); ctx.moveTo(56, 1180); ctx.lineTo(W - 56, 1180); ctx.stroke();
+      ctx.fillStyle = "#fff"; ctx.font = "700 30px -apple-system, system-ui, sans-serif";
+      ctx.fillText(S.me.name || "", 56, 1230);
+      ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.font = "22px -apple-system, system-ui, sans-serif";
+      ctx.fillText([S.me.ren_no, S.me.team].filter(Boolean).join(" · "), 56, 1266);
+      ctx.fillStyle = "#FF8A33"; ctx.font = "700 22px -apple-system, system-ui, sans-serif";
+      ctx.fillText((S.me.phone || "") + "  ·  kwongthye.com", 56, 1302);
+    }
 
-    ctx.fillStyle = "rgba(255,255,255,.82)"; ctx.font = "30px -apple-system, system-ui";
-    var bits = [];
-    if (row.bedrooms) bits.push(row.bedrooms + " " + t("房", "beds"));
-    if (row.bathrooms) bits.push(row.bathrooms + " " + t("卫", "baths"));
-    if (row.built_up) bits.push(int(row.built_up) + " sqft");
-    ctx.fillText(bits.join("   ·   "), 86, 300 + lines.length * 82 + 250);
+    var collagePromise = Promise.all(allPhotos.map(function (u, i) { return loadImage(i); }))
+      .then(function (imgs) {
+        drawCollage(imgs);
+        return new Promise(function (resolve) { cv.toBlob(function (b) { resolve(b); }, "image/png"); });
+      })
+      .catch(function () {
+        drawCollage([]);
+        return new Promise(function (resolve) { cv.toBlob(function (b) { resolve(b); }, "image/png"); });
+      });
 
-    ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.beginPath(); ctx.moveTo(86, H - 300); ctx.lineTo(W - 86, H - 300); ctx.stroke();
-    ctx.fillStyle = "#fff"; ctx.font = "600 36px -apple-system, system-ui";
-    ctx.fillText(S.me.name, 86, H - 220);
-    ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.font = "24px -apple-system, system-ui";
-    ctx.fillText([S.me.ren_no, S.me.team].filter(Boolean).join(" · "), 86, H - 176);
-    ctx.fillStyle = "#E2C88F"; ctx.font = "24px -apple-system, system-ui";
-    ctx.fillText("kwongthye.com/properties/?p=" + row.code, 86, H - 124);
-    ctx.fillStyle = "rgba(255,255,255,.45)"; ctx.font = "20px -apple-system, system-ui";
-    ctx.fillText(t("资料由货源中介提供，以现场与正式文件为准。", "Information provided by the listing agent."), 86, H - 84);
-
+    function downloadBlob(blob, name) {
+      if (!blob) return;
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { a.remove(); URL.revokeObjectURL(a.href); }, 1500);
+    }
     function markShared() {
       api("/listings/" + row.id + "/shared", { method: "POST" }).catch(function () {});
     }
-    function downloadPhotos() {
+    function downloadPack() {
       copyText(text).then(function () {
-        allPhotos.forEach(function (u, i) {
+        photos.forEach(function (u, i) {
           var a = document.createElement("a");
           a.href = photoUrl(i);
           a.download = "roofx-" + row.code + "-" + (i + 1) + ".jpg";
@@ -928,39 +986,42 @@
           a.click();
           setTimeout(function () { a.remove(); }, 1500);
         });
-        toast(t("文案已复制，照片开始下载；去 WhatsApp 选照片粘贴即可", "Text copied; photos are downloading. Pick them in WhatsApp and paste the text."));
+        return collagePromise;
+      }).then(function (blob) {
+        downloadBlob(blob, "roofx-" + row.code + "-card.png");
+        toast(t("3 张照片 + 拼图卡片开始下载；文案已复制", "3 photos + collage are downloading; text copied."));
         markShared();
       });
     }
-    function sharePhotos() {
-      if (!photos.length) { toast(t("这个房源还没有照片", "No photos yet")); return; }
-      copyText(text).then(function () {
-        if (navigator.share && navigator.canShare) {
-          Promise.all(photos.map(function (u, i) {
-            return fetch(photoUrl(i), { credentials: "same-origin" }).then(function (r) {
-              if (!r.ok) throw new Error("photo_fetch_failed");
-              return r.blob();
-            }).then(function (b) {
-              return new File([b], "roofx-" + row.code + "-" + (i + 1) + ".jpg", { type: b.type || "image/jpeg" });
-            });
-          })).then(function (fs) {
-            var payload = { files: fs, title: S.me.name + " · " + row.code };
-            if (!navigator.canShare(payload)) throw new Error("files_not_supported");
-            return navigator.share(payload);
-          }).then(function () {
-            markShared();
-            toast(t("照片已交给 WhatsApp；发完照片后，回来粘贴文案", "Photos handed to WhatsApp. After sending them, paste the copied text."));
-          }).catch(function (e) {
-            if (e && e.name === "AbortError") return;
-            downloadPhotos();
-          });
-        } else {
-          downloadPhotos();
-        }
+    function photoFile(i) {
+      return fetch(photoUrl(i), { credentials: "same-origin" }).then(function (r) {
+        if (!r.ok) throw new Error("photo_fetch_failed");
+        return r.blob();
+      }).then(function (b) {
+        return new File([b], "roofx-" + row.code + "-" + (i + 1) + ".jpg", { type: b.type || "image/jpeg" });
       });
     }
-    var sp = $("#sharePhotos", m.root); if (sp) sp.addEventListener("click", sharePhotos);
-    var dp = $("#dlPhotos", m.root); if (dp) dp.addEventListener("click", downloadPhotos);
+    function sharePack() {
+      if (!photos.length) { toast(t("这个房源还没有照片", "No photos yet")); return; }
+      copyText(text).then(function () {
+        return Promise.all([Promise.all(photos.map(function (u, i) { return photoFile(i); })), collagePromise]);
+      }).then(function (res) {
+        var files = res[0].slice();
+        if (res[1]) files.push(new File([res[1]], "roofx-" + row.code + "-card.png", { type: "image/png" }));
+        var payload = { files: files, title: S.me.name + " · " + row.code };
+        if (!navigator.share || !navigator.canShare || !navigator.canShare(payload)) throw new Error("files_not_supported");
+        return navigator.share(payload);
+      }).then(function () {
+        markShared();
+        toast(t("4 张图已交给 WhatsApp；发完后回来粘贴文案", "4 images handed to WhatsApp. After sending, paste the copied text."));
+      }).catch(function (e) {
+        if (e && e.name === "AbortError") return;
+        downloadPack();
+      });
+    }
+
+    var sp = $("#sharePhotos", m.root); if (sp) sp.addEventListener("click", sharePack);
+    var dp = $("#dlPhotos", m.root); if (dp) dp.addEventListener("click", downloadPack);
     $("#copyText", m.root).addEventListener("click", function () {
       var ta = $("#shareText", m.root); ta.select();
       navigator.clipboard.writeText(ta.value).then(function () { toast(t("已复制文案", "Text copied")); markShared(); })
@@ -970,17 +1031,15 @@
       markShared();
       window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
     });
-    $("#dlCard", m.root).addEventListener("click", function () {
-      cv.toBlob(function (blob) {
-        var a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "roofx-" + row.code + ".png";
-        a.click();
-        setTimeout(function () { URL.revokeObjectURL(a.href); }, 3000);
-        toast(t("已下载", "Downloaded"));
-      }, "image/png");
+    var dc = $("#dlCard", m.root);
+    if (dc) dc.addEventListener("click", function () {
+      collagePromise.then(function (blob) {
+        downloadBlob(blob, "roofx-" + row.code + "-card.png");
+        toast(t("拼图卡片已下载", "Collage downloaded"));
+      });
     });
   }
+
   function wrapText(ctx, text, max, maxLines) {
     var out = [], line = "";
     for (var i = 0; i < text.length; i++) {
