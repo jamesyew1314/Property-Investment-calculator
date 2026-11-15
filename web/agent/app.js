@@ -805,7 +805,8 @@
 
   function shareCard(row) {
     var text = shareText(row);
-    var photos = (Array.isArray(row.photos) ? row.photos : []).filter(Boolean).slice(0, 4);
+    var allPhotos = (Array.isArray(row.photos) ? row.photos : []).filter(Boolean).slice(0, 12);
+    var photos = allPhotos.slice(0, 4);
     function photoUrl(i) { return "/api/agent/listings/" + encodeURIComponent(row.id) + "/photo/" + i; }
     var photoHtml = photos.length
       ? '<div style="display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px">' + photos.map(function (u, i) {
@@ -818,17 +819,17 @@
         '<textarea id="shareText" readonly style="width:100%;min-height:120px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE">' + esc(text) + "</textarea>" +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px">' +
           '<button class="btn gold" id="sharePhotos" type="button">' + t("分享照片 + 文案", "Share photos + text") + "</button>" +
-          '<button class="btn line" id="dlPhotos" type="button">' + t("下载全部照片", "Download all photos") + "</button>" +
         "</div>" +
-        '<div style="font-size:11px;color:var(--muted);margin-bottom:5px">' + t("照片（最多 4 张，随文案一起分享）", "Photos (up to 4, shared with the text)") + "</div>" +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:5px">' + t("照片：分享取前 4 张；下载房源照片含全部 " + allPhotos.length + " 张", "Photos: first 4 for sharing; download includes all " + allPhotos.length) + "</div>" +
         photoHtml +
         '<div id="waGroups" style="margin-top:12px"></div>' +
-        '<div style="margin:12px 0 6px;font-size:12px;color:var(--muted)">' + t("分享卡（可下载发群）", "Share card (download)") + "</div>" +
-        '<canvas id="shareCanvas" width="1080" height="1350" style="width:100%;max-width:360px;border-radius:12px;border:1px solid var(--line)"></canvas>',
+        '<div style="margin:12px 0 6px;font-size:12px;color:var(--muted)">' + t("分享卡（品牌卡，不含房源照片）", "Share card (brand card, no listing photos)") + "</div>" +
+        '<canvas id="shareCanvas" width="1080" height="1350" style="width:100%;max-width:360px;border-radius:12px;border:1px solid var(--line)"></canvas>' +
+        '<div style="margin-top:8px"><button class="btn line sm" id="dlCard" type="button">' + t("下载分享卡", "Download share card") + "</button></div>",
       footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button>" +
         '<button class="btn line" id="copyText">' + t("复制文案", "Copy text") + "</button>" +
         '<button class="btn gold" id="openWa">' + t("打开 WhatsApp", "Open WhatsApp") + "</button>" +
-        '<button class="btn dark" id="dl">' + t("下载图片", "Download image") + "</button>"
+        '<button class="btn dark" id="dlPhotos">' + t("下载房源照片", "Download listing photos") + "</button>"
     });
     api("/wa-groups").then(function (j) {
       var box = $("#waGroups", m.root); if (!box) return;
@@ -902,7 +903,7 @@
     }
     function downloadPhotos() {
       copyText(text).then(function () {
-        photos.forEach(function (u, i) {
+        allPhotos.forEach(function (u, i) {
           var a = document.createElement("a");
           a.href = photoUrl(i);
           a.download = "roofx-" + row.code + "-" + (i + 1) + ".jpg";
@@ -953,7 +954,7 @@
       markShared();
       window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
     });
-    $("#dl", m.root).addEventListener("click", function () {
+    $("#dlCard", m.root).addEventListener("click", function () {
       cv.toBlob(function (blob) {
         var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
