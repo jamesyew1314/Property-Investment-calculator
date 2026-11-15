@@ -821,53 +821,27 @@
 
   function shareCard(row) {
     var text = shareText(row);
-    var allPhotos = (Array.isArray(row.photos) ? row.photos : []).filter(Boolean).slice(0, 12);
-    var photos = allPhotos.slice(0, 3);
-    function photoUrl(i) { return "/api/agent/listings/" + encodeURIComponent(row.id) + "/photo/" + i; }
-    function loadImage(i) {
-      return new Promise(function (resolve) {
-        var im = new Image();
-        im.onload = function () { resolve(im); };
-        im.onerror = function () { resolve(null); };
-        im.src = photoUrl(i);
-      });
-    }
-    function roundRect(ctx, x, y, w, h, r) {
-      r = Math.min(r, w / 2, h / 2);
-      ctx.beginPath();
-      ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
-    }
-    function drawCover(ctx, im, x, y, w, h) {
-      if (!im) { ctx.fillStyle = "#122A3E"; ctx.fillRect(x, y, w, h); return; }
-      var s = Math.max(w / im.width, h / im.height);
-      var sw = w / s, sh = h / s;
-      var sx = (im.width - sw) / 2, sy = (im.height - sh) / 2;
-      ctx.drawImage(im, sx, sy, sw, sh, x, y, w, h);
-    }
-    var photoHtml = photos.length
-      ? '<div style="display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px">' + photos.map(function (u, i) {
-          return '<img src="' + photoUrl(i) + '" alt="" style="width:94px;height:72px;object-fit:cover;border-radius:8px;flex:0 0 auto;border:1px solid var(--line)">';
-        }).join("") + "</div>"
-      : '<div class="muted" style="font-size:11.5px;padding:6px 0 10px">' + t("这个房源还没有照片。", "This listing has no photos yet.") + "</div>";
+    var photos = (Array.isArray(row.photos) ? row.photos : []).filter(Boolean);
+    var first = photos[0] || "";
+    function photoUrl() { return "/api/agent/listings/" + encodeURIComponent(row.id) + "/photo/0"; }
+    var photoHtml = first
+      ? '<img src="' + photoUrl() + '" alt="" style="width:100%;max-height:300px;object-fit:cover;border-radius:12px;border:1px solid var(--line)">'
+      : '<div class="muted" style="font-size:12px;padding:10px 0">' + t("这个房源还没有照片。", "This listing has no photos yet.") + "</div>";
     var m = modal({
       title: t("分享到群", "Share to group"),
-      body: '<p class="muted" style="margin:0 0 8px">' + t("分享包 = 前 3 张照片 + 1 张拼图卡片（含全部照片和资料）。存相册时在系统菜单选「存储图像」，不要选「存储到文件」；文案会自动复制。", "Share pack = first 3 photos + 1 collage card (all photos and details). In the system menu choose “Save Images”, not “Save to Files”; the text is copied.") + "</p>" +
+      body: '<p class="muted" style="margin:0 0 8px">' + t("一次分享 1 张首图和文案：图片会自动带文案发到 WhatsApp，不再下载到文件。", "Share one main photo with the caption. It goes to WhatsApp directly — no Files download.") + "</p>" +
         '<textarea id="shareText" readonly style="width:100%;min-height:120px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE">' + esc(text) + "</textarea>" +
-        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px">' +
-          '<button class="btn gold" id="sharePhotos" type="button">' + t("分享 3 张照片 + 拼图卡片", "Share 3 photos + collage") + "</button>" +
-        "</div>" +
-        '<div style="font-size:11px;color:var(--muted);margin-bottom:5px">' + t("第 1–3 张：房源照片；第 4 张：拼图卡片。文案已自动复制。", "Images 1–3: listing photos; image 4: collage card. The text is copied.") + "</div>" +
+        '<div style="margin:12px 0 6px;font-size:12px;color:var(--muted)">' + t("分享图（第 1 张）", "Share image (first photo)") + "</div>" +
         photoHtml +
-        '<div style="margin:10px 0 6px;font-size:12px;color:var(--muted)">' + t("第 4 张：拼图卡片（自动生成，含全部照片）", "Image 4: collage card (all photos, auto-generated)") + "</div>" +
-        '<canvas id="shareCanvas" width="1080" height="1350" style="width:100%;max-width:360px;border-radius:12px;border:1px solid var(--line)"></canvas>' +
-        '<div style="margin-top:8px"><button class="btn line sm" id="dlCard" type="button">' + t("只保存拼图卡片到相册", "Save collage to Photos") + "</button></div>" +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px">' +
+          '<button class="btn gold" id="shareOne" type="button">' + t("分享首图 + 文案", "Share first photo + text") + "</button>" +
+          '<button class="btn line" id="saveOne" type="button">' + t("保存首图到相册", "Save first photo to Photos") + "</button>" +
+        "</div>" +
+        '<div style="font-size:11px;color:var(--muted);margin:2px 0 10px">' + t("保存时在系统菜单选「存储图像」，不要选「存储到文件」。", "When saving, choose “Save Images”, not “Save to Files”.") + "</div>" +
         '<div id="waGroups" style="margin-top:12px"></div>',
       footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button>" +
         '<button class="btn line" id="copyText">' + t("复制文案", "Copy text") + "</button>" +
-        '<button class="btn gold" id="openWa">' + t("打开 WhatsApp", "Open WhatsApp") + "</button>" +
-        '<button class="btn dark" id="dlPhotos">' + t("保存到手机相册", "Save to Photos") + "</button>"
+        '<button class="btn gold" id="openWa">' + t("打开 WhatsApp", "Open WhatsApp") + "</button>"
     });
     api("/wa-groups").then(function (j) {
       var box = $("#waGroups", m.root); if (!box) return;
@@ -876,7 +850,7 @@
         box.innerHTML = '<div class="muted" style="font-size:12px">' + t("还没有配置群组。到「个人资料 → WhatsApp 群组」添加群链接。", "No groups yet. Add group links in Profile → WhatsApp groups.") + "</div>";
         return;
       }
-      box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">' + t("点一个群：先复制文案并打开群；发 3 张照片 + 拼图卡片，再粘贴文案", "Tap a group: text is copied and the group opens. Send 3 photos + collage, then paste the text.") + "</div>" +
+      box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">' + t("点一个群：复制文案并打开群；先发首图，再粘贴文案", "Tap a group: text is copied and the group opens. Send the main photo, then paste the text.") + "</div>" +
         gs.map(function (g, i) {
           return '<button type="button" class="btn line sm" data-wa="' + i + '" style="margin:0 6px 6px 0">' + esc(g.label) + " ↗</button>";
         }).join("");
@@ -890,156 +864,54 @@
       });
     }).catch(function () {});
 
-    var cv = $("#shareCanvas", m.root), ctx = cv.getContext("2d");
-    function drawCollage(imgs) {
-      var W = 1080, H = 1350;
-      ctx.fillStyle = "#081725"; ctx.fillRect(0, 0, W, H);
-      var grd = ctx.createLinearGradient(0, 0, W, H);
-      grd.addColorStop(0, "#0E2438"); grd.addColorStop(1, "#07131F");
-      ctx.fillStyle = grd; ctx.fillRect(0, 12, W, H - 12);
-      ctx.fillStyle = "#FF6900"; ctx.fillRect(0, 0, W, 12);
-      ctx.fillStyle = "#FF8A33"; ctx.font = "800 22px -apple-system, system-ui, sans-serif";
-      ctx.fillText("AGENTSITE · 房源分享", 56, 66);
-      ctx.fillStyle = "#FFFFFF"; ctx.font = "900 42px -apple-system, system-ui, sans-serif";
-      ctx.fillText(String(row.code || ""), 56, 116);
-      ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "22px -apple-system, system-ui, sans-serif";
-      ctx.fillText([projName(row), areaName(row.area_code)].filter(Boolean).join(" · "), 56, 152);
-
-      var n = Math.max(1, allPhotos.length);
-      var cols = 3, gap = 12, left = 56, top = 178, gridW = W - left * 2;
-      var rows = Math.ceil(n / cols);
-      var cellW = (gridW - gap * (cols - 1)) / cols;
-      var cellH = rows === 1 ? 340 : rows === 2 ? 260 : Math.min(210, (620 - gap * (rows - 1)) / rows);
-      for (var i = 0; i < n; i++) {
-        var x = left + (i % cols) * (cellW + gap);
-        var y = top + Math.floor(i / cols) * (cellH + gap);
-        ctx.save(); roundRect(ctx, x, y, cellW, cellH, 14); ctx.clip();
-        drawCover(ctx, imgs[i] || null, x, y, cellW, cellH);
-        ctx.restore();
-        if (!imgs[i]) {
-          ctx.fillStyle = "rgba(255,255,255,.45)"; ctx.font = "18px -apple-system, system-ui, sans-serif";
-          ctx.fillText(t("照片", "Photo"), x + 16, y + cellH - 18);
-        }
-      }
-
-      var dy = Math.min(820, top + rows * cellH + gap * (rows - 1) + 50);
-      ctx.fillStyle = "#fff"; ctx.font = "800 36px -apple-system, system-ui, sans-serif";
-      var title = projName(row) || areaName(row.area_code) || "";
-      var titleLines = wrapText(ctx, title, W - 112, 1);
-      if (titleLines[0]) ctx.fillText(titleLines[0], 56, dy);
-      var price = row.intent === "rent" ? row.rent_price : row.asking_price;
-      ctx.fillStyle = "#FF8A33"; ctx.font = "900 60px -apple-system, system-ui, sans-serif";
-      ctx.fillText(price ? money(price, row.intent === "rent") : t("价格待定", "Price on request"), 56, dy + 78);
-      var bits = [];
-      if (row.bedrooms) bits.push(row.bedrooms + " " + t("房", "beds"));
-      if (row.bathrooms) bits.push(row.bathrooms + " " + t("卫", "baths"));
-      if (row.built_up) bits.push(Number(row.built_up).toLocaleString("en-MY") + " sqft");
-      ctx.fillStyle = "rgba(255,255,255,.88)"; ctx.font = "26px -apple-system, system-ui, sans-serif";
-      ctx.fillText(bits.join("   ·   "), 56, dy + 126);
-      ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "22px -apple-system, system-ui, sans-serif";
-      var addr = [row.address_text, row.address].filter(Boolean).join(" · ");
-      var addrLines = wrapText(ctx, addr, W - 112, 2);
-      addrLines.forEach(function (ln, i) { ctx.fillText(ln, 56, dy + 166 + i * 30); });
-
-      ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.beginPath(); ctx.moveTo(56, 1180); ctx.lineTo(W - 56, 1180); ctx.stroke();
-      ctx.fillStyle = "#fff"; ctx.font = "700 30px -apple-system, system-ui, sans-serif";
-      ctx.fillText(S.me.name || "", 56, 1230);
-      ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.font = "22px -apple-system, system-ui, sans-serif";
-      ctx.fillText([S.me.ren_no, S.me.team].filter(Boolean).join(" · "), 56, 1266);
-      ctx.fillStyle = "#FF8A33"; ctx.font = "700 22px -apple-system, system-ui, sans-serif";
-      ctx.fillText((S.me.phone || "") + "  ·  kwongthye.com", 56, 1302);
-    }
-
-    var collagePromise = Promise.all(allPhotos.map(function (u, i) { return loadImage(i); }))
-      .then(function (imgs) {
-        drawCollage(imgs);
-        return new Promise(function (resolve) { cv.toBlob(function (b) { resolve(b); }, "image/png"); });
-      })
-      .catch(function () {
-        drawCollage([]);
-        return new Promise(function (resolve) { cv.toBlob(function (b) { resolve(b); }, "image/png"); });
-      });
-
-    function downloadBlob(blob, name) {
-      if (!blob) return;
-      var a = document.createElement("a");
-      a.href = URL.createObjectURL(blob); a.download = name;
-      document.body.appendChild(a); a.click();
-      setTimeout(function () { a.remove(); URL.revokeObjectURL(a.href); }, 1500);
-    }
     function markShared() {
       api("/listings/" + row.id + "/shared", { method: "POST" }).catch(function () {});
     }
-    function downloadPack() {
-      copyText(text).then(function () {
-        photos.forEach(function (u, i) {
-          var a = document.createElement("a");
-          a.href = photoUrl(i);
-          a.download = "roofx-" + row.code + "-" + (i + 1) + ".jpg";
-          a.style.display = "none";
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(function () { a.remove(); }, 1500);
-        });
-        return collagePromise;
-      }).then(function (blob) {
-        downloadBlob(blob, "roofx-" + row.code + "-card.png");
-        toast(t("3 张照片 + 拼图卡片开始下载；文案已复制", "3 photos + collage are downloading; text copied."));
-        markShared();
-      });
-    }
-    function photoFile(i) {
-      return fetch(photoUrl(i), { credentials: "same-origin" }).then(function (r) {
+    function photoFile() {
+      return fetch(photoUrl(), { credentials: "same-origin" }).then(function (r) {
         if (!r.ok) throw new Error("photo_fetch_failed");
         return r.blob();
       }).then(function (b) {
-        return new File([b], "roofx-" + row.code + "-" + (i + 1) + ".jpg", { type: b.type || "image/jpeg" });
+        return new File([b], "roofx-" + row.code + "-1.jpg", { type: b.type || "image/jpeg" });
       });
     }
-    function buildPack() {
-      return Promise.all([Promise.all(photos.map(function (u, i) { return photoFile(i); })), collagePromise]).then(function (res) {
-        var files = res[0].slice();
-        if (res[1]) files.push(new File([res[1]], "roofx-" + row.code + "-card.png", { type: "image/png" }));
-        return files;
-      });
-    }
-    function saveToPhotos() {
-      if (!photos.length) { toast(t("这个房源还没有照片", "No photos yet")); return; }
-      copyText(text);
-      buildPack().then(function (files) {
-        var payload = { files: files, title: S.me.name + " · " + row.code };
-        if (!navigator.share || !navigator.canShare || !navigator.canShare(payload)) throw new Error("files_not_supported");
-        return navigator.share(payload);
-      }).then(function () {
-        markShared();
-        toast(t("系统菜单已打开：选「存储图像 / Save Images」，不要选「存储到文件」", "System menu opened: choose “Save Images”, not “Save to Files”."));
-      }).catch(function (e) {
-        if (e && e.name === "AbortError") return;
-        if (String(e && e.message || "").indexOf("files_not_supported") >= 0) {
-          toast(t("这个浏览器不支持直接存相册，请用 Safari 或 Chrome 打开本页", "This browser cannot save to Photos. Open this page in Safari or Chrome."), true);
-          return;
-        }
-        downloadPack();
-      });
-    }
-    function sharePack() {
-      if (!photos.length) { toast(t("这个房源还没有照片", "No photos yet")); return; }
+    function shareOne() {
+      if (!first) { toast(t("这个房源还没有照片", "No photos yet"), true); return; }
       copyText(text).then(function () {
-        return buildPack();
-      }).then(function (files) {
-        var payload = { files: files, title: S.me.name + " · " + row.code };
-        if (!navigator.share || !navigator.canShare || !navigator.canShare(payload)) throw new Error("files_not_supported");
+        return photoFile();
+      }).then(function (file) {
+        var payload = { files: [file], title: S.me.name + " · " + row.code, text: text };
+        var filesOnly = { files: [file], title: S.me.name + " · " + row.code };
+        if (!navigator.share || !navigator.canShare) throw new Error("share_not_supported");
+        if (navigator.canShare(payload)) return navigator.share(payload);
+        if (navigator.canShare(filesOnly)) return navigator.share(filesOnly);
+        throw new Error("share_not_supported");
+      }).then(function () {
+        markShared();
+        toast(t("首图和文案已交给 WhatsApp；若文案没带上，直接粘贴即可", "Main photo handed to WhatsApp. If the text did not attach, paste it."));
+      }).catch(function (e) {
+        if (e && e.name === "AbortError") return;
+        toast(t("这个浏览器不支持直接分享图片，请用 Safari 或 Chrome 打开本页", "This browser cannot share images. Open this page in Safari or Chrome."), true);
+      });
+    }
+    function saveOne() {
+      if (!first) { toast(t("这个房源还没有照片", "No photos yet"), true); return; }
+      copyText(text);
+      photoFile().then(function (file) {
+        var payload = { files: [file], title: S.me.name + " · " + row.code };
+        if (!navigator.share || !navigator.canShare || !navigator.canShare(payload)) throw new Error("save_not_supported");
         return navigator.share(payload);
       }).then(function () {
         markShared();
-        toast(t("4 张图已交给 WhatsApp；发完后回来粘贴文案", "4 images handed to WhatsApp. After sending, paste the copied text."));
+        toast(t("系统菜单已打开：选「存储图像」，不要选「存储到文件」", "System menu opened: choose “Save Images”, not “Save to Files”."));
       }).catch(function (e) {
         if (e && e.name === "AbortError") return;
-        downloadPack();
+        toast(t("这个浏览器不支持直接存相册，请用 Safari 或 Chrome 打开本页", "This browser cannot save to Photos. Open this page in Safari or Chrome."), true);
       });
     }
-    var sp = $("#sharePhotos", m.root); if (sp) sp.addEventListener("click", sharePack);
-    var dp = $("#dlPhotos", m.root); if (dp) dp.addEventListener("click", saveToPhotos);
+
+    var so = $("#shareOne", m.root); if (so) so.addEventListener("click", shareOne);
+    var sv = $("#saveOne", m.root); if (sv) sv.addEventListener("click", saveOne);
     $("#copyText", m.root).addEventListener("click", function () {
       var ta = $("#shareText", m.root); ta.select();
       navigator.clipboard.writeText(ta.value).then(function () { toast(t("已复制文案", "Text copied")); markShared(); })
@@ -1048,21 +920,6 @@
     $("#openWa", m.root).addEventListener("click", function () {
       markShared();
       window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
-    });
-    var dc = $("#dlCard", m.root);
-    if (dc) dc.addEventListener("click", function () {
-      collagePromise.then(function (blob) {
-        if (!blob) { toast(t("卡片生成失败", "Card generation failed"), true); return; }
-        var file = new File([blob], "roofx-" + row.code + "-card.png", { type: "image/png" });
-        var payload = { files: [file], title: S.me.name + " · " + row.code };
-        if (!navigator.share || !navigator.canShare || !navigator.canShare(payload)) {
-          toast(t("这个浏览器不支持直接存相册，请用 Safari 或 Chrome 打开本页", "This browser cannot save to Photos. Open this page in Safari or Chrome."), true);
-          return;
-        }
-        navigator.share(payload).then(function () {
-          toast(t("系统菜单已打开：选「存储图像 / Save Images」", "System menu opened: choose “Save Images”."));
-        }).catch(function (e) { if (e && e.name !== "AbortError") toast(e.message, true); });
-      });
     });
   }
 
