@@ -831,12 +831,12 @@
       : '<div class="muted" style="font-size:11.5px;padding:6px 0 10px">' + t("这个房源还没有照片。", "This listing has no photos yet.") + "</div>";
     var m = modal({
       title: t("分享到群", "Share to group"),
-      body: '<p class="muted" style="margin:0 0 8px">' + t("文案和照片一起发：可直接调起系统分享，或下载照片后到 WhatsApp 选图粘贴文案。", "Share text and photos together: use the system share sheet, or download the photos and paste the text in WhatsApp.") + "</p>" +
+      body: '<p class="muted" style="margin:0 0 8px">' + t("先发照片，再贴文案：这样群里是照片在前、文案在后。点分享后文案会自动复制，发完照片回来粘贴即可。", "Photos first, text second: share the photos, then paste the copied text. This keeps the photos above the caption in WhatsApp.") + "</p>" +
         '<textarea id="shareText" readonly style="width:100%;min-height:120px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE">' + esc(text) + "</textarea>" +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px">' +
-          '<button class="btn gold" id="sharePhotos" type="button">' + t("分享照片 + 文案", "Share photos + text") + "</button>" +
+          '<button class="btn gold" id="sharePhotos" type="button">' + t("先分享照片（文案自动复制）", "Share photos first (text copied)") + "</button>" +
         "</div>" +
-        '<div style="font-size:11px;color:var(--muted);margin-bottom:5px">' + t("照片：分享取前 4 张；下载房源照片含全部 " + allPhotos.length + " 张", "Photos: first 4 for sharing; download includes all " + allPhotos.length) + "</div>" +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:5px">' + t("分享只发照片，取前 4 张；文案已自动复制。下载房源照片含全部 " + allPhotos.length + " 张。", "Sharing sends photos only (first 4); the text is copied. Download includes all " + allPhotos.length + " photos.") + "</div>" +
         photoHtml +
         '<div id="waGroups" style="margin-top:12px"></div>' +
         '<div style="margin:12px 0 6px;font-size:12px;color:var(--muted)">' + t("分享卡（品牌卡，不含房源照片）", "Share card (brand card, no listing photos)") + "</div>" +
@@ -854,7 +854,7 @@
         box.innerHTML = '<div class="muted" style="font-size:12px">' + t("还没有配置群组。到「个人资料 → WhatsApp 群组」添加群链接。", "No groups yet. Add group links in Profile → WhatsApp groups.") + "</div>";
         return;
       }
-      box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">' + t("点一个群：自动复制文案并打开群，直接粘贴发送", "Tap a group: text is copied and the group opens — paste and send") + "</div>" +
+      box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">' + t("点一个群：先复制文案并打开群；选照片发送，再粘贴文案", "Tap a group: text is copied and the group opens. Send photos first, then paste the text.") + "</div>" +
         gs.map(function (g, i) {
           return '<button type="button" class="btn line sm" data-wa="' + i + '" style="margin:0 6px 6px 0">' + esc(g.label) + " ↗</button>";
         }).join("");
@@ -934,30 +934,30 @@
     }
     function sharePhotos() {
       if (!photos.length) { toast(t("这个房源还没有照片", "No photos yet")); return; }
-      var files;
-      if (navigator.share && navigator.canShare) {
-        Promise.all(photos.map(function (u, i) {
-          return fetch(photoUrl(i), { credentials: "same-origin" }).then(function (r) {
-            if (!r.ok) throw new Error("photo_fetch_failed");
-            return r.blob();
-          }).then(function (b) {
-            return new File([b], "roofx-" + row.code + "-" + (i + 1) + ".jpg", { type: b.type || "image/jpeg" });
+      copyText(text).then(function () {
+        if (navigator.share && navigator.canShare) {
+          Promise.all(photos.map(function (u, i) {
+            return fetch(photoUrl(i), { credentials: "same-origin" }).then(function (r) {
+              if (!r.ok) throw new Error("photo_fetch_failed");
+              return r.blob();
+            }).then(function (b) {
+              return new File([b], "roofx-" + row.code + "-" + (i + 1) + ".jpg", { type: b.type || "image/jpeg" });
+            });
+          })).then(function (fs) {
+            var payload = { files: fs, title: S.me.name + " · " + row.code };
+            if (!navigator.canShare(payload)) throw new Error("files_not_supported");
+            return navigator.share(payload);
+          }).then(function () {
+            markShared();
+            toast(t("照片已交给 WhatsApp；发完照片后，回来粘贴文案", "Photos handed to WhatsApp. After sending them, paste the copied text."));
+          }).catch(function (e) {
+            if (e && e.name === "AbortError") return;
+            downloadPhotos();
           });
-        })).then(function (fs) {
-          files = fs;
-          var payload = { files: files, title: S.me.name + " · " + row.code, text: text };
-          if (!navigator.canShare(payload)) throw new Error("files_not_supported");
-          return navigator.share(payload);
-        }).then(function () {
-          markShared();
-          toast(t("已调起系统分享", "Share sheet opened"));
-        }).catch(function (e) {
-          if (e && e.name === "AbortError") return;
+        } else {
           downloadPhotos();
-        });
-      } else {
-        downloadPhotos();
-      }
+        }
+      });
     }
     var sp = $("#sharePhotos", m.root); if (sp) sp.addEventListener("click", sharePhotos);
     var dp = $("#dlPhotos", m.root); if (dp) dp.addEventListener("click", downloadPhotos);
