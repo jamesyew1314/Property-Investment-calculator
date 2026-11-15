@@ -626,6 +626,28 @@ module.exports = function createAgentApi({ pool, sendMail, rateLimit, siteUrl })
       res.json({ ok: true, share_count: out.rows[0].share_count });
     } catch (e) { next(e); }
   });
+  // 房源照片代理：给「文案 + 照片一起分享」提供同源图片，避免 OSS CORS 限制
+  r.get("/listings/:id/photo/:idx", requireAgent, async function (req, res, next) {
+    try {
+      const row = await ownListing(req.params.id, req.agent.id);
+      if (!row) return res.status(404).json({ ok: false, error: "not_found" });
+      const photos = Array.isArray(row.photos) ? row.photos : [];
+      const idx = Number(req.params.idx);
+      if (!Number.isInteger(idx) || idx < 0 || idx >= photos.length) return res.status(404).json({ ok: false, error: "photo_not_found" });
+      let u = String(photos[idx] || "");
+      if (!/^https?:\/\//i.test(u)) u = base.replace(/\/+$/, "") + (u.charAt(0) === "/" ? u : "/" + u);
+      const rsp = await fetch(u, { redirect: "follow" });
+      if (!rsp.ok) return res.status(502).json({ ok: false, error: "photo_fetch_failed" });
+      const type = rsp.headers.get("content-type") || "image/jpeg";
+      if (!/^image\//i.test(type)) return res.status(502).json({ ok: false, error: "photo_not_image" });
+      const buf = Buffer.from(await rsp.arrayBuffer());
+      if (buf.length > 12 * 1024 * 1024) return res.status(413).json({ ok: false, error: "photo_too_large" });
+      res.setHeader("Cache-Control", "private, max-age=3600");
+      res.setHeader("Content-Type", type);
+      res.send(buf);
+    } catch (e) { next(e); }
+  });
+
   // ---------- 房源图片 ----------
   r.post("/listings/:id/photos", requireAgent, express.raw({ type: ["image/jpeg", "image/png", "image/webp"], limit: "8mb" }), async function (req, res, next) {
     try {

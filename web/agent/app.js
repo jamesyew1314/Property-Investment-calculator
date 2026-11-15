@@ -805,10 +805,23 @@
 
   function shareCard(row) {
     var text = shareText(row);
+    var photos = (Array.isArray(row.photos) ? row.photos : []).filter(Boolean).slice(0, 4);
+    function photoUrl(i) { return "/api/agent/listings/" + encodeURIComponent(row.id) + "/photo/" + i; }
+    var photoHtml = photos.length
+      ? '<div style="display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px">' + photos.map(function (u, i) {
+          return '<img src="' + photoUrl(i) + '" alt="" style="width:84px;height:64px;object-fit:cover;border-radius:8px;flex:0 0 auto;border:1px solid var(--line)">';
+        }).join("") + "</div>"
+      : '<div class="muted" style="font-size:11.5px;padding:6px 0 10px">' + t("这个房源还没有照片。", "This listing has no photos yet.") + "</div>";
     var m = modal({
       title: t("分享到群", "Share to group"),
-      body: '<p class="muted" style="margin:0 0 8px">' + t("复制文案，或直接打开 WhatsApp 选群；图片可先下载再一起发。", "Copy the text or open WhatsApp to pick a group; download the image to attach.") + "</p>" +
+      body: '<p class="muted" style="margin:0 0 8px">' + t("文案和照片一起发：可直接调起系统分享，或下载照片后到 WhatsApp 选图粘贴文案。", "Share text and photos together: use the system share sheet, or download the photos and paste the text in WhatsApp.") + "</p>" +
         '<textarea id="shareText" readonly style="width:100%;min-height:120px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE">' + esc(text) + "</textarea>" +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px">' +
+          '<button class="btn gold" id="sharePhotos" type="button">' + t("分享照片 + 文案", "Share photos + text") + "</button>" +
+          '<button class="btn line" id="dlPhotos" type="button">' + t("下载全部照片", "Download all photos") + "</button>" +
+        "</div>" +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:5px">' + t("照片（最多 4 张，随文案一起分享）", "Photos (up to 4, shared with the text)") + "</div>" +
+        photoHtml +
         '<div id="waGroups" style="margin-top:12px"></div>' +
         '<div style="margin:12px 0 6px;font-size:12px;color:var(--muted)">' + t("分享卡（可下载发群）", "Share card (download)") + "</div>" +
         '<canvas id="shareCanvas" width="1080" height="1350" style="width:100%;max-width:360px;border-radius:12px;border:1px solid var(--line)"></canvas>',
@@ -887,6 +900,50 @@
     function markShared() {
       api("/listings/" + row.id + "/shared", { method: "POST" }).catch(function () {});
     }
+    function downloadPhotos() {
+      copyText(text).then(function () {
+        photos.forEach(function (u, i) {
+          var a = document.createElement("a");
+          a.href = photoUrl(i);
+          a.download = "roofx-" + row.code + "-" + (i + 1) + ".jpg";
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(function () { a.remove(); }, 1500);
+        });
+        toast(t("文案已复制，照片开始下载；去 WhatsApp 选照片粘贴即可", "Text copied; photos are downloading. Pick them in WhatsApp and paste the text."));
+        markShared();
+      });
+    }
+    function sharePhotos() {
+      if (!photos.length) { toast(t("这个房源还没有照片", "No photos yet")); return; }
+      var files;
+      if (navigator.share && navigator.canShare) {
+        Promise.all(photos.map(function (u, i) {
+          return fetch(photoUrl(i), { credentials: "same-origin" }).then(function (r) {
+            if (!r.ok) throw new Error("photo_fetch_failed");
+            return r.blob();
+          }).then(function (b) {
+            return new File([b], "roofx-" + row.code + "-" + (i + 1) + ".jpg", { type: b.type || "image/jpeg" });
+          });
+        })).then(function (fs) {
+          files = fs;
+          var payload = { files: files, title: S.me.name + " · " + row.code, text: text };
+          if (!navigator.canShare(payload)) throw new Error("files_not_supported");
+          return navigator.share(payload);
+        }).then(function () {
+          markShared();
+          toast(t("已调起系统分享", "Share sheet opened"));
+        }).catch(function (e) {
+          if (e && e.name === "AbortError") return;
+          downloadPhotos();
+        });
+      } else {
+        downloadPhotos();
+      }
+    }
+    var sp = $("#sharePhotos", m.root); if (sp) sp.addEventListener("click", sharePhotos);
+    var dp = $("#dlPhotos", m.root); if (dp) dp.addEventListener("click", downloadPhotos);
     $("#copyText", m.root).addEventListener("click", function () {
       var ta = $("#shareText", m.root); ta.select();
       navigator.clipboard.writeText(ta.value).then(function () { toast(t("已复制文案", "Text copied")); markShared(); })
