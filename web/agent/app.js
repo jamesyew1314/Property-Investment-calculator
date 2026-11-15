@@ -769,7 +769,7 @@
     var COND = { vacant: "Vacant", occupied: "Occupied", tenanted: "Tenanted", renovated: "Renovated", new: "New", good: "Good condition", fair: "Fair condition", needs_work: "Needs work" };
     var TITLE = { individual: "Individual title", strata: "Strata title", master: "Master title" };
     var wa = String(S.me.phone || "").replace(/[^0-9]/g, "").replace(/^0/, "60");
-    var lines = [rent ? "*WTR / For Rent 出租*" : "*WTS / For Sale 出售*"];
+    var lines = [rent ? "*WTL / For Rent 出租*" : "*WTS / For Sale 出售*"];
     if (row.headline) lines.push("*" + row.headline + "*");
     lines.push("");
     var addr = row.address || "";
