@@ -378,13 +378,13 @@
     });
   }
   function statusLabel(k) {
-    var m = { available: ["在售/在租", "Available"], reserved: ["已订", "Reserved"], sold: ["已售", "Sold"], rented: ["已租", "Rented"], off_market: ["下架", "Off market"] };
+    var m = { available: ["在售/在租", "Available"], reserved: ["已订", "Reserved"], sold: ["已出售", "Sold"], rented: ["已出租", "Rented"], off_market: ["下架", "Off market"] };
     var v = m[k] || [k, k];
     return t(v[0], v[1]);
   }
   function pill(status) {
     var map = { new: ["blue", "新", "New"], accepted: ["green", "已接受", "Accepted"], declined: ["grey", "已拒绝", "Declined"], done: ["green", "已完成", "Done"],
-      available: ["green", "在售/在租", "Available"], reserved: ["amber", "已订", "Reserved"], sold: ["grey", "已售", "Sold"], rented: ["grey", "已租", "Rented"], off_market: ["grey", "下架", "Off market"] };
+      available: ["green", "在售/在租", "Available"], reserved: ["amber", "已订", "Reserved"], sold: ["grey", "已出售", "Sold"], rented: ["grey", "已出租", "Rented"], off_market: ["grey", "下架", "Off market"] };
     var m = map[status] || ["grey", status, status];
     return '<span class="pill ' + m[0] + '">' + esc(t(m[1], m[2])) + "</span>";
   }
@@ -538,7 +538,14 @@
     var priceLine = pf ? (pf.total ? money(pf.total) + " · " + money(pf.psf) + "/psf" : money(pf.psf) + "/psf · " + t("请填写土地面积以计算总价", "Enter land area to calculate total")) : (price ? money(price, row.intent === "rent") : "");
     if (priceLine && row.negotiable) priceLine += " · " + t("可议价", "Negotiable");
     var photos = Array.isArray(row.photos) ? row.photos : [];
+    var statusBar = '<div style="display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:8px 10px;background:#F7F9FC;border:1px solid #E5EAF2;border-radius:8px">' +
+      '<span style="font-size:12px;color:#6B7A8D">' + t("房源状态", "Status") + "</span>" +
+      '<select id="vdStatus" style="flex:1;max-width:180px;padding:6px 8px;border:1px solid #D6DCE7;border-radius:6px">' +
+        optList([{key:"available",zh:"在售 / 在租",en:"Available"},{key:"reserved",zh:"已订",en:"Reserved"},{key:"sold",zh:"已出售",en:"Sold"},{key:"rented",zh:"已出租",en:"Rented"},{key:"off_market",zh:"下架",en:"Off market"}], row.status || "available", false) +
+      "</select>" +
+      '<button class="btn line sm" id="vdStatusSave" type="button">' + t("更新", "Update") + "</button></div>";
     var body = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><b style="font-family:Georgia,serif;font-size:20px;color:#0E2438">' + esc(row.code) + "</b>" + pill(row.status) + "</div>" +
+      statusBar +
       (row.headline ? '<div style="font-weight:700;color:#0E2438;margin-bottom:8px">' + esc(row.headline) + "</div>" : "") +
       (photos.length ? '<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:12px">' + photos.slice(0, 8).map(function (u) { return '<img src="' + esc(u) + '" style="width:96px;height:72px;object-fit:cover;border-radius:8px;flex:0 0 auto">'; }).join("") + "</div>" : "") +
       row2(t("售价 / 租金", "Price"), priceLine) +
@@ -573,6 +580,14 @@
     $("#vdCopy", m.root).addEventListener("click", function () {
       copyText(shareText(row)).then(function () { toast(t("文案已复制", "Copied")); });
     });
+    var vdStatusSave = $("#vdStatusSave", m.root);
+    if (vdStatusSave) vdStatusSave.addEventListener("click", function () {
+      var st = $("#vdStatus", m.root).value;
+      vdStatusSave.disabled = true;
+      api("/listings/" + row.id, { method: "PATCH", body: { status: st } })
+        .then(function () { toast(t("状态已更新", "Status updated")); m.close(); route(); })
+        .catch(function (e) { vdStatusSave.disabled = false; toast(e.message, true); });
+    });
     $("#vdEdit", m.root).addEventListener("click", function () { m.close(); listingForm(row); });
   }
 
@@ -597,7 +612,8 @@
     var body = '<form id="lf">' + '<input type="hidden" name="address" value="' + esc(row.address || "") + '">' +
       '<h4 style="margin:4px 0 8px;color:#0E2438">' + t("价格", "Price") + "</h4>" +
       '<div class="grid2 nums">' + field(t("出售 / 出租", "Sale / Rent"), '<select name="intent"><option value="sale"' + (row.intent !== "rent" ? " selected" : "") + ">" + t("出售", "Sale") + '</option><option value="rent"' + (row.intent === "rent" ? " selected" : "") + ">" + t("出租", "Rent") + "</option></select>") +
-      '<div class="f"><label>' + t("可否议价", "Negotiable") + '</label><label class="chk"><input type="checkbox" name="negotiable" value="true"' + (row.negotiable ? " checked" : "") + "> " + t("可议价", "Negotiable") + "</label></div>" +
+      field(t("房源状态", "Listing status"), '<select name="status">' + optList([{key:"available",zh:"在售 / 在租",en:"Available"},{key:"reserved",zh:"已订",en:"Reserved"},{key:"sold",zh:"已出售",en:"Sold"},{key:"rented",zh:"已出租",en:"Rented"},{key:"off_market",zh:"下架",en:"Off market"}], row.status || "available", false) + "</select>") + "</div>" +
+      '<div class="f" style="margin:0 0 8px"><label class="chk"><input type="checkbox" name="negotiable" value="true"' + (row.negotiable ? " checked" : "") + "> " + t("可议价", "Negotiable") + "</label></div>" +
       '<div class="grid2 nums">' + field(t("售价 (RM)", "Asking price"), '<input name="asking_price" inputmode="numeric" value="' + esc(row.asking_price || "") + '">') +
       field(t("租金 (RM/月)", "Monthly rent"), '<input name="rent_price" inputmode="numeric" value="' + esc(row.rent_price || "") + '">') + "</div>" +
       '<div class="grid2 nums">' + field(t("价钱单位", "Price unit"), '<select name="price_unit">' + optList([{key:"total",zh:"总价 Total",en:"Total"},{key:"psf",zh:"每平方尺 psf",en:"Per sqft"}], row.price_unit || "total", false) + "</select>") +
