@@ -858,21 +858,21 @@
       : '<div class="muted" style="font-size:11.5px;padding:6px 0 10px">' + t("这个房源还没有照片。", "This listing has no photos yet.") + "</div>";
     var m = modal({
       title: t("分享到群", "Share to group"),
-      body: '<p class="muted" style="margin:0 0 8px">' + t("分享包 = 前 3 张照片 + 1 张拼图卡片（含全部照片和资料）。文案会自动复制；先发这 4 张，再粘贴文案。", "Share pack = first 3 photos + 1 collage card (all photos and details). The text is copied automatically. Send the 4 images first, then paste the text.") + "</p>" +
+      body: '<p class="muted" style="margin:0 0 8px">' + t("分享包 = 前 3 张照片 + 1 张拼图卡片（含全部照片和资料）。存相册时在系统菜单选「存储图像」，不要选「存储到文件」；文案会自动复制。", "Share pack = first 3 photos + 1 collage card (all photos and details). In the system menu choose “Save Images”, not “Save to Files”; the text is copied.") + "</p>" +
         '<textarea id="shareText" readonly style="width:100%;min-height:120px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE">' + esc(text) + "</textarea>" +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px">' +
           '<button class="btn gold" id="sharePhotos" type="button">' + t("分享 3 张照片 + 拼图卡片", "Share 3 photos + collage") + "</button>" +
         "</div>" +
         '<div style="font-size:11px;color:var(--muted);margin-bottom:5px">' + t("第 1–3 张：房源照片；第 4 张：拼图卡片。文案已自动复制。", "Images 1–3: listing photos; image 4: collage card. The text is copied.") + "</div>" +
         photoHtml +
-        '<div style="margin:10px 0 6px;font-size:12px;color:var(--muted)">' + t("第 4 张：拼图卡片（自动生成）", "Image 4: collage card (auto-generated)") + "</div>" +
+        '<div style="margin:10px 0 6px;font-size:12px;color:var(--muted)">' + t("第 4 张：拼图卡片（自动生成，含全部照片）", "Image 4: collage card (all photos, auto-generated)") + "</div>" +
         '<canvas id="shareCanvas" width="1080" height="1350" style="width:100%;max-width:360px;border-radius:12px;border:1px solid var(--line)"></canvas>' +
-        '<div style="margin-top:8px"><button class="btn line sm" id="dlCard" type="button">' + t("只下载拼图卡片", "Download collage only") + "</button></div>" +
+        '<div style="margin-top:8px"><button class="btn line sm" id="dlCard" type="button">' + t("只保存拼图卡片到相册", "Save collage to Photos") + "</button></div>" +
         '<div id="waGroups" style="margin-top:12px"></div>',
       footer: '<button class="btn line" data-close>' + t("关闭", "Close") + "</button>" +
         '<button class="btn line" id="copyText">' + t("复制文案", "Copy text") + "</button>" +
         '<button class="btn gold" id="openWa">' + t("打开 WhatsApp", "Open WhatsApp") + "</button>" +
-        '<button class="btn dark" id="dlPhotos">' + t("下载 3 张照片 + 卡片", "Download 3 photos + card") + "</button>"
+        '<button class="btn dark" id="dlPhotos">' + t("保存到手机相册", "Save to Photos") + "</button>"
     });
     api("/wa-groups").then(function (j) {
       var box = $("#waGroups", m.root); if (!box) return;
@@ -1001,13 +1001,37 @@
         return new File([b], "roofx-" + row.code + "-" + (i + 1) + ".jpg", { type: b.type || "image/jpeg" });
       });
     }
+    function buildPack() {
+      return Promise.all([Promise.all(photos.map(function (u, i) { return photoFile(i); })), collagePromise]).then(function (res) {
+        var files = res[0].slice();
+        if (res[1]) files.push(new File([res[1]], "roofx-" + row.code + "-card.png", { type: "image/png" }));
+        return files;
+      });
+    }
+    function saveToPhotos() {
+      if (!photos.length) { toast(t("这个房源还没有照片", "No photos yet")); return; }
+      copyText(text);
+      buildPack().then(function (files) {
+        var payload = { files: files, title: S.me.name + " · " + row.code };
+        if (!navigator.share || !navigator.canShare || !navigator.canShare(payload)) throw new Error("files_not_supported");
+        return navigator.share(payload);
+      }).then(function () {
+        markShared();
+        toast(t("系统菜单已打开：选「存储图像 / Save Images」，不要选「存储到文件」", "System menu opened: choose “Save Images”, not “Save to Files”."));
+      }).catch(function (e) {
+        if (e && e.name === "AbortError") return;
+        if (String(e && e.message || "").indexOf("files_not_supported") >= 0) {
+          toast(t("这个浏览器不支持直接存相册，请用 Safari 或 Chrome 打开本页", "This browser cannot save to Photos. Open this page in Safari or Chrome."), true);
+          return;
+        }
+        downloadPack();
+      });
+    }
     function sharePack() {
       if (!photos.length) { toast(t("这个房源还没有照片", "No photos yet")); return; }
       copyText(text).then(function () {
-        return Promise.all([Promise.all(photos.map(function (u, i) { return photoFile(i); })), collagePromise]);
-      }).then(function (res) {
-        var files = res[0].slice();
-        if (res[1]) files.push(new File([res[1]], "roofx-" + row.code + "-card.png", { type: "image/png" }));
+        return buildPack();
+      }).then(function (files) {
         var payload = { files: files, title: S.me.name + " · " + row.code };
         if (!navigator.share || !navigator.canShare || !navigator.canShare(payload)) throw new Error("files_not_supported");
         return navigator.share(payload);
@@ -1019,9 +1043,8 @@
         downloadPack();
       });
     }
-
     var sp = $("#sharePhotos", m.root); if (sp) sp.addEventListener("click", sharePack);
-    var dp = $("#dlPhotos", m.root); if (dp) dp.addEventListener("click", downloadPack);
+    var dp = $("#dlPhotos", m.root); if (dp) dp.addEventListener("click", saveToPhotos);
     $("#copyText", m.root).addEventListener("click", function () {
       var ta = $("#shareText", m.root); ta.select();
       navigator.clipboard.writeText(ta.value).then(function () { toast(t("已复制文案", "Text copied")); markShared(); })
@@ -1034,8 +1057,16 @@
     var dc = $("#dlCard", m.root);
     if (dc) dc.addEventListener("click", function () {
       collagePromise.then(function (blob) {
-        downloadBlob(blob, "roofx-" + row.code + "-card.png");
-        toast(t("拼图卡片已下载", "Collage downloaded"));
+        if (!blob) { toast(t("卡片生成失败", "Card generation failed"), true); return; }
+        var file = new File([blob], "roofx-" + row.code + "-card.png", { type: "image/png" });
+        var payload = { files: [file], title: S.me.name + " · " + row.code };
+        if (!navigator.share || !navigator.canShare || !navigator.canShare(payload)) {
+          toast(t("这个浏览器不支持直接存相册，请用 Safari 或 Chrome 打开本页", "This browser cannot save to Photos. Open this page in Safari or Chrome."), true);
+          return;
+        }
+        navigator.share(payload).then(function () {
+          toast(t("系统菜单已打开：选「存储图像 / Save Images」", "System menu opened: choose “Save Images”."));
+        }).catch(function (e) { if (e && e.name !== "AbortError") toast(e.message, true); });
       });
     });
   }
