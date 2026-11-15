@@ -821,53 +821,21 @@
 
   function shareCard(row) {
     var text = shareText(row);
-    var photos = (Array.isArray(row.photos) ? row.photos : []).filter(Boolean).slice(0, 3);
-    function photoUrl(i) { return "/api/agent/listings/" + encodeURIComponent(row.id) + "/photo/" + i; }
-    function loadImage(i) {
-      return new Promise(function (resolve) {
-        var im = new Image();
-        im.onload = function () { resolve(im); };
-        im.onerror = function () { resolve(null); };
-        im.src = photoUrl(i);
-      });
-    }
-    function roundRect(ctx, x, y, w, h, r) {
-      r = Math.min(r, w / 2, h / 2);
-      ctx.beginPath(); ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-    }
-    function drawCover(ctx, im, x, y, w, h) {
-      if (!im) { ctx.fillStyle = "#D8D0C3"; ctx.fillRect(x, y, w, h); return; }
-      var s = Math.max(w / im.width, h / im.height);
-      var sw = w / s, sh = h / s;
-      ctx.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, x, y, w, h);
-    }
-    function wrapLines(ctx, txt, maxW) {
-      var lines = [];
-      String(txt || "").replace(/\*/g, "").split("\n").forEach(function (p) {
-        p = p.trim();
-        if (!p) { lines.push(""); return; }
-        var line = "";
-        for (var i = 0; i < p.length; i++) {
-          var test = line + p[i];
-          if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = p[i]; }
-          else line = test;
-        }
-        if (line) lines.push(line);
-      });
-      return lines;
-    }
+    var photos = (Array.isArray(row.photos) ? row.photos : []).filter(Boolean);
+    var first = photos[0] || "";
+    function photoUrl() { return "/api/agent/listings/" + encodeURIComponent(row.id) + "/photo/0"; }
+    var photoHtml = first
+      ? '<img src="' + photoUrl() + '" alt="" style="width:100%;max-height:300px;object-fit:cover;border-radius:12px;border:1px solid var(--line)">'
+      : '<div class="muted" style="font-size:12px;padding:10px 0">' + t("这个房源还没有照片。", "This listing has no photos yet.") + "</div>";
     var m = modal({
       title: t("分享到群", "Share to group"),
-      body: '<p class="muted" style="margin:0 0 8px">' + t("一张图完成：上面 3 张照片，下面完整房源文案。发到 WhatsApp 不会掉图，也不用再粘贴。", "One image: 3 photos on top and the full listing caption below. Nothing goes missing in WhatsApp.") + "</p>" +
-        '<textarea id="shareText" readonly style="width:100%;min-height:100px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:12.5px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE">' + esc(text) + "</textarea>" +
-        '<div style="margin:10px 0 6px;font-size:12px;color:var(--muted)">' + t("单图海报预览（3 张照片 + 完整文案）", "Poster preview (3 photos + full caption)") + "</div>" +
-        '<canvas id="shareCanvas" width="1080" height="1920" style="width:100%;max-width:360px;border-radius:12px;border:1px solid var(--line)"></canvas>' +
+      body: '<p class="muted" style="margin:0 0 8px">' + t("一次分享 1 张首图和文案：图片会自动带文案发到 WhatsApp，不再下载到文件。", "Share one main photo with the caption. It goes to WhatsApp directly — no Files download.") + "</p>" +
+        '<textarea id="shareText" readonly style="width:100%;min-height:120px;padding:10px;border:1px solid #D6DCE7;border-radius:8px;font:13px/1.7 ui-monospace,Menlo,monospace;background:#FBFCFE">' + esc(text) + "</textarea>" +
+        '<div style="margin:12px 0 6px;font-size:12px;color:var(--muted)">' + t("分享图（第 1 张）", "Share image (first photo)") + "</div>" +
+        photoHtml +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px">' +
-          '<button class="btn gold" id="sharePoster" type="button">' + t("分享海报到 WhatsApp", "Share poster to WhatsApp") + "</button>" +
-          '<button class="btn line" id="savePoster" type="button">' + t("保存海报到相册", "Save poster to Photos") + "</button>" +
+          '<button class="btn gold" id="shareOne" type="button">' + t("分享首图 + 文案", "Share first photo + text") + "</button>" +
+          '<button class="btn line" id="saveOne" type="button">' + t("保存首图到相册", "Save first photo to Photos") + "</button>" +
         "</div>" +
         '<div style="font-size:11px;color:var(--muted);margin:2px 0 10px">' + t("保存时在系统菜单选「存储图像」，不要选「存储到文件」。", "When saving, choose “Save Images”, not “Save to Files”.") + "</div>" +
         '<div id="waGroups" style="margin-top:12px"></div>',
@@ -882,7 +850,7 @@
         box.innerHTML = '<div class="muted" style="font-size:12px">' + t("还没有配置群组。到「个人资料 → WhatsApp 群组」添加群链接。", "No groups yet. Add group links in Profile → WhatsApp groups.") + "</div>";
         return;
       }
-      box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">' + t("点一个群：复制文案并打开群；发送这张海报即可", "Tap a group: text is copied and the group opens. Send the poster.") + "</div>" +
+      box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">' + t("点一个群：复制文案并打开群；先发首图，再粘贴文案", "Tap a group: text is copied and the group opens. Send the main photo, then paste the text.") + "</div>" +
         gs.map(function (g, i) {
           return '<button type="button" class="btn line sm" data-wa="' + i + '" style="margin:0 6px 6px 0">' + esc(g.label) + " ↗</button>";
         }).join("");
@@ -896,118 +864,40 @@
       });
     }).catch(function () {});
 
-    var cv = $("#shareCanvas", m.root), ctx = cv.getContext("2d");
-    function drawPoster(imgs) {
-      var W = 1080, H = 1920, left = 40, top = 140;
-      ctx.fillStyle = "#EDE7DE"; ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = "#0B1F31"; ctx.fillRect(0, 0, W, 124);
-      ctx.fillStyle = "#FF6900"; ctx.fillRect(0, 0, W, 8);
-      ctx.fillStyle = "#FF8A33"; ctx.font = "800 20px -apple-system, system-ui, sans-serif";
-      ctx.fillText("AGENTSITE · 房源分享", left, 48);
-      ctx.fillStyle = "#FFFFFF"; ctx.font = "800 30px -apple-system, system-ui, sans-serif";
-      ctx.fillText(String(row.code || ""), left, 88);
-      ctx.textAlign = "right";
-      ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.font = "600 20px -apple-system, system-ui, sans-serif";
-      ctx.fillText(S.me.name || "", W - left, 48);
-      ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "18px -apple-system, system-ui, sans-serif";
-      ctx.fillText(S.me.phone || "", W - left, 78);
-      ctx.textAlign = "left";
-
-      var gap = 12, cols = 2, gridW = W - left * 2;
-      var cellW = (gridW - gap) / cols, cellH = 300;
-      for (var i = 0; i < 4; i++) {
-        var x = left + (i % cols) * (cellW + gap);
-        var y = top + Math.floor(i / cols) * (cellH + gap);
-        ctx.save(); roundRect(ctx, x, y, cellW, cellH, 16); ctx.clip();
-        if (i < 3) {
-          drawCover(ctx, imgs[i] || null, x, y, cellW, cellH);
-          if (!imgs[i]) {
-            ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.font = "20px -apple-system, system-ui, sans-serif";
-            ctx.fillText(t("照片", "Photo"), x + 18, y + cellH - 20);
-          }
-        } else {
-          var price = row.intent === "rent" ? row.rent_price : row.asking_price;
-          ctx.fillStyle = "#FF6900"; ctx.fillRect(x, y, cellW, cellH);
-          ctx.fillStyle = "rgba(255,255,255,.9)"; ctx.font = "800 22px -apple-system, system-ui, sans-serif";
-          ctx.fillText(row.intent === "rent" ? "WTL / FOR RENT" : "WTS / FOR SALE", x + 24, y + 46);
-          ctx.fillStyle = "#fff"; ctx.font = "900 54px -apple-system, system-ui, sans-serif";
-          ctx.fillText(row.intent === "rent" ? t("出租", "Rent") : t("出售", "Sale"), x + 24, y + 120);
-          ctx.fillStyle = "rgba(255,255,255,.95)"; ctx.font = "800 34px -apple-system, system-ui, sans-serif";
-          ctx.fillText(price ? money(price, row.intent === "rent") : "—", x + 24, y + cellH - 34);
-        }
-        ctx.restore();
-      }
-
-      var boxY = 790, boxH = 930;
-      ctx.save(); roundRect(ctx, left, boxY, W - left * 2, boxH, 20); ctx.clip();
-      ctx.fillStyle = "#FFFFFF"; ctx.fillRect(left, boxY, W - left * 2, boxH);
-      ctx.restore();
-      ctx.fillStyle = "#0B1F31"; ctx.font = "800 28px -apple-system, system-ui, sans-serif";
-      ctx.fillText([projName(row), areaName(row.area_code)].filter(Boolean).join(" · ") || String(row.code || ""), left + 30, boxY + 46);
-      ctx.strokeStyle = "#E6E1D8"; ctx.beginPath(); ctx.moveTo(left + 30, boxY + 66); ctx.lineTo(W - left - 30, boxY + 66); ctx.stroke();
-
-      var plain = text.replace(/\*/g, "").replace(/\n{3,}/g, "\n\n").trim();
-      var sizes = [23, 21, 19, 17, 15], chosen = null, chosenLines = null, chosenLH = 0;
-      var maxW = W - left * 2 - 60, maxH = boxH - 110;
-      for (var s = 0; s < sizes.length; s++) {
-        ctx.font = "400 " + sizes[s] + "px -apple-system, system-ui, sans-serif";
-        var lines = wrapLines(ctx, plain, maxW);
-        var lh = Math.round(sizes[s] * 1.45);
-        if (lines.length * lh <= maxH) { chosen = sizes[s]; chosenLines = lines; chosenLH = lh; break; }
-      }
-      if (!chosen) {
-        chosen = 15; ctx.font = "400 15px -apple-system, system-ui, sans-serif";
-        chosenLines = wrapLines(ctx, plain, maxW); chosenLH = 22;
-        var maxLines = Math.floor(maxH / chosenLH);
-        if (chosenLines.length > maxLines) { chosenLines = chosenLines.slice(0, maxLines); chosenLines[maxLines - 1] += "…"; }
-      }
-      ctx.fillStyle = "#20252B"; ctx.font = "400 " + chosen + "px -apple-system, system-ui, sans-serif";
-      var ty = boxY + 106;
-      chosenLines.forEach(function (ln) { if (ln) ctx.fillText(ln, left + 30, ty); ty += chosenLH; });
-
-      ctx.fillStyle = "#0B1F31"; ctx.fillRect(0, H - 120, W, 120);
-      ctx.fillStyle = "#FF8A33"; ctx.font = "800 22px -apple-system, system-ui, sans-serif";
-      ctx.fillText(S.me.name || "", left, H - 72);
-      ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.font = "20px -apple-system, system-ui, sans-serif";
-      ctx.fillText([S.me.ren_no, S.me.phone, "kwongthye.com"].filter(Boolean).join(" · "), left, H - 38);
-    }
-
-    var posterPromise = Promise.all([0,1,2].map(function (i) { return loadImage(i); }))
-      .then(function (imgs) {
-        drawPoster(imgs);
-        return new Promise(function (resolve) { cv.toBlob(function (b) { resolve(b); }, "image/png"); });
-      })
-      .catch(function () {
-        drawPoster([]);
-        return new Promise(function (resolve) { cv.toBlob(function (b) { resolve(b); }, "image/png"); });
-      });
-
     function markShared() {
       api("/listings/" + row.id + "/shared", { method: "POST" }).catch(function () {});
     }
-    function posterFile() {
-      return posterPromise.then(function (blob) {
-        if (!blob) throw new Error("poster_failed");
-        return new File([blob], "roofx-" + row.code + "-poster.png", { type: "image/png" });
+    function photoFile() {
+      return fetch(photoUrl(), { credentials: "same-origin" }).then(function (r) {
+        if (!r.ok) throw new Error("photo_fetch_failed");
+        return r.blob();
+      }).then(function (b) {
+        return new File([b], "roofx-" + row.code + "-1.jpg", { type: b.type || "image/jpeg" });
       });
     }
-    function sharePoster() {
-      copyText(text);
-      posterFile().then(function (file) {
-        var payload = { files: [file], title: S.me.name + " · " + row.code };
-        if (!navigator.share || !navigator.canShare || !navigator.canShare(payload)) throw new Error("share_not_supported");
-        return navigator.share(payload);
+    function shareOne() {
+      if (!first) { toast(t("这个房源还没有照片", "No photos yet"), true); return; }
+      copyText(text).then(function () {
+        return photoFile();
+      }).then(function (file) {
+        var payload = { files: [file], title: S.me.name + " · " + row.code, text: text };
+        var filesOnly = { files: [file], title: S.me.name + " · " + row.code };
+        if (!navigator.share || !navigator.canShare) throw new Error("share_not_supported");
+        if (navigator.canShare(payload)) return navigator.share(payload);
+        if (navigator.canShare(filesOnly)) return navigator.share(filesOnly);
+        throw new Error("share_not_supported");
       }).then(function () {
         markShared();
-        toast(t("海报已交给 WhatsApp", "Poster handed to WhatsApp"));
+        toast(t("首图和文案已交给 WhatsApp；若文案没带上，直接粘贴即可", "Main photo handed to WhatsApp. If the text did not attach, paste it."));
       }).catch(function (e) {
         if (e && e.name === "AbortError") return;
         toast(t("这个浏览器不支持直接分享图片，请用 Safari 或 Chrome 打开本页", "This browser cannot share images. Open this page in Safari or Chrome."), true);
       });
     }
-    function savePoster() {
+    function saveOne() {
+      if (!first) { toast(t("这个房源还没有照片", "No photos yet"), true); return; }
       copyText(text);
-      posterFile().then(function (file) {
+      photoFile().then(function (file) {
         var payload = { files: [file], title: S.me.name + " · " + row.code };
         if (!navigator.share || !navigator.canShare || !navigator.canShare(payload)) throw new Error("save_not_supported");
         return navigator.share(payload);
@@ -1020,8 +910,8 @@
       });
     }
 
-    var sp = $("#sharePoster", m.root); if (sp) sp.addEventListener("click", sharePoster);
-    var sv = $("#savePoster", m.root); if (sv) sv.addEventListener("click", savePoster);
+    var so = $("#shareOne", m.root); if (so) so.addEventListener("click", shareOne);
+    var sv = $("#saveOne", m.root); if (sv) sv.addEventListener("click", saveOne);
     $("#copyText", m.root).addEventListener("click", function () {
       var ta = $("#shareText", m.root); ta.select();
       navigator.clipboard.writeText(ta.value).then(function () { toast(t("已复制文案", "Text copied")); markShared(); })
