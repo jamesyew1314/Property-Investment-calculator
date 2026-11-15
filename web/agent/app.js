@@ -825,17 +825,12 @@
     var photos = allPhotos.slice(0, 3);
     function photoUrl(i) { return "/api/agent/listings/" + encodeURIComponent(row.id) + "/photo/" + i; }
     function loadImage(i) {
-      return fetch(photoUrl(i), { credentials: "same-origin" }).then(function (r) {
-        if (!r.ok) throw new Error("photo_fetch_failed");
-        return r.blob();
-      }).then(function (b) {
-        return new Promise(function (resolve) {
-          var u = URL.createObjectURL(b), im = new Image();
-          im.onload = function () { URL.revokeObjectURL(u); resolve(im); };
-          im.onerror = function () { URL.revokeObjectURL(u); resolve(null); };
-          im.src = u;
-        });
-      }).catch(function () { return null; });
+      return new Promise(function (resolve) {
+        var im = new Image();
+        im.onload = function () { resolve(im); };
+        im.onerror = function () { resolve(null); };
+        im.src = photoUrl(i);
+      });
     }
     function roundRect(ctx, x, y, w, h, r) {
       r = Math.min(r, w / 2, h / 2);
