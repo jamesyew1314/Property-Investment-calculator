@@ -9,9 +9,12 @@ cd "$(dirname "$0")/.."
 KEY="${KEY:-.secrets/fangchan_key.pem}"
 HOST="${HOST:-47.254.235.22}"
 USER_="${USER_:-root}"
-SSH="ssh -i $KEY -o StrictHostKeyChecking=no -o ConnectTimeout=15"
-SCP="scp -i $KEY -o StrictHostKeyChecking=no"
-RSYNC="rsync -az -e \"ssh -i $KEY -o StrictHostKeyChecking=no\""
+JUMP="${JUMP:-}"
+SSH_OPTS="-i $KEY -o StrictHostKeyChecking=no -o ConnectTimeout=15"
+if [ -n "$JUMP" ]; then SSH_OPTS="$SSH_OPTS -J $JUMP"; fi
+SSH="ssh $SSH_OPTS"
+SCP="scp $SSH_OPTS"
+RSYNC_SSH="ssh $SSH_OPTS"
 
 echo "▸ 1/5 回归测试"
 node web/test.js | tail -1
@@ -23,7 +26,7 @@ node work/test-i18n.js
 node work/test-orders.js
 
 echo "▸ 2/5 上传静态站点"
-rsync -az -e "ssh -i $KEY -o StrictHostKeyChecking=no" \
+rsync -az -e "$RSYNC_SSH" \
   --exclude '.DS_Store' \
   web/ "$USER_@$HOST:/srv/fangchan/web/"
 
