@@ -378,7 +378,49 @@ module.exports = function createClientApi(opts) {
     });
   }));
 
-  // ---------- 6) 提交变更请求 ----------
+  // ---------- 6) 自动 token 费用（来自 token_usage，不是人工 ledger） ----------
+  // 汇总所有自己的订单，给 dashboard 卡片用；按 order_id 分组。
+  r.get("/token-usage", requireClient, wrap(async function (req, res) {
+    const out = await pool.query(
+      "SELECT u.order_id, COALESCE(SUM(u.cost_myr),0)::float8 AS cost_myr, " +
+      "       COALESCE(SUM(u.cost_usd),0)::float8 AS cost_usd, " +
+      "       COALESCE(SUM(u.uncached_input_tokens + u.cache_read_tokens + u.cache_write_tokens + u.output_tokens),0)::bigint AS tokens, " +
+      "       MAX(u.updated_at) AS last_at " +
+      "FROM token_usage u JOIN site_orders o ON o.id=u.order_id " +
+      "WHERE o.client_user_id=$1 GROUP BY u.order_id", [req.client.id]
+    );
+    res.json({ ok: true, rows: out.rows.map(function (x) {
+      return { order_id: x.order_id, cost_myr: x.cost_myr, cost_usd: x.cost_usd,
+        tokens: Number(x.tokens), last_at: x.last_at };
+    }) });
+  }));
+
+  // 单个订单：摘要 + 最近 100 条；仍以订单归属为第一道闸门。
+  r.get("/orders/:id/token-usage", requireClient, wrap(async function (req, res) {
+    const id = core.parseId(req.params.id);
+    if (!id) return res.status(404).json({ ok: false, error: "not_found" });
+    const owned = await pool.query("SELECT id FROM site_orders WHERE id=$1 AND client_user_id=$2", [id, req.client.id]);
+    if (!owned.rows[0]) return res.status(404).json({ ok: false, error: "not_found" });
+    const summary = await pool.query(
+      "SELECT COALESCE(SUM(cost_myr),0)::float8 AS total_cost_myr, " +
+      "       COALESCE(SUM(cost_usd),0)::float8 AS total_cost_usd, " +
+      "       COALESCE(SUM(uncached_input_tokens + cache_read_tokens + cache_write_tokens + output_tokens),0)::bigint AS total_tokens, " +
+      "       COALESCE(SUM(CASE WHEN observed_at >= date_trunc('month', now()) THEN cost_myr ELSE 0 END),0)::float8 AS month_cost_myr, " +
+      "       MAX(updated_at) AS last_at FROM token_usage WHERE order_id=$1", [id]
+    );
+    const rows = await pool.query(
+      "SELECT id, model, uncached_input_tokens, cache_read_tokens, cache_write_tokens, output_tokens, " +
+      "       rate_period, cost_myr, observed_at, updated_at FROM token_usage " +
+      "WHERE order_id=$1 ORDER BY observed_at DESC, id DESC LIMIT 100", [id]
+    );
+    const s = summary.rows[0] || {};
+    res.json({ ok: true, summary: {
+      total_cost_myr: s.total_cost_myr || 0, total_cost_usd: s.total_cost_usd || 0,
+      total_tokens: Number(s.total_tokens || 0), month_cost_myr: s.month_cost_myr || 0, last_at: s.last_at || null
+    }, rows: rows.rows });
+  }));
+
+  // ---------- 7) 提交变更请求 ----------
   // 顺序固定：鉴权 → 限流 → parseId → 归属 → body 校验（避免 400/404 差异探测他人订单）
   r.post("/orders/:id/changes", requireClient, limit(20, 60 * 60 * 1000), wrap(async function (req, res) {
     const id = core.parseId(req.params.id);

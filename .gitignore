@@ -54,3 +54,6 @@ match-platform/backups/
 match-platform/.env
 match-platform/*.log
 .deploy-log
+
+# local token meter mapping (contains client workspace paths)
+work/token-meter.config.json

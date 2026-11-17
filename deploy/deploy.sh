@@ -25,6 +25,7 @@ node work/test-static.js
 node work/test-i18n.js
 node work/test-orders.js
 node work/test-client.js
+node work/test-token-usage.js
 
 echo "▸ 2/5 上传静态站点"
 rsync -az -e "$RSYNC_SSH" \
@@ -34,7 +35,7 @@ rsync -az -e "$RSYNC_SSH" \
 echo "▸ 3/5 上传后端"
 $SCP work/api-server.js "$USER_@$HOST:/srv/fangchan/api/server.js"
 for f in mail-layout.js receipt-pdf.js report-pdf.js admin.js send-reminders.js send-monthly.js \
-         library-api.js library-core.js library-taxonomy.js public-api.js agent-api.js agent-core.js agent-page.js public-page.js ai-copy.js digest.js news.js listing-code.js match.js billplz.js import-core.js import-ai.js oss.js migrate-oss.js order-api.js order-core.js client-api.js; do
+         library-api.js library-core.js library-taxonomy.js public-api.js agent-api.js agent-core.js agent-page.js public-page.js ai-copy.js digest.js news.js listing-code.js match.js billplz.js import-core.js import-ai.js oss.js migrate-oss.js order-api.js order-core.js client-api.js token-usage.js; do
   [ -f "work/$f" ] && $SCP "work/$f" "$USER_@$HOST:/srv/fangchan/api/$f"
 done
 
@@ -47,7 +48,8 @@ $SCP work/migrations/034_cobroke.sql "$USER_@$HOST:/tmp/034_cobroke.sql"
 $SCP work/migrations/035_client_prefs.sql "$USER_@$HOST:/tmp/035_client_prefs.sql"
 $SCP work/migrations/036_site_orders.sql "$USER_@$HOST:/tmp/036_site_orders.sql"
 $SCP work/migrations/037_client_portal.sql "$USER_@$HOST:/tmp/037_client_portal.sql"
-$SSH "$USER_@$HOST" 'sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/030_brand.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/031_listing_fields.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/032_form_v3.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/033_pool_integrity.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/034_cobroke.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/035_client_prefs.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/036_site_orders.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/037_client_portal.sql >/dev/null && echo "  migrations ok"'
+$SCP work/migrations/038_token_usage.sql "$USER_@$HOST:/tmp/038_token_usage.sql"
+$SSH "$USER_@$HOST" 'sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/030_brand.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/031_listing_fields.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/032_form_v3.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/033_pool_integrity.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/034_cobroke.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/035_client_prefs.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/036_site_orders.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/037_client_portal.sql >/dev/null && sudo -u postgres psql -d fangchan -v ON_ERROR_STOP=1 -f /tmp/038_token_usage.sql >/dev/null && echo "  migrations ok"'
 
 echo "▸ 4/5 修正权限并重启"
 $SSH "$USER_@$HOST" '

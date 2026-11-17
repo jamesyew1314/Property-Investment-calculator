@@ -13,6 +13,7 @@ const listingCode = require("./listing-code");
 const createAgentApi = require("./agent-api");
 const createOrderApi = require("./order-api");
 const createClientApi = require("./client-api");
+const { createTokenUsageApi } = require("./token-usage");
 const renderAgentPage = require("./agent-page");
 const renderPublicListing = require("./public-page");
 const runDigest = require("./digest");
@@ -1558,6 +1559,9 @@ app.use("/api", createOrderApi({ pool: pool, requireAdmin: requireAdmin,
 app.use("/api/client", createClientApi({
   pool: pool, sendMail: sendMail, rateLimit: rateLimit, siteUrl: "https://kwongthye.com"
 }));
+
+// ---------- 自动 token 计量（开发侧 meter 内部上报） ----------
+app.use("/api/internal", createTokenUsageApi({ pool: pool }));
 
 // ---------- fallbacks ----------
 app.use("/api", function (req, res) { res.status(404).json({ ok: false, error: "not_found" }); });

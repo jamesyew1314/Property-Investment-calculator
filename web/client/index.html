@@ -314,6 +314,18 @@
         <p class="empty" id="d-updates-empty" data-i18n="updates_empty" hidden></p>
       </section>
 
+      <section class="panel wide" id="usage-panel">
+        <h2 data-i18n="usage_title"></h2>
+        <p style="color:var(--muted);font-size:12.5px;line-height:1.6;margin:0 0 12px" data-i18n="usage_note"></p>
+        <div class="ov">
+          <div><div class="k" data-i18n="usage_total"></div><div class="v num" id="d-token-total">RM 0.00</div></div>
+          <div><div class="k" data-i18n="usage_month"></div><div class="v num" id="d-token-month">RM 0.00</div></div>
+          <div><div class="k" data-i18n="usage_tokens"></div><div class="v num" id="d-token-count">0</div></div>
+        </div>
+        <div id="d-usage"></div>
+        <p class="empty" id="d-usage-empty" data-i18n="usage_empty" hidden></p>
+      </section>
+
       <section class="panel">
         <h2 data-i18n="ledger_title"></h2>
         <div id="d-ledger"></div>
@@ -412,15 +424,25 @@
     phase_word: ["阶段", "Phase", "Fasa"],
     progress_word: ["进度", "Progress", "Kemajuan"],
     payment_word: ["付款", "Payment", "Bayaran"],
-    tokens_word: ["Token", "Tokens", "Token"],
+    tokens_word: ["Token 费用", "Token cost", "Kos token"],
+    usage_title: ["开发 Token 费用", "Development token cost", "Kos token pembangunan"],
+    usage_note: ["由开发环境自动上报，约 30 秒刷新。费用按模型 token 用量估算。",
+      "Reported automatically from the development environment, refreshed about every 30 seconds. Cost is estimated from model token usage.",
+      "Dilaporkan secara automatik daripada persekitaran pembangunan, dikemas kini kira-kira setiap 30 saat. Kos dianggarkan daripada penggunaan token model."],
+    usage_total: ["累计费用", "Total cost", "Jumlah kos"],
+    usage_month: ["本月费用", "This month", "Bulan ini"],
+    usage_tokens: ["Token 总数", "Total tokens", "Jumlah token"],
+    usage_short: ["Token 费用", "Token cost", "Kos token"],
+    usage_empty: ["还没有自动 token 记录。", "No automatic token usage yet.", "Belum ada penggunaan token automatik."],
+    usage_model: ["模型", "Model", "Model"],
     back_order: ["返回下单页", "Back to order page", "Kembali ke halaman pesanan"],
     back_dash: ["← 返回订单列表", "← Back to orders", "← Kembali ke senarai pesanan"],
     brief_title: ["建站需求", "Project brief", "Ringkasan projek"],
     brief_empty: ["还没有填写建站需求。", "No brief details yet.", "Belum ada butiran projek."],
     updates_title: ["进度更新", "Progress updates", "Kemas kini kemajuan"],
     updates_empty: ["还没有进度更新。", "No progress updates yet.", "Belum ada kemas kini kemajuan."],
-    ledger_title: ["Token 流水", "Token ledger", "Lejar token"],
-    ledger_empty: ["还没有 token 流水。", "No token activity yet.", "Belum ada aktiviti token."],
+    ledger_title: ["Token 人工调整", "Token adjustments", "Pelarasan token"],
+    ledger_empty: ["还没有人工调整记录。", "No manual adjustments yet.", "Belum ada pelarasan manual."],
     changes_title: ["变更请求", "Change requests", "Permintaan perubahan"],
     changes_empty: ["还没有变更请求。", "No change requests yet.", "Belum ada permintaan perubahan."],
     change_form_title: ["提交变更请求", "Request a change", "Minta perubahan"],
@@ -490,6 +512,7 @@
 
   var session = null;
   var orders = [];
+  var usageByOrder = {};
   var currentOrderId = null;
   var lastDetail = null;
   var detailSeq = 0;
@@ -526,6 +549,10 @@
   function tokensText(raw) {
     var n = Number(raw);
     return (isFinite(n) ? n : 0).toFixed(2);
+  }
+  function moneyText(raw) {
+    var n = Number(raw);
+    return "RM " + (isFinite(n) ? n : 0).toFixed(2);
   }
   function phaseLabel(p) {
     var key = "phase_" + String(p || "");
@@ -701,12 +728,23 @@
 
     var meta = el("div", "oc-meta");
     meta.appendChild(el("span", "badge " + paymentClass(o.payment_status), paymentLabel(o.payment_status)));
-    meta.appendChild(el("span", "tok", tokensText(o.tokens) + " " + t("tokens_unit")));
+    var u = usageByOrder[String(o.id)] || {};
+    meta.appendChild(el("span", "tok", t("usage_short") + " " + moneyText(u.cost_myr)));
     meta.appendChild(el("span", "when", t("updated") + " " + fmtDate(o.updated_at)));
     card.appendChild(meta);
 
     card.addEventListener("click", function () { openOrder(id); });
     return card;
+  }
+
+  function loadUsageMap() {
+    return api("/api/client/token-usage").then(function (body) {
+      var map = {};
+      (body && Array.isArray(body.rows) ? body.rows : []).forEach(function (r) {
+        map[String(r.order_id)] = r;
+      });
+      usageByOrder = map;
+    }).catch(function () {});
   }
 
   function renderDash() {
@@ -781,6 +819,40 @@
     });
   }
 
+  function renderTokenUsage(summary, rows) {
+    var sum = summary || {};
+    var list = Array.isArray(rows) ? rows : [];
+    $("d-token-total").textContent = moneyText(sum.total_cost_myr);
+    $("d-token-month").textContent = moneyText(sum.month_cost_myr);
+    $("d-token-count").textContent = String(Number(sum.total_tokens || 0));
+    $("d-tokens").textContent = moneyText(sum.total_cost_myr);
+    var box = $("d-usage");
+    box.textContent = "";
+    $("d-usage-empty").hidden = list.length > 0;
+    $("d-usage-empty").textContent = t("usage_empty");
+    list.forEach(function (u) {
+      var row = el("div", "led-row");
+      var main = el("div", "led-main");
+      main.appendChild(el("span", "badge st-open", String(u.model || t("none"))));
+      main.appendChild(el("span", "led-note",
+        t("usage_model") + ": " + String(u.model || t("none")) + " · " +
+        (Number(u.uncached_input_tokens || 0) + Number(u.cache_read_tokens || 0) +
+          Number(u.cache_write_tokens || 0) + Number(u.output_tokens || 0)) + " tokens"));
+      row.appendChild(main);
+      row.appendChild(el("span", "led-amt neg", "-" + moneyText(u.cost_myr)));
+      row.appendChild(el("div", "led-when", fmtDate(u.observed_at)));
+      box.appendChild(row);
+    });
+  }
+
+  function loadTokenUsage(id, seq) {
+    return api("/api/client/orders/" + encodeURIComponent(id) + "/token-usage").then(function (body) {
+      if (seq !== detailSeq) return;
+      if (String(currentOrderId) !== String(id)) return;
+      renderTokenUsage(body && body.summary, body && body.rows);
+    }).catch(function () {});
+  }
+
   function renderChanges(list) {
     var box = $("d-changes");
     box.textContent = "";
@@ -839,7 +911,7 @@
       var pwa = $("payhelp_wa");
       if (pwa) pwa.href = "https://wa.me/60165280918?text=" + encodeURIComponent("Invoice / payment for " + order.order_no);
     }
-    $("d-tokens").textContent = tokensText(order.tokens);
+    $("d-tokens").textContent = "RM 0.00";
     $("d-updated").textContent = fmtDate(order.updated_at);
 
     renderBrief(order.brief_json);
@@ -858,7 +930,12 @@
     $("d-payment").className = "badge pay-unpaid";
     $("d-payment").textContent = "—";
     var ph = $("payhelp"); if (ph) ph.hidden = true;
-    $("d-tokens").textContent = "0.00";
+    $("d-tokens").textContent = "RM 0.00";
+    $("d-token-total").textContent = "RM 0.00";
+    $("d-token-month").textContent = "RM 0.00";
+    $("d-token-count").textContent = "0";
+    $("d-usage").textContent = "";
+    $("d-usage-empty").hidden = false;
     $("d-updated").textContent = "—";
     $("d-brief").textContent = "";
     $("d-updates").textContent = "";
@@ -888,6 +965,7 @@
       if (String(currentOrderId) !== String(id)) return;
       $("detail-loading").hidden = true;
       renderDetail(body);
+      loadTokenUsage(id, seq);
     }).catch(function (e) {
       if (seq !== detailSeq) return;
       $("detail-loading").hidden = true;
@@ -915,8 +993,10 @@
       session = body.client || session;
       orders = Array.isArray(body.orders) ? body.orders : [];
       setMsg("dash-status", null, "");
-      renderDash();
-      if (id) return loadOrder(id, { silent: true });
+      return loadUsageMap().then(function () {
+        renderDash();
+        if (id) return loadOrder(id, { silent: true });
+      });
     }).catch(function (e) {
       if (e && e.code === "auth") return;
       // 轮询失败写 dashboard 内联错误（SPEC §6.1 错误态复用 #dash-status），下一次成功自动清除
@@ -931,7 +1011,7 @@
       session = body.client || session;
       orders = Array.isArray(body.orders) ? body.orders : [];
       $("dash-loading").hidden = true;
-      renderDash();
+      return loadUsageMap().then(renderDash);
     }).catch(function (e) {
       $("dash-loading").hidden = true;
       if (e && e.code === "auth") return;
@@ -946,7 +1026,7 @@
     $("dash-loading").hidden = true;
     setMsg("dash-status", null, "");
     showView("dash");
-    renderDash();
+    loadUsageMap().then(renderDash);
     startPolling();
   }
 

@@ -1,0 +1,9 @@
+{
+  "api_base": "https://kwongthye.com",
+  "orders": [
+    {
+      "order_no": "ORD-261117-XXXX",
+      "workspace": "/Users/huangminming/Downloads/日常/order-system-mvp"
+    }
+  ]
+}
