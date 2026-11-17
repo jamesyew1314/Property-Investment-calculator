@@ -79,6 +79,7 @@
     <span class="sp"></span>
     <span id="who" hidden style="color:#8FE3B0;font-size:12px;margin-right:6px" data-i18n="signedIn">● 已登录</span>
     <span id="roleTag" hidden class="tag" style="margin-right:8px"></span>
+    <a href="/admin/orders/" style="color:#fff;background:#C6A15B;border:1px solid #C6A15B;border-radius:999px;padding:6px 12px;font-size:12px;text-decoration:none;margin-right:6px;white-space:nowrap">订单后台 Orders</a>
     <a href="/library/" style="color:#C6A15B;border:1px solid rgba(198,161,91,.55);border-radius:999px;padding:6px 12px;font-size:12px;text-decoration:none;margin-right:6px;white-space:nowrap">资料库 Library</a>
     <button id="langBtn">EN</button>
     <button id="pwdBtn" hidden style="margin-right:4px" data-i18n="changePwd">修改密码</button>
@@ -761,6 +762,12 @@
     applyRole(me && me.role);
     loadStats(); loadCharts(); loadList(); loadUsers(""); loadMsgs(); loadViews(); loadEvents(); loadLogs();
     if (myRole === "owner") loadAdmins();
+    try {
+      var nxt = new URLSearchParams(location.search).get("next") || "";
+      if (/^\/admin\/[A-Za-z0-9._~\/-]*$/.test(nxt) && nxt !== "/admin/") {
+        setTimeout(function () { location.assign(nxt); }, 60);
+      }
+    } catch (e) {}
     $("logoutBtn").onclick = function () {
       api("/logout", { method: "POST" }).then(function () { show(false); });
     };

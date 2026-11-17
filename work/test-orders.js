@@ -1428,7 +1428,7 @@ async function main() {
     ["new", "contacted", "paid", "building", "review", "live", "paused", "cancelled"].forEach(function (s) {
       ok(!!dict["status_" + s], "后台状态文案存在: " + s);
     });
-    ok(html.indexOf('href="/admin/"') > 0, "后台页 401 时引导到 /admin/ 登录");
+    ok(html.indexOf('href="/admin/?next=') > 0, "后台页 401 时引导到 /admin/ 登录并返回订单后台");
     ok(/res\.status === 401/.test(html), "后台页显式处理 401");
   }
 
