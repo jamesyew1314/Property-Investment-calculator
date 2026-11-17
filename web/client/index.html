@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0F2740">
+<meta name="robots" content="noindex, nofollow">
+<title>客户门户 · RoofX</title>
+<link rel="icon" type="image/png" href="/icon-256.png?v=client1">
+<style>
+  :root{
+    --ink:#12212E;--navy:#0F2740;--navy2:#173A57;--paper:#F7F4EE;--card:#FFFFFF;
+    --copper:#B5723F;--copper2:#9C5C2C;--line:#E3DCD0;--muted:#6B7785;
+    --ok:#1F7A4D;--bad:#B03A2E;--warn:#8A5A10;--radius:16px;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--copper2)}
+  .wrap{width:min(1060px,93vw);margin:0 auto}
+  header{padding:16px 0;border-bottom:1px solid var(--line);background:rgba(247,244,238,.95);
+    position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
+  .bar{display:flex;align-items:center;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);min-width:0}
+  .brand img{width:34px;height:34px;border-radius:9px;flex:0 0 auto}
+  .brand b{font-family:Georgia,"Times New Roman",serif;font-size:18px;letter-spacing:.3px}
+  .brand .sub{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);display:block;line-height:1.2}
+  .langs{margin-left:auto;display:flex;gap:2px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px;flex:0 0 auto}
+  .langs button{border:0;background:transparent;color:var(--muted);font:600 12px/1 inherit;padding:7px 11px;border-radius:999px;cursor:pointer}
+  .langs button.on{background:var(--navy);color:#fff}
+  main{padding:34px 0 30px;min-height:62vh}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:500;color:var(--navy);
+    font-size:clamp(24px,3vw,32px);line-height:1.2;margin:0;letter-spacing:-.2px}
+  h2{font-family:Georgia,"Times New Roman",serif;font-weight:500;color:var(--navy);
+    font-size:17px;line-height:1.3;margin:0 0 12px}
+  .sub{color:var(--muted);font-size:14px;margin:6px 0 0}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:600;color:var(--navy)}
+
+  /* 登录 */
+  .auth{display:flex;justify-content:center;padding:18px 0 6px}
+  .login-card{width:min(460px,100%);background:#fff;border:1px solid var(--line);border-radius:20px;
+    padding:30px 28px;box-shadow:0 16px 44px rgba(18,33,46,.07)}
+  .login-card h1{font-size:26px;margin-bottom:6px}
+  .login-card form{display:flex;flex-direction:column;gap:7px;margin:20px 0 6px}
+  .login-card label,.form-field label{font-size:12.5px;font-weight:600;color:#3A4654}
+  input,textarea,select{width:100%;padding:12px 13px;border:1px solid #D8D2C7;border-radius:11px;
+    font:inherit;font-size:15px;background:#FDFCFA;color:var(--ink);min-width:0}
+  input:focus,textarea:focus,select:focus{outline:2px solid rgba(181,114,63,.25);border-color:var(--copper)}
+  textarea{min-height:88px;resize:vertical}
+  .hint{font-size:12px;color:var(--muted);margin:14px 0 0;line-height:1.6}
+
+  /* 按钮 */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--navy);
+    color:#fff;border:1px solid var(--navy);border-radius:999px;padding:12px 22px;
+    font:600 14px/1.2 inherit;cursor:pointer;text-decoration:none;min-height:44px}
+  .btn:hover{background:var(--navy2)}
+  .btn:disabled{opacity:.6;cursor:wait}
+  .btn.ghost{background:#fff;color:var(--navy);border-color:#CBD6E2}
+  .btn.ghost:hover{background:#F5F8FC}
+  .btn.sm{padding:8px 14px;font-size:12.5px;min-height:36px;border-radius:10px}
+
+  /* 状态提示 */
+  .status{font-size:13px;border-radius:10px;padding:10px 12px;margin:12px 0 0;line-height:1.55}
+  .status.err{background:#FDF0EE;border:1px solid #F0C9C2;color:#8E2F24}
+  .status.ok{background:#EAF6EF;border:1px solid #C8E6D4;color:#1D6B43}
+  .loading{font-size:13px;color:var(--muted);padding:16px 0}
+  .empty{font-size:13.5px;color:var(--muted);background:#fff;border:1px dashed #D8D2C7;
+    border-radius:14px;padding:22px 16px;text-align:center;margin:10px 0 0}
+
+  /* 顶栏 */
+  .pagehead{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+  .pagehead .spacer{flex:1 1 auto}
+  .pagehead .sub{width:100%;margin-top:4px}
+  .back{border:0;background:transparent;color:var(--copper2);font:600 13px/1.2 inherit;
+    cursor:pointer;padding:8px 0;margin-bottom:8px}
+  .back:hover{text-decoration:underline}
+
+  /* 订单卡片 */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:6px}
+  .order-card{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);
+    border-radius:18px;padding:18px 18px 14px;cursor:pointer;font:inherit;color:inherit;
+    box-shadow:0 8px 24px rgba(18,33,46,.04);transition:transform .15s ease,box-shadow .15s ease}
+  .order-card:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(18,33,46,.1)}
+  .order-card:focus-visible{outline:3px solid rgba(181,114,63,.4);outline-offset:2px}
+  .oc-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .oc-no{font-size:14.5px;overflow-wrap:anywhere;min-width:0}
+  .oc-top .badge{margin-left:auto}
+  .track{height:9px;border-radius:999px;background:#EDE7DC;overflow:hidden;flex:1 1 auto;min-width:60px}
+  .track i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--copper),#D9A473)}
+  .oc-progress{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .pct{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .oc-meta{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:12px;color:var(--muted)}
+  .oc-meta .tok{font-variant-numeric:tabular-nums;color:var(--navy);font-weight:600}
+  .oc-meta .when{flex:1 1 100%;overflow-wrap:anywhere}
+
+  /* 徽标 */
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;
+    white-space:nowrap;max-width:100%;overflow-wrap:anywhere}
+  .p-brief{background:#E8F0FA;color:#245A96}
+  .p-design{background:#EFE9FA;color:#5A3E9E}
+  .p-build{background:#FFF3DC;color:#8A5A10}
+  .p-review{background:#FDF0E6;color:#94531F}
+  .p-launch{background:#E3F6EF;color:#116B4E}
+  .p-live{background:#E7F5EC;color:#1D6B43}
+  .pay-unpaid{background:#FBEAE8;color:#8E2F24}
+  .pay-paid{background:#E7F5EC;color:#1D6B43}
+  .pay-refunded{background:#EEF0F3;color:#55616E}
+  .st-open{background:#E8F0FA;color:#245A96}
+  .st-in_progress{background:#FFF3DC;color:#8A5A10}
+  .st-done{background:#E7F5EC;color:#1D6B43}
+  .st-cancelled{background:#EEF0F3;color:#55616E}
+  .pr-low{background:#EEF0F3;color:#55616E}
+  .pr-normal{background:#E8F0FA;color:#245A96}
+  .pr-high{background:#FBEAE8;color:#8E2F24}
+
+  /* 详情 */
+  .detail-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .detail-head h1{font-size:clamp(21px,2.6vw,27px);overflow-wrap:anywhere;min-width:0}
+  .detailgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;min-width:0}
+  .panel.wide{grid-column:1/-1}
+  .ov{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:4px}
+  .ov .k{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .ov .v{font-size:14px;color:var(--ink);overflow-wrap:anywhere}
+  .ov .v.num{font-variant-numeric:tabular-nums}
+  .ov .v.wide{grid-column:1/-1}
+  .detail-progress{display:flex;align-items:center;gap:10px;margin-top:14px}
+
+  .brief-row{display:grid;grid-template-columns:9.5rem minmax(0,1fr);gap:10px;padding:9px 0;
+    border-bottom:1px dashed #EDE7DC;font-size:13.5px}
+  .brief-row:last-child{border-bottom:0}
+  .brief-row .bk{color:var(--muted);font-weight:600;overflow-wrap:anywhere}
+  .brief-row .bv{color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+
+  .up-item{border-left:2px solid var(--line);padding:2px 0 2px 12px;margin-bottom:12px;min-width:0}
+  .up-item:last-child{margin-bottom:0}
+  .up-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+  .up-head .pct{color:var(--navy);font-weight:600}
+  .up-head .when{margin-left:auto;overflow-wrap:anywhere;text-align:right}
+  .up-note{margin:6px 0 0;font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+
+  .led-row{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;padding:9px 0;
+    border-bottom:1px dashed #EDE7DC}
+  .led-row:last-child{border-bottom:0}
+  .led-main{display:flex;gap:8px;align-items:baseline;flex:1 1 160px;min-width:0;flex-wrap:wrap}
+  .led-note{font-size:12.5px;color:#44515E;overflow-wrap:anywhere;word-break:break-word;min-width:0}
+  .led-amt{font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;margin-left:auto;white-space:nowrap}
+  .led-amt.pos{color:var(--ok)}
+  .led-amt.neg{color:var(--bad)}
+  .led-when{flex:1 1 100%;font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+
+  .chg-item{border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:10px;min-width:0}
+  .chg-item:last-of-type{margin-bottom:0}
+  .chg-head{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+  .chg-title{font-weight:600;font-size:14px;color:var(--navy);overflow-wrap:anywhere;word-break:break-word;min-width:0;flex:1 1 140px}
+  .chg-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:12px}
+  .chg-link{font-size:12px;overflow-wrap:anywhere;word-break:break-word}
+  .chg-desc{margin:8px 0 0;font-size:13px;color:#33404D;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+  .chg-admin{margin:8px 0 0;font-size:12.5px;color:#5F523C;background:#FFFDF8;border:1px solid #EFE3CB;
+    border-radius:9px;padding:8px 10px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+  .chg-when{font-size:11px;color:var(--muted);margin-top:8px;overflow-wrap:anywhere}
+
+  /* 变更表单 */
+  #change-form{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+  .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px}
+  .form-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .form-field.full{grid-column:1/-1}
+  .form-actions{display:flex;justify-content:flex-end;margin-top:12px}
+  #change-form .status{margin-top:10px}
+
+  footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);font-size:12px}
+  footer .fbar{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  footer a{color:var(--muted)}
+  footer .copy{margin-left:auto}
+
+  @media(max-width:760px){
+    main{padding:24px 0 20px}
+    .detailgrid{grid-template-columns:minmax(0,1fr)}
+    .brief-row{grid-template-columns:minmax(0,1fr);gap:2px}
+    .brief-row .bk{font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+    .form-grid{grid-template-columns:minmax(0,1fr)}
+    .login-card{padding:24px 20px}
+  }
+  @media (max-width: 430px){
+    .wrap{width:94vw}
+    header{padding:11px 0}
+    .brand b{font-size:16px}
+    .brand .sub{display:none}
+    .langs button{padding:7px 9px}
+    main{padding:20px 0 16px}
+    h1{font-size:23px}
+    .auth{padding:6px 0}
+    .login-card{padding:22px 16px;border-radius:16px}
+    .login-card h1{font-size:22px}
+    .btn{width:100%;padding:12px 16px}
+    .btn.sm{width:auto}
+    .pagehead{align-items:flex-start;gap:10px}
+    .pagehead .spacer{display:none}
+    .pagehead .btn{width:auto;margin-left:auto}
+    .cards{grid-template-columns:minmax(0,1fr);gap:12px}
+    .order-card{padding:15px 14px 12px}
+    .oc-top{gap:8px}
+    .oc-top .badge{margin-left:0}
+    .panel{padding:16px 14px;border-radius:14px}
+    .ov{grid-template-columns:minmax(0,1fr)}
+    .detail-progress{gap:8px}
+    .up-head .when{margin-left:0;width:100%;text-align:left}
+    .led-amt{margin-left:0}
+    .form-actions .btn{width:100%}
+    .form-grid{gap:10px}
+    input,textarea,select{font-size:16px}
+    .brief-row .bv{font-size:13px}
+    footer .copy{margin-left:0}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/order/">
+      <img src="/icon-256.png?v=client1" alt="RoofX">
+      <span class="brandtext"><b>RoofX</b><span class="sub">Client Portal</span></span>
+    </a>
+    <div class="langs" id="langs" role="group" aria-label="Language">
+      <button type="button" data-lang="zh">中文</button>
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="bm">BM</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="login" class="auth" hidden>
+    <div class="login-card">
+      <h1 data-i18n="login_title"></h1>
+      <p class="sub" data-i18n="login_sub"></p>
+      <form id="login-form" novalidate>
+        <label for="login-email" data-i18n="login_email"></label>
+        <input id="login-email" name="email" type="email" autocomplete="email" maxlength="120" data-i18n-ph="login_email_ph">
+        <button class="btn" id="login-btn" type="submit" data-i18n="login_btn"></button>
+      </form>
+      <p class="status" id="login-msg" role="status" hidden></p>
+      <p class="hint" data-i18n="login_hint"></p>
+    </div>
+  </section>
+
+  <section id="dash" hidden>
+    <div class="pagehead">
+      <h1 id="dash-title" data-i18n="dash_title"></h1>
+      <span class="spacer"></span>
+      <button class="btn ghost sm" id="logout-btn" type="button" data-i18n="logout"></button>
+      <p class="sub" id="dash-who"></p>
+    </div>
+    <div class="loading" id="dash-loading" data-i18n="loading" hidden></div>
+    <p class="status" id="dash-status" role="status" hidden></p>
+    <div id="orders" class="cards"></div>
+    <div class="empty" id="dash-empty" data-i18n="no_orders" hidden></div>
+  </section>
+
+  <section id="detail" hidden>
+    <button class="back" id="detail-back" type="button" data-i18n="back_dash"></button>
+    <div class="detail-head">
+      <h1 id="d-order-no" class="mono">—</h1>
+      <span class="badge p-brief" id="d-phase">—</span>
+    </div>
+    <div class="loading" id="detail-loading" data-i18n="loading" hidden></div>
+    <p class="status" id="detail-status" role="status" hidden></p>
+
+    <div class="detailgrid">
+      <section class="panel">
+        <h2 data-i18n="overview_title"></h2>
+        <div class="ov">
+          <div>
+            <div class="k" data-i18n="progress_word"></div>
+            <div class="v num" id="d-progress-num">0%</div>
+          </div>
+          <div>
+            <div class="k" data-i18n="payment_word"></div>
+            <div class="v"><span class="badge pay-unpaid" id="d-payment">—</span></div>
+          </div>
+          <div>
+            <div class="k" data-i18n="tokens_word"></div>
+            <div class="v num" id="d-tokens">0.00</div>
+          </div>
+          <div>
+            <div class="k" data-i18n="updated"></div>
+            <div class="v" id="d-updated">—</div>
+          </div>
+        </div>
+        <div class="detail-progress">
+          <div class="track"><i id="d-progress-bar"></i></div>
+        </div>
+      </section>
+
+      <section class="panel" id="payhelp" hidden>
+        <h2 data-i18n="payhelp_title"></h2>
+        <p style="color:var(--muted);font-size:13px;line-height:1.7;margin:0 0 12px" data-i18n="payhelp_body"></p>
+        <a class="btn ghost sm" id="payhelp_wa" target="_blank" rel="noopener" data-i18n="payhelp_btn"></a>
+      </section>
+
+      <section class="panel">
+        <h2 data-i18n="brief_title"></h2>
+        <div id="d-brief"></div>
+        <p class="empty" id="d-brief-empty" data-i18n="brief_empty" hidden></p>
+      </section>
+
+      <section class="panel">
+        <h2 data-i18n="updates_title"></h2>
+        <div id="d-updates"></div>
+        <p class="empty" id="d-updates-empty" data-i18n="updates_empty" hidden></p>
+      </section>
+
+      <section class="panel">
+        <h2 data-i18n="ledger_title"></h2>
+        <div id="d-ledger"></div>
+        <p class="empty" id="d-ledger-empty" data-i18n="ledger_empty" hidden></p>
+      </section>
+
+      <section class="panel wide">
+        <h2 data-i18n="changes_title"></h2>
+        <div id="d-changes"></div>
+        <p class="empty" id="d-changes-empty" data-i18n="changes_empty" hidden></p>
+
+        <form id="change-form" novalidate>
+          <h2 style="font-size:15px;margin-bottom:0" data-i18n="change_form_title"></h2>
+          <div class="form-grid">
+            <div class="form-field full">
+              <label for="chg-title" data-i18n="chg_title"></label>
+              <input id="chg-title" name="title" type="text" maxlength="120" data-i18n-ph="chg_title_ph">
+            </div>
+            <div class="form-field full">
+              <label for="chg-desc" data-i18n="chg_desc"></label>
+              <textarea id="chg-desc" name="description" maxlength="2000" data-i18n-ph="chg_desc_ph"></textarea>
+            </div>
+            <div class="form-field">
+              <label for="chg-url" data-i18n="chg_url"></label>
+              <input id="chg-url" name="page_url" type="url" maxlength="500" data-i18n-ph="chg_url_ph">
+            </div>
+            <div class="form-field">
+              <label for="chg-priority" data-i18n="chg_priority"></label>
+              <select id="chg-priority" name="priority">
+                <option value="low" data-i18n="priority_low"></option>
+                <option value="normal" selected data-i18n="priority_normal"></option>
+                <option value="high" data-i18n="priority_high"></option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" id="chg-submit" type="submit" data-i18n="chg_submit"></button>
+          </div>
+          <p class="status" id="chg-msg" role="status" hidden></p>
+        </form>
+      </section>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap fbar">
+    <a href="/order/" data-i18n="back_order"></a>
+    <span>© <span id="year">2026</span> RoofX Web Studio</span>
+    <span class="copy">Client Portal</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var INDEX = { zh: 0, en: 1, bm: 2 };
+  var BRIEF_KEYS = ["goal", "pages", "listing_count", "listing_source", "domain", "logo_url",
+    "brand_color", "reference_url", "asset_links", "target_launch", "notes"];
+  var I18N = {
+    page_title: ["客户门户 · RoofX", "Client portal · RoofX", "Portal pelanggan · RoofX"],
+    login_title: ["登录客户门户", "Sign in to your portal", "Log masuk ke portal anda"],
+    login_sub: ["使用下单时的邮箱，我们会发送一次性登录链接。",
+      "Use the email from your order and we will send a one-time sign-in link.",
+      "Gunakan e-mel pesanan anda dan kami akan hantar pautan log masuk sekali guna."],
+    login_email: ["邮箱", "Email", "E-mel"],
+    login_email_ph: ["you@example.com", "you@example.com", "anda@example.com"],
+    login_btn: ["发送登录链接", "Send sign-in link", "Hantar pautan log masuk"],
+    login_sending: ["正在发送…", "Sending…", "Menghantar…"],
+    login_invalid: ["登录链接无效或已过期，请重新获取。",
+      "This sign-in link is invalid or has expired. Please request a new one.",
+      "Pautan log masuk tidak sah atau telah tamat tempoh. Sila minta pautan baharu."],
+    session_expired: ["登录已过期，请重新获取登录链接。",
+      "Your session has expired. Please request a new sign-in link.",
+      "Sesi anda telah tamat. Sila minta pautan log masuk baharu."],
+    login_email_err: ["邮箱格式不正确，请检查。", "That email address looks invalid.", "Alamat e-mel itu tidak sah."],
+    link_sent: ["如果该邮箱有订单，登录链接已发送，请查收邮件（含垃圾邮件）。",
+      "If that email has orders, a sign-in link is on its way. Please check your inbox and spam.",
+      "Jika e-mel itu mempunyai pesanan, pautan log masuk sedang dihantar. Sila semak peti masuk dan spam."],
+    login_rate: ["请求太频繁，请 10 分钟后再试。", "Too many requests. Please try again in 10 minutes.",
+      "Terlalu banyak permintaan. Sila cuba lagi dalam 10 minit."],
+    login_network: ["网络连接失败，请检查网络后重试。", "Network error. Check your connection and try again.",
+      "Ralat rangkaian. Semak sambungan anda dan cuba lagi."],
+    login_hint: ["我们不会发送密码，每个登录链接只能使用一次。",
+      "We never send passwords, and each link works only once.",
+      "Kami tidak menghantar kata laluan, dan setiap pautan hanya berfungsi sekali."],
+    dash_title: ["我的网站订单", "My website orders", "Pesanan laman web saya"],
+    logout: ["退出登录", "Sign out", "Log keluar"],
+    no_orders: ["这个邮箱下还没有订单。下单后会自动出现在这里。",
+      "No orders for this email yet. New orders appear here automatically.",
+      "Tiada pesanan untuk e-mel ini lagi. Pesanan baharu akan muncul di sini secara automatik."],
+    updated: ["更新于", "Updated", "Dikemas kini"],
+    loading: ["加载中…", "Loading…", "Memuatkan…"],
+    tokens_unit: ["tokens", "tokens", "token"],
+    overview_title: ["进度概览", "Progress overview", "Gambaran kemajuan"],
+    phase_word: ["阶段", "Phase", "Fasa"],
+    progress_word: ["进度", "Progress", "Kemajuan"],
+    payment_word: ["付款", "Payment", "Bayaran"],
+    tokens_word: ["Token", "Tokens", "Token"],
+    back_order: ["返回下单页", "Back to order page", "Kembali ke halaman pesanan"],
+    back_dash: ["← 返回订单列表", "← Back to orders", "← Kembali ke senarai pesanan"],
+    brief_title: ["建站需求", "Project brief", "Ringkasan projek"],
+    brief_empty: ["还没有填写建站需求。", "No brief details yet.", "Belum ada butiran projek."],
+    updates_title: ["进度更新", "Progress updates", "Kemas kini kemajuan"],
+    updates_empty: ["还没有进度更新。", "No progress updates yet.", "Belum ada kemas kini kemajuan."],
+    ledger_title: ["Token 流水", "Token ledger", "Lejar token"],
+    ledger_empty: ["还没有 token 流水。", "No token activity yet.", "Belum ada aktiviti token."],
+    changes_title: ["变更请求", "Change requests", "Permintaan perubahan"],
+    changes_empty: ["还没有变更请求。", "No change requests yet.", "Belum ada permintaan perubahan."],
+    change_form_title: ["提交变更请求", "Request a change", "Minta perubahan"],
+    chg_title: ["标题", "Title", "Tajuk"],
+    chg_title_ph: ["例如：更换首页主图", "e.g. Replace the home page hero image", "cth. Ganti imej utama halaman"],
+    chg_desc: ["说明", "Description", "Penerangan"],
+    chg_desc_ph: ["需要改什么、改成什么", "What should change and how", "Apa yang perlu diubah dan bagaimana"],
+    chg_url: ["页面链接（选填）", "Page URL (optional)", "URL halaman (pilihan)"],
+    chg_url_ph: ["https://…", "https://…", "https://…"],
+    chg_priority: ["优先级", "Priority", "Keutamaan"],
+    chg_submit: ["提交请求", "Send request", "Hantar permintaan"],
+    chg_sent: ["已提交，我们会尽快处理。", "Request sent. We will review it soon.",
+      "Permintaan dihantar. Kami akan menyemaknya tidak lama lagi."],
+    change_admin_note: ["备注", "Note", "Catatan"],
+    err_title: ["请填写标题。", "Please add a title.", "Sila tambah tajuk."],
+    err_desc: ["请填写说明。", "Please add a description.", "Sila tambah penerangan."],
+    err_url: ["页面链接必须是 http 或 https 地址。", "The page URL must start with http or https.",
+      "URL halaman mesti bermula dengan http atau https."],
+    err_rate: ["提交太频繁，请稍后再试。", "Too many requests. Please try again later.",
+      "Terlalu banyak permintaan. Sila cuba lagi kemudian."],
+    err_generic: ["操作失败，请稍后重试。", "Something went wrong. Please try again.",
+      "Sesuatu tidak kena. Sila cuba lagi."],
+    err_network: ["网络连接失败，请重试。", "Network error. Please retry.", "Ralat rangkaian. Sila cuba lagi."],
+    err_not_found: ["找不到这个订单。", "This order could not be found.", "Pesanan ini tidak ditemui."],
+    ledger_topup: ["充值", "Top-up", "Tambah nilai"],
+    ledger_usage: ["使用", "Usage", "Penggunaan"],
+    ledger_adjust: ["调整", "Adjustment", "Pelarasan"],
+    priority_low: ["低", "Low", "Rendah"],
+    priority_normal: ["普通", "Normal", "Biasa"],
+    priority_high: ["高", "High", "Tinggi"],
+    status_open: ["待处理", "Open", "Terbuka"],
+    status_in_progress: ["处理中", "In progress", "Sedang diproses"],
+    status_done: ["已完成", "Done", "Selesai"],
+    status_cancelled: ["已取消", "Cancelled", "Dibatalkan"],
+    phase_brief: ["需求收集", "Brief", "Ringkasan"],
+    phase_design: ["设计", "Design", "Reka bentuk"],
+    phase_build: ["制作", "Build", "Pembinaan"],
+    phase_review: ["验收", "Review", "Semakan"],
+    phase_launch: ["上线准备", "Launch", "Pelancaran"],
+    phase_live: ["已上线", "Live", "Aktif"],
+    payment_unpaid: ["未付款", "Unpaid", "Belum dibayar"],
+    payment_paid: ["已付款", "Paid", "Dibayar"],
+    payment_refunded: ["已退款", "Refunded", "Dipulangkan"],
+    payhelp_title: ["如何付款", "How to pay", "Cara bayar"],
+    payhelp_body: ["首月 RM2,500（含建站 + 首月服务）。请通过 WhatsApp 获取发票并完成银行转账；确认收款后 1 个工作日内开工。",
+      "First month RM2,500 (setup + first month). WhatsApp us for the invoice and pay by bank transfer; work starts within 1 business day after payment is confirmed.",
+      "Bulan pertama RM2,500 (penyediaan + bulan pertama). WhatsApp kami untuk invois dan bayar melalui pindahan bank; kerja bermula dalam 1 hari bekerja selepas bayaran disahkan."],
+    payhelp_btn: ["WhatsApp 获取发票", "WhatsApp for invoice", "WhatsApp untuk invois"],
+    label_goal: ["建站目标", "Goal", "Matlamat"],
+    label_pages: ["需要页面", "Pages needed", "Halaman diperlukan"],
+    label_listing_count: ["房源数量", "Listing count", "Bilangan senarai"],
+    label_listing_source: ["房源来源", "Listing source", "Sumber senarai"],
+    label_domain: ["域名", "Domain", "Domain"],
+    label_logo_url: ["Logo 链接", "Logo link", "Pautan logo"],
+    label_brand_color: ["品牌色", "Brand colour", "Warna jenama"],
+    label_reference_url: ["参考网站", "Reference site", "Laman rujukan"],
+    label_asset_links: ["素材链接", "Asset links", "Pautan bahan"],
+    label_target_launch: ["目标上线日期", "Target launch", "Sasaran pelancaran"],
+    label_notes: ["备注", "Notes", "Catatan"],
+    none: ["—", "—", "—"]
+  };
+
+  var q = new URLSearchParams(location.search);
+  var lang = q.get("lang");
+  if (!lang) { try { lang = localStorage.getItem("kt_lang") || localStorage.getItem("kwongthye_lang"); } catch (e) { lang = null; } }
+  if (!INDEX.hasOwnProperty(lang)) lang = "zh";
+
+  var session = null;
+  var orders = [];
+  var currentOrderId = null;
+  var lastDetail = null;
+  var detailSeq = 0;
+  var polling = false;
+  var MSG = {};
+
+  function t(key) {
+    var v = I18N[key];
+    return v ? (v[INDEX[lang]] || v[0]) : key;
+  }
+  function hasKey(key) { return Object.prototype.hasOwnProperty.call(I18N, key); }
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function locale() {
+    return lang === "zh" ? "zh-CN" : lang === "bm" ? "ms-MY" : "en-MY";
+  }
+  function fmtDate(iso) {
+    if (!iso) return t("none");
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return t("none");
+    return d.toLocaleString(locale(), { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+  }
+  function clampPct(raw) {
+    var n = Number(raw);
+    if (!isFinite(n)) n = 0;
+    n = Math.round(n);
+    return Math.max(0, Math.min(100, n));
+  }
+  function tokensText(raw) {
+    var n = Number(raw);
+    return (isFinite(n) ? n : 0).toFixed(2);
+  }
+  function phaseLabel(p) {
+    var key = "phase_" + String(p || "");
+    return hasKey(key) ? t(key) : String(p || t("none"));
+  }
+  function phaseClass(p) {
+    var s = String(p || "");
+    return /^[a-z]+$/.test(s) ? "p-" + s : "p-brief";
+  }
+  function paymentLabel(p) {
+    var key = "payment_" + String(p || "");
+    return hasKey(key) ? t(key) : String(p || t("none"));
+  }
+  function paymentClass(p) {
+    var s = String(p || "");
+    return /^[a-z]+$/.test(s) ? "pay-" + s : "pay-unpaid";
+  }
+  function statusLabel(s) {
+    var key = "status_" + String(s || "");
+    return hasKey(key) ? t(key) : String(s || t("none"));
+  }
+  function statusClass(s) {
+    var v = String(s || "");
+    return /^[a-z_]+$/.test(v) ? "st-" + v : "st-open";
+  }
+  function priorityLabel(p) {
+    var key = "priority_" + String(p || "");
+    return hasKey(key) ? t(key) : String(p || t("none"));
+  }
+  function priorityClass(p) {
+    var v = String(p || "");
+    return /^[a-z]+$/.test(v) ? "pr-" + v : "pr-normal";
+  }
+  function safeHttpUrl(raw) {
+    try {
+      var u = new URL(String(raw));
+      if (u.protocol === "http:" || u.protocol === "https:") return u.toString();
+    } catch (e) {}
+    return "";
+  }
+
+  function setMsg(id, key, kind) {
+    MSG[id] = key ? { key: key, kind: kind || "" } : null;
+    paintMsg(id);
+  }
+  function paintMsg(id) {
+    var node = $(id);
+    if (!node) return;
+    var m = MSG[id];
+    node.hidden = !m;
+    node.textContent = m ? t(m.key) : "";
+    node.className = "status" + (m && m.kind ? " " + m.kind : "");
+  }
+
+  function showView(name) {
+    $("login").hidden = name !== "login";
+    $("dash").hidden = name !== "dash";
+    $("detail").hidden = name !== "detail";
+  }
+
+  function apply() {
+    document.documentElement.lang = lang === "zh" ? "zh-Hans" : lang;
+    document.title = t("page_title");
+    document.querySelectorAll("[data-i18n]").forEach(function (node) {
+      var k = node.getAttribute("data-i18n");
+      if (I18N[k]) node.textContent = t(k);
+    });
+    document.querySelectorAll("[data-i18n-ph]").forEach(function (node) {
+      var k = node.getAttribute("data-i18n-ph");
+      if (I18N[k]) node.setAttribute("placeholder", t(k));
+    });
+    document.querySelectorAll("#langs button").forEach(function (b) {
+      var on = b.getAttribute("data-lang") === lang;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    Object.keys(MSG).forEach(paintMsg);
+    if (!orders.length) $("dash-empty").textContent = t("no_orders");
+    if (!lastDetail) {
+      $("d-brief-empty").textContent = t("brief_empty");
+      $("d-updates-empty").textContent = t("updates_empty");
+      $("d-ledger-empty").textContent = t("ledger_empty");
+      $("d-changes-empty").textContent = t("changes_empty");
+    }
+    if (!$("dash").hidden && session) renderDash();
+    if (!$("detail").hidden && lastDetail) renderDetail(lastDetail);
+  }
+
+  function setLang(next) {
+    if (!INDEX.hasOwnProperty(next)) return;
+    lang = next;
+    try { localStorage.setItem("kt_lang", lang); localStorage.setItem("kwongthye_lang", lang); } catch (e) {}
+    try {
+      var u = new URL(location.href);
+      u.searchParams.set("lang", lang);
+      history.replaceState(null, "", u.toString());
+    } catch (e) {}
+    apply();
+  }
+
+  function stripToken() {
+    try {
+      var u = new URL(location.href);
+      if (u.searchParams.has("token")) {
+        u.searchParams.delete("token");
+        history.replaceState(null, "", u.pathname + (u.searchParams.toString() ? "?" + u.searchParams.toString() : "") + u.hash);
+      }
+    } catch (e) {}
+  }
+
+  function api(path, opts) {
+    var init = Object.assign({ credentials: "same-origin", headers: {} }, opts || {});
+    if (init.body != null && typeof init.body !== "string") {
+      init.body = JSON.stringify(init.body);
+      init.headers["Content-Type"] = "application/json";
+    }
+    var quiet = !!init.quiet;
+    delete init.quiet;
+    return fetch(path, init).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        if (res.status === 401) {
+          onAuthLost(quiet ? null : "login_invalid");
+          throw { code: "auth", status: 401 };
+        }
+        if (!res.ok) throw { code: (body && body.error) || "http_" + res.status, status: res.status, body: body };
+        return body;
+      });
+    });
+  }
+
+  function onAuthLost(msgKey) {
+    var wasLoggedIn = !!session;
+    stopPolling();
+    session = null;
+    orders = [];
+    currentOrderId = null;
+    lastDetail = null;
+    detailSeq++;
+    $("dash-loading").hidden = true;
+    setMsg("dash-status", null, "");
+    showView("login");
+    if (msgKey === "login_invalid" && wasLoggedIn) msgKey = "session_expired";
+    setMsg("login-msg", msgKey, msgKey ? "err" : "");
+  }
+
+  function startPolling() {
+    if (!pollTimer) pollTimer = setInterval(refresh, 30000);
+  }
+  function stopPolling() {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  }
+
+  function orderCard(o) {
+    var id = String(o.id);
+    var card = el("button", "order-card");
+    card.type = "button";
+    card.setAttribute("data-order-id", id);
+
+    var top = el("div", "oc-top");
+    top.appendChild(el("span", "mono oc-no", String(o.order_no || t("none"))));
+    top.appendChild(el("span", "badge " + phaseClass(o.phase), phaseLabel(o.phase)));
+    card.appendChild(top);
+
+    var pct = clampPct(o.progress);
+    var prow = el("div", "oc-progress");
+    var track = el("div", "track");
+    var fill = document.createElement("i");
+    fill.style.width = pct + "%";
+    track.appendChild(fill);
+    prow.appendChild(track);
+    prow.appendChild(el("span", "pct", pct + "%"));
+    card.appendChild(prow);
+
+    var meta = el("div", "oc-meta");
+    meta.appendChild(el("span", "badge " + paymentClass(o.payment_status), paymentLabel(o.payment_status)));
+    meta.appendChild(el("span", "tok", tokensText(o.tokens) + " " + t("tokens_unit")));
+    meta.appendChild(el("span", "when", t("updated") + " " + fmtDate(o.updated_at)));
+    card.appendChild(meta);
+
+    card.addEventListener("click", function () { openOrder(id); });
+    return card;
+  }
+
+  function renderDash() {
+    $("dash-title").textContent = t("dash_title");
+    var who = $("dash-who");
+    if (who) who.textContent = session && session.email ? String(session.email) : "";
+    $("dash-empty").hidden = orders.length > 0;
+    $("dash-empty").textContent = t("no_orders");
+    var box = $("orders");
+    box.textContent = "";
+    orders.forEach(function (o) { box.appendChild(orderCard(o)); });
+  }
+
+  function renderBrief(raw) {
+    var box = $("d-brief");
+    box.textContent = "";
+    var data = (raw && typeof raw === "object" && !Array.isArray(raw)) ? raw : {};
+    var shown = 0;
+    BRIEF_KEYS.forEach(function (k) {
+      var v = data[k];
+      if (v == null) return;
+      var text = Array.isArray(v) ? v.join(", ") : String(v);
+      if (!text.trim()) return;
+      var row = el("div", "brief-row");
+      row.appendChild(el("span", "bk", t("label_" + k)));
+      row.appendChild(el("span", "bv", text));
+      box.appendChild(row);
+      shown++;
+    });
+    $("d-brief-empty").hidden = shown > 0;
+    $("d-brief-empty").textContent = t("brief_empty");
+  }
+
+  function renderUpdates(list) {
+    var box = $("d-updates");
+    box.textContent = "";
+    $("d-updates-empty").hidden = list.length > 0;
+    $("d-updates-empty").textContent = t("updates_empty");
+    list.forEach(function (u) {
+      var item = el("div", "up-item");
+      var head = el("div", "up-head");
+      head.appendChild(el("span", "badge " + phaseClass(u.phase), phaseLabel(u.phase)));
+      if (u.progress != null) head.appendChild(el("span", "pct", clampPct(u.progress) + "%"));
+      head.appendChild(el("span", "when", fmtDate(u.created_at)));
+      item.appendChild(head);
+      if (u.note) item.appendChild(el("p", "up-note", String(u.note)));
+      box.appendChild(item);
+    });
+  }
+
+  function renderLedger(list) {
+    var box = $("d-ledger");
+    box.textContent = "";
+    $("d-ledger-empty").hidden = list.length > 0;
+    $("d-ledger-empty").textContent = t("ledger_empty");
+    list.forEach(function (l) {
+      var kind = String(l.kind || "");
+      var amount = Number(l.amount);
+      if (!isFinite(amount)) amount = 0;
+      var shown = kind === "usage" ? -Math.abs(amount) : amount;
+      var row = el("div", "led-row");
+      var main = el("div", "led-main");
+      var key = "ledger_" + kind;
+      main.appendChild(el("span", "badge " + (kind === "usage" ? "pr-high" : kind === "topup" ? "st-done" : "st-open"),
+        hasKey(key) ? t(key) : (kind || t("none"))));
+      if (l.note) main.appendChild(el("span", "led-note", String(l.note)));
+      row.appendChild(main);
+      row.appendChild(el("span", "led-amt " + (shown < 0 ? "neg" : "pos"),
+        (shown < 0 ? "-" : "+") + Math.abs(shown).toFixed(2)));
+      row.appendChild(el("div", "led-when", fmtDate(l.created_at)));
+      box.appendChild(row);
+    });
+  }
+
+  function renderChanges(list) {
+    var box = $("d-changes");
+    box.textContent = "";
+    $("d-changes-empty").hidden = list.length > 0;
+    $("d-changes-empty").textContent = t("changes_empty");
+    list.forEach(function (c) {
+      var item = el("div", "chg-item");
+      var head = el("div", "chg-head");
+      head.appendChild(el("span", "chg-title", String(c.title || t("none"))));
+      head.appendChild(el("span", "badge " + statusClass(c.status), statusLabel(c.status)));
+      item.appendChild(head);
+
+      var meta = el("div", "chg-meta");
+      meta.appendChild(el("span", "badge " + priorityClass(c.priority), priorityLabel(c.priority)));
+      if (c.page_url) {
+        var href = safeHttpUrl(c.page_url);
+        if (href) {
+          var a = el("a", "chg-link", String(c.page_url));
+          a.href = href;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          meta.appendChild(a);
+        } else {
+          meta.appendChild(el("span", "chg-link", String(c.page_url)));
+        }
+      }
+      item.appendChild(meta);
+      if (c.description) item.appendChild(el("p", "chg-desc", String(c.description)));
+      if (c.admin_note) item.appendChild(el("p", "chg-admin", t("change_admin_note") + ": " + String(c.admin_note)));
+      item.appendChild(el("div", "chg-when", fmtDate(c.created_at)));
+      box.appendChild(item);
+    });
+  }
+
+  function renderDetail(body) {
+    lastDetail = body;
+    var order = (body && body.order) || {};
+    var updates = Array.isArray(body && body.updates) ? body.updates : [];
+    var changes = Array.isArray(body && body.changes) ? body.changes : [];
+    var ledger = Array.isArray(body && body.ledger) ? body.ledger : [];
+
+    $("d-order-no").textContent = String(order.order_no || t("none"));
+    var phase = $("d-phase");
+    phase.className = "badge " + phaseClass(order.phase);
+    phase.textContent = phaseLabel(order.phase);
+
+    var pct = clampPct(order.progress);
+    $("d-progress-bar").style.width = pct + "%";
+    $("d-progress-num").textContent = pct + "%";
+    var pay = $("d-payment");
+    pay.className = "badge " + paymentClass(order.payment_status);
+    pay.textContent = paymentLabel(order.payment_status);
+    var ph = $("payhelp");
+    if (ph) {
+      ph.hidden = order.payment_status === "paid";
+      var pwa = $("payhelp_wa");
+      if (pwa) pwa.href = "https://wa.me/60165280918?text=" + encodeURIComponent("Invoice / payment for " + order.order_no);
+    }
+    $("d-tokens").textContent = tokensText(order.tokens);
+    $("d-updated").textContent = fmtDate(order.updated_at);
+
+    renderBrief(order.brief_json);
+    renderUpdates(updates);
+    renderLedger(ledger);
+    renderChanges(changes);
+    setMsg("detail-status", null, "");
+  }
+
+  function clearDetail() {
+    $("d-order-no").textContent = "—";
+    $("d-phase").className = "badge p-brief";
+    $("d-phase").textContent = "—";
+    $("d-progress-bar").style.width = "0%";
+    $("d-progress-num").textContent = "0%";
+    $("d-payment").className = "badge pay-unpaid";
+    $("d-payment").textContent = "—";
+    var ph = $("payhelp"); if (ph) ph.hidden = true;
+    $("d-tokens").textContent = "0.00";
+    $("d-updated").textContent = "—";
+    $("d-brief").textContent = "";
+    $("d-updates").textContent = "";
+    $("d-ledger").textContent = "";
+    $("d-changes").textContent = "";
+    $("d-brief-empty").hidden = false;
+    $("d-updates-empty").hidden = false;
+    $("d-ledger-empty").hidden = false;
+    $("d-changes-empty").hidden = false;
+    $("d-brief-empty").textContent = t("brief_empty");
+    $("d-updates-empty").textContent = t("updates_empty");
+    $("d-ledger-empty").textContent = t("ledger_empty");
+    $("d-changes-empty").textContent = t("changes_empty");
+    lastDetail = null;
+  }
+
+  function loadOrder(id, opts) {
+    opts = opts || {};
+    var seq = opts.seq != null ? opts.seq : ++detailSeq;
+    if (!opts.silent) {
+      $("detail-loading").hidden = false;
+      setMsg("detail-status", null, "");
+      clearDetail();
+    }
+    return api("/api/client/orders/" + encodeURIComponent(id)).then(function (body) {
+      if (seq !== detailSeq) return;
+      if (String(currentOrderId) !== String(id)) return;
+      $("detail-loading").hidden = true;
+      renderDetail(body);
+    }).catch(function (e) {
+      if (seq !== detailSeq) return;
+      $("detail-loading").hidden = true;
+      if (e && e.code === "auth") return;
+      if (opts.silent) return;
+      if (e && e.status === 404) setMsg("detail-status", "err_not_found", "err");
+      else setMsg("detail-status", "err_network", "err");
+    });
+  }
+
+  function openOrder(id) {
+    id = String(id);
+    currentOrderId = id;
+    detailSeq++;
+    showView("detail");
+    window.scrollTo(0, 0);
+    loadOrder(id, { seq: detailSeq });
+  }
+
+  function refresh() {
+    if (!session || polling) return;
+    polling = true;
+    var id = currentOrderId;
+    api("/api/client/me").then(function (body) {
+      session = body.client || session;
+      orders = Array.isArray(body.orders) ? body.orders : [];
+      setMsg("dash-status", null, "");
+      renderDash();
+      if (id) return loadOrder(id, { silent: true });
+    }).catch(function (e) {
+      if (e && e.code === "auth") return;
+      // 轮询失败写 dashboard 内联错误（SPEC §6.1 错误态复用 #dash-status），下一次成功自动清除
+      if (!$("dash").hidden) setMsg("dash-status", "err_network", "err");
+    }).then(function () { polling = false; });
+  }
+
+  function loadDash() {
+    $("dash-loading").hidden = false;
+    setMsg("dash-status", null, "");
+    api("/api/client/me").then(function (body) {
+      session = body.client || session;
+      orders = Array.isArray(body.orders) ? body.orders : [];
+      $("dash-loading").hidden = true;
+      renderDash();
+    }).catch(function (e) {
+      $("dash-loading").hidden = true;
+      if (e && e.code === "auth") return;
+      setMsg("dash-status", "err_network", "err");
+    });
+  }
+
+  function applySession(body) {
+    stripToken();
+    session = body.client || null;
+    orders = Array.isArray(body.orders) ? body.orders : [];
+    $("dash-loading").hidden = true;
+    setMsg("dash-status", null, "");
+    showView("dash");
+    renderDash();
+    startPolling();
+  }
+
+  document.getElementById("langs").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-lang]");
+    if (b) setLang(b.getAttribute("data-lang"));
+  });
+
+  document.getElementById("login-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var email = $("login-email").value.trim();
+    if (!email) {
+      setMsg("login-msg", "login_email_err", "err");
+      $("login-email").focus();
+      return;
+    }
+    var btn = $("login-btn");
+    btn.disabled = true;
+    setMsg("login-msg", "login_sending", "");
+    api("/api/client/request-link", { method: "POST", body: { email: email } }).then(function () {
+      setMsg("login-msg", "link_sent", "ok");
+    }).catch(function (e) {
+      if (e && e.code === "auth") return;
+      if (e && e.status === 400) setMsg("login-msg", "login_email_err", "err");
+      else if (e && e.status === 429) setMsg("login-msg", "login_rate", "err");
+      else setMsg("login-msg", "login_network", "err");
+    }).then(function () { btn.disabled = false; });
+  });
+
+  $("logout-btn").addEventListener("click", function () {
+    stopPolling();
+    session = null;
+    orders = [];
+    currentOrderId = null;
+    lastDetail = null;
+    detailSeq++;
+    api("/api/client/logout", { method: "POST", quiet: true }).catch(function () {}).then(function () {
+      showView("login");
+      setMsg("login-msg", null, "");
+      $("login-email").value = "";
+    });
+  });
+
+  $("detail-back").addEventListener("click", function () {
+    currentOrderId = null;
+    lastDetail = null;
+    detailSeq++;
+    showView("dash");
+    if (!orders.length) renderDash();
+    loadDash();
+  });
+
+  $("change-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!currentOrderId) return;
+    var title = $("chg-title").value.trim();
+    var desc = $("chg-desc").value.trim();
+    var url = $("chg-url").value.trim();
+    var priority = $("chg-priority").value;
+    if (!title) {
+      setMsg("chg-msg", "err_title", "err");
+      $("chg-title").focus();
+      return;
+    }
+    if (!desc) {
+      setMsg("chg-msg", "err_desc", "err");
+      $("chg-desc").focus();
+      return;
+    }
+    var btn = $("chg-submit");
+    btn.disabled = true;
+    setMsg("chg-msg", "loading", "");
+    api("/api/client/orders/" + encodeURIComponent(currentOrderId) + "/changes", {
+      method: "POST",
+      body: { title: title, description: desc, page_url: url || null, priority: priority }
+    }).then(function () {
+      $("chg-title").value = "";
+      $("chg-desc").value = "";
+      $("chg-url").value = "";
+      $("chg-priority").value = "normal";
+      setMsg("chg-msg", "chg_sent", "ok");
+      return loadOrder(currentOrderId, { silent: true });
+    }).catch(function (e) {
+      if (e && e.code === "auth") return;
+      if (e && e.status === 400) {
+        var field = e.body && e.body.field;
+        if (field === "title") { setMsg("chg-msg", "err_title", "err"); $("chg-title").focus(); }
+        else if (field === "description") { setMsg("chg-msg", "err_desc", "err"); $("chg-desc").focus(); }
+        else if (field === "page_url") { setMsg("chg-msg", "err_url", "err"); $("chg-url").focus(); }
+        else setMsg("chg-msg", "err_generic", "err");
+      } else if (e && e.status === 429) setMsg("chg-msg", "err_rate", "err");
+      else if (e && e.status === 404) setMsg("chg-msg", "err_not_found", "err");
+      else setMsg("chg-msg", "err_network", "err");
+    }).then(function () { btn.disabled = false; });
+  });
+
+  document.getElementById("year").textContent = String(new Date().getFullYear());
+
+  function boot() {
+    var token = q.get("token");
+    if (token) {
+      showView("login");
+      // 先剥离；applySession / 失败分支再各调用一次（幂等），确保任何路径都不留 token
+      stripToken();
+      setMsg("login-msg", "loading", "");
+      api("/api/client/verify", { method: "POST", body: { token: token } }).then(function () {
+        // verify 只给 client，必须再 GET /me 才有 orders（SPEC §6.1 / P1-7）
+        showView("dash");
+        $("dash-loading").hidden = false;
+        return api("/api/client/me");
+      }).then(function (body) {
+        applySession(body);
+      }).catch(function (e) {
+        stripToken();
+        $("dash-loading").hidden = true;
+        if (e && e.code === "auth") return;
+        showView("login");
+        setMsg("login-msg", "login_invalid", "err");
+      });
+      return;
+    }
+    // 无 token：先展示 dashboard 加载态，401 再回登录（SPEC §6.1 加载/错误三态）
+    showView("dash");
+    $("dash-loading").hidden = false;
+    api("/api/client/me", { quiet: true }).then(function (body) {
+      applySession(body);
+    }).catch(function (e) {
+      $("dash-loading").hidden = true;
+      if (e && e.code === "auth") { showView("login"); setMsg("login-msg", null, ""); return; }
+      showView("login");
+      setMsg("login-msg", "login_network", "err");
+    });
+  }
+
+  apply();
+  // SPEC §6.1 要求的字面量；先清掉未登录空转，会话建立后由 startPolling() 启动
+  var pollTimer = setInterval(refresh, 30000);
+  stopPolling();
+  boot();
+})();
+</script>
+</body>
+</html>

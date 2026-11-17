@@ -107,12 +107,43 @@
   .b-status{background:#E7F5EC;color:#1D6B43}
   .b-note{background:#FFF3DC;color:#8A5A10}
   .b-other{background:#EEF0F3;color:#55616E}
+  .b-payment{background:#E3F6EF;color:#116B4E}
+  .b-progress{background:#EFE9FA;color:#5A3E9E}
   .tl-meta{flex:1 1 auto;min-width:0;font-size:11.5px;color:var(--muted);
     word-break:break-word;overflow-wrap:anywhere}
   /* 时间串由 fmtDate 固定格式产出（三语最长约 21 字符 ≈147px），单行不换行仍可缩；若改长格式需复查溢出 */
   .tl-time{white-space:nowrap}
   .tl-note{flex:1 1 100%;min-width:0;font-size:12.5px;color:var(--ink);
     white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  /* 客户需求 / 付款 / 进度 / 更新 / 变更（SPEC §6.3 追加区块） */
+  .substatus{font-size:12px;color:var(--muted);min-height:16px;margin-top:8px;
+    overflow-wrap:anywhere;word-break:break-word}
+  .substatus.ok{color:var(--ok)}
+  .substatus.err{color:#8E2F24}
+  .brief-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px}
+  .brief-item{min-width:0}
+  .brief-item .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .brief-item .v{font-size:13px;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+  .pay-at{font-size:13px;color:var(--ink);overflow-wrap:anywhere}
+  .update-list{display:flex;flex-direction:column;gap:10px}
+  .upd-item{border-left:2px solid var(--line);padding:2px 0 2px 10px;min-width:0}
+  .upd-head{display:flex;gap:6px 10px;flex-wrap:wrap;align-items:baseline;font-size:11.5px;color:var(--muted)}
+  .upd-note{font-size:12.5px;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;margin-top:4px}
+  .chg-admin-item{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;min-width:0}
+  .chg-admin-item:last-child{margin-bottom:0}
+  .chg-admin-item .chg-head{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+  .chg-admin-item .chg-t{font-weight:600;font-size:13px;color:var(--ink);overflow-wrap:anywhere;word-break:break-word;min-width:0;flex:1 1 160px}
+  .chg-admin-item .chg-d{font-size:12px;color:#44515E;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;margin-top:6px}
+  .chg-admin-item .chg-url{color:var(--muted);word-break:break-all}
+  .chg-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-top:8px}
+  .chg-controls .field{flex:1 1 130px}
+  .chg-controls .grow{flex:2 1 200px}
+  .chg-msg{font-size:11.5px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
+  .chg-msg.ok{color:var(--ok)}
+  .chg-msg.err{color:#8E2F24}
+  .p-low{background:#EEF0F3;color:#55616E}
+  .p-normal{background:#E8F0FA;color:#245A96}
+  .p-high{background:#FBEAE8;color:#8E2F24}
   @media(max-width:760px){
     .bar b{font-size:15px}
     .bar .who{display:none}
@@ -139,6 +170,10 @@
     .meta{grid-template-columns:1fr}
     .row .field,.row .grow{flex:1 1 100%}
     .row .btn{width:100%}
+    .brief-list{grid-template-columns:minmax(0,1fr)}
+    .chg-controls .field,.chg-controls .grow{flex:1 1 100%}
+    .chg-controls .btn{width:100%}
+    .btn.sm{min-height:36px}
     .modal{padding:10px}
   }
 </style>
@@ -271,6 +306,62 @@
       <div id="dtimeline"></div>
     </div>
 
+    <div class="substatus" id="detail-status" role="status"></div>
+
+    <div class="sect" id="brief-sect">
+      <h3 data-i18n="brief_section"></h3>
+      <div class="brief-list" id="dbrief"></div>
+      <div class="empty" id="dbrief-empty" hidden></div>
+    </div>
+
+    <div class="sect" id="pay-sect">
+      <h3 data-i18n="pay_section"></h3>
+      <div class="row">
+        <div class="field">
+          <label for="dpayment" data-i18n="payment_status"></label>
+          <select id="dpayment"></select>
+        </div>
+        <div class="field grow">
+          <div class="k" data-i18n="payment_paid_at" style="font-size:10.5px;color:var(--muted)"></div>
+          <div class="pay-at" id="dpaidat">—</div>
+        </div>
+        <button class="btn" id="paybtn" type="button" data-i18n="pay_save"></button>
+      </div>
+      <div class="substatus" id="paystatus" role="status"></div>
+    </div>
+
+    <div class="sect" id="progress-sect">
+      <h3 data-i18n="progress_section"></h3>
+      <div class="row">
+        <div class="field">
+          <label for="dphase" data-i18n="phase_label"></label>
+          <select id="dphase"></select>
+        </div>
+        <div class="field">
+          <label for="dprogress" data-i18n="progress_label"></label>
+          <input id="dprogress" type="number" min="0" max="100" step="1" inputmode="numeric" value="0">
+        </div>
+        <div class="field grow">
+          <label for="dpnote" data-i18n="progress_note"></label>
+          <input id="dpnote" type="text" maxlength="500" data-i18n-ph="progress_note_ph">
+        </div>
+        <button class="btn" id="progressbtn" type="button" data-i18n="progress_save"></button>
+      </div>
+      <div class="substatus" id="progressstatus" role="status"></div>
+    </div>
+
+    <div class="sect" id="updates-sect">
+      <h3 data-i18n="updates_section"></h3>
+      <div class="update-list" id="dupdates"></div>
+      <div class="substatus" id="dupdates-status" role="status"></div>
+    </div>
+
+    <div class="sect" id="changes-sect">
+      <h3 data-i18n="changes_section"></h3>
+      <div id="dchanges"></div>
+      <div class="substatus" id="dchanges-status" role="status"></div>
+    </div>
+
     <div class="alert" id="dalert" role="alert" style="margin-top:14px"></div>
   </div>
 </div>
@@ -281,6 +372,12 @@
   var INDEX = { zh: 0, en: 1, bm: 2 };
   var STATUSES = ["new", "contacted", "paid", "building", "review", "live", "paused", "cancelled"];
   var TOKEN_KINDS = ["topup", "usage", "adjust"];
+  var PHASES = ["brief", "design", "build", "review", "launch", "live"];
+  var PAYMENT_STATUSES = ["unpaid", "paid", "refunded"];
+  var CHANGE_STATUSES = ["open", "in_progress", "done", "cancelled"];
+  var CHANGE_PRIORITIES = ["low", "normal", "high"];
+  var BRIEF_KEYS = ["goal", "pages", "listing_count", "listing_source", "domain", "logo_url",
+    "brand_color", "reference_url", "asset_links", "target_launch", "notes"];
   var I18N = {
     page_title: ["订单后台 — RoofX", "Order desk — RoofX", "Meja pesanan — RoofX"],
     title: ["建站订单", "Website orders", "Pesanan laman web"],
@@ -352,6 +449,66 @@
     status_live: ["已上线", "Live", "Aktif"],
     status_paused: ["已暂停", "Paused", "Dijeda"],
     status_cancelled: ["已取消", "Cancelled", "Dibatalkan"],
+    brief_section: ["客户需求", "Client brief", "Ringkasan pelanggan"],
+    brief_empty: ["客户还没有填写建站需求。", "The client has not filled in a brief yet.", "Pelanggan belum mengisi ringkasan projek."],
+    detail_not_found: ["该订单不存在或已被删除。", "This order does not exist or was deleted.", "Pesanan ini tidak wujud atau telah dipadam."],
+    pay_section: ["付款", "Payment", "Bayaran"],
+    payment_status: ["付款状态", "Payment status", "Status bayaran"],
+    payment_unpaid: ["未付款", "Unpaid", "Belum dibayar"],
+    payment_paid: ["已付款", "Paid", "Dibayar"],
+    payment_refunded: ["已退款", "Refunded", "Dipulangkan"],
+    payment_paid_at: ["付款时间", "Paid at", "Dibayar pada"],
+    pay_save: ["保存付款状态", "Save payment", "Simpan bayaran"],
+    pay_saved: ["付款状态已保存。", "Payment status saved.", "Status bayaran disimpan."],
+    progress_section: ["进度", "Progress", "Kemajuan"],
+    phase_label: ["阶段", "Phase", "Fasa"],
+    progress_label: ["进度（0–100）", "Progress (0–100)", "Kemajuan (0–100)"],
+    progress_note: ["客户可见备注", "Client-visible note", "Nota untuk pelanggan"],
+    progress_note_ph: ["可选，例如：首页初稿已完成", "Optional, e.g. Home page first draft is ready", "Pilihan, cth. Draf pertama halaman siap"],
+    progress_save: ["保存进度", "Save progress", "Simpan kemajuan"],
+    progress_saved: ["进度已保存，客户可见更新已生成。", "Progress saved and a client-visible update was created.", "Kemajuan disimpan dan kemas kini untuk pelanggan dijana."],
+    updates_section: ["客户可见更新", "Client-visible updates", "Kemas kini untuk pelanggan"],
+    updates_empty: ["还没有客户可见更新。", "No client-visible updates yet.", "Belum ada kemas kini untuk pelanggan."],
+    updates_visible: ["客户可见", "Visible to client", "Dapat dilihat pelanggan"],
+    updates_hidden: ["仅内部", "Internal only", "Dalaman sahaja"],
+    changes_section: ["变更请求", "Change requests", "Permintaan perubahan"],
+    changes_empty: ["还没有变更请求。", "No change requests yet.", "Belum ada permintaan perubahan."],
+    change_status: ["状态", "Status", "Status"],
+    change_note: ["处理备注", "Admin note", "Nota pentadbir"],
+    change_save: ["保存", "Save", "Simpan"],
+    change_saved: ["已保存。", "Saved.", "Disimpan."],
+    change_priority: ["优先级", "Priority", "Keutamaan"],
+    change_page_url: ["页面链接", "Page URL", "URL halaman"],
+    change_status_open: ["待处理", "Open", "Terbuka"],
+    change_status_in_progress: ["处理中", "In progress", "Sedang diproses"],
+    change_status_done: ["已完成", "Done", "Selesai"],
+    change_status_cancelled: ["已取消", "Cancelled", "Dibatalkan"],
+    phase_brief: ["需求收集", "Brief", "Ringkasan"],
+    phase_design: ["设计", "Design", "Reka bentuk"],
+    phase_build: ["制作", "Build", "Pembinaan"],
+    phase_review: ["验收", "Review", "Semakan"],
+    phase_launch: ["上线准备", "Launch", "Pelancaran"],
+    phase_live: ["已上线", "Live", "Aktif"],
+    priority_low: ["低", "Low", "Rendah"],
+    priority_normal: ["普通", "Normal", "Biasa"],
+    priority_high: ["高", "High", "Tinggi"],
+    timeline_type_payment: ["付款", "Payment", "Bayaran"],
+    timeline_type_progress: ["进度", "Progress", "Kemajuan"],
+    invalid_phase: ["阶段值不合法。", "Invalid phase.", "Fasa tidak sah."],
+    invalid_progress: ["进度必须是 0–100 的整数。", "Progress must be a whole number from 0 to 100.", "Kemajuan mesti nombor bulat 0 hingga 100."],
+    invalid_note: ["备注过长或格式不正确。", "The note is too long or invalid.", "Nota terlalu panjang atau tidak sah."],
+    invalid_status: ["状态值不合法。", "Invalid status.", "Status tidak sah."],
+    invalid_payment_status: ["付款状态不合法。", "Invalid payment status.", "Status bayaran tidak sah."],
+    label_goal: ["建站目标", "Goal", "Matlamat"],
+    label_pages: ["需要页面", "Pages needed", "Halaman diperlukan"],
+    label_listing_count: ["房源数量", "Listing count", "Bilangan senarai"],
+    label_listing_source: ["房源来源", "Listing source", "Sumber senarai"],
+    label_logo_url: ["Logo 链接", "Logo link", "Pautan logo"],
+    label_brand_color: ["品牌色", "Brand colour", "Warna jenama"],
+    label_reference_url: ["参考网站", "Reference site", "Laman rujukan"],
+    label_asset_links: ["素材链接", "Asset links", "Pautan bahan"],
+    label_target_launch: ["目标上线日期", "Target launch", "Sasaran pelancaran"],
+    label_notes: ["备注", "Notes", "Catatan"],
     none: ["—", "—", "—"]
   };
 
@@ -377,6 +534,51 @@
   function fmtMoney(n) {
     var x = Number(n);
     return isFinite(x) ? x.toFixed(2) : "0.00";
+  }
+  function clampPct(raw) {
+    var n = Number(raw);
+    if (!isFinite(n)) n = 0;
+    return Math.max(0, Math.min(100, Math.round(n)));
+  }
+  function phaseText(p) {
+    var k = "phase_" + String(p || "");
+    return I18N[k] ? t(k) : String(p || t("none"));
+  }
+  function paymentText(p) {
+    var k = "payment_" + String(p || "");
+    return I18N[k] ? t(k) : String(p || t("none"));
+  }
+  function priorityText(p) {
+    var k = "priority_" + String(p || "");
+    return I18N[k] ? t(k) : String(p || t("none"));
+  }
+  function changeStatusText(s) {
+    var k = "change_status_" + String(s || "");
+    return I18N[k] ? t(k) : String(s || t("none"));
+  }
+  function changeStatusClass(s) {
+    var v = String(s || "");
+    var map = { open: "s-new", in_progress: "s-building", done: "s-live", cancelled: "s-cancelled" };
+    return map[v] || "s-paused";
+  }
+  function setSub(id, key, kind) {
+    var node = $(id);
+    if (!node) return;
+    node.hidden = !key;
+    node.className = "substatus" + (kind ? " " + kind : "");
+    node.textContent = key ? t(key) : "";
+  }
+  // 统一错误文案映射（SPEC §6.3）：401 已在 fetchJson 内走 showGate
+  function errorKey(e) {
+    if (!e) return "err_generic";
+    if (e.status === 403) return "err_forbidden";
+    if (e.status === 404 || e.code === "not_found") return "detail_not_found";
+    if (e.code === "invalid_phase") return "invalid_phase";
+    if (e.code === "invalid_progress") return "invalid_progress";
+    if (e.code === "invalid_note") return "invalid_note";
+    if (e.code === "invalid_status") return "invalid_status";
+    if (e.code === "invalid_payment_status") return "invalid_payment_status";
+    return "err_generic";
   }
 
   function apply() {
@@ -406,6 +608,14 @@
     if (!document.getElementById("app").hidden) render();
     // 弹窗打开时切语言：重新拉取，让徽标/时间/状态文案一起换语言（SPEC §5.3-4）
     if (current && !$("modal").hidden) loadTimeline(current.id);
+    if ($("dpayment").options.length) {
+      Array.prototype.forEach.call($("dpayment").options, function (o) { o.textContent = paymentText(o.value); });
+    }
+    if ($("dphase").options.length) {
+      Array.prototype.forEach.call($("dphase").options, function (o) { o.textContent = phaseText(o.value); });
+    }
+    // 追加区块同样在切语言时重拉（SPEC §6.3 / P2-21）
+    if (current && !$("modal").hidden) loadDetailExtras(current.id);
   }
 
   function setLang(next) {
@@ -533,6 +743,18 @@
       var map = { topup: "token_topup", usage: "token_usage", adjust: "token_adjust" };
       o.textContent = t(map[o.value]);
     });
+
+    var ps = $("dpayment");
+    if (!ps.options.length) {
+      PAYMENT_STATUSES.forEach(function (s) { ps.appendChild(new Option("", s)); });
+    }
+    Array.prototype.forEach.call(ps.options, function (o) { o.textContent = paymentText(o.value); });
+
+    var phs = $("dphase");
+    if (!phs.options.length) {
+      PHASES.forEach(function (s) { phs.appendChild(new Option("", s)); });
+    }
+    Array.prototype.forEach.call(phs.options, function (o) { o.textContent = phaseText(o.value); });
   }
 
   function load() {
@@ -596,6 +818,8 @@
     $("modal").hidden = false;
     document.body.style.overflow = "hidden";
     loadTimeline(r.id);
+    loadDetailExtras(r.id);
+    resetExtras(r);
     $("closebtn").focus();
   }
 
@@ -603,8 +827,9 @@
     $("modal").hidden = true;
     document.body.style.overflow = "";
     current = null;
-    // 使在途的时间线响应失效，并复位区块（SPEC §5.4-2）
+    // 使在途的时间线/详情扩展响应失效，并复位区块（SPEC §5.4-2 / §6.3）
     timelineSeq++;
+    detailSeq++;
     $("dtimeline").innerHTML = "";
     var st = $("dtimeline-status");
     st.hidden = true;
@@ -616,7 +841,13 @@
   // ---------- 订单事件时间线（SPEC §5 / §10.4） ----------
   // 竞态令牌（SPEC §10.4 片段里写作 tlSeq，同一令牌）：只有最后一次时间线请求的响应允许落地
   var timelineSeq = 0;
-  var TYPE_KEY = { created: "timeline_type_created", status: "timeline_type_status", note: "timeline_type_note" };
+  var TYPE_KEY = {
+    created: "timeline_type_created",
+    status: "timeline_type_status",
+    note: "timeline_type_note",
+    payment: "timeline_type_payment",
+    progress: "timeline_type_progress"
+  };
 
   function timelineLoading() {
     var st = $("dtimeline-status");
@@ -694,6 +925,215 @@
         if ($("modal").hidden) return;
         if (e && (e.status === 404 || e.code === "not_found")) timelineError(t("timeline_err_not_found"));
         else timelineError(t("timeline_err"));
+      });
+  }
+
+  // ---------- 详情扩展区块：客户需求 / 付款 / 进度 / 更新 / 变更（SPEC §6.3） ----------
+  // 竞态令牌：关闭弹窗、重开或切语言时，只有最后一次 /detail 响应允许落地
+  var detailSeq = 0;
+
+  function extrasLoading() {
+    $("dbrief").textContent = "";
+    $("dbrief-empty").hidden = true;
+    $("dupdates").textContent = "";
+    $("dchanges").textContent = "";
+    setSub("detail-status", "loading", "");
+    setSub("dupdates-status", null, "");
+    setSub("dchanges-status", null, "");
+  }
+
+  // 打开详情时把列表行里已有的新四列回填到表单（列表可能尚未含新列，用默认值兜底）
+  function resetExtras(r) {
+    r = r || {};
+    var pay = $("dpayment");
+    pay.value = PAYMENT_STATUSES.indexOf(String(r.payment_status)) >= 0 ? String(r.payment_status) : "unpaid";
+    $("dpaidat").textContent = fmtDate(r.paid_at);
+    var ph = $("dphase");
+    ph.value = PHASES.indexOf(String(r.phase)) >= 0 ? String(r.phase) : "brief";
+    $("dprogress").value = String(clampPct(r.progress));
+    $("dpnote").value = "";
+    setSub("paystatus", null, "");
+    setSub("progressstatus", null, "");
+  }
+
+  function mergeRow(order) {
+    if (!order) return;
+    for (var i = 0; i < rows.length; i++) {
+      if (String(rows[i].id) === String(order.id)) {
+        rows[i] = Object.assign({}, rows[i], order);
+        if (current && String(current.id) === String(order.id)) current = rows[i];
+        break;
+      }
+    }
+  }
+
+  function renderBriefExtras(raw) {
+    var box = $("dbrief");
+    box.textContent = "";
+    var data = (raw && typeof raw === "object" && !Array.isArray(raw)) ? raw : {};
+    var shown = 0;
+    BRIEF_KEYS.forEach(function (k) {
+      var v = data[k];
+      if (v == null) return;
+      var text = Array.isArray(v) ? v.join(", ") : String(v);
+      if (!text.trim()) return;
+      var item = el("div", "brief-item");
+      item.appendChild(el("div", "k", t("label_" + k)));
+      item.appendChild(el("div", "v", text));
+      box.appendChild(item);
+      shown++;
+    });
+    $("dbrief-empty").hidden = shown > 0;
+    $("dbrief-empty").textContent = t("brief_empty");
+  }
+
+  function renderUpdatesExtras(list) {
+    var box = $("dupdates");
+    box.textContent = "";
+    if (!list.length) {
+      setSub("dupdates-status", "updates_empty", "");
+      return;
+    }
+    setSub("dupdates-status", null, "");
+    list.forEach(function (u) {
+      var item = el("div", "upd-item");
+      var head = el("div", "upd-head");
+      head.appendChild(el("span", "badge " + (u.visible ? "s-live" : "s-paused"),
+        u.visible ? t("updates_visible") : t("updates_hidden")));
+      head.appendChild(el("span", "badge s-building", phaseText(u.phase)));
+      if (u.progress != null) head.appendChild(el("span", "", clampPct(u.progress) + "%"));
+      head.appendChild(el("span", "", fmtDate(u.created_at)));
+      head.appendChild(el("span", "", t("timeline_actor") + " " + (u.actor || t("none"))));
+      item.appendChild(head);
+      if (u.note) item.appendChild(el("div", "upd-note", String(u.note)));
+      box.appendChild(item);
+    });
+  }
+
+  function renderChangesExtras(list) {
+    var box = $("dchanges");
+    box.textContent = "";
+    if (!list.length) {
+      setSub("dchanges-status", "changes_empty", "");
+      return;
+    }
+    setSub("dchanges-status", null, "");
+    list.forEach(function (c) {
+      var item = el("div", "chg-admin-item");
+      var head = el("div", "chg-head");
+      head.appendChild(el("div", "chg-t", String(c.title || t("none"))));
+      var sBadge = el("span", "badge " + changeStatusClass(c.status), changeStatusText(c.status));
+      head.appendChild(sBadge);
+      var pr = CHANGE_PRIORITIES.indexOf(String(c.priority)) >= 0 ? String(c.priority) : "normal";
+      head.appendChild(el("span", "badge p-" + pr, priorityText(c.priority)));
+      item.appendChild(head);
+
+      if (c.description) item.appendChild(el("div", "chg-d", String(c.description)));
+      if (c.page_url) item.appendChild(el("div", "chg-d chg-url", String(c.page_url)));
+
+      var controls = el("div", "chg-controls");
+      var statusField = el("div", "field");
+      statusField.appendChild(el("label", "", t("change_status")));
+      var sel = document.createElement("select");
+      sel.className = "chg-status";
+      CHANGE_STATUSES.forEach(function (s) { sel.appendChild(new Option(changeStatusText(s), s)); });
+      sel.value = CHANGE_STATUSES.indexOf(String(c.status)) >= 0 ? String(c.status) : "open";
+      statusField.appendChild(sel);
+      controls.appendChild(statusField);
+
+      var noteField = el("div", "field grow");
+      noteField.appendChild(el("label", "", t("change_note")));
+      var noteInput = document.createElement("input");
+      noteInput.type = "text";
+      noteInput.maxLength = 1000;
+      noteInput.className = "chg-note";
+      noteInput.value = c.admin_note == null ? "" : String(c.admin_note);
+      noteField.appendChild(noteInput);
+      controls.appendChild(noteField);
+
+      var saveBtn = el("button", "btn sm chg-save", t("change_save"));
+      saveBtn.type = "button";
+      saveBtn.setAttribute("data-change-id", String(c.id));
+      controls.appendChild(saveBtn);
+      item.appendChild(controls);
+
+      var msg = el("div", "chg-msg");
+      item.appendChild(msg);
+
+      saveBtn.addEventListener("click", function () {
+        var changeId = String(c.id);
+        saveBtn.disabled = true;
+        msg.className = "chg-msg";
+        msg.textContent = t("loading");
+        fetchJson("/api/admin/changes/" + encodeURIComponent(changeId), {
+          method: "PATCH",
+          body: JSON.stringify({ status: sel.value, admin_note: noteInput.value.trim() })
+        }).then(function (body) {
+          var ch = (body && body.change) || {};
+          if (ch.status) {
+            sel.value = ch.status;
+            sBadge.className = "badge " + changeStatusClass(ch.status);
+            sBadge.textContent = changeStatusText(ch.status);
+          }
+          noteInput.value = ch.admin_note == null ? "" : String(ch.admin_note);
+          msg.className = "chg-msg ok";
+          msg.textContent = t("change_saved");
+        }).catch(function (e) {
+          if (e && e.code === "auth") return;
+          msg.className = "chg-msg err";
+          msg.textContent = t(errorKey(e));
+        }).finally(function () { saveBtn.disabled = false; });
+      });
+
+      box.appendChild(item);
+    });
+  }
+
+  function renderExtras(body) {
+    if (!body) return;
+    setSub("detail-status", null, "");
+    var order = body.order || null;
+    if (order) mergeRow(order);
+    if (order && order.tokens != null) $("dtokens").textContent = fmtMoney(order.tokens);
+    if (order) {
+      $("dpayment").value = PAYMENT_STATUSES.indexOf(String(order.payment_status)) >= 0 ? String(order.payment_status) : "unpaid";
+      $("dpaidat").textContent = fmtDate(order.paid_at);
+      // /detail 可能比列表行新（SPEC §6.3）：把阶段/进度同步进表单，
+      // 否则保存进度会拿旧值 PATCH，把后端较新的进度改回旧值。
+      // 非 PHASES 的 phase 不臆造：保留表单里已有的合法值（resetExtras 已用 brief 兜底）。
+      var curPhase = PHASES.indexOf(String($("dphase").value)) >= 0 ? String($("dphase").value) : "brief";
+      $("dphase").value = PHASES.indexOf(String(order.phase)) >= 0 ? String(order.phase) : curPhase;
+      $("dprogress").value = String(clampPct(order.progress));
+    }
+    renderBriefExtras(body.brief_json);
+    renderUpdatesExtras(Array.isArray(body.updates) ? body.updates : []);
+    renderChangesExtras(Array.isArray(body.changes) ? body.changes : []);
+  }
+
+  // 拉取 /detail：失败只写区块状态，不关弹窗、不碰 #dalert（SPEC §6.3）
+  function loadDetailExtras(orderId) {
+    var seq = ++detailSeq;
+    var id = String(orderId);
+    extrasLoading();
+    return fetchJson("/api/admin/orders/" + encodeURIComponent(orderId) + "/detail")
+      .then(function (body) {
+        if (seq !== detailSeq) return;
+        if ($("modal").hidden) return;
+        if (!current || String(current.id) !== id) return;
+        renderExtras(body);
+      })
+      .catch(function (e) {
+        if (seq !== detailSeq) return;
+        if (e && e.code === "auth") return;
+        if ($("modal").hidden) return;
+        var key = errorKey(e);
+        $("dbrief").textContent = "";
+        $("dbrief-empty").hidden = true;
+        $("dupdates").textContent = "";
+        $("dchanges").textContent = "";
+        setSub("detail-status", key, "err");
+        setSub("dupdates-status", null, "");
+        setSub("dchanges-status", null, "");
       });
   }
 
@@ -783,6 +1223,68 @@
       else if (e && e.code === "invalid_token") alertBox($("dalert"), "err", t("err_amount"));
       else alertBox($("dalert"), "err", t("err_generic"));
     }).then(function () { btn.disabled = false; });
+  });
+
+  // ---------- 付款状态（SPEC §6.3） ----------
+  $("paybtn").addEventListener("click", function () {
+    if (!current) return;
+    var openId = current.id;
+    var btn = $("paybtn");
+    var next = $("dpayment").value;
+    btn.disabled = true;
+    setSub("paystatus", "loading", "");
+    fetchJson("/api/admin/orders/" + encodeURIComponent(openId) + "/payment", {
+      method: "PATCH",
+      body: JSON.stringify({ payment_status: next })
+    }).then(function (body) {
+      mergeRow(body && body.order);
+      if (body && body.order) {
+        var applied = String(body.order.payment_status);
+        $("dpayment").value = PAYMENT_STATUSES.indexOf(applied) >= 0 ? applied : next;
+        $("dpaidat").textContent = fmtDate(body.order.paid_at);
+      }
+      $("dtokens").textContent = fmtMoney(current ? current.tokens : 0);
+      setSub("paystatus", "pay_saved", "ok");
+      render();
+      if (!current || String(current.id) !== String(openId)) return;
+      loadTimeline(openId);
+      loadDetailExtras(openId);
+    }).catch(function (e) {
+      if (e && e.code === "auth") return;
+      setSub("paystatus", errorKey(e), "err");
+    }).finally(function () { btn.disabled = false; });
+  });
+
+  // ---------- 进度（SPEC §6.3） ----------
+  $("progressbtn").addEventListener("click", function () {
+    if (!current) return;
+    var openId = current.id;
+    var btn = $("progressbtn");
+    var phase = $("dphase").value;
+    var progress = Number($("dprogress").value);
+    var note = $("dpnote").value.trim();
+    btn.disabled = true;
+    setSub("progressstatus", "loading", "");
+    fetchJson("/api/admin/orders/" + encodeURIComponent(openId) + "/progress", {
+      method: "PATCH",
+      body: JSON.stringify({ phase: phase, progress: progress, note: note })
+    }).then(function (body) {
+      mergeRow(body && body.order);
+      if (body && body.order) {
+        var appliedPhase = String(body.order.phase);
+        $("dphase").value = PHASES.indexOf(appliedPhase) >= 0 ? appliedPhase : phase;
+        $("dprogress").value = String(clampPct(body.order.progress));
+      }
+      $("dpnote").value = "";
+      setSub("progressstatus", "progress_saved", "ok");
+      render();
+      if (!current || String(current.id) !== String(openId)) return;
+      loadTimeline(openId);
+      loadDetailExtras(openId);
+    }).catch(function (e) {
+      if (e && e.code === "auth") return;
+      setSub("progressstatus", errorKey(e), "err");
+    }).finally(function () { btn.disabled = false; });
   });
 
   buildSelects();

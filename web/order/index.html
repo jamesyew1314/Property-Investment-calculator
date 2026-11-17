@@ -95,6 +95,10 @@
     font-size:14px;background:#FDFCFA;color:var(--ink)}
   input:focus,textarea:focus{outline:2px solid rgba(181,114,63,.25);border-color:var(--copper)}
   textarea{min-height:96px;resize:vertical}
+  .briefbox{margin-top:20px;padding-top:18px;border-top:1px dashed #D8D2C7}
+  .briefhead{margin-bottom:12px}
+  .briefhead h3{font-family:Georgia,serif;font-weight:500;font-size:17px;color:var(--navy);margin:0 0 3px}
+  .briefhead p{margin:0;color:var(--muted);font-size:12.5px}
   .consent{display:flex;gap:10px;align-items:flex-start;margin:18px 0 6px;font-size:13px;color:#3A4654}
   .consent input{width:18px;height:18px;margin-top:2px;flex:0 0 auto;accent-color:var(--copper2)}
   .consent a{color:var(--copper2)}
@@ -274,6 +278,50 @@
             <textarea id="f_notes" name="notes" maxlength="1000" data-i18n-ph="ph_notes"></textarea>
           </div>
         </div>
+        <div class="briefbox">
+          <div class="briefhead">
+            <h3 data-i18n="brief_title"></h3>
+            <p data-i18n="brief_sub"></p>
+          </div>
+          <div class="formgrid">
+            <div class="field full">
+              <label for="b_goal" data-i18n="label_goal"></label>
+              <textarea id="b_goal" name="b_goal" maxlength="500"></textarea>
+            </div>
+            <div class="field">
+              <label for="b_pages" data-i18n="label_pages"></label>
+              <input id="b_pages" name="b_pages" type="text" maxlength="500">
+            </div>
+            <div class="field">
+              <label for="b_listing_count" data-i18n="label_listing_count"></label>
+              <input id="b_listing_count" name="b_listing_count" type="number" min="0" step="1" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="b_listing_source" data-i18n="label_listing_source"></label>
+              <input id="b_listing_source" name="b_listing_source" type="text" maxlength="500">
+            </div>
+            <div class="field">
+              <label for="b_logo_url" data-i18n="label_logo_url"></label>
+              <input id="b_logo_url" name="b_logo_url" type="url" maxlength="500">
+            </div>
+            <div class="field">
+              <label for="b_brand_color" data-i18n="label_brand_color"></label>
+              <input id="b_brand_color" name="b_brand_color" type="text" maxlength="500">
+            </div>
+            <div class="field">
+              <label for="b_reference_url" data-i18n="label_reference_url"></label>
+              <input id="b_reference_url" name="b_reference_url" type="url" maxlength="500">
+            </div>
+            <div class="field full">
+              <label for="b_asset_links" data-i18n="label_asset_links"></label>
+              <textarea id="b_asset_links" name="b_asset_links" maxlength="2000" data-i18n-ph="ph_asset_links"></textarea>
+            </div>
+            <div class="field full">
+              <label for="b_target_launch" data-i18n="label_target_launch"></label>
+              <input id="b_target_launch" name="b_target_launch" type="text" maxlength="500" placeholder="2026-12-01">
+            </div>
+          </div>
+        </div>
         <label class="consent" for="f_contract">
           <input id="f_contract" name="contract_accepted" type="checkbox">
           <span><span data-i18n="consent_a"></span> <a href="/terms/" target="_blank" rel="noopener" data-i18n="consent_link"></a></span>
@@ -411,6 +459,21 @@
     st_live: ["已上线", "Live", "Aktif"],
     st_paused: ["已暂停", "Paused", "Dijeda"],
     st_cancelled: ["已取消", "Cancelled", "Dibatalkan"],
+    brief_title: ["建站需求（选填）", "Project brief (optional)", "Ringkasan projek (pilihan)"],
+    brief_sub: ["提前告诉我们目标与素材，可以加快制作；不确定的可以留空。",
+      "Tell us the goal and assets up front to speed things up. Leave anything unsure blank.",
+      "Beritahu matlamat dan bahan awal untuk mempercepatkan proses. Biarkan kosong jika belum pasti."],
+    label_goal: ["建站目标", "Goal", "Matlamat"],
+    label_pages: ["需要页面", "Pages needed", "Halaman diperlukan"],
+    label_listing_count: ["房源数量", "Listing count", "Bilangan senarai"],
+    label_listing_source: ["房源来源", "Listing source", "Sumber senarai"],
+    label_logo_url: ["Logo 链接", "Logo link", "Pautan logo"],
+    label_brand_color: ["品牌色", "Brand colour", "Warna jenama"],
+    label_reference_url: ["参考网站", "Reference site", "Laman rujukan"],
+    label_asset_links: ["素材链接", "Asset links", "Pautan bahan"],
+    label_target_launch: ["目标上线日期", "Target launch", "Sasaran pelancaran"],
+    ph_asset_links: ["每行一个 Drive/Dropbox 链接，最多 10 个", "One Drive/Dropbox link per line, up to 10", "Satu pautan Drive/Dropbox setiap baris, sehingga 10"],
+    err_brief: ["建站需求格式不正确，请检查链接与长度。", "Brief details look invalid. Please check the links and lengths.", "Butiran projek tidak sah. Sila semak pautan dan panjangnya."],
     footer_note: ["RoofX Web Studio · 马来西亚房产中介建站", "RoofX Web Studio · Websites for Malaysian property agents", "RoofX Web Studio · Laman web untuk ejen hartanah Malaysia"],
     footer_terms: ["服务条款", "Terms", "Terma"],
     footer_privacy: ["隐私政策", "Privacy", "Privasi"]
@@ -479,6 +542,11 @@
     errbox.classList.remove("show");
   }
   function focusField(name) {
+    if (name === "brief") {
+      var first = document.getElementById("b_goal") || form.querySelector('[name^="b_"]');
+      if (first) first.focus();
+      return;
+    }
     var el = form.querySelector('[name="' + name + '"]');
     if (el) el.focus();
   }
@@ -488,7 +556,39 @@
     if (field === "email") return t("err_email");
     if (field === "domain") return t("err_domain");
     if (field === "contract_accepted") return t("err_consent");
+    if (field === "brief") return t("err_brief");
     return t("err_generic");
+  }
+
+  // 建站需求 brief：只收非空值；domain/notes 复用顶层输入（冻结修订 A1）
+  function buildBrief() {
+    function raw(id) {
+      var node = document.getElementById(id);
+      return node ? String(node.value == null ? "" : node.value).trim() : "";
+    }
+    function putText(target, key, value) {
+      var v = String(value == null ? "" : value).trim();
+      if (v) target[key] = v;
+    }
+    var brief = {};
+    putText(brief, "goal", raw("b_goal"));
+    putText(brief, "pages", raw("b_pages"));
+    var countRaw = raw("b_listing_count");
+    if (countRaw !== "") {
+      var count = Number(countRaw);
+      if (isFinite(count)) brief.listing_count = count;
+    }
+    putText(brief, "listing_source", raw("b_listing_source"));
+    putText(brief, "logo_url", raw("b_logo_url"));
+    putText(brief, "brand_color", raw("b_brand_color"));
+    putText(brief, "reference_url", raw("b_reference_url"));
+    var assets = raw("b_asset_links").split(/[\n,]/).map(function (s) { return s.trim(); })
+      .filter(function (s) { return !!s; }).slice(0, 10);
+    if (assets.length) brief.asset_links = assets;
+    putText(brief, "target_launch", raw("b_target_launch"));
+    putText(brief, "domain", form.elements["domain"].value);
+    putText(brief, "notes", form.elements["notes"].value);
+    return brief;
   }
 
   form.addEventListener("submit", function (e) {
@@ -505,6 +605,7 @@
       notes: form.elements["notes"].value,
       contract_accepted: form.elements["contract_accepted"].checked
     };
+    data.brief = buildBrief();
     if (!data.name.trim()) { showErr(t("err_name")); focusField("name"); return; }
     if (!data.phone.trim()) { showErr(t("err_phone")); focusField("phone"); return; }
     if (!data.contract_accepted) { showErr(t("err_consent")); focusField("contract_accepted"); return; }

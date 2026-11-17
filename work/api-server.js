@@ -12,6 +12,7 @@ const { createNewsApi, startScheduler: startNewsScheduler } = require("./news");
 const listingCode = require("./listing-code");
 const createAgentApi = require("./agent-api");
 const createOrderApi = require("./order-api");
+const createClientApi = require("./client-api");
 const renderAgentPage = require("./agent-page");
 const renderPublicListing = require("./public-page");
 const runDigest = require("./digest");
@@ -154,8 +155,11 @@ async function sendMail(to, subject, text, replyToOverride, attachments, htmlOve
     if (!r.ok) throw new Error("mail_failed");
     return "sent";
   }
+  // 本地 fallback 写盘前脱敏 magic link：应用日志不落 raw token（邮件本身不变）。
+  // 于是 work/mail.log 里的链接故意不可用；本地联调必须配 SMTP/Resend 或测试 stub。
+  const logText = String(text).replace(/token=[0-9a-f]{64}/g, "token=[redacted]").replace(/\n/g, " ");
   await fsp.appendFile(pathMod.join(__dirname, "mail.log"),
-    [new Date().toISOString(), "TO:", to, "|", subject, "|", text.replace(/\n/g, " ")].join(" ") + "\n");
+    [new Date().toISOString(), "TO:", to, "|", subject, "|", logText].join(" ") + "\n");
   return "logged";
 }
 
@@ -1548,6 +1552,12 @@ app.use("/api/library", createLibraryApi({ pool, requireAdmin, requireWrite }));
 // ---------- 建站接单（Website orders） ----------
 app.use("/api", createOrderApi({ pool: pool, requireAdmin: requireAdmin,
   requireWrite: requireWrite, rateLimit: rateLimit }));
+
+// ---------- 客户建站门户（Client portal） ----------
+// 必须在 /api 404 fallback 之前挂载（与 order-api 相邻）。
+app.use("/api/client", createClientApi({
+  pool: pool, sendMail: sendMail, rateLimit: rateLimit, siteUrl: "https://kwongthye.com"
+}));
 
 // ---------- fallbacks ----------
 app.use("/api", function (req, res) { res.status(404).json({ ok: false, error: "not_found" }); });

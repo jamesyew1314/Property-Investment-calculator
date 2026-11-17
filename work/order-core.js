@@ -206,9 +206,97 @@ function parseId(value) {
   return Number.isInteger(n) && n > 0 && n <= 9007199254740991 ? n : null;
 }
 
+// ---------- 客户门户：阶段 / 付款 / 变更白名单 ----------
+const PHASES = ["brief", "design", "build", "review", "launch", "live"];
+const PAYMENT_STATUSES = ["unpaid", "paid", "refunded"];
+const CHANGE_STATUSES = ["open", "in_progress", "done", "cancelled"];
+const CHANGE_PRIORITIES = ["low", "normal", "high"];
+
+// brief 白名单：顺序即输出顺序（JSON.stringify 稳定），未知 key 一律丢弃。
+const BRIEF_KEYS = ["goal", "pages", "listing_count", "listing_source", "domain", "logo_url",
+  "brand_color", "reference_url", "asset_links", "target_launch", "notes"];
+const BRIEF_MAX_TOTAL = 8000;
+// 内部规则（SPEC §3 步骤 2/5/7）
+const BRIEF_MAX_INPUT_KEYS = 12;   // 未知 key 也计数
+const BRIEF_STRING_MAX = 500;
+const BRIEF_NOTES_MAX = 1000;
+const BRIEF_ARRAY_MAX = 10;
+// 只允许 http/https：防 javascript:/data: 进入客户页（存储型 XSS）
+const BRIEF_URL_KEYS = new Set(["logo_url", "reference_url", "asset_links"]);
+
+// 归一化客户邮箱：空 / 超长 / 不合法一律 ""（调用方据此返回 invalid_email）
+function normalizeEmail(raw) {
+  const email = String(raw == null ? "" : raw).trim().toLowerCase();
+  if (!email || email.length > 120 || !EMAIL_RE.test(email)) return "";
+  return email;
+}
+
+function isHttpUrl(value) {
+  let u;
+  try { u = new URL(String(value)); } catch (e) { return false; }
+  return u.protocol === "http:" || u.protocol === "https:";
+}
+
+function briefString(v) {
+  return String(v).replace(/\u0000/g, "").trim();
+}
+
+function briefFail() {
+  return { ok: false, value: null, error: "brief" };
+}
+
+// 结构化 brief：11 个白名单字段；失败整包拒绝（只有数组 >10 项按前 10 项截断）。
+// v1.1 冻结：只有 undefined（未提供）成功；null 是 non-object → 失败（brief:null 必须 400）。
+function normalizeBrief(raw) {
+  if (raw === undefined) return { ok: true, value: {}, error: null };
+  if (raw === null || typeof raw !== "object" || Array.isArray(raw)) return briefFail();
+  // 未知 key 也占名额：12 个以内才收，超出即失败
+  if (Object.keys(raw).length > BRIEF_MAX_INPUT_KEYS) return briefFail();
+
+  const out = {};
+  for (const key of BRIEF_KEYS) { // 固定顺序遍历 → 输出 key 顺序稳定
+    const v = raw[key];
+    if (v === undefined || v === null) continue; // null/undefined 视为未提供
+
+    if (typeof v === "string") {
+      const s = briefString(v);
+      if (!s) continue; // 空串等于未提供
+      if (s.length > (key === "notes" ? BRIEF_NOTES_MAX : BRIEF_STRING_MAX)) return briefFail();
+      if (BRIEF_URL_KEYS.has(key) && !isHttpUrl(s)) return briefFail();
+      out[key] = s;
+      continue;
+    }
+
+    if (typeof v === "number") {
+      if (!Number.isFinite(v)) return briefFail(); // NaN / Infinity 拒绝；0 保留
+      if (BRIEF_URL_KEYS.has(key)) return briefFail(); // URL 字段必须是 string 或 string[]
+      out[key] = v;
+      continue;
+    }
+
+    if (Array.isArray(v)) {
+      if (!v.every(function (item) { return typeof item === "string"; })) return briefFail();
+      const items = v.map(briefString).filter(function (s) { return !!s; });
+      if (!items.length) continue; // 空数组等于未提供
+      // 每个元素都卡 500，再截前 10（截断本身不报错）
+      if (items.some(function (s) { return s.length > BRIEF_STRING_MAX; })) return briefFail();
+      if (BRIEF_URL_KEYS.has(key) && !items.every(isHttpUrl)) return briefFail();
+      out[key] = items.slice(0, BRIEF_ARRAY_MAX).join(", ");
+      continue;
+    }
+
+    return briefFail(); // boolean / object / 嵌套数组等一律拒绝
+  }
+
+  if (JSON.stringify(out).length > BRIEF_MAX_TOTAL) return briefFail();
+  return { ok: true, value: out, error: null };
+}
+
 module.exports = {
   PACKAGE_CODE, PRICES, STATUSES, TOKEN_KINDS, ORDER_ALPHABET, ORDER_NO_RE,
   orderDateStamp, orderNoFromSeq, randomOrderNo,
   normalizeOrder, validateStatus, normalizeToken,
-  balanceOf, canUseTokens, money2, parseId
+  balanceOf, canUseTokens, money2, parseId,
+  PHASES, PAYMENT_STATUSES, CHANGE_STATUSES, CHANGE_PRIORITIES,
+  BRIEF_KEYS, BRIEF_MAX_TOTAL, normalizeEmail, normalizeBrief
 };
