@@ -2,7 +2,9 @@
 "use strict";
 // token-meter.js — 扫描本机 DSH session 的 tokenUsage，按订单 workspace 推送到生产内部 API。
 // 用法：
+//   TOKEN_METER_KEY=... node work/token-meter.js --order ORD-... --workspace /path --interval 30
 //   TOKEN_METER_KEY=... node work/token-meter.js --config work/token-meter.config.json --once
+//   TOKEN_METER_KEY=... node work/token-meter.js --order ORD-... --workspace /path --interval 30
 //   TOKEN_METER_KEY=... node work/token-meter.js --config work/token-meter.config.json
 // 说明：只读 ~/.dsh/storages/session_projcache/sessions/*.json；不读取对话内容，只读用量/模型/工作目录。
 
@@ -11,13 +13,15 @@ const os = require("node:os");
 const path = require("node:path");
 
 function parseArgs(argv) {
-  const out = { config: "work/token-meter.config.json", once: false, dryRun: false, interval: 30 };
+  const out = { config: "work/token-meter.config.json", once: false, dryRun: false, interval: 30, order: "", workspace: "" };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--config") out.config = argv[++i];
     else if (a === "--once") out.once = true;
     else if (a === "--dry-run") out.dryRun = true;
     else if (a === "--interval") out.interval = Math.max(5, Number(argv[++i]) || 30);
+    else if (a === "--order") out.order = String(argv[++i] || "").trim();
+    else if (a === "--workspace") out.workspace = String(argv[++i] || "").trim();
   }
   return out;
 }
@@ -97,7 +101,10 @@ async function runOnce(opts) {
   const apiBase = process.env.METER_API_BASE || cfg.api_base || "https://kwongthye.com";
   const meterKey = process.env.TOKEN_METER_KEY || "";
   if (!meterKey && !opts.dryRun) throw new Error("TOKEN_METER_KEY is required");
-  const rows = scanSessions(sessionDir(), cfg.orders || []);
+  const orders = opts.order && opts.workspace
+    ? [{ order_no: opts.order, workspace: opts.workspace }]
+    : (cfg.orders || []);
+  const rows = scanSessions(sessionDir(), orders);
   console.log(new Date().toISOString() + " sessions matched: " + rows.length);
   for (const row of rows) {
     if (opts.dryRun) { console.log("DRY " + JSON.stringify(row)); continue; }
