@@ -105,7 +105,7 @@ async function runOnce(opts) {
     ? [{ order_no: opts.order, workspace: opts.workspace }]
     : (cfg.orders || []);
   const rows = scanSessions(sessionDir(), orders);
-  console.log(new Date().toISOString() + " sessions matched: " + rows.length);
+  if (rows.length) console.log(new Date().toISOString() + " sessions matched: " + rows.length);
   for (const row of rows) {
     if (opts.dryRun) { console.log("DRY " + JSON.stringify(row)); continue; }
     try {

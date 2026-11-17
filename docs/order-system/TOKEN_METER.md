@@ -101,3 +101,58 @@ meter 只匹配 `workingDirectory` 等于或位于配置 workspace 下的 DSH se
 - 没有自动启动守护进程；需要手动 `nohup` 或 launchd
 - 没有 token 预算/超额停机（下一阶段）
 - 价格/汇率是估算，最终以 DeepSeek 账单为准
+
+
+## 8. macOS 自动启动（已配置）
+
+已创建 LaunchAgent：
+
+```text
+~/Library/LaunchAgents/com.roofx.token-meter.plist
+```
+
+它登录后自动运行：
+
+```bash
+/bin/bash "<project>/work/token-meter-launchd.sh"
+```
+
+wrapper 会：
+
+- 读取 `.secrets/token_meter_key`
+- 读取 `work/token-meter.config.json`
+- 每 30 秒扫描 DSH session
+- 把用量推到生产
+- 退出/崩溃后 launchd 自动重启
+
+查看状态：
+
+```bash
+launchctl print gui/$(id -u)/com.roofx.token-meter
+tail -f ~/Library/Logs/roofx-token-meter.log
+tail -f ~/Library/Logs/roofx-token-meter.err.log
+```
+
+停止/卸载：
+
+```bash
+launchctl bootout gui/$(id -u)/com.roofx.token-meter
+```
+
+### 多客户配置
+
+`work/token-meter.config.json` 支持多个订单：
+
+```json
+{
+  "api_base": "https://kwongthye.com",
+  "orders": [
+    { "order_no": "ORD-261117-AAAA", "workspace": "/Users/huangminming/clients/AAAA" },
+    { "order_no": "ORD-261117-BBBB", "workspace": "/Users/huangminming/clients/BBBB" }
+  ]
+}
+```
+
+保存后不用重启；meter 每轮重新读配置。
+
+**重要**：每个客户必须有独立开发目录；不要把两个客户放在同一个 workspace，否则会归到同一个订单。
