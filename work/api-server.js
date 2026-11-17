@@ -11,6 +11,7 @@ const createPublicApi = require("./public-api");
 const { createNewsApi, startScheduler: startNewsScheduler } = require("./news");
 const listingCode = require("./listing-code");
 const createAgentApi = require("./agent-api");
+const createOrderApi = require("./order-api");
 const renderAgentPage = require("./agent-page");
 const renderPublicListing = require("./public-page");
 const runDigest = require("./digest");
@@ -1543,6 +1544,10 @@ app.use("/api/agent", createAgentApi({
 
 // ---------- 房产资料库（PropBase） ----------
 app.use("/api/library", createLibraryApi({ pool, requireAdmin, requireWrite }));
+
+// ---------- 建站接单（Website orders） ----------
+app.use("/api", createOrderApi({ pool: pool, requireAdmin: requireAdmin,
+  requireWrite: requireWrite, rateLimit: rateLimit }));
 
 // ---------- fallbacks ----------
 app.use("/api", function (req, res) { res.status(404).json({ ok: false, error: "not_found" }); });

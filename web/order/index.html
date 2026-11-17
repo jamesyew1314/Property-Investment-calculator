@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Property agent websites: first month RM2,500, then RM1,500/month. Dedicated design, domain, hosting, listing sync and WhatsApp.">
+<meta name="theme-color" content="#0F2740">
+<title>房产中介建站 · RoofX Web Studio</title>
+<link rel="icon" type="image/png" href="/icon-256.png?v=ord1">
+<style>
+  :root{
+    --ink:#12212E;--navy:#0F2740;--navy2:#173A57;--paper:#F7F4EE;--card:#FFFFFF;
+    --copper:#B5723F;--copper2:#9C5C2C;--line:#E3DCD0;--muted:#6B7785;
+    --ok:#1F7A4D;--bad:#B03A2E;--radius:18px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--copper2)}
+  .wrap{width:min(1120px,92vw);margin:0 auto}
+  header{padding:18px 0;border-bottom:1px solid var(--line);background:rgba(247,244,238,.94);
+    position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
+  .bar{display:flex;align-items:center;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy)}
+  .brand img{width:34px;height:34px;border-radius:9px}
+  .brand b{font-family:Georgia,"Times New Roman",serif;font-size:18px;letter-spacing:.3px}
+  .brand .sub{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:block;line-height:1.2}
+  .langs{margin-left:auto;display:flex;gap:2px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px}
+  .langs button{border:0;background:transparent;color:var(--muted);font:600 12px/1 inherit;padding:7px 11px;border-radius:999px;cursor:pointer}
+  .langs button.on{background:var(--navy);color:#fff}
+  main{padding:46px 0 24px}
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:start}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--copper2);font-weight:700;margin-bottom:14px}
+  .eyebrow:before{content:"";width:26px;height:2px;background:var(--copper)}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:500;color:var(--navy);
+    font-size:clamp(30px,4.1vw,46px);line-height:1.16;margin:0 0 18px;letter-spacing:-.3px}
+  h1 em{font-style:italic;color:var(--copper2)}
+  .lead{color:#44515E;font-size:16.5px;max-width:56ch;margin:0 0 24px}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12.5px;color:#3E4A57}
+  .chip b{color:var(--navy)}
+  .cta{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;text-decoration:none;
+    padding:14px 24px;border-radius:999px;font-weight:600;font-size:14.5px;border:1px solid var(--navy)}
+  .cta:hover{background:var(--navy2)}
+  .cta.ghost{background:transparent;color:var(--navy);border-color:#C9BFB0;margin-left:10px}
+  .note-small{font-size:12px;color:var(--muted);margin-top:12px}
+
+  .price{background:var(--navy);color:#fff;border-radius:22px;padding:30px 28px;box-shadow:0 24px 50px rgba(15,39,64,.18)}
+  .price .tag{display:inline-block;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:#E8CFA9;border:1px solid rgba(232,207,169,.45);border-radius:999px;padding:4px 10px;margin-bottom:18px}
+  .price .row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+  .price .row:last-of-type{border-bottom:0}
+  .price .k{font-size:12.5px;color:#C9D6E2}
+  .price .v{font-family:Georgia,serif;font-size:26px;color:#fff;white-space:nowrap}
+  .price .v small{font-size:12px;color:#C9D6E2;font-family:inherit}
+  .price .total{margin-top:14px;background:rgba(255,255,255,.08);border-radius:14px;padding:12px 14px;font-size:12.5px;color:#E7EEF5}
+  .price .total b{color:#fff}
+  .price ul{margin:18px 0 0;padding:0;list-style:none}
+  .price li{position:relative;padding-left:20px;font-size:12.8px;color:#D7E1EA;margin:7px 0}
+  .price li:before{content:"";position:absolute;left:0;top:8px;width:8px;height:8px;border-radius:50%;
+    background:#E8CFA9}
+
+  section.block{padding:44px 0 6px}
+  h2{font-family:Georgia,serif;font-weight:500;color:var(--navy);font-size:clamp(22px,2.6vw,32px);margin:0 0 8px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 22px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .step .n{font-family:Georgia,serif;color:var(--copper);font-size:13px;letter-spacing:.12em}
+  .step h3{font-size:15px;margin:8px 0 6px;color:var(--navy)}
+  .step p{margin:0;font-size:13px;color:var(--muted)}
+  .includes{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .inc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+  .inc i{width:20px;height:20px;border-radius:50%;background:#EFE6D8;color:var(--copper2);font-style:normal;
+    font-size:11px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;margin-top:2px}
+  .inc span{font-size:13.5px;color:#33404D}
+  .fair{background:#FFF9EF;border:1px solid #EBD9BC;border-radius:16px;padding:18px 20px;margin-top:18px}
+  .fair h3{margin:0 0 6px;font-size:13.5px;color:#7A5526;letter-spacing:.04em}
+  .fair p{margin:0;font-size:12.8px;color:#6C593E;line-height:1.7}
+
+  .formcard{background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;margin:14px 0 10px;
+    box-shadow:0 14px 40px rgba(18,33,46,.06)}
+  .formhead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+  .formhead h2{margin:0 0 4px;font-size:24px}
+  .formhead p{margin:0;color:var(--muted);font-size:13px}
+  .reqhint{font-size:11.5px;color:var(--muted);white-space:nowrap;padding-top:6px}
+  .formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field.full{grid-column:1/-1}
+  label{font-size:12.5px;font-weight:600;color:#3A4654}
+  label .opt{font-weight:400;color:var(--muted);font-size:11.5px;margin-left:4px}
+  input,textarea{width:100%;padding:12px 13px;border:1px solid #D8D2C7;border-radius:11px;font:inherit;
+    font-size:14px;background:#FDFCFA;color:var(--ink)}
+  input:focus,textarea:focus{outline:2px solid rgba(181,114,63,.25);border-color:var(--copper)}
+  textarea{min-height:96px;resize:vertical}
+  .consent{display:flex;gap:10px;align-items:flex-start;margin:18px 0 6px;font-size:13px;color:#3A4654}
+  .consent input{width:18px;height:18px;margin-top:2px;flex:0 0 auto;accent-color:var(--copper2)}
+  .consent a{color:var(--copper2)}
+  .errbox{display:none;background:#FDF0EE;border:1px solid #F0C9C2;color:#8E2F24;border-radius:11px;
+    padding:11px 13px;font-size:13px;margin:10px 0 0}
+  .errbox.show{display:block}
+  .submitrow{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap}
+  .submit{background:var(--copper);border:1px solid var(--copper);color:#fff;border-radius:999px;padding:13px 26px;
+    font:600 14.5px/1 inherit;cursor:pointer;min-width:180px}
+  .submit:hover{background:var(--copper2)}
+  .submit:disabled{opacity:.6;cursor:wait}
+  .privacy{font-size:11.5px;color:var(--muted)}
+
+  .success{display:none;background:#fff;border:1px solid var(--line);border-radius:22px;padding:34px 28px;text-align:center;
+    margin:14px 0}
+  .success.show{display:block}
+  .success .tick{width:54px;height:54px;border-radius:50%;background:#E7F4EC;color:var(--ok);
+    display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px}
+  .success h2{margin:0 0 6px;font-size:26px}
+  .success p{color:var(--muted);font-size:13.5px;margin:0 auto 8px;max-width:52ch}
+  .orderbox{display:inline-block;background:var(--paper);border:1px dashed #C9BFB0;border-radius:12px;
+    padding:12px 18px;font:600 19px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--navy);margin:12px 0}
+  .success .meta{font-size:12.5px;color:var(--muted)}
+  .success .meta b{color:var(--navy)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 40px;margin-top:34px;color:var(--muted);font-size:12px}
+  footer .fbar{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  footer a{color:var(--muted)}
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;gap:26px}
+    .grid3{grid-template-columns:1fr}
+    .includes{grid-template-columns:1fr}
+  }
+  @media(max-width:640px){
+    header{padding:12px 0}
+    .hero h1 em{display:block}
+    .brand b{font-size:16px}
+    .brand .sub{display:none}
+    main{padding:28px 0 10px}
+    h1{font-size:30px}
+    .lead{font-size:15px}
+    .cta,.cta.ghost{display:flex;justify-content:center;width:100%;margin:0 0 10px}
+    .price{padding:24px 20px;border-radius:18px}
+    .price .row{display:block;padding:10px 0}
+    .price .k{display:block;margin-bottom:3px}
+    .price .v{display:block;text-align:right;white-space:normal;font-size:23px}
+    .price .v small{display:block;margin-top:2px}
+    .formcard{padding:20px 16px;border-radius:18px}
+    .formgrid{grid-template-columns:1fr}
+    .formhead{flex-direction:column;gap:6px}
+    .reqhint{padding-top:0}
+    .submit{width:100%}
+    .submitrow{gap:10px}
+    section.block{padding:32px 0 4px}
+    .orderbox{font-size:17px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/">
+      <img src="/icon-256.png?v=ord1" alt="RoofX">
+      <span class="brandtext"><b>RoofX</b><span class="sub">Web Studio</span></span>
+    </a>
+    <div class="langs" id="langs" role="group" aria-label="Language">
+      <button type="button" data-lang="zh">中文</button>
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="bm">BM</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <div class="eyebrow" data-i18n="eyebrow"></div>
+      <h1><span data-i18n="h1a"></span> <em data-i18n="h1b"></em></h1>
+      <p class="lead" data-i18n="lead"></p>
+      <div class="chips">
+        <span class="chip"><b>RM1,500</b> <span data-i18n="chip_month"></span></span>
+        <span class="chip"><b>RM2,500</b> <span data-i18n="chip_setup"></span></span>
+        <span class="chip" data-i18n="chip_turnaround"></span>
+      </div>
+      <a class="cta" href="#order" data-i18n="cta_primary"></a>
+      <a class="cta ghost" href="#included" data-i18n="cta_secondary"></a>
+      <p class="note-small" data-i18n="hero_note"></p>
+    </div>
+
+    <aside class="price" aria-labelledby="pricetitle">
+      <span class="tag" data-i18n="price_tag"></span>
+      <div class="row">
+        <span class="k" id="pricetitle" data-i18n="price_month_k"></span>
+        <span class="v">RM1,500 <small data-i18n="per_month"></small></span>
+      </div>
+      <div class="row">
+        <span class="k" data-i18n="price_setup_k"></span>
+        <span class="v">RM2,500 <small data-i18n="one_time"></small></span>
+      </div>
+      <div class="total" data-i18n="price_total"></div>
+      <ul>
+        <li data-i18n="price_li1"></li>
+        <li data-i18n="price_li2"></li>
+        <li data-i18n="price_li3"></li>
+      </ul>
+    </aside>
+  </div>
+
+  <section class="block" id="included">
+    <h2 data-i18n="inc_title"></h2>
+    <p class="sub" data-i18n="inc_sub"></p>
+    <div class="includes">
+      <div class="inc"><i>01</i><span data-i18n="inc1"></span></div>
+      <div class="inc"><i>02</i><span data-i18n="inc2"></span></div>
+      <div class="inc"><i>03</i><span data-i18n="inc3"></span></div>
+      <div class="inc"><i>04</i><span data-i18n="inc4"></span></div>
+      <div class="inc"><i>05</i><span data-i18n="inc5"></span></div>
+      <div class="inc"><i>06</i><span data-i18n="inc6"></span></div>
+    </div>
+    <div class="fair">
+      <h3 data-i18n="fair_title"></h3>
+      <p data-i18n="fair_body"></p>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 data-i18n="how_title"></h2>
+    <p class="sub" data-i18n="how_sub"></p>
+    <div class="grid3">
+      <div class="step"><div class="n">01</div><h3 data-i18n="how1_t"></h3><p data-i18n="how1_d"></p></div>
+      <div class="step"><div class="n">02</div><h3 data-i18n="how2_t"></h3><p data-i18n="how2_d"></p></div>
+      <div class="step"><div class="n">03</div><h3 data-i18n="how3_t"></h3><p data-i18n="how3_d"></p></div>
+    </div>
+  </section>
+
+  <section class="block" id="order">
+    <div class="formcard" id="formcard">
+      <div class="formhead">
+        <div>
+          <h2 data-i18n="form_title"></h2>
+          <p data-i18n="form_sub"></p>
+        </div>
+        <div class="reqhint" data-i18n="req_hint"></div>
+      </div>
+      <form id="orderform" novalidate>
+        <div class="formgrid">
+          <div class="field">
+            <label for="f_name"><span data-i18n="label_name"></span> *</label>
+            <input id="f_name" name="name" type="text" autocomplete="name" maxlength="80" data-i18n-ph="ph_name">
+          </div>
+          <div class="field">
+            <label for="f_phone"><span data-i18n="label_phone"></span> *</label>
+            <input id="f_phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="32" data-i18n-ph="ph_phone">
+          </div>
+          <div class="field">
+            <label for="f_email"><span data-i18n="label_email"></span><span class="opt" data-i18n="optional"></span></label>
+            <input id="f_email" name="email" type="email" autocomplete="email" maxlength="120" data-i18n-ph="ph_email">
+          </div>
+          <div class="field">
+            <label for="f_company"><span data-i18n="label_company"></span><span class="opt" data-i18n="optional"></span></label>
+            <input id="f_company" name="company" type="text" autocomplete="organization" maxlength="120" data-i18n-ph="ph_company">
+          </div>
+          <div class="field">
+            <label for="f_ren"><span data-i18n="label_ren"></span><span class="opt" data-i18n="optional"></span></label>
+            <input id="f_ren" name="ren_no" type="text" maxlength="40" data-i18n-ph="ph_ren">
+          </div>
+          <div class="field">
+            <label for="f_area"><span data-i18n="label_area"></span><span class="opt" data-i18n="optional"></span></label>
+            <input id="f_area" name="area" type="text" maxlength="80" data-i18n-ph="ph_area">
+          </div>
+          <div class="field full">
+            <label for="f_domain"><span data-i18n="label_domain"></span><span class="opt" data-i18n="optional"></span></label>
+            <input id="f_domain" name="domain" type="text" maxlength="120" data-i18n-ph="ph_domain">
+          </div>
+          <div class="field full">
+            <label for="f_notes"><span data-i18n="label_notes"></span><span class="opt" data-i18n="optional"></span></label>
+            <textarea id="f_notes" name="notes" maxlength="1000" data-i18n-ph="ph_notes"></textarea>
+          </div>
+        </div>
+        <label class="consent" for="f_contract">
+          <input id="f_contract" name="contract_accepted" type="checkbox">
+          <span><span data-i18n="consent_a"></span> <a href="/terms/" target="_blank" rel="noopener" data-i18n="consent_link"></a></span>
+        </label>
+        <div class="errbox" id="errbox" role="alert"></div>
+        <div class="submitrow">
+          <button class="submit" id="submitbtn" type="submit" data-i18n="submit"></button>
+          <span class="privacy" data-i18n="privacy"></span>
+        </div>
+      </form>
+    </div>
+
+    <div class="success" id="success" role="status" aria-live="polite">
+      <div class="tick">✓</div>
+      <h2 data-i18n="success_title"></h2>
+      <p data-i18n="success_body"></p>
+      <div class="orderbox" id="orderno">—</div>
+      <p class="meta"><span data-i18n="success_status"></span>: <b id="orderstatus">—</b></p>
+      <p class="meta"><span data-i18n="success_prices"></span></p>
+      <p class="meta" data-i18n="success_next"></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap fbar">
+    <span data-i18n="footer_note"></span>
+    <a href="/terms/" data-i18n="footer_terms"></a>
+    <a href="/privacy/" data-i18n="footer_privacy"></a>
+    <span style="margin-left:auto">© <span id="year">2026</span> RoofX Web Studio</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var INDEX = { zh: 0, en: 1, bm: 2 };
+  var I18N = {
+    page_title: ["房产中介建站 · RoofX Web Studio", "Websites for property agents · RoofX Web Studio", "Laman web untuk ejen hartanah · RoofX Web Studio"],
+    meta_desc: ["房产中介专属建站服务：首月 RM2,500（含建站 + 首月服务），之后 RM1,500/月。专属设计、域名、托管、房源同步与 WhatsApp 直达。",
+      "Property agent websites: first month RM2,500 (setup + first month), then RM1,500/month. Dedicated design, domain, hosting, listing sync and WhatsApp.",
+      "Laman web ejen hartanah: bulan pertama RM2,500 (penyediaan + bulan pertama), kemudian RM1,500/bulan. Reka bentuk khusus, domain, hosting, penyegerakan senarai dan WhatsApp."],
+    eyebrow: ["房产中介建站服务", "Website service for property agents", "Perkhidmatan laman web untuk ejen hartanah"],
+    h1a: ["一个真正", "A website", "Laman web"],
+    h1b: ["属于你的房产网站", "that is truly yours", "yang benar-benar milik anda"],
+    lead: ["专属设计、房源同步、WhatsApp 直达，一个工作日内对接。你专注带看与成交，网站交给我们。",
+      "Dedicated design, listing sync and WhatsApp click-to-chat. We reply within one business day, so you can focus on viewings and closing.",
+      "Reka bentuk khusus, penyegerakan senarai hartanah dan WhatsApp terus. Kami balas dalam satu hari bekerja, anda fokus pada tontonan dan jualan."],
+    chip_month: ["/ 月", "/ month", "/ bulan"],
+    chip_setup: ["首月总价（含建站）", "first month total (incl. setup)", "jumlah bulan pertama (termasuk penyediaan)"],
+    chip_turnaround: ["3–5 个工作日上线", "Live in 3–5 business days", "Siap dalam 3–5 hari bekerja"],
+    cta_primary: ["开始接单 →", "Start your order →", "Mulakan pesanan →"],
+    cta_secondary: ["查看包含内容", "See what's included", "Lihat apa yang disertakan"],
+    hero_note: ["提交后 1 个工作日内，我们会通过 WhatsApp 联系你确认需求。",
+      "After you submit, we will contact you on WhatsApp within one business day.",
+      "Selepas anda hantar, kami akan hubungi anda melalui WhatsApp dalam satu hari bekerja."],
+    price_tag: ["Dedicated 套餐", "Dedicated package", "Pakej Dedicated"],
+    price_month_k: ["月费", "Monthly fee", "Bayaran bulanan"],
+    price_setup_k: ["首月总价（含建站 + 首月服务）", "First month total (setup + first month)", "Jumlah bulan pertama (penyediaan + bulan pertama)"],
+    price_total: ["首月只收 RM2,500（含建站 + 首月服务），第 2 个月起 RM1,500/月。",
+      "First month is RM2,500 total (setup + first month of service). From month 2, RM1,500/month.",
+      "Bulan pertama RM2,500 (penyediaan + bulan pertama perkhidmatan). Mulai bulan kedua, RM1,500/bulan."],
+    price_li1: ["专属设计，不是模板套壳", "Dedicated design, not a template", "Reka bentuk khusus, bukan templat"],
+    price_li2: ["域名、SSL、托管全包", "Domain, SSL and hosting included", "Domain, SSL dan hosting disertakan"],
+    price_li3: ["随时可暂停或取消，无绑定合约", "Pause or cancel anytime, no lock-in", "Boleh jeda atau batal bila-bila masa, tiada kontrak terikat"],
+    per_month: ["/ 月", "/ month", "/ bulan"],
+    one_time: ["含建站 + 首月服务", "incl. setup + first month", "termasuk penyediaan + bulan pertama"],
+    inc_title: ["RM1,500/月，包含什么", "What RM1,500/month includes", "Apa yang termasuk dalam RM1,500/bulan"],
+    inc_sub: ["不是只给你一个空壳网站，而是能直接接客的房产门面。",
+      "Not an empty shell — a property storefront that can take enquiries from day one.",
+      "Bukan laman kosong — kedai hartanah yang boleh menerima pertanyaan sejak hari pertama."],
+    inc1: ["专属首页与房源列表，按你的品牌配色定制", "Dedicated home page and listing grid, matched to your brand colours", "Laman utama dan senarai hartanah khusus, mengikut warna jenama anda"],
+    inc2: ["房源同步：Excel / CSV 导入，自动生成详情页", "Listing sync: import Excel / CSV and auto-generate detail pages", "Penyegerakan senarai: import Excel / CSV dan jana halaman butiran automatik"],
+    inc3: ["手机端优先，WhatsApp 一键直达", "Mobile-first layout with one-tap WhatsApp", "Susun atur mudah alih dengan WhatsApp satu ketikan"],
+    inc4: ["域名绑定、SSL 证书、托管与备份", "Domain binding, SSL, hosting and backups", "Pengikatan domain, SSL, hosting dan sandaran"],
+    inc5: ["每月 4 次内容更新（价格、房源、文案）", "Four content updates per month (prices, listings, copy)", "Empat kemas kini kandungan sebulan (harga, senarai, teks)"],
+    inc6: ["基础 SEO 与分享预览图，方便发 Facebook", "Basic SEO and share previews for Facebook", "SEO asas dan pratonton kongsi untuk Facebook"],
+    fair_title: ["Fair use 说明", "Fair use", "Penggunaan berpatutan"],
+    fair_body: ["每月最多 4 次内容更新、同步 300 套房源、图片总量 2GB。不含广告投放、视频拍摄、文案代写与第三方付费插件；超出部分按 RM150/小时 另行报价。",
+      "Up to 4 content updates per month, 300 listings synced, 2GB of images. Excludes ad spend, video production, copywriting and paid third-party plugins; extra work is quoted at RM150/hour.",
+      "Sehingga 4 kemas kini kandungan sebulan, 300 senarai hartanah, 2GB imej. Tidak termasuk belanja iklan, produksi video, penulisan teks dan plugin pihak ketiga berbayar; kerja tambahan disebut pada RM150/jam."],
+    how_title: ["怎么开始", "How it works", "Cara bermula"],
+    how_sub: ["三步，不需要技术背景。", "Three steps, no technical background needed.", "Tiga langkah, tanpa latar belakang teknikal."],
+    how1_t: ["填写资料", "Send your details", "Hantar maklumat"],
+    how1_d: ["姓名、WhatsApp、区域与域名想法，1 分钟提交。", "Name, WhatsApp, area and domain idea — one minute.", "Nama, WhatsApp, kawasan dan idea domain — satu minit."],
+    how2_t: ["我们联系你", "We contact you", "Kami hubungi anda"],
+    how2_d: ["1 个工作日内确认需求、报价与上线时间。", "We confirm scope, quote and timeline within one business day.", "Kami sahkan skop, sebut harga dan jadual dalam satu hari bekerja."],
+    how3_t: ["上线接单", "Go live", "Mula beroperasi"],
+    how3_d: ["3–5 个工作日交付，之后每月维护与更新。", "Delivered in 3–5 business days, then maintained monthly.", "Disiapkan dalam 3–5 hari bekerja, kemudian diselenggara setiap bulan."],
+    form_title: ["提交建站需求", "Request your website", "Mohon laman web anda"],
+    form_sub: ["填好后我们会在 1 个工作日内通过 WhatsApp 联系你。", "We will reply on WhatsApp within one business day.", "Kami akan balas di WhatsApp dalam satu hari bekerja."],
+    req_hint: ["* 必填", "* Required", "* Wajib"],
+    label_name: ["姓名", "Name", "Nama"],
+    label_phone: ["WhatsApp 号码", "WhatsApp number", "Nombor WhatsApp"],
+    label_email: ["邮箱", "Email", "E-mel"],
+    label_company: ["公司 / 团队", "Company / team", "Syarikat / pasukan"],
+    label_ren: ["REN 编号", "REN number", "Nombor REN"],
+    label_area: ["主要区域", "Main area", "Kawasan utama"],
+    label_domain: ["想要的域名", "Preferred domain", "Domain pilihan"],
+    label_notes: ["备注", "Notes", "Catatan"],
+    optional: ["（选填）", " (optional)", " (pilihan)"],
+    ph_name: ["你的姓名", "Your name", "Nama anda"],
+    ph_phone: ["例如 012-345 6789", "e.g. 012-345 6789", "cth. 012-345 6789"],
+    ph_email: ["you@example.com", "you@example.com", "anda@example.com"],
+    ph_company: ["例如 ABC Realty", "e.g. ABC Realty", "cth. ABC Realty"],
+    ph_ren: ["例如 REN 12345", "e.g. REN 12345", "cth. REN 12345"],
+    ph_area: ["例如 Skudai / Johor Bahru", "e.g. Skudai / Johor Bahru", "cth. Skudai / Johor Bahru"],
+    ph_domain: ["例如 yourname.com（还没想好可以留空）", "e.g. yourname.com (leave blank if unsure)", "cth. namaanda.com (biarkan kosong jika belum pasti)"],
+    ph_notes: ["房源数量、想要的功能、上线时间……", "Number of listings, features you need, timeline…", "Bilangan senarai, ciri yang diperlukan, jadual…"],
+    consent_a: ["我已阅读并同意", "I have read and agree to the", "Saya telah membaca dan bersetuju dengan"],
+    consent_link: ["服务条款", "Terms of Service", "Terma Perkhidmatan"],
+    submit: ["提交需求", "Submit request", "Hantar permohonan"],
+    privacy: ["资料只用于联系与建站，不会出售给第三方。", "Your details are used only to contact you and build your site.", "Maklumat anda hanya digunakan untuk menghubungi anda dan membina laman web."],
+    err_name: ["请填写姓名。", "Please enter your name.", "Sila masukkan nama anda."],
+    err_phone: ["请填写有效的 WhatsApp 号码（至少 7 位数字）。", "Please enter a valid WhatsApp number (at least 7 digits).", "Sila masukkan nombor WhatsApp yang sah (sekurang-kurangnya 7 digit)."],
+    err_email: ["邮箱格式不正确。", "That email address looks invalid.", "Alamat e-mel itu tidak sah."],
+    err_domain: ["域名格式不正确，例如 yourname.com。", "Domain looks invalid, e.g. yourname.com.", "Domain tidak sah, cth. namaanda.com."],
+    err_consent: ["请先同意服务条款。", "Please accept the Terms of Service.", "Sila terima Terma Perkhidmatan."],
+    err_rate: ["提交太频繁，请 10 分钟后再试。", "Too many submissions. Please try again in 10 minutes.", "Terlalu banyak penghantaran. Sila cuba lagi dalam 10 minit."],
+    err_generic: ["提交失败，请稍后重试，或直接 WhatsApp 联系我们。", "Submission failed. Please try again or message us on WhatsApp.", "Penghantaran gagal. Sila cuba lagi atau hubungi kami di WhatsApp."],
+    err_network: ["网络连接失败，请检查网络后重试。", "Network error. Check your connection and try again.", "Ralat rangkaian. Semak sambungan anda dan cuba lagi."],
+    submitting: ["提交中…", "Submitting…", "Menghantar…"],
+    success_title: ["已收到你的需求", "Request received", "Permohonan diterima"],
+    success_body: ["记下这个订单号，方便之后查询进度。我们会在 1 个工作日内通过 WhatsApp 联系你。",
+      "Keep this order number to check progress. We will contact you on WhatsApp within one business day.",
+      "Simpan nombor pesanan ini untuk menyemak status. Kami akan hubungi anda di WhatsApp dalam satu hari bekerja."],
+    success_prices: ["首月 RM2,500（含建站 + 首月服务）· 之后 RM1,500/月", "First month RM2,500 (setup + first month) · then RM1,500/month", "Bulan pertama RM2,500 (penyediaan + bulan pertama) · kemudian RM1,500/bulan"],
+    success_status: ["当前状态", "Current status", "Status semasa"],
+    success_next: ["接下来：确认需求 → 支付首月费用 → 3–5 个工作日上线。", "Next: confirm scope → pay first month → live in 3–5 business days.", "Seterusnya: sahkan skop → bayar bulan pertama → siap dalam 3–5 hari bekerja."],
+    st_new: ["新订单", "New", "Baharu"],
+    st_contacted: ["已联系", "Contacted", "Dihubungi"],
+    st_paid: ["已付款", "Paid", "Dibayar"],
+    st_building: ["制作中", "Building", "Sedang dibina"],
+    st_review: ["待验收", "In review", "Dalam semakan"],
+    st_live: ["已上线", "Live", "Aktif"],
+    st_paused: ["已暂停", "Paused", "Dijeda"],
+    st_cancelled: ["已取消", "Cancelled", "Dibatalkan"],
+    footer_note: ["RoofX Web Studio · 马来西亚房产中介建站", "RoofX Web Studio · Websites for Malaysian property agents", "RoofX Web Studio · Laman web untuk ejen hartanah Malaysia"],
+    footer_terms: ["服务条款", "Terms", "Terma"],
+    footer_privacy: ["隐私政策", "Privacy", "Privasi"]
+  };
+
+  var q = new URLSearchParams(location.search);
+  var lang = q.get("lang") || localStorage.getItem("kt_lang") || localStorage.getItem("kwongthye_lang") || "zh";
+  if (!INDEX.hasOwnProperty(lang)) lang = "zh";
+
+  function t(key) {
+    var v = I18N[key];
+    return v ? (v[INDEX[lang]] || v[0]) : key;
+  }
+
+  function apply() {
+    document.documentElement.lang = lang === "zh" ? "zh-Hans" : lang;
+    document.title = t("page_title");
+    var md = document.querySelector('meta[name="description"]');
+    if (md) md.setAttribute("content", t("meta_desc"));
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n");
+      if (I18N[k]) el.textContent = t(k);
+    });
+    document.querySelectorAll("[data-i18n-ph]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n-ph");
+      if (I18N[k]) el.setAttribute("placeholder", t(k));
+    });
+    document.querySelectorAll("#langs button").forEach(function (b) {
+      b.classList.toggle("on", b.getAttribute("data-lang") === lang);
+      b.setAttribute("aria-pressed", b.getAttribute("data-lang") === lang ? "true" : "false");
+    });
+    if (lastOrder) {
+      document.getElementById("orderstatus").textContent = t("st_" + lastOrder.status) || lastOrder.status;
+    }
+  }
+
+  function setLang(next) {
+    if (!INDEX.hasOwnProperty(next)) return;
+    lang = next;
+    try { localStorage.setItem("kt_lang", lang); localStorage.setItem("kwongthye_lang", lang); } catch (e) {}
+    try {
+      var u = new URL(location.href);
+      u.searchParams.set("lang", lang);
+      history.replaceState(null, "", u.toString());
+    } catch (e) {}
+    apply();
+  }
+
+  document.getElementById("langs").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-lang]");
+    if (b) setLang(b.getAttribute("data-lang"));
+  });
+
+  var lastOrder = null;
+  var form = document.getElementById("orderform");
+  var errbox = document.getElementById("errbox");
+  var btn = document.getElementById("submitbtn");
+  var submitLabel = "submit";
+
+  function showErr(msg) {
+    errbox.textContent = msg;
+    errbox.classList.add("show");
+  }
+  function clearErr() {
+    errbox.textContent = "";
+    errbox.classList.remove("show");
+  }
+  function focusField(name) {
+    var el = form.querySelector('[name="' + name + '"]');
+    if (el) el.focus();
+  }
+  function fieldError(field) {
+    if (field === "name") return t("err_name");
+    if (field === "phone") return t("err_phone");
+    if (field === "email") return t("err_email");
+    if (field === "domain") return t("err_domain");
+    if (field === "contract_accepted") return t("err_consent");
+    return t("err_generic");
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    clearErr();
+    var data = {
+      name: form.elements["name"].value,
+      phone: form.elements["phone"].value,
+      email: form.elements["email"].value,
+      company: form.elements["company"].value,
+      ren_no: form.elements["ren_no"].value,
+      area: form.elements["area"].value,
+      domain: form.elements["domain"].value,
+      notes: form.elements["notes"].value,
+      contract_accepted: form.elements["contract_accepted"].checked
+    };
+    if (!data.name.trim()) { showErr(t("err_name")); focusField("name"); return; }
+    if (!data.phone.trim()) { showErr(t("err_phone")); focusField("phone"); return; }
+    if (!data.contract_accepted) { showErr(t("err_consent")); focusField("contract_accepted"); return; }
+
+    btn.disabled = true;
+    submitLabel = btn.getAttribute("data-i18n");
+    btn.textContent = t("submitting");
+
+    fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify(data)
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        return { status: res.status, body: body };
+      });
+    }).then(function (r) {
+      if (r.status === 201 || r.status === 200) {
+        lastOrder = r.body.order || null;
+        if (!lastOrder) throw new Error("bad_response");
+        document.getElementById("orderno").textContent = lastOrder.order_no;
+        document.getElementById("orderstatus").textContent = t("st_" + lastOrder.status) || lastOrder.status;
+        document.getElementById("formcard").hidden = true;
+        document.getElementById("success").classList.add("show");
+        document.getElementById("success").scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      if (r.status === 429) { showErr(t("err_rate")); return; }
+      if (r.body && r.body.error === "invalid_input") {
+        showErr(fieldError(r.body.field));
+        focusField(r.body.field);
+        return;
+      }
+      showErr(t("err_generic"));
+    }).catch(function () {
+      showErr(t("err_network"));
+    }).then(function () {
+      btn.disabled = false;
+      btn.setAttribute("data-i18n", submitLabel);
+      btn.textContent = t(submitLabel);
+    });
+  });
+
+  document.getElementById("year").textContent = String(new Date().getFullYear());
+  apply();
+})();
+</script>
+</body>
+</html>

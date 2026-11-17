@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0F2740">
+<title>订单后台 Orders — RoofX</title>
+<link rel="icon" type="image/png" href="/icon-256.png?v=ord1">
+<style>
+  :root{--navy:#0F2740;--navy2:#173A57;--paper:#F4F6F9;--card:#fff;--ink:#16232F;--muted:#647383;
+    --line:#E1E7EF;--gold:#B5723F;--ok:#1F7A4D;--bad:#B03A2E;--warn:#9A6A17}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  [hidden]{display:none!important}
+  a{color:var(--navy)}
+  .wrap{width:min(1180px,94vw);margin:0 auto}
+  header{background:var(--navy);color:#fff;padding:12px 0}
+  .bar{display:flex;align-items:center;gap:12px}
+  .bar b{font-family:Georgia,serif;font-size:17px}
+  .bar .sep{opacity:.4}
+  .bar .who{font-size:12.5px;color:#C7D5E3}
+  .langs{margin-left:auto;display:flex;gap:2px;background:rgba(255,255,255,.1);border-radius:999px;padding:3px}
+  .langs button{border:0;background:transparent;color:#D7E3EF;font:600 11.5px/1 inherit;padding:7px 10px;border-radius:999px;cursor:pointer}
+  .langs button.on{background:#fff;color:var(--navy)}
+  main{padding:24px 0 60px}
+  h1{font-size:21px;margin:0 0 4px;color:var(--navy)}
+  .sub{margin:0;color:var(--muted);font-size:13px}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;background:#fff;border:1px solid var(--line);
+    border-radius:14px;padding:14px;margin:18px 0}
+  .field{display:flex;flex-direction:column;gap:5px}
+  label{font-size:11.5px;color:var(--muted);font-weight:600}
+  input,select,textarea{font:inherit;font-size:13.5px;padding:9px 10px;border:1px solid #D5DDE7;border-radius:9px;
+    background:#FCFDFF;color:var(--ink);min-width:0}
+  input:focus,select:focus,textarea:focus{outline:2px solid rgba(15,39,64,.18);border-color:var(--navy)}
+  .toolbar input[type=search]{width:240px;max-width:60vw}
+  .btn{background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:9px;padding:9px 16px;
+    font:600 13px/1.2 inherit;cursor:pointer;white-space:nowrap}
+  .btn:hover{background:var(--navy2)}
+  .btn.ghost{background:#fff;color:var(--navy);border-color:#CBD6E2}
+  .btn.gold{background:var(--gold);border-color:var(--gold)}
+  .btn.sm{padding:6px 12px;font-size:12px;border-radius:8px}
+  .btn:disabled{opacity:.55;cursor:wait}
+  .alert{display:none;border-radius:10px;padding:10px 12px;font-size:13px;margin:0 0 12px}
+  .alert.show{display:block}
+  .alert.err{background:#FDF0EE;border:1px solid #F2CEC7;color:#8E2F24}
+  .alert.ok{background:#EAF6EF;border:1px solid #C8E6D4;color:#1D6B43}
+  .tablewrap{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:#FAFBFD;font-weight:700}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover{background:#FBFCFE}
+  .mono{font:600 12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--navy);white-space:nowrap}
+  .cust b{display:block;font-size:13.5px;color:var(--ink);font-weight:600}
+  .cust span{font-size:11.5px;color:var(--muted)}
+  .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .s-new{background:#E8F0FA;color:#245A96}
+  .s-contacted{background:#FFF3DC;color:#8A5A10}
+  .s-paid{background:#E7F5EC;color:#1D6B43}
+  .s-building{background:#EFE9FA;color:#5A3E9E}
+  .s-review{background:#FDF0E6;color:#94531F}
+  .s-live{background:#E3F6EF;color:#116B4E}
+  .s-paused{background:#EEF0F3;color:#55616E}
+  .s-cancelled{background:#FBEAE8;color:#8E2F24}
+  .empty{padding:44px 16px;text-align:center;color:var(--muted);font-size:13px}
+  .loading{padding:36px 16px;text-align:center;color:var(--muted);font-size:13px}
+
+  .gate{max-width:460px;margin:44px auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:30px;text-align:center}
+  .gate .lock{width:48px;height:48px;border-radius:50%;background:#EEF2F7;color:var(--navy);display:flex;
+    align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px}
+  .gate h2{margin:0 0 6px;font-size:19px;color:var(--navy)}
+  .gate p{margin:0 0 18px;color:var(--muted);font-size:13px}
+  .gate code{background:#F1F4F8;border-radius:6px;padding:2px 6px;font-size:12.5px}
+
+  .modal{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-start;justify-content:center;
+    padding:24px 16px;background:rgba(9,20,32,.55);overflow:auto}
+  .sheet{width:min(720px,100%);background:#fff;border-radius:18px;padding:22px;box-shadow:0 30px 70px rgba(9,20,32,.35)}
+  .sheet-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+  .sheet-head h2{margin:0;font-size:18px;color:var(--navy)}
+  .sheet-head .mono{margin-top:3px}
+  .x{margin-left:auto;border:0;background:#F1F4F8;width:32px;height:32px;border-radius:50%;font-size:16px;
+    cursor:pointer;color:var(--muted);line-height:1}
+  .meta{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;background:#FAFBFD;border:1px solid var(--line);
+    border-radius:12px;padding:12px 14px;margin-bottom:14px}
+  .meta .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .meta .v{font-size:13px;color:var(--ink);word-break:break-word}
+  .meta .v.emptyv{color:#9AA6B4}
+  .notesbox{background:#FFFDF8;border:1px solid #EFE3CB;border-radius:10px;padding:10px 12px;font-size:12.5px;
+    color:#5F523C;margin-bottom:14px;white-space:pre-wrap;word-break:break-word}
+  .sect{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+  .sect h3{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+  .row .field{flex:1 1 120px}
+  .row .grow{flex:2 1 180px}
+  .bal{font-family:Georgia,serif;font-size:22px;color:var(--navy)}
+  .bal small{font-size:11px;color:var(--muted);font-family:inherit;margin-left:4px}
+  /* 事件时间线（SPEC §5.5 / §10.1）：不写固定像素宽，长内容一律折行 */
+  #dtimeline-status{font-size:12.5px;color:var(--muted);min-width:0}
+  #dtimeline-status.err{color:#8E2F24}
+  #dtimeline{display:flex;flex-direction:column;gap:10px;min-width:0}
+  .tl-item{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;min-width:0;
+    border-left:2px solid var(--line);padding:2px 0 2px 10px}
+  .tl-item .badge{max-width:100%;white-space:normal;word-break:break-word}
+  .b-created{background:#E8F0FA;color:#245A96}
+  .b-status{background:#E7F5EC;color:#1D6B43}
+  .b-note{background:#FFF3DC;color:#8A5A10}
+  .b-other{background:#EEF0F3;color:#55616E}
+  .tl-meta{flex:1 1 auto;min-width:0;font-size:11.5px;color:var(--muted);
+    word-break:break-word;overflow-wrap:anywhere}
+  /* 时间串由 fmtDate 固定格式产出（三语最长约 21 字符 ≈147px），单行不换行仍可缩；若改长格式需复查溢出 */
+  .tl-time{white-space:nowrap}
+  .tl-note{flex:1 1 100%;min-width:0;font-size:12.5px;color:var(--ink);
+    white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  @media(max-width:760px){
+    .bar b{font-size:15px}
+    .bar .who{display:none}
+    main{padding:18px 0 40px}
+    h1{font-size:19px}
+    .toolbar{padding:12px;gap:8px}
+    .toolbar .field{flex:1 1 100%}
+    .toolbar input[type=search]{width:100%;max-width:none}
+    .toolbar .btn{flex:1 1 45%}
+    .tablewrap{background:transparent;border:0;border-radius:0;overflow:visible}
+    table,tbody,tr,td{display:block;width:100%}
+    thead{display:none}
+    tbody tr{background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px 12px;margin-bottom:10px}
+    tbody tr:hover{background:#fff}
+    td{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-bottom:1px dashed #EDF1F6;text-align:right}
+    tbody tr td:last-child{border-bottom:0}
+    td:before{content:attr(data-label);font-size:11px;color:var(--muted);font-weight:600;text-align:left;flex:0 0 auto}
+    td.cust-td{display:block;text-align:left}
+    td.cust-td:before{display:none}
+    td[data-label=""]:before{display:none}
+    td.cust-td .cust b{font-size:14.5px}
+    .mono{white-space:normal;word-break:break-all}
+    .sheet{padding:18px 14px;border-radius:14px}
+    .meta{grid-template-columns:1fr}
+    .row .field,.row .grow{flex:1 1 100%}
+    .row .btn{width:100%}
+    .modal{padding:10px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <b>ROOFX</b><span class="sep">/</span>
+    <span data-i18n="title"></span>
+    <span class="who" id="who"></span>
+    <div class="langs" id="langs" role="group" aria-label="Language">
+      <button type="button" data-lang="zh">中文</button>
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="bm">BM</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="gate" class="gate" hidden>
+    <div class="lock">🔒</div>
+    <h2 data-i18n="gate_title"></h2>
+    <p><span data-i18n="gate_body"></span> <code>/admin/</code></p>
+    <a class="btn" href="/admin/" data-i18n="gate_btn"></a>
+  </section>
+
+  <section id="app" hidden>
+    <h1 data-i18n="title"></h1>
+    <p class="sub" data-i18n="sub"></p>
+
+    <div class="toolbar">
+      <div class="field">
+        <label for="fstatus" data-i18n="filter_status"></label>
+        <select id="fstatus">
+          <option value="" data-i18n="filter_all"></option>
+        </select>
+      </div>
+      <div class="field grow">
+        <label for="fq" data-i18n="filter_q"></label>
+        <input id="fq" type="search" data-i18n-ph="filter_q_ph" autocomplete="off">
+      </div>
+      <button class="btn" id="searchbtn" type="button" data-i18n="search"></button>
+      <button class="btn ghost" id="resetbtn" type="button" data-i18n="reset"></button>
+    </div>
+
+    <div class="alert" id="alert" role="alert"></div>
+
+    <div class="loading" id="loading" data-i18n="loading"></div>
+    <div class="tablewrap" id="tablewrap" hidden>
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="th_no"></th>
+            <th data-i18n="th_customer"></th>
+            <th data-i18n="th_phone"></th>
+            <th data-i18n="th_area"></th>
+            <th data-i18n="th_status"></th>
+            <th data-i18n="th_tokens"></th>
+            <th data-i18n="th_created"></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden data-i18n="empty"></div>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dtitle">
+    <div class="sheet-head">
+      <div>
+        <h2 id="dtitle" data-i18n="detail_title"></h2>
+        <div class="mono" id="dno">—</div>
+      </div>
+      <button class="x" id="closebtn" type="button" aria-label="Close">✕</button>
+    </div>
+
+    <div class="meta" id="dmeta"></div>
+    <div class="notesbox" id="dnotes" hidden></div>
+
+    <div class="sect">
+      <h3 data-i18n="status_section"></h3>
+      <div class="row">
+        <div class="field">
+          <label for="dstatus" data-i18n="th_status"></label>
+          <select id="dstatus"></select>
+        </div>
+        <div class="field grow">
+          <label for="dnote" data-i18n="status_note"></label>
+          <input id="dnote" type="text" maxlength="500" data-i18n-ph="status_note_ph">
+        </div>
+        <button class="btn" id="savebtn" type="button" data-i18n="save_status"></button>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h3 data-i18n="token_section"></h3>
+      <div class="row" style="margin-bottom:10px">
+        <div>
+          <div class="k" data-i18n="label_balance" style="font-size:10.5px;color:var(--muted)"></div>
+          <div class="bal"><span id="dtokens">0.00</span><small data-i18n="tokens_unit"></small></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="tkind" data-i18n="token_kind"></label>
+          <select id="tkind">
+            <option value="topup" data-i18n="token_topup"></option>
+            <option value="usage" data-i18n="token_usage"></option>
+            <option value="adjust" data-i18n="token_adjust"></option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="tamount" data-i18n="token_amount"></label>
+          <input id="tamount" type="number" step="0.01" inputmode="decimal" placeholder="0.00">
+        </div>
+        <div class="field grow">
+          <label for="tnote" data-i18n="token_note"></label>
+          <input id="tnote" type="text" maxlength="300" data-i18n-ph="token_note_ph">
+        </div>
+        <button class="btn gold" id="tokenbtn" type="button" data-i18n="token_submit"></button>
+      </div>
+    </div>
+
+    <div class="sect" id="timeline-sect">
+      <h3 data-i18n="timeline_section"></h3>
+      <div id="dtimeline-status" role="status"></div>
+      <div id="dtimeline"></div>
+    </div>
+
+    <div class="alert" id="dalert" role="alert" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var INDEX = { zh: 0, en: 1, bm: 2 };
+  var STATUSES = ["new", "contacted", "paid", "building", "review", "live", "paused", "cancelled"];
+  var TOKEN_KINDS = ["topup", "usage", "adjust"];
+  var I18N = {
+    page_title: ["订单后台 — RoofX", "Order desk — RoofX", "Meja pesanan — RoofX"],
+    title: ["建站订单", "Website orders", "Pesanan laman web"],
+    sub: ["公开下单页收到的订单。改状态与 token 充值都在这里。", "Orders from the public page. Update status and top up tokens here.", "Pesanan daripada halaman awam. Kemas kini status dan tambah token di sini."],
+    filter_status: ["状态", "Status", "Status"],
+    filter_all: ["全部状态", "All statuses", "Semua status"],
+    filter_q: ["搜索", "Search", "Cari"],
+    filter_q_ph: ["单号 / 姓名 / 电话 / 公司 / 邮箱", "Order no / name / phone / company / email", "No. pesanan / nama / telefon / syarikat / e-mel"],
+    search: ["查询", "Search", "Cari"],
+    reset: ["重置", "Reset", "Set semula"],
+    loading: ["加载中…", "Loading…", "Memuatkan…"],
+    empty: ["没有符合条件的订单。", "No orders match these filters.", "Tiada pesanan sepadan."],
+    th_no: ["订单号", "Order no", "No. pesanan"],
+    th_customer: ["客户", "Customer", "Pelanggan"],
+    th_phone: ["电话", "Phone", "Telefon"],
+    th_area: ["区域", "Area", "Kawasan"],
+    th_status: ["状态", "Status", "Status"],
+    th_tokens: ["Token 余额", "Token balance", "Baki token"],
+    th_created: ["创建时间", "Created", "Dicipta"],
+    manage: ["管理", "Manage", "Urus"],
+    gate_title: ["请先登录后台", "Admin sign-in required", "Log masuk pentadbir diperlukan"],
+    gate_body: ["订单后台沿用现有管理员会话，请先到", "This desk uses the existing admin session. Please sign in at", "Meja ini menggunakan sesi pentadbir sedia ada. Sila log masuk di"],
+    gate_btn: ["前往 /admin/ 登录", "Go to /admin/ to sign in", "Pergi ke /admin/ untuk log masuk"],
+    err_auth: ["登录已过期，请重新登录。", "Session expired. Please sign in again.", "Sesi tamat. Sila log masuk semula."],
+    err_forbidden: ["当前账号是只读权限，不能修改订单。", "This account is read-only and cannot change orders.", "Akaun ini hanya baca dan tidak boleh mengubah pesanan."],
+    err_load: ["加载失败，请重试。", "Could not load orders. Please retry.", "Gagal memuatkan pesanan. Sila cuba lagi."],
+    err_network: ["网络错误，请重试。", "Network error. Please retry.", "Ralat rangkaian. Sila cuba lagi."],
+    err_generic: ["操作失败，请重试。", "Action failed. Please retry.", "Tindakan gagal. Sila cuba lagi."],
+    err_amount: ["金额必须是非零数字；充值/扣减必须为正数。", "Amount must be non-zero; top-up and usage must be positive.", "Jumlah mesti bukan sifar; tambah nilai dan penggunaan mesti positif."],
+    insufficient: ["Token 余额不足，不能扣减。", "Not enough tokens for this usage.", "Token tidak mencukupi untuk penggunaan ini."],
+    detail_title: ["订单详情", "Order detail", "Butiran pesanan"],
+    label_email: ["邮箱", "Email", "E-mel"],
+    label_company: ["公司", "Company", "Syarikat"],
+    label_ren: ["REN", "REN", "REN"],
+    label_domain: ["域名", "Domain", "Domain"],
+    label_created: ["创建", "Created", "Dicipta"],
+    label_updated: ["更新", "Updated", "Dikemas kini"],
+    label_balance: ["当前 Token 余额", "Current token balance", "Baki token semasa"],
+    tokens_unit: ["tokens", "tokens", "token"],
+    status_section: ["状态与事件", "Status and timeline", "Status dan garis masa"],
+    timeline_section: ["事件时间线", "Event timeline", "Garis masa peristiwa"],
+    timeline_loading: ["正在加载事件…", "Loading events…", "Memuatkan peristiwa…"],
+    timeline_empty: ["还没有事件记录。", "No events yet.", "Tiada peristiwa lagi."],
+    timeline_err: ["时间线加载失败，请重试。", "Could not load the timeline. Please retry.", "Gagal memuatkan garis masa. Sila cuba lagi."],
+    timeline_err_not_found: ["该订单已不存在或已被删除。", "This order no longer exists or was deleted.", "Pesanan ini tidak lagi wujud atau telah dipadam."],
+    timeline_actor: ["操作人", "By", "Oleh"],
+    timeline_type_created: ["创建", "Created", "Dicipta"],
+    timeline_type_status: ["状态", "Status", "Status"],
+    timeline_type_note: ["备注", "Note", "Catatan"],
+    status_note: ["事件备注", "Event note", "Nota peristiwa"],
+    status_note_ph: ["可选，例如：已电话确认，等付款", "Optional, e.g. called, waiting for payment", "Pilihan, cth. telah ditelefon, menunggu bayaran"],
+    save_status: ["保存状态", "Save status", "Simpan status"],
+    saved: ["已保存。", "Saved.", "Disimpan."],
+    token_section: ["Token 充值 / 扣减", "Token top-up / usage", "Tambah / guna token"],
+    token_kind: ["类型", "Type", "Jenis"],
+    token_topup: ["充值 topup", "Top-up", "Tambah nilai"],
+    token_usage: ["扣减 usage", "Usage", "Penggunaan"],
+    token_adjust: ["调整 adjust（可负）", "Adjust (can be negative)", "Laras (boleh negatif)"],
+    token_amount: ["金额", "Amount", "Jumlah"],
+    token_note: ["备注", "Note", "Catatan"],
+    token_note_ph: ["例如：9 月充值 / 额外页面", "e.g. September top-up / extra page", "cth. tambah nilai September / halaman tambahan"],
+    token_submit: ["记一笔", "Record", "Rekod"],
+    token_done: ["已记账，余额已更新。", "Recorded. Balance updated.", "Direkod. Baki dikemas kini."],
+    status_new: ["新订单", "New", "Baharu"],
+    status_contacted: ["已联系", "Contacted", "Dihubungi"],
+    status_paid: ["已付款", "Paid", "Dibayar"],
+    status_building: ["制作中", "Building", "Sedang dibina"],
+    status_review: ["待验收", "In review", "Dalam semakan"],
+    status_live: ["已上线", "Live", "Aktif"],
+    status_paused: ["已暂停", "Paused", "Dijeda"],
+    status_cancelled: ["已取消", "Cancelled", "Dibatalkan"],
+    none: ["—", "—", "—"]
+  };
+
+  var q = new URLSearchParams(location.search);
+  var lang = q.get("lang") || localStorage.getItem("kt_lang") || localStorage.getItem("kwongthye_lang") || "zh";
+  if (!INDEX.hasOwnProperty(lang)) lang = "zh";
+  var rows = [];
+  var current = null;
+
+  function t(key) {
+    var v = I18N[key];
+    return v ? (v[INDEX[lang]] || v[0]) : key;
+  }
+  function locale() {
+    return lang === "zh" ? "zh-CN" : lang === "bm" ? "ms-MY" : "en-MY";
+  }
+  function fmtDate(iso) {
+    if (!iso) return t("none");
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return t("none");
+    return d.toLocaleString(locale(), { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+  }
+  function fmtMoney(n) {
+    var x = Number(n);
+    return isFinite(x) ? x.toFixed(2) : "0.00";
+  }
+
+  function apply() {
+    document.documentElement.lang = lang === "zh" ? "zh-Hans" : lang;
+    document.title = t("page_title");
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n");
+      if (I18N[k]) el.textContent = t(k);
+    });
+    document.querySelectorAll("[data-i18n-ph]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n-ph");
+      if (I18N[k]) el.setAttribute("placeholder", t(k));
+    });
+    document.querySelectorAll("#langs button").forEach(function (b) {
+      b.classList.toggle("on", b.getAttribute("data-lang") === lang);
+    });
+    if ($("fstatus").options.length) {
+      Array.prototype.forEach.call($("fstatus").options, function (o) {
+        if (o.value) o.textContent = t("status_" + o.value);
+      });
+    }
+    if ($("dstatus").options.length) {
+      Array.prototype.forEach.call($("dstatus").options, function (o) {
+        o.textContent = t("status_" + o.value);
+      });
+    }
+    if (!document.getElementById("app").hidden) render();
+    // 弹窗打开时切语言：重新拉取，让徽标/时间/状态文案一起换语言（SPEC §5.3-4）
+    if (current && !$("modal").hidden) loadTimeline(current.id);
+  }
+
+  function setLang(next) {
+    if (!INDEX.hasOwnProperty(next)) return;
+    lang = next;
+    try { localStorage.setItem("kt_lang", lang); localStorage.setItem("kwongthye_lang", lang); } catch (e) {}
+    try {
+      var u = new URL(location.href);
+      u.searchParams.set("lang", lang);
+      history.replaceState(null, "", u.toString());
+    } catch (e) {}
+    apply();
+  }
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function alertBox(box, kind, msg) {
+    box.className = "alert " + kind + " show";
+    box.textContent = msg;
+  }
+  function hideAlert(box) { box.className = "alert"; box.textContent = ""; }
+
+  function showGate() {
+    if (!$("modal").hidden) closeDetail();
+    $("app").hidden = true;
+    $("gate").hidden = false;
+  }
+  function showApp() {
+    $("gate").hidden = true;
+    $("app").hidden = false;
+  }
+
+  function fetchJson(url, opts) {
+    var init = Object.assign({ credentials: "same-origin", headers: {} }, opts || {});
+    if (init.body) init.headers["Content-Type"] = "application/json";
+    return fetch(url, init).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        if (res.status === 401) { showGate(); throw { code: "auth" }; }
+        if (!res.ok) throw { code: (body && body.error) || "http_" + res.status, status: res.status, body: body };
+        return body;
+      });
+    });
+  }
+
+  function statusBadge(status) {
+    var b = el("span", "badge s-" + status, t("status_" + status));
+    return b;
+  }
+
+  function render() {
+    var tbody = $("rows");
+    tbody.innerHTML = "";
+    $("empty").hidden = rows.length > 0;
+    rows.forEach(function (r) {
+      var tr = document.createElement("tr");
+
+      var tdNo = el("td", "", null);
+      tdNo.setAttribute("data-label", t("th_no"));
+      tdNo.appendChild(el("span", "mono", r.order_no));
+      tr.appendChild(tdNo);
+
+      var tdCust = el("td", "cust-td", null);
+      var cust = el("div", "cust");
+      cust.appendChild(el("b", "", r.name || t("none")));
+      var sub = [r.company, r.ren_no ? "REN " + r.ren_no : ""].filter(Boolean).join(" · ");
+      cust.appendChild(el("span", "", sub || t("none")));
+      tdCust.appendChild(cust);
+      tr.appendChild(tdCust);
+
+      var tdPhone = el("td", "num", r.phone || t("none"));
+      tdPhone.setAttribute("data-label", t("th_phone"));
+      tr.appendChild(tdPhone);
+
+      var tdArea = el("td", "", r.area || t("none"));
+      tdArea.setAttribute("data-label", t("th_area"));
+      tr.appendChild(tdArea);
+
+      var tdStatus = el("td", "", null);
+      tdStatus.setAttribute("data-label", t("th_status"));
+      tdStatus.appendChild(statusBadge(r.status));
+      tr.appendChild(tdStatus);
+
+      var tdTok = el("td", "num", fmtMoney(r.tokens));
+      tdTok.setAttribute("data-label", t("th_tokens"));
+      tr.appendChild(tdTok);
+
+      var tdCreated = el("td", "num", fmtDate(r.created_at));
+      tdCreated.setAttribute("data-label", t("th_created"));
+      tr.appendChild(tdCreated);
+
+      var tdAct = el("td", "", null);
+      tdAct.setAttribute("data-label", "");
+      var btn = el("button", "btn sm ghost", t("manage"));
+      btn.type = "button";
+      btn.addEventListener("click", function () { openDetail(r); });
+      tdAct.appendChild(btn);
+      tr.appendChild(tdAct);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  function buildSelects() {
+    var fs = $("fstatus");
+    if (!fs.options.length) {
+      fs.appendChild(new Option("", ""));
+      STATUSES.forEach(function (s) { fs.appendChild(new Option("", s)); });
+    }
+    Array.prototype.forEach.call(fs.options, function (o) { if (o.value) o.textContent = t("status_" + o.value); });
+    fs.options[0].textContent = t("filter_all");
+
+    var ds = $("dstatus");
+    if (!ds.options.length) {
+      STATUSES.forEach(function (s) { ds.appendChild(new Option("", s)); });
+    }
+    Array.prototype.forEach.call(ds.options, function (o) { o.textContent = t("status_" + o.value); });
+
+    var tk = $("tkind");
+    Array.prototype.forEach.call(tk.options, function (o) {
+      var map = { topup: "token_topup", usage: "token_usage", adjust: "token_adjust" };
+      o.textContent = t(map[o.value]);
+    });
+  }
+
+  function load() {
+    $("loading").hidden = false;
+    $("tablewrap").hidden = true;
+    hideAlert($("alert"));
+    var params = new URLSearchParams();
+    var s = $("fstatus").value;
+    var query = $("fq").value.trim();
+    if (s) params.set("status", s);
+    if (query) params.set("q", query);
+    var url = "/api/admin/orders" + (params.toString() ? "?" + params.toString() : "");
+    fetchJson(url).then(function (body) {
+      rows = body.rows || [];
+      showApp();
+      render();
+      $("tablewrap").hidden = false;
+    }).catch(function (e) {
+      if (e && e.code === "auth") return;
+      showApp();
+      if (e && e.status === 403) alertBox($("alert"), "err", t("err_forbidden"));
+      else alertBox($("alert"), "err", t("err_load"));
+    }).then(function () {
+      $("loading").hidden = true;
+    });
+  }
+
+  function metaItem(k, v) {
+    var d = el("div");
+    d.appendChild(el("div", "k", k));
+    d.appendChild(el("div", "v" + (v ? "" : " emptyv"), v || t("none")));
+    return d;
+  }
+
+  function openDetail(r) {
+    current = r;
+    $("dno").textContent = r.order_no;
+    $("dstatus").value = r.status;
+    $("dnote").value = "";
+    $("tamount").value = "";
+    $("tnote").value = "";
+    hideAlert($("dalert"));
+    $("dtokens").textContent = fmtMoney(r.tokens);
+
+    var meta = $("dmeta");
+    meta.innerHTML = "";
+    meta.appendChild(metaItem(t("th_customer"), r.name));
+    meta.appendChild(metaItem(t("label_company"), r.company));
+    meta.appendChild(metaItem(t("th_phone"), r.phone));
+    meta.appendChild(metaItem(t("label_email"), r.email));
+    meta.appendChild(metaItem(t("label_ren"), r.ren_no));
+    meta.appendChild(metaItem(t("th_area"), r.area));
+    meta.appendChild(metaItem(t("label_domain"), r.domain));
+    meta.appendChild(metaItem(t("label_created"), fmtDate(r.created_at)));
+    meta.appendChild(metaItem(t("label_updated"), fmtDate(r.updated_at)));
+
+    var notes = $("dnotes");
+    if (r.notes) { notes.hidden = false; notes.textContent = r.notes; }
+    else { notes.hidden = true; notes.textContent = ""; }
+
+    $("modal").hidden = false;
+    document.body.style.overflow = "hidden";
+    loadTimeline(r.id);
+    $("closebtn").focus();
+  }
+
+  function closeDetail() {
+    $("modal").hidden = true;
+    document.body.style.overflow = "";
+    current = null;
+    // 使在途的时间线响应失效，并复位区块（SPEC §5.4-2）
+    timelineSeq++;
+    $("dtimeline").innerHTML = "";
+    var st = $("dtimeline-status");
+    st.hidden = true;
+    st.className = "";
+    st.setAttribute("role", "status");
+    st.textContent = "";
+  }
+
+  // ---------- 订单事件时间线（SPEC §5 / §10.4） ----------
+  // 竞态令牌（SPEC §10.4 片段里写作 tlSeq，同一令牌）：只有最后一次时间线请求的响应允许落地
+  var timelineSeq = 0;
+  var TYPE_KEY = { created: "timeline_type_created", status: "timeline_type_status", note: "timeline_type_note" };
+
+  function timelineLoading() {
+    var st = $("dtimeline-status");
+    $("dtimeline").innerHTML = "";
+    st.hidden = false;
+    st.className = "";
+    st.setAttribute("role", "status");
+    st.textContent = t("timeline_loading");
+  }
+
+  function timelineEmpty() {
+    var st = $("dtimeline-status");
+    $("dtimeline").innerHTML = "";
+    st.hidden = false;
+    st.className = "";
+    st.setAttribute("role", "status");
+    st.textContent = t("timeline_empty");
+  }
+
+  // 单元素切 role：#dtimeline-status 常驻 status，失败时切 alert（TASKS §7-6，禁止第二个状态节点）
+  function timelineError(msg) {
+    var st = $("dtimeline-status");
+    $("dtimeline").innerHTML = "";
+    st.hidden = false;
+    st.className = "err";
+    st.setAttribute("role", "alert");
+    st.textContent = msg;
+  }
+
+  function renderTimeline(list) {
+    var box = $("dtimeline");
+    var st = $("dtimeline-status");
+    box.innerHTML = "";
+    if (!list.length) { timelineEmpty(); return; }
+    st.hidden = true;
+    st.className = "";
+    st.setAttribute("role", "status");
+    st.textContent = "";
+    list.forEach(function (ev) {
+      var type = String((ev && ev.type) || "");
+      var item = el("div", "tl-item");
+      var badge = el("span", "badge");
+      var key = Object.prototype.hasOwnProperty.call(TYPE_KEY, type) ? TYPE_KEY[type] : null;
+      if (key) {
+        badge.className += " b-" + type;
+        badge.textContent = t(key);
+      } else {
+        // 未知/空 type 原样显示（textContent，不翻译、不丢行）
+        badge.className += " b-other";
+        badge.textContent = type || t("none");
+      }
+      var meta = el("span", "tl-meta");
+      meta.appendChild(el("span", "tl-time", fmtDate(ev && ev.created_at)));
+      meta.appendChild(document.createTextNode(" · " + t("timeline_actor") + " · " + ((ev && ev.actor) || t("none"))));
+      item.appendChild(badge);
+      item.appendChild(meta);
+      if (ev && ev.note) item.appendChild(el("div", "tl-note", String(ev.note)));
+      box.appendChild(item);
+    });
+  }
+
+  // 时间线失败只写 #dtimeline-status，不碰 #dalert、不影响按钮状态（SPEC §5.4-6）
+  function loadTimeline(orderId) {
+    var seq = ++timelineSeq;
+    timelineLoading();
+    return fetchJson("/api/admin/orders/" + encodeURIComponent(orderId) + "/events")
+      .then(function (body) {
+        if (seq !== timelineSeq) return;
+        if ($("modal").hidden) return;
+        renderTimeline(Array.isArray(body && body.rows) ? body.rows : []);
+      })
+      .catch(function (e) {
+        if (seq !== timelineSeq) return;
+        if (e && e.code === "auth") return;
+        if ($("modal").hidden) return;
+        if (e && (e.status === 404 || e.code === "not_found")) timelineError(t("timeline_err_not_found"));
+        else timelineError(t("timeline_err"));
+      });
+  }
+
+  function updateRowFrom(order) {
+    if (!order) return;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].id === order.id) { rows[i] = Object.assign({}, rows[i], order); current = rows[i]; break; }
+    }
+  }
+
+  $("langs").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-lang]");
+    if (b) setLang(b.getAttribute("data-lang"));
+  });
+  $("searchbtn").addEventListener("click", load);
+  $("resetbtn").addEventListener("click", function () {
+    $("fstatus").value = "";
+    $("fq").value = "";
+    load();
+  });
+  $("fq").addEventListener("keydown", function (e) { if (e.key === "Enter") load(); });
+  $("fstatus").addEventListener("change", load);
+  $("closebtn").addEventListener("click", closeDetail);
+  $("modal").addEventListener("click", function (e) { if (e.target === $("modal")) closeDetail(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !$("modal").hidden) closeDetail();
+  });
+
+  $("savebtn").addEventListener("click", function () {
+    if (!current) return;
+    var openId = current.id;
+    var btn = $("savebtn");
+    var status = $("dstatus").value;
+    var note = $("dnote").value.trim();
+    btn.disabled = true;
+    hideAlert($("dalert"));
+    fetchJson("/api/admin/orders/" + encodeURIComponent(current.id), {
+      method: "PATCH",
+      body: JSON.stringify({ status: status, note: note })
+    }).then(function (body) {
+      updateRowFrom(body.order);
+      $("dstatus").value = current.status;
+      $("dnote").value = "";
+      $("dtokens").textContent = fmtMoney(current.tokens);
+      alertBox($("dalert"), "ok", t("saved"));
+      render();
+      // 保存成功后刷新时间线；先确认弹窗还停在同一张单上（SPEC §5.4-7）
+      if (!current || current.id !== openId) return;
+      loadTimeline(openId);
+    }).catch(function (e) {
+      if (e && e.code === "auth") return;
+      if (e && e.status === 403) alertBox($("dalert"), "err", t("err_forbidden"));
+      else alertBox($("dalert"), "err", t("err_generic"));
+    }).then(function () { btn.disabled = false; });
+  });
+
+  $("tokenbtn").addEventListener("click", function () {
+    if (!current) return;
+    var openId = current.id;
+    var btn = $("tokenbtn");
+    var amount = Number($("tamount").value);
+    var kind = $("tkind").value;
+    hideAlert($("dalert"));
+    if (!isFinite(amount) || amount === 0 || (kind !== "adjust" && amount < 0)) {
+      alertBox($("dalert"), "err", t("err_amount"));
+      return;
+    }
+    btn.disabled = true;
+    fetchJson("/api/admin/orders/" + encodeURIComponent(current.id) + "/tokens", {
+      method: "POST",
+      body: JSON.stringify({ kind: kind, amount: amount, note: $("tnote").value.trim() })
+    }).then(function (body) {
+      current.tokens = body.balance;
+      $("dtokens").textContent = fmtMoney(body.balance);
+      $("tamount").value = "";
+      $("tnote").value = "";
+      alertBox($("dalert"), "ok", t("token_done"));
+      updateRowFrom({ id: current.id, tokens: body.balance });
+      render();
+      // token 记账成功后同样刷新（不会产生新事件行，见 SPEC §11.2 / L2）
+      if (!current || current.id !== openId) return;
+      loadTimeline(openId);
+    }).catch(function (e) {
+      if (e && e.code === "auth") return;
+      if (e && e.code === "insufficient_tokens") alertBox($("dalert"), "err", t("insufficient"));
+      else if (e && e.status === 403) alertBox($("dalert"), "err", t("err_forbidden"));
+      else if (e && e.code === "invalid_token") alertBox($("dalert"), "err", t("err_amount"));
+      else alertBox($("dalert"), "err", t("err_generic"));
+    }).then(function () { btn.disabled = false; });
+  });
+
+  buildSelects();
+  apply();
+  load();
+})();
+</script>
+</body>
+</html>
