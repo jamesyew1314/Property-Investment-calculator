@@ -165,9 +165,65 @@
     section.block{padding:32px 0 4px}
     .orderbox{font-size:17px}
   }
+
+  /* 2026-11 Malaysia SME refresh */
+  body{background:#F6F1E7}
+  .promo{background:#8E2F24;color:#FFF7E8;font-size:12.5px}
+  .promo-in{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;flex-wrap:wrap}
+  .promo b{color:#F2D49B}
+  .promo a{color:#fff;text-decoration:none;font-weight:600;white-space:nowrap}
+  header{background:#0E2438;border-bottom:1px solid rgba(255,255,255,.14);box-shadow:0 6px 24px rgba(14,36,56,.12)}
+  .brand{color:#fff}.brand b{color:#fff}.brand .sub{color:#D9C39D}
+  .brand img{width:38px;height:38px;border-radius:10px;background:#fff;padding:3px}
+  .langs{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+  .langs button{color:#DCE5EE}
+  .langs button.on{background:#C6A15B;color:#0E2438}
+  main{padding:34px 0 24px;background:
+    radial-gradient(900px 420px at 88% -5%, rgba(198,161,91,.20), transparent 62%),
+    radial-gradient(700px 380px at 0% 15%, rgba(14,36,56,.08), transparent 65%)}
+  .hero{gap:38px}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:#FFF6E3;border:1px solid #E5C98E;color:#7A4E17;
+    font-size:11.5px;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:6px 12px;margin-bottom:12px}
+  .hero-badge:before{content:"🇲🇾";font-size:13px}
+  h1{font-size:clamp(34px,4.6vw,54px);line-height:1.08;letter-spacing:-.8px}
+  h1 em{font-style:normal;color:#9C5C2C;background:linear-gradient(transparent 64%,rgba(198,161,91,.38) 64%)}
+  .lead{font-size:16px;line-height:1.75;color:#3B4652}
+  .trustrow{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+  .trustrow span{font-size:12px;color:#33404D;background:#fff;border:1px solid #E3DCD0;border-radius:999px;padding:6px 11px}
+  .trustrow span:before{content:"✓";color:#1F7A4D;font-weight:700;margin-right:6px}
+  .cta.wa{background:#1F7A4D;border-color:#1F7A4D}
+  .cta.wa:hover{background:#17643E}
+  .price{border:1px solid rgba(198,161,91,.5);box-shadow:0 22px 48px rgba(14,36,56,.2)}
+  .price .tag{background:rgba(198,161,91,.14)}
+  section.block{padding:40px 0 6px}
+  h2{font-size:clamp(24px,2.8vw,34px);letter-spacing:-.3px}
+  .step,.inc{box-shadow:0 4px 18px rgba(18,33,46,.04)}
+  .step{border-top:3px solid #C6A15B}
+  .faq details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 0 10px}
+  .faq summary{cursor:pointer;font-weight:600;color:var(--navy);font-size:14px;list-style:none}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary:after{content:"+";float:right;color:#9C5C2C;font-size:18px;line-height:1}
+  .faq details[open] summary:after{content:"–"}
+  .faq p{margin:10px 0 0;color:#5D6B7A;font-size:13.5px;line-height:1.75}
+  .wa-float{position:fixed;right:18px;bottom:18px;z-index:30;display:flex;align-items:center;gap:8px;
+    background:#1F7A4D;color:#fff;text-decoration:none;border-radius:999px;padding:12px 18px;font-weight:700;font-size:13px;
+    box-shadow:0 10px 24px rgba(31,122,77,.35)}
+  .wa-float:hover{background:#17643E}
+  @media(max-width:640px){
+    .promo-in{font-size:11px;gap:4px}
+    .promo-in .promo-left{display:none}
+    main{padding:22px 0 10px}
+    h1{font-size:34px}
+    .cta.wa{margin-bottom:10px}
+    .wa-float{right:12px;bottom:12px;padding:10px 14px;font-size:12px}
+  }
 </style>
 </head>
 <body>
+<div class="promo"><div class="wrap promo-in">
+  <span class="promo-left" data-i18n="promo_left"></span>
+  <a href="https://wa.me/60165280918?text=Hi%20RoofX%2C%20I%20want%20a%20website" target="_blank" rel="noopener" data-i18n="promo_wa"></a>
+</div></div>
 <header>
   <div class="wrap bar">
     <a class="brand" href="/">
@@ -185,14 +241,20 @@
 <main class="wrap">
   <div class="hero">
     <div>
+      <div class="hero-badge" data-i18n="hero_badge"></div>
       <div class="eyebrow" data-i18n="eyebrow"></div>
       <h1><span data-i18n="h1a"></span> <em data-i18n="h1b"></em></h1>
       <p class="lead" data-i18n="lead"></p>
+      <div class="trustrow">
+        <span data-i18n="trust_1"></span><span data-i18n="trust_2"></span>
+        <span data-i18n="trust_3"></span><span data-i18n="trust_4"></span>
+      </div>
       <div class="chips">
         <span class="chip"><b>RM299</b> <span data-i18n="chip_month"></span></span>
         <span class="chip"><b>RM2,500</b> <span data-i18n="chip_setup"></span></span>
         <span class="chip" data-i18n="chip_turnaround"></span>
       </div>
+      <a class="cta wa" href="https://wa.me/60165280918?text=Hi%20RoofX%2C%20I%20want%20a%20website" target="_blank" rel="noopener" data-i18n="cta_wa"></a>
       <a class="cta ghost" href="#included" data-i18n="cta_secondary"></a>
       <p class="note-small" data-i18n="hero_note"></p>
     </div>
@@ -296,6 +358,18 @@
       <div class="step"><div class="n">01</div><h3 data-i18n="how1_t"></h3><p data-i18n="how1_d"></p></div>
       <div class="step"><div class="n">02</div><h3 data-i18n="how2_t"></h3><p data-i18n="how2_d"></p></div>
       <div class="step"><div class="n">03</div><h3 data-i18n="how3_t"></h3><p data-i18n="how3_d"></p></div>
+    </div>
+  </section>
+
+  <section class="block" id="faq">
+    <h2 data-i18n="faq_title"></h2>
+    <p class="sub" data-i18n="faq_sub"></p>
+    <div class="faq">
+      <details><summary data-i18n="faq_q1"></summary><p data-i18n="faq_a1"></p></details>
+      <details><summary data-i18n="faq_q2"></summary><p data-i18n="faq_a2"></p></details>
+      <details><summary data-i18n="faq_q3"></summary><p data-i18n="faq_a3"></p></details>
+      <details><summary data-i18n="faq_q4"></summary><p data-i18n="faq_a4"></p></details>
+      <details><summary data-i18n="faq_q5"></summary><p data-i18n="faq_a5"></p></details>
     </div>
   </section>
 
@@ -429,6 +503,7 @@
   </div>
 </footer>
 
+<a class="wa-float" href="https://wa.me/60165280918?text=Hi%20RoofX%2C%20I%20want%20a%20website" target="_blank" rel="noopener" data-i18n="wa_float"></a>
 <script>
 (function () {
   "use strict";
@@ -438,12 +513,12 @@
     meta_desc: ["面向全行业个体、公司老板的专属建站服务：首月 RM2,500（含建站 + 首月服务），第 2 个月起 RM199/299/499 三选一。专属设计、域名、托管、内容导入与 WhatsApp 直达。",
       "Dedicated websites for businesses, sole traders and company owners: first month RM2,500 (setup + first month), then choose RM199/299/499 per month. Design, domain, hosting, content import and WhatsApp.",
       "Laman web khusus untuk perniagaan, individu dan pemilik syarikat: bulan pertama RM2,500 (penyediaan + bulan pertama), kemudian pilih RM199/299/499 sebulan. Reka bentuk, domain, hosting, import kandungan dan WhatsApp."],
-    eyebrow: ["全行业建站服务", "Website service for every industry", "Perkhidmatan laman web untuk semua industri"],
-    h1a: ["一个真正", "A website", "Laman web"],
-    h1b: ["属于你的品牌网站", "that is truly yours", "yang benar-benar milik anda"],
-    lead: ["专属设计、内容导入、WhatsApp 直达。固定服务时段 9am–12pm、1pm–4pm，期间任何问题即时回复。你专注经营与成交，网站交给我们。",
-      "Dedicated design, content import and WhatsApp click-to-chat. Fixed service windows 9am–12pm and 1pm–4pm, with immediate replies during those times. You focus on running your business.",
-      "Reka bentuk khusus, import kandungan dan WhatsApp terus. Waktu perkhidmatan tetap 9am–12pm dan 1pm–4pm, dengan balasan segera dalam tempoh itu. Anda fokus pada perniagaan anda."],
+    eyebrow: ["马来西亚 · 全行业建站服务", "Malaysia · websites for every industry", "Malaysia · laman web untuk semua industri"],
+    h1a: ["网站不是摆设", "Your website is not decoration", "Laman web bukan hiasan"],
+    h1b: ["是你 24 小时的业务员", "it is your 24/7 salesperson", "ia jurujual 24 jam anda"],
+    lead: ["专属设计、手机优先、WhatsApp 直达。首月 RM2,500 含建站 + 首月服务，之后低至 RM199/月。固定服务时段 9am–12pm、1pm–4pm，问题即时回复。",
+      "Dedicated design, mobile-first and WhatsApp click-to-chat. First month RM2,500 includes setup + first month; from RM199/month after. Fixed service windows 9am–12pm and 1pm–4pm with immediate replies.",
+      "Reka bentuk khusus, mudah alih dan WhatsApp terus. Bulan pertama RM2,500 termasuk penyediaan + bulan pertama; mulai RM199/bulan selepas itu. Waktu perkhidmatan 9am–12pm dan 1pm–4pm, balasan segera."],
     chip_month: ["/ 月", "/ month", "/ bulan"],
     chip_setup: ["首月总价（含建站）", "first month total (incl. setup)", "jumlah bulan pertama (termasuk penyediaan)"],
     chip_turnaround: ["固定服务 9am–12pm / 1pm–4pm", "Fixed service 9am–12pm / 1pm–4pm", "Perkhidmatan tetap 9am–12pm / 1pm–4pm"],
@@ -585,6 +660,29 @@
     err_brief: ["建站需求格式不正确，请检查链接与长度。", "Brief details look invalid. Please check the links and lengths.", "Butiran projek tidak sah. Sila semak pautan dan panjangnya."],
     footer_note: ["RoofX Web Studio · 马来西亚全行业建站", "RoofX Web Studio · Websites for every industry in Malaysia", "RoofX Web Studio · Laman web untuk semua industri di Malaysia"],
     footer_terms: ["服务条款", "Terms", "Terma"],
+    promo_left: ["马来西亚全行业建站 · 首月 RM2,500 含建站 + 首月服务",
+      "Malaysia websites for every industry · first month RM2,500 includes setup + first month",
+      "Laman web Malaysia untuk semua industri · bulan pertama RM2,500 termasuk penyediaan + bulan pertama"],
+    promo_wa: ["WhatsApp 咨询 →", "WhatsApp us →", "WhatsApp kami →"],
+    hero_badge: ["马来西亚本地团队 · 中文 / EN / BM", "Malaysian local team · CN / EN / BM", "Pasukan tempatan Malaysia · CN / EN / BM"],
+    trust_1: ["本地团队", "Local team", "Pasukan tempatan"],
+    trust_2: ["手机优先", "Mobile-first", "Mudah alih dahulu"],
+    trust_3: ["WhatsApp 直达", "WhatsApp direct", "WhatsApp terus"],
+    trust_4: ["固定服务时段", "Fixed service hours", "Waktu perkhidmatan tetap"],
+    cta_wa: ["WhatsApp 咨询", "WhatsApp us", "WhatsApp kami"],
+    wa_float: ["WhatsApp 咨询", "WhatsApp us", "WhatsApp kami"],
+    faq_title: ["常见问题", "Common questions", "Soalan lazim"],
+    faq_sub: ["先看答案，再决定要不要聊。", "Read the answers first, then decide whether to talk.", "Baca jawapan dahulu, kemudian tentukan sama ada mahu berbincang."],
+    faq_q1: ["可以做其他行业吗？", "Can you build for other industries?", "Boleh buat untuk industri lain?"],
+    faq_a1: ["可以。我们服务全行业个体、公司老板，不只房产中介。", "Yes. We work with businesses, sole traders and company owners across all industries, not just property agents.", "Boleh. Kami melayani perniagaan, individu dan pemilik syarikat dalam semua industri, bukan hanya ejen hartanah."],
+    faq_q2: ["首月多少钱？之后怎么收？", "What does the first month cost? What about after?", "Berapa bulan pertama? Bagaimana selepas itu?"],
+    faq_a2: ["首月 RM2,500（含建站 + 首月服务）。第 2 个月起 RM199 / RM299 / RM499 三选一，下单时选择。", "First month RM2,500 (setup + first month). From month 2, choose RM199 / RM299 / RM499 at checkout.", "Bulan pertama RM2,500 (penyediaan + bulan pertama). Mulai bulan 2, pilih RM199 / RM299 / RM499 semasa pesanan."],
+    faq_q3: ["多久可以上线？", "How long until launch?", "Berapa lama untuk dilancarkan?"],
+    faq_a3: ["资料齐全并确认付款后，按双方确认的排期上线；不承诺未确认的固定天数。", "After complete materials and cleared payment, we launch on the schedule agreed by both parties; we do not promise an unconfirmed fixed number of days.", "Selepas bahan lengkap dan bayaran disahkan, kami lancarkan mengikut jadual yang dipersetujui; kami tidak menjanjikan jumlah hari tetap yang belum disahkan."],
+    faq_q4: ["修改怎么算？", "How do revisions work?", "Bagaimana semakan dikira?"],
+    faq_a4: ["方案含每月 30 分钟 / 1 小时 / 2 小时修改；超出部分 RM150/小时。", "Plans include 30 minutes / 1 hour / 2 hours of edits per month; extra work is RM150/hour.", "Pelan termasuk 30 minit / 1 jam / 2 jam suntingan sebulan; lebihan RM150/jam."],
+    faq_q5: ["怎么付款？服务时间？", "How do I pay? When are you available?", "Bagaimana bayaran? Bila tersedia?"],
+    faq_a5: ["银行转账，人工确认后开始排期。固定服务时段：每天 9am–12pm、1pm–4pm（马来西亚时间）。", "Bank transfer; scheduling starts after manual confirmation. Fixed service hours: 9am–12pm and 1pm–4pm Malaysia time, daily.", "Pindahan bank; penjadualan bermula selepas pengesahan manual. Waktu perkhidmatan: 9am–12pm dan 1pm–4pm waktu Malaysia, setiap hari."],
     footer_privacy: ["隐私政策", "Privacy", "Privasi"]
   };
 
