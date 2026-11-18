@@ -300,6 +300,7 @@
         <h2 data-i18n="payhelp_title"></h2>
         <p style="color:var(--muted);font-size:13px;line-height:1.7;margin:0 0 12px" data-i18n="payhelp_body"></p>
         <a class="btn ghost sm" id="payhelp_wa" target="_blank" rel="noopener" data-i18n="payhelp_btn"></a>
+        <a class="btn sm" id="pay-btn" hidden target="_blank" rel="noopener" data-i18n="pay_now"></a>
       </section>
 
       <section class="panel">
@@ -491,6 +492,7 @@
       "First month RM2,500 (setup + first month). From month 2: hosting care RM199/month, care + content RM299/month, content growth RM499/month, chosen at order time. WhatsApp us for the invoice and pay by bank transfer; scheduling starts after payment is confirmed, with priority during the 9am–12pm and 1pm–4pm service windows.",
       "Bulan pertama RM2,500 (penyediaan + bulan pertama). Mulai bulan 2: penjagaan hosting RM199/bulan, penjagaan + kandungan RM299/bulan, pertumbuhan kandungan RM499/bulan, dipilih semasa pesanan. WhatsApp kami untuk invois dan bayar melalui pindahan bank; penjadualan bermula selepas bayaran disahkan, dengan keutamaan dalam waktu perkhidmatan 9am–12pm dan 1pm–4pm."],
     payhelp_btn: ["WhatsApp 获取发票", "WhatsApp for invoice", "WhatsApp untuk invois"],
+    pay_now: ["立即在线付款（FPX）", "Pay online now (FPX)", "Bayar dalam talian sekarang (FPX)"],
     label_goal: ["建站目标", "Goal", "Matlamat"],
     label_pages: ["需要页面", "Pages needed", "Halaman diperlukan"],
     label_listing_count: ["内容 / 产品数量", "Content / product count", "Bilangan kandungan / produk"],
@@ -845,6 +847,18 @@
     });
   }
 
+  function loadBill(id, seq) {
+    return api("/api/client/orders/" + encodeURIComponent(id) + "/bill").then(function (body) {
+      if (seq !== detailSeq) return;
+      if (String(currentOrderId) !== String(id)) return;
+      var btn = $("pay-btn");
+      if (!btn) return;
+      if (body && body.bill_url && body.payment_status !== "paid") {
+        btn.href = body.bill_url; btn.hidden = false;
+      } else { btn.hidden = true; }
+    }).catch(function () {});
+  }
+
   function loadTokenUsage(id, seq) {
     return api("/api/client/orders/" + encodeURIComponent(id) + "/token-usage").then(function (body) {
       if (seq !== detailSeq) return;
@@ -966,6 +980,7 @@
       $("detail-loading").hidden = true;
       renderDetail(body);
       loadTokenUsage(id, seq);
+      loadBill(id, seq);
     }).catch(function (e) {
       if (seq !== detailSeq) return;
       $("detail-loading").hidden = true;

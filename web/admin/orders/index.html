@@ -254,6 +254,12 @@
     </div>
 
     <div class="meta" id="dmeta"></div>
+    <div class="billrow" id="dbillrow" hidden style="display:none;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 12px">
+      <span data-i18n="bill_status" style="font-size:12px;color:#6B7785"></span>
+      <a id="dbill" href="#" target="_blank" rel="noopener" class="btn sm" style="text-decoration:none" data-i18n="bill_open"></a>
+      <button class="btn sm" id="dbillbtn" type="button" data-i18n="gen_bill"></button>
+      <span id="dbillmsg" style="font-size:12px;color:#B03A2E"></span>
+    </div>
     <div class="notesbox" id="dnotes" hidden></div>
 
     <div class="sect">
@@ -413,6 +419,10 @@
     label_company: ["公司", "Company", "Syarikat"],
     label_ren: ["行业资质 / 执照", "Business licence / qualification", "Lesen / kelayakan perniagaan"],
     label_plan: ["月费方案", "Monthly plan", "Pelan bulanan"],
+    bill_status: ["在线付款", "Online payment", "Bayaran dalam talian"],
+    bill_open: ["打开付款链接", "Open payment link", "Buka pautan bayaran"],
+    gen_bill: ["生成付款链接", "Create payment link", "Jana pautan bayaran"],
+    gateway_not_configured: ["支付网关未配置（缺 BILLPLZ_API_KEY / BILLPLZ_COLLECTION_ID）", "Payment gateway not configured (missing BILLPLZ_API_KEY / BILLPLZ_COLLECTION_ID)", "Gerbang pembayaran belum dikonfigurasi (tiada BILLPLZ_API_KEY / BILLPLZ_COLLECTION_ID)"],
     plan_care: ["托管维护", "Hosting care", "Penjagaan hosting"],
     plan_content: ["托管 + 内容", "Care + content", "Penjagaan + kandungan"],
     plan_growth: ["内容成长", "Content growth", "Pertumbuhan kandungan"],
@@ -786,6 +796,29 @@
     });
   }
 
+  function renderBill(r) {
+    var row = $("dbillrow"), a = $("dbill"), btn = $("dbillbtn"), msg = $("dbillmsg");
+    if (!row) return;
+    if (r && r.payment_status === "paid") { row.style.display = "none"; return; }
+    row.style.display = "flex";
+    if (r && r.bill_url) { a.href = r.bill_url; a.hidden = false; btn.hidden = true; msg.textContent = ""; }
+    else { a.hidden = true; btn.hidden = false; msg.textContent = ""; }
+    btn.onclick = function () { genBill(r.id); };
+  }
+  function genBill(id) {
+    var a = $("dbill"), btn = $("dbillbtn"), msg = $("dbillmsg");
+    btn.disabled = true; msg.textContent = "…";
+    fetchJson("/api/internal/payments/bills", { method: "POST", body: { id: id } }).then(function (j) {
+      btn.disabled = false;
+      if (j && j.ok && j.bill_url) {
+        if (current) current.bill_url = j.bill_url;
+        a.href = j.bill_url; a.hidden = false; btn.hidden = true; msg.textContent = "";
+      } else {
+        msg.textContent = j && j.error === "gateway_not_configured" ? t("gateway_not_configured")
+          : (j && j.error ? j.error : t("err_generic"));
+      }
+    }).catch(function () { btn.disabled = false; msg.textContent = t("err_generic"); });
+  }
   function planLabel(p) {
     var key = { care199: "plan_care", care299: "plan_content", growth499: "plan_growth" }[p];
     return key ? t(key) : String(p || t("none"));
@@ -812,6 +845,7 @@
     meta.appendChild(metaItem(t("th_customer"), r.name));
     meta.appendChild(metaItem(t("label_company"), r.company));
     meta.appendChild(metaItem(t("label_plan"), planLabel(r.care_plan)));
+    renderBill(r);
     meta.appendChild(metaItem(t("th_phone"), r.phone));
     meta.appendChild(metaItem(t("label_email"), r.email));
     meta.appendChild(metaItem(t("label_ren"), r.ren_no));

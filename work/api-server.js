@@ -14,6 +14,7 @@ const createAgentApi = require("./agent-api");
 const createOrderApi = require("./order-api");
 const createClientApi = require("./client-api");
 const { createTokenUsageApi } = require("./token-usage");
+const { createPaymentsApi } = require("./payments");
 const renderAgentPage = require("./agent-page");
 const renderPublicListing = require("./public-page");
 const runDigest = require("./digest");
@@ -1562,6 +1563,12 @@ app.use("/api/client", createClientApi({
 
 // ---------- 自动 token 计量（开发侧 meter 内部上报） ----------
 app.use("/api/internal", createTokenUsageApi({ pool: pool }));
+
+// ---------- 在线支付（Billplz Phase A） ----------
+app.use("/api/internal/payments", createPaymentsApi({
+  pool: pool, requireAdmin: requireAdmin, requireWrite: requireWrite,
+  rateLimit: rateLimit, siteUrl: "https://kwongthye.com"
+}));
 
 // ---------- fallbacks ----------
 app.use("/api", function (req, res) { res.status(404).json({ ok: false, error: "not_found" }); });

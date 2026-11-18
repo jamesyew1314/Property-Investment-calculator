@@ -378,6 +378,19 @@ module.exports = function createClientApi(opts) {
     });
   }));
 
+  // ---------- 6b) 在线付款链接（Billplz） ----------
+  r.get("/orders/:id/bill", requireClient, wrap(async function (req, res) {
+    const id = core.parseId(req.params.id);
+    if (!id) return res.status(404).json({ ok: false, error: "not_found" });
+    const out = await pool.query(
+      "SELECT bill_url, gateway, payment_status, setup_price::float8 AS setup_price " +
+      "FROM site_orders WHERE id=$1 AND client_user_id=$2", [id, req.client.id]);
+    const row = out.rows[0];
+    if (!row) return res.status(404).json({ ok: false, error: "not_found" });
+    res.json({ ok: true, bill_url: row.bill_url, gateway: row.gateway,
+      payment_status: row.payment_status, setup_price: row.setup_price });
+  }));
+
   // ---------- 6) 自动 token 费用（来自 token_usage，不是人工 ledger） ----------
   // 汇总所有自己的订单，给 dashboard 卡片用；按 order_id 分组。
   r.get("/token-usage", requireClient, wrap(async function (req, res) {
