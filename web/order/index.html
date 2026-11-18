@@ -278,6 +278,14 @@
             <input id="f_ren" name="ren_no" type="text" maxlength="40" data-i18n-ph="ph_ren">
           </div>
           <div class="field">
+            <label for="f_plan"><span data-i18n="plan_label"></span> *</label>
+            <select id="f_plan" name="care_plan">
+              <option value="care299" selected data-i18n="plan_content"></option>
+              <option value="care199" data-i18n="plan_care"></option>
+              <option value="growth499" data-i18n="plan_growth"></option>
+            </select>
+          </div>
+          <div class="field">
             <label for="f_area"><span data-i18n="label_area"></span><span class="opt" data-i18n="optional"></span></label>
             <input id="f_area" name="area" type="text" maxlength="80" data-i18n-ph="ph_area">
           </div>
@@ -352,6 +360,7 @@
       <p data-i18n="success_body"></p>
       <div class="orderbox" id="orderno">—</div>
       <p class="meta"><span data-i18n="success_status"></span>: <b id="orderstatus">—</b></p>
+      <p class="meta"><span data-i18n="success_plan"></span>: <b id="orderplan">—</b></p>
       <p class="meta"><span data-i18n="success_prices"></span></p>
       <p class="meta" data-i18n="success_next"></p>
     </div>
@@ -391,14 +400,15 @@
       "Fixed service windows: 9:00am–12:00pm and 1:00pm–4:00pm Malaysia time, every day (closed 12:00pm–1:00pm). Any question during these windows gets an immediate reply; messages outside them are prioritised when the next window starts.",
       "Waktu perkhidmatan tetap: 9:00am–12:00pm dan 1:00pm–4:00pm waktu Malaysia, setiap hari (rehat 12:00pm–1:00pm). Sebarang pertanyaan dalam tempoh ini dibalas segera; mesej di luar tempoh akan diutamakan apabila tempoh seterusnya bermula."],
     price_tag: ["建站 + 托管套餐", "Build + care package", "Pakej bina + penjagaan"],
-    price_month_k: ["第 2 个月起（上线前确认）", "From month 2 (confirmed before launch)", "Mulai bulan 2 (disahkan sebelum pelancaran)"],
+    price_month_k: ["第 2 个月起（三选一）", "From month 2 (choose one)", "Mulai bulan 2 (pilih satu)"],
     plan_care: ["托管维护", "Hosting care", "Penjagaan hosting"],
     plan_content: ["托管 + 内容", "Care + content", "Penjagaan + kandungan"],
     plan_growth: ["内容成长", "Content growth", "Pertumbuhan kandungan"],
+    plan_label: ["第 2 个月起方案", "Month 2 plan", "Pelan bulan 2"],
     price_setup_k: ["首月总价（含建站 + 首月服务）", "First month total (setup + first month)", "Jumlah bulan pertama (penyediaan + bulan pertama)"],
-    price_total: ["首月 RM2,500（含建站 + 首月服务）。第 2 个月起三选一，上线前确认；年付按 10 个月计；超出内容修改 RM150/小时；Token 费用另计。",
-      "First month RM2,500 (setup + first month). From month 2, choose one plan, confirmed before launch; annual billing is 10 months; extra content work RM150/hour; token charges separate.",
-      "Bulan pertama RM2,500 (penyediaan + bulan pertama). Mulai bulan 2, pilih satu pelan, disahkan sebelum pelancaran; bil tahunan 10 bulan; kerja kandungan tambahan RM150/jam; caj token berasingan."],
+    price_total: ["首月 RM2,500（含建站 + 首月服务）。第 2 个月起三选一，下单时选择；年付按 10 个月计；超出内容修改 RM150/小时；Token 费用另计。",
+      "First month RM2,500 (setup + first month). From month 2, choose one plan at checkout; annual billing is 10 months; extra content work RM150/hour; token charges separate.",
+      "Bulan pertama RM2,500 (penyediaan + bulan pertama). Mulai bulan 2, pilih satu pelan semasa pesanan; bil tahunan 10 bulan; kerja kandungan tambahan RM150/jam; caj token berasingan."],
     price_li1: ["专属设计，不是模板套壳", "Dedicated design, not a template", "Reka bentuk khusus, bukan templat"],
     price_li2: ["域名、SSL、托管全包", "Domain, SSL and hosting included", "Domain, SSL dan hosting disertakan"],
     price_li3: ["按月付费，提前 30 天通知可取消", "Billed monthly; cancel with 30 days' notice", "Dibilkan bulanan; batal dengan notis 30 hari"],
@@ -454,6 +464,7 @@
     err_phone: ["请填写有效的 WhatsApp 号码（至少 7 位数字）。", "Please enter a valid WhatsApp number (at least 7 digits).", "Sila masukkan nombor WhatsApp yang sah (sekurang-kurangnya 7 digit)."],
     err_email: ["邮箱格式不正确。", "That email address looks invalid.", "Alamat e-mel itu tidak sah."],
     err_domain: ["域名格式不正确，例如 yourname.com。", "Domain looks invalid, e.g. yourname.com.", "Domain tidak sah, cth. namaanda.com."],
+    err_plan: ["请选择月费方案。", "Please choose a monthly plan.", "Sila pilih pelan bulanan."],
     err_consent: ["请先同意服务条款。", "Please accept the Terms of Service.", "Sila terima Terma Perkhidmatan."],
     err_rate: ["提交太频繁，请 10 分钟后再试。", "Too many submissions. Please try again in 10 minutes.", "Terlalu banyak penghantaran. Sila cuba lagi dalam 10 minit."],
     err_generic: ["提交失败，请稍后重试，或直接 WhatsApp 联系我们。", "Submission failed. Please try again or message us on WhatsApp.", "Penghantaran gagal. Sila cuba lagi atau hubungi kami di WhatsApp."],
@@ -465,6 +476,7 @@
       "Simpan nombor pesanan ini untuk menyemak status. Kami akan membalas di WhatsApp dalam waktu perkhidmatan 9am–12pm dan 1pm–4pm."],
     success_prices: ["首月 RM2,500（含建站 + 首月服务）· 第 2 个月起 RM199 / 299 / 499", "First month RM2,500 (setup + first month) · from month 2: RM199 / 299 / 499", "Bulan pertama RM2,500 (penyediaan + bulan pertama) · mulai bulan 2: RM199 / 299 / 499"],
     success_status: ["当前状态", "Current status", "Status semasa"],
+    success_plan: ["已选方案", "Selected plan", "Pelan dipilih"],
     success_next: ["接下来：确认需求 → 支付首月费用 → 按确认排期上线。", "Next: confirm scope → pay first month → go live on the agreed schedule.", "Seterusnya: sahkan skop → bayar bulan pertama → dilancarkan mengikut jadual yang dipersetujui."],
     st_new: ["新订单", "New", "Baharu"],
     st_contacted: ["已联系", "Contacted", "Dihubungi"],
@@ -565,11 +577,16 @@
     var el = form.querySelector('[name="' + name + '"]');
     if (el) el.focus();
   }
+  function planLabel(p) {
+    var key = { care199: "plan_care", care299: "plan_content", growth499: "plan_growth" }[p];
+    return key ? t(key) : String(p || t("none"));
+  }
   function fieldError(field) {
     if (field === "name") return t("err_name");
     if (field === "phone") return t("err_phone");
     if (field === "email") return t("err_email");
     if (field === "domain") return t("err_domain");
+    if (field === "care_plan") return t("err_plan");
     if (field === "contract_accepted") return t("err_consent");
     if (field === "brief") return t("err_brief");
     return t("err_generic");
@@ -615,6 +632,7 @@
       email: form.elements["email"].value,
       company: form.elements["company"].value,
       ren_no: form.elements["ren_no"].value,
+      care_plan: form.elements["care_plan"].value,
       area: form.elements["area"].value,
       domain: form.elements["domain"].value,
       notes: form.elements["notes"].value,
@@ -644,6 +662,8 @@
         if (!lastOrder) throw new Error("bad_response");
         document.getElementById("orderno").textContent = lastOrder.order_no;
         document.getElementById("orderstatus").textContent = t("st_" + lastOrder.status) || lastOrder.status;
+        var planEl = document.getElementById("orderplan");
+        if (planEl) planEl.textContent = planLabel(lastOrder.care_plan);
         document.getElementById("formcard").hidden = true;
         document.getElementById("success").classList.add("show");
         document.getElementById("success").scrollIntoView({ behavior: "smooth", block: "center" });

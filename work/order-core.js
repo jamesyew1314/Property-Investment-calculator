@@ -6,6 +6,9 @@ const PACKAGE_CODE = "dedicated";
 // 价格口径：setup = 首月总价（含建站 + 首月服务），不是“建站费 + 首月月费”。
 // monthly 从第 2 个月起收取（默认主方案 RM299）；改价时同步改迁移默认值与前端文案。
 const PRICES = { monthly: 299, setup: 2500 };
+// 第 2 个月起三档方案；care_plan 存数据库，monthly_price 由方案决定。
+const CARE_PLANS = { care199: 199, care299: 299, growth499: 499 };
+const DEFAULT_CARE_PLAN = "care299";
 
 // 状态机白名单（顺序即后台下拉顺序）
 const STATUSES = ["new", "contacted", "paid", "building", "review", "live", "paused", "cancelled"];
@@ -74,7 +77,8 @@ function normalizeOrder(body) {
   const raw = body && typeof body === "object" ? body : {};
   const out = {
     name: "", phone: "", email: null, company: null, ren_no: null,
-    area: null, domain: null, notes: null, contract_accepted: false
+    area: null, domain: null, notes: null, contract_accepted: false,
+    care_plan: DEFAULT_CARE_PLAN
   };
   const errors = {};
 
@@ -136,7 +140,12 @@ function normalizeOrder(body) {
   if (raw.contract_accepted !== true) errors.contract_accepted = "required";
   else out.contract_accepted = true;
 
-  const fieldOrder = ["name", "phone", "email", "contract_accepted", "domain",
+  // 第 2 个月起方案：不传默认 care299；非法代码报错（优先于 domain 等可选字段）
+  const carePlan = squish(raw.care_plan).toLowerCase() || DEFAULT_CARE_PLAN;
+  if (!Object.prototype.hasOwnProperty.call(CARE_PLANS, carePlan)) errors.care_plan = "invalid";
+  else out.care_plan = carePlan;
+
+  const fieldOrder = ["name", "phone", "email", "contract_accepted", "care_plan", "domain",
     "company", "ren_no", "area", "notes"];
   const firstField = fieldOrder.find(function (k) { return !!errors[k]; }) || null;
   return { values: out, errors: errors, first_field: firstField,
@@ -293,7 +302,7 @@ function normalizeBrief(raw) {
 }
 
 module.exports = {
-  PACKAGE_CODE, PRICES, STATUSES, TOKEN_KINDS, ORDER_ALPHABET, ORDER_NO_RE,
+  PACKAGE_CODE, PRICES, CARE_PLANS, DEFAULT_CARE_PLAN, STATUSES, TOKEN_KINDS, ORDER_ALPHABET, ORDER_NO_RE,
   orderDateStamp, orderNoFromSeq, randomOrderNo,
   normalizeOrder, validateStatus, normalizeToken,
   balanceOf, canUseTokens, money2, parseId,

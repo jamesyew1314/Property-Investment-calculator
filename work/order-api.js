@@ -10,7 +10,7 @@ const core = require("./order-core");
 
 const ADMIN_SELECT = `
   SELECT o.id, o.order_no, o.name, o.phone, o.email, o.company, o.ren_no, o.area, o.domain, o.notes,
-         o.package_code, o.monthly_price::float8 AS monthly_price, o.setup_price::float8 AS setup_price,
+         o.package_code, o.care_plan, o.monthly_price::float8 AS monthly_price, o.setup_price::float8 AS setup_price,
          o.status, o.phase, o.progress, o.payment_status, o.paid_at,
          o.contract_accepted, o.created_at, o.updated_at,
          COALESCE((SELECT SUM(CASE WHEN l.kind = 'usage' THEN -l.amount ELSE l.amount END)
@@ -124,13 +124,13 @@ module.exports = function createOrderApi(opts) {
           const out = await client.query(
             `INSERT INTO site_orders
                (order_no, name, phone, email, company, ren_no, area, domain, notes,
-                package_code, monthly_price, setup_price, contract_accepted, brief_json)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb)
-             RETURNING id, order_no, status, monthly_price::float8 AS monthly_price,
+                package_code, monthly_price, setup_price, contract_accepted, care_plan, brief_json)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb)
+             RETURNING id, order_no, status, care_plan, monthly_price::float8 AS monthly_price,
                        setup_price::float8 AS setup_price, created_at`,
             [orderNo, v.name, v.phone, v.email, v.company, v.ren_no, v.area, v.domain, v.notes,
-              core.PACKAGE_CODE, core.PRICES.monthly, core.PRICES.setup, v.contract_accepted,
-              JSON.stringify(brief.value)]
+              core.PACKAGE_CODE, core.CARE_PLANS[v.care_plan], core.PRICES.setup, v.contract_accepted,
+              v.care_plan, JSON.stringify(brief.value)]
           );
           created = out.rows[0];
           await client.query("RELEASE SAVEPOINT order_try");
@@ -164,6 +164,7 @@ module.exports = function createOrderApi(opts) {
         order: {
           order_no: created.order_no,
           status: created.status,
+          care_plan: created.care_plan,
           monthly_price: created.monthly_price,
           setup_price: created.setup_price
         }

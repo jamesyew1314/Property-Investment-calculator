@@ -412,6 +412,10 @@
     label_email: ["邮箱", "Email", "E-mel"],
     label_company: ["公司", "Company", "Syarikat"],
     label_ren: ["行业资质 / 执照", "Business licence / qualification", "Lesen / kelayakan perniagaan"],
+    label_plan: ["月费方案", "Monthly plan", "Pelan bulanan"],
+    plan_care: ["托管维护", "Hosting care", "Penjagaan hosting"],
+    plan_content: ["托管 + 内容", "Care + content", "Penjagaan + kandungan"],
+    plan_growth: ["内容成长", "Content growth", "Pertumbuhan kandungan"],
     label_domain: ["域名", "Domain", "Domain"],
     label_created: ["创建", "Created", "Dicipta"],
     label_updated: ["更新", "Updated", "Dikemas kini"],
@@ -782,6 +786,10 @@
     });
   }
 
+  function planLabel(p) {
+    var key = { care199: "plan_care", care299: "plan_content", growth499: "plan_growth" }[p];
+    return key ? t(key) : String(p || t("none"));
+  }
   function metaItem(k, v) {
     var d = el("div");
     d.appendChild(el("div", "k", k));
@@ -803,6 +811,7 @@
     meta.innerHTML = "";
     meta.appendChild(metaItem(t("th_customer"), r.name));
     meta.appendChild(metaItem(t("label_company"), r.company));
+    meta.appendChild(metaItem(t("label_plan"), planLabel(r.care_plan)));
     meta.appendChild(metaItem(t("th_phone"), r.phone));
     meta.appendChild(metaItem(t("label_email"), r.email));
     meta.appendChild(metaItem(t("label_ren"), r.ren_no));

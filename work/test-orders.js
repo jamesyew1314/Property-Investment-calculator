@@ -371,21 +371,22 @@ function makeFakePool() {
         const e = new Error("duplicate key"); e.code = "23505"; throw e;
       }
       const now = new Date().toISOString();
-      // 就地扩展：$14 是 brief JSON 字符串，入库存成对象（与 node-pg 的 jsonb 返回形态一致）
+      // 就地扩展：$15 是 brief JSON 字符串，入库存成对象（与 node-pg 的 jsonb 返回形态一致）
       let briefJson = {};
-      if (p[13] !== undefined && p[13] !== null) {
-        try { briefJson = JSON.parse(p[13]); } catch (e) { briefJson = {}; }
+      if (p[14] !== undefined && p[14] !== null) {
+        try { briefJson = JSON.parse(p[14]); } catch (e) { briefJson = {}; }
       }
       const row = {
         id: db.seq++, order_no: orderNo, name: p[1], phone: p[2], email: p[3], company: p[4],
         ren_no: p[5], area: p[6], domain: p[7], notes: p[8], package_code: p[9],
         monthly_price: p[10], setup_price: p[11], status: "new", contract_accepted: p[12],
+        care_plan: p[13],
         phase: "brief", progress: 0, payment_status: "unpaid", paid_at: null,
         launched_at: null, brief_json: briefJson, client_user_id: null,
         created_at: now, updated_at: now
       };
       db.orders.push(row);
-      return { rows: [{ id: row.id, order_no: row.order_no, status: row.status,
+      return { rows: [{ id: row.id, order_no: row.order_no, status: row.status, care_plan: row.care_plan,
         monthly_price: Number(row.monthly_price), setup_price: Number(row.setup_price), created_at: now }] };
     }
 
@@ -684,9 +685,41 @@ async function httpTests() {
     ok(r.body.ok === true && core.ORDER_NO_RE.test(r.body.order.order_no), "HTTP 返回合法单号", r.body);
     eq(r.body.order.status, "new", "HTTP 新单状态 new");
     eq([r.body.order.monthly_price, r.body.order.setup_price], [299, 2500], "HTTP 返回价格 299/2500");
+    eq(r.body.order.care_plan, "care299", "未选方案 → 默认 care299");
     const orderNo = r.body.order.order_no;
     ok(fake._db.events.some(function (e) { return e.type === "created"; }), "HTTP 下单写入 created 事件");
     ok(fake._db.orders[0].domain === "andylau.com", "HTTP domain 归一化后入库");
+
+    // 方案选择：独立假库 + 独立 server，避免污染主库后续计数断言
+    {
+      const fake2 = makeFakePool();
+      const app2 = express();
+      app2.use(express.json());
+      app2.use("/api", createOrderApi({
+        pool: fake2, requireAdmin: requireAdmin, requireWrite: requireWrite,
+        rateLimit: function () { return function (req, res, next) { next(); }; }
+      }));
+      app2.use(function (err, req, res, next) { res.status(500).json({ ok: false, error: "server_error" }); });
+      const server2 = app2.listen(0, "127.0.0.1");
+      await new Promise(function (resolve) { server2.once("listening", resolve); });
+      const base2 = "http://127.0.0.1:" + server2.address().port;
+      async function post2(body) {
+        const res = await fetch(base2 + "/api/orders", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+        });
+        const json = await res.json().catch(function () { return {}; });
+        return { status: res.status, body: json };
+      }
+      let r2 = await post2({ name: "Growth", phone: "012-345 6789", contract_accepted: true, care_plan: "growth499" });
+      eq([r2.status, r2.body.order.monthly_price, r2.body.order.care_plan], [201, 499, "growth499"],
+        "选 growth499 → 月费 499");
+      r2 = await post2({ name: "Growth", phone: "012-345 6789", contract_accepted: true, care_plan: "care199" });
+      eq([r2.status, r2.body.order.monthly_price, r2.body.order.care_plan], [201, 199, "care199"],
+        "选 care199 → 月费 199");
+      r2 = await post2({ name: "Bad", phone: "012-345 6789", contract_accepted: true, care_plan: "platinum" });
+      eq([r2.status, r2.body.field], [400, "care_plan"], "非法方案 → 400/care_plan");
+      server2.close();
+    }
 
     r = await call("GET", "/api/orders/" + orderNo);
     eq(r.status, 200, "公开查单 → 200");
@@ -1006,8 +1039,8 @@ async function portalTests() {
         asset_links: ["https://a.com/x", "https://b.com/y"], notes: " 加急 " }
     });
     eq([r.status, r.body.ok], [201, true], "带 brief 下单 → 201");
-    eq(Object.keys(r.body.order).sort(), ["monthly_price", "order_no", "setup_price", "status"],
-      "带 brief 下单响应仍恰好 4 键");
+    eq(Object.keys(r.body.order).sort(), ["care_plan", "monthly_price", "order_no", "setup_price", "status"],
+      "带 brief 下单响应恰好 5 键（含 care_plan）");
     const created = db.orders[db.orders.length - 1];
     eq(created.brief_json, { goal: "卖房", pages: "首页", listing_count: 12,
       asset_links: "https://a.com/x, https://b.com/y", notes: "加急" },
@@ -1015,9 +1048,9 @@ async function portalTests() {
     ok(typeof created.brief_json === "object" && !Array.isArray(created.brief_json),
       "brief_json 是 object 而不是 JSON 字符串");
     eq(created.client_user_id, 7, "同邮箱下单在同一事务内自动绑定 client_user_id（lower(email)）");
-    ok(/contract_accepted,\s*brief_json\s*\)/i.test(db.lastInsertSql) && /\$14::jsonb/i.test(db.lastInsertSql) &&
-      /\$1,\$2,\$3,\$4,\$5,\$6,\$7,\$8,\$9,\$10,\$11,\$12,\$13,\$14/.test(db.lastInsertSql),
-      "POST /orders INSERT = 14 列且 brief_json 走 $14::jsonb", db.lastInsertSql);
+    ok(/care_plan,\s*brief_json\s*\)/i.test(db.lastInsertSql) && /\$15::jsonb/i.test(db.lastInsertSql) &&
+      /\$1,\$2,\$3,\$4,\$5,\$6,\$7,\$8,\$9,\$10,\$11,\$12,\$13,\$14,\$15/.test(db.lastInsertSql),
+      "POST /orders INSERT = 15 列且 brief_json 走 $15::jsonb", db.lastInsertSql);
     ok(/o\.client_user_id IS NULL/i.test(db.lastBindSql) && /lower\(u\.email\) = lower\(\$2\)/i.test(db.lastBindSql),
       "绑定 SQL 只绑未绑定订单且按 lower(email) 匹配", db.lastBindSql);
 
