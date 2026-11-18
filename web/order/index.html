@@ -127,6 +127,16 @@
   footer{border-top:1px solid var(--line);padding:26px 0 40px;margin-top:34px;color:var(--muted);font-size:12px}
   footer .fbar{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
   footer a{color:var(--muted)}
+  .plantable-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px;background:#fff}
+  .plantable{width:100%;border-collapse:collapse;min-width:640px;font-size:13.5px}
+  .plantable th{background:var(--navy);color:#fff;text-align:left;padding:10px 12px;font-weight:600;white-space:nowrap}
+  .plantable td{padding:12px;border-top:1px solid var(--line);color:#3B4652;vertical-align:top}
+  .plantable td.fee{white-space:nowrap;color:var(--navy)}
+  .plantable td.fee b{font-size:16px}
+  .plantable td.fee small{color:var(--muted);font-weight:400}
+  .plantable tr.rec{background:#FBF7EF}
+  .plantable tr.over td{background:#F3F6FA;color:#5D6B7A}
+  .plans-note{margin:12px 0 0;color:var(--muted);font-size:12.5px}
   @media(max-width:900px){
     .hero{grid-template-columns:1fr;gap:26px}
     .grid3{grid-template-columns:1fr}
@@ -218,6 +228,50 @@
       </ul>
     </aside>
   </div>
+
+  <section class="block" id="plans">
+    <h2 data-i18n="plans_title"></h2>
+    <p class="sub" data-i18n="plans_sub"></p>
+    <div class="plantable-wrap">
+      <table class="plantable">
+        <thead>
+          <tr>
+            <th data-i18n="th_plan"></th>
+            <th data-i18n="th_fee"></th>
+            <th data-i18n="th_includes"></th>
+            <th data-i18n="th_for"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-i18n="plan_care"></td>
+            <td class="fee"><b>RM199</b> <small data-i18n="per_month"></small></td>
+            <td data-i18n="plan_care_inc"></td>
+            <td data-i18n="plan_care_for"></td>
+          </tr>
+          <tr class="rec">
+            <td data-i18n="plan_content"></td>
+            <td class="fee"><b>RM299</b> <small data-i18n="per_month"></small></td>
+            <td data-i18n="plan_content_inc"></td>
+            <td data-i18n="plan_content_for"></td>
+          </tr>
+          <tr>
+            <td data-i18n="plan_growth"></td>
+            <td class="fee"><b>RM499</b> <small data-i18n="per_month"></small></td>
+            <td data-i18n="plan_growth_inc"></td>
+            <td data-i18n="plan_growth_for"></td>
+          </tr>
+          <tr class="over">
+            <td data-i18n="overage_label"></td>
+            <td class="fee"><b>RM150</b> <small data-i18n="per_hour"></small></td>
+            <td data-i18n="overage_inc"></td>
+            <td data-i18n="overage_for"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="plans-note" data-i18n="plans_note"></p>
+  </section>
 
   <section class="block" id="included">
     <h2 data-i18n="inc_title"></h2>
@@ -405,6 +459,36 @@
     plan_content: ["托管 + 内容", "Care + content", "Penjagaan + kandungan"],
     plan_growth: ["内容成长", "Content growth", "Pertumbuhan kandungan"],
     plan_label: ["第 2 个月起方案", "Month 2 plan", "Pelan bulan 2"],
+    plans_title: ["月费方案说明", "Monthly plan details", "Butiran pelan bulanan"],
+    plans_sub: ["第 2 个月起按方案收费；首月 RM2,500 已含建站与首月服务。",
+      "From month 2 you pay by plan; the first month RM2,500 already includes setup and the first month of service.",
+      "Mulai bulan 2 anda membayar mengikut pelan; bulan pertama RM2,500 sudah termasuk penyediaan dan bulan pertama perkhidmatan."],
+    th_plan: ["方案", "Plan", "Pelan"],
+    th_fee: ["月费", "Monthly fee", "Bayaran bulanan"],
+    th_includes: ["包含", "Includes", "Termasuk"],
+    th_for: ["适合", "Best for", "Sesuai untuk"],
+    plan_care_inc: ["服务器、SSL、每日备份、安全更新、监控、每月 30 分钟小修",
+      "Server, SSL, daily backups, security updates, monitoring, 30 minutes of minor fixes per month",
+      "Pelayan, SSL, sandaran harian, kemas kini keselamatan, pemantauan, 30 minit pembaikan kecil sebulan"],
+    plan_care_for: ["基本不改内容", "Hardly changes content", "Jarang menukar kandungan"],
+    plan_content_inc: ["RM199 全部内容 + 每月 1 小时内容修改",
+      "Everything in RM199 + 1 hour of content edits per month",
+      "Semua dalam RM199 + 1 jam suntingan kandungan sebulan"],
+    plan_content_for: ["大多数客户", "Most clients", "Kebanyakan pelanggan"],
+    plan_growth_inc: ["RM299 全部内容 + 每月 2 小时修改 + 月度报告 + 优先处理",
+      "Everything in RM299 + 2 hours of edits per month + monthly report + priority handling",
+      "Semua dalam RM299 + 2 jam suntingan sebulan + laporan bulanan + keutamaan"],
+    plan_growth_for: ["经常更新", "Updates often", "Kerap mengemas kini"],
+    overage_label: ["超出部分", "Overage", "Lebihan"],
+    overage_inc: ["按需报价（超出套餐的内容修改 / 开发）",
+      "Quoted as needed (content edits / development beyond the plan)",
+      "Disebut mengikut keperluan (suntingan kandungan / pembangunan melebihi pelan)"],
+    overage_for: ["所有方案", "All plans", "Semua pelan"],
+    per_hour: ["/ 小时", "/ hour", "/ jam"],
+    plans_note: ["年付按 10 个月计；Token 费用另计；不含广告投放、视频拍摄与第三方付费插件。",
+      "Annual billing is 10 months; token charges are separate; excludes ad spend, video production and paid third-party plugins.",
+      "Bil tahunan 10 bulan; caj token berasingan; tidak termasuk belanja iklan, produksi video dan plugin pihak ketiga berbayar."],
+
     price_setup_k: ["首月总价（含建站 + 首月服务）", "First month total (setup + first month)", "Jumlah bulan pertama (penyediaan + bulan pertama)"],
     price_total: ["首月 RM2,500（含建站 + 首月服务）。第 2 个月起三选一，下单时选择；年付按 10 个月计；超出内容修改 RM150/小时；Token 费用另计。",
       "First month RM2,500 (setup + first month). From month 2, choose one plan at checkout; annual billing is 10 months; extra content work RM150/hour; token charges separate.",
