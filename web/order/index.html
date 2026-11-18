@@ -310,6 +310,29 @@
   .wa-float{background:#25D366;color:#06251A;box-shadow:0 10px 24px rgba(37,211,102,.4)}
   .wa-float:hover{background:#1FBE5A}
   @media(max-width:640px){.price .v{font-size:24px}.price .total{font-size:12px}}
+
+  .device-stage{position:relative;padding:0 0 18px;perspective:900px}
+  .device-stage .demo{border:8px solid #06152E;border-radius:16px;background:#06152E;padding:8px;
+    box-shadow:0 26px 50px rgba(0,0,0,.45);position:relative;z-index:2}
+  .device-stage .demo .demo-body{padding:16px 14px}
+  .laptop-base{position:absolute;left:-4%;right:-4%;bottom:4px;height:13px;z-index:1;
+    background:linear-gradient(#20395B,#071A3A);border-radius:0 0 14px 14px;box-shadow:0 12px 20px rgba(0,0,0,.35)}
+  .laptop-base:before{content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);
+    width:56px;height:4px;border-radius:0 0 6px 6px;background:#0A1A33}
+  .phone{position:absolute;right:-8px;bottom:-8px;width:86px;height:162px;padding:4px;z-index:3;
+    background:#06152E;border-radius:18px;box-shadow:0 18px 32px rgba(0,0,0,.5);transform:rotate(4deg)}
+  .phone:before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);
+    width:24px;height:3px;border-radius:999px;background:#0A1A33;z-index:4}
+  .phone-body{width:100%;height:100%;border-radius:14px;padding:12px 7px 8px;overflow:hidden;color:#fff;
+    background:linear-gradient(160deg,#0F3B73,#0A2A5E)}
+  .phone-badge{display:block;font-size:5.5px;line-height:1.2;color:#FFD400;border:1px solid rgba(255,212,0,.5);
+    border-radius:999px;padding:2px 4px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .phone-h{font-size:8px;line-height:1.2;font-weight:800;margin:7px 0 6px;max-height:20px;overflow:hidden}
+  .phone-btn{background:#25D366;color:#06251A;font-size:5.5px;font-weight:800;text-align:center;
+    border-radius:999px;padding:4px 3px;margin-bottom:7px;white-space:nowrap;overflow:hidden}
+  .phone-card{height:22px;border-radius:5px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.15);margin-bottom:5px}
+  .phone-card.short{height:16px;width:70%}
+  @media(max-width:900px){.device-stage{display:none}}
 </style>
 </head>
 <body>
@@ -353,7 +376,8 @@
     </div>
 
     <div class="hero-right">
-      <div class="demo" aria-hidden="true">
+      <div class="device-stage" aria-hidden="true">
+      <div class="demo">
         <div class="demo-cap" data-i18n="demo_tag"></div>
         <div class="demo-bar"><i></i><i></i><i></i><span class="demo-url" data-i18n="demo_url"></span></div>
         <div class="demo-body">
@@ -363,6 +387,14 @@
           <div class="demo-cta"><span data-i18n="demo_cta"></span><span class="demo-wa" data-i18n="demo_wa"></span></div>
           <div class="demo-grid"><i></i><i></i><i></i></div>
         </div>
+      </div>
+        <div class="laptop-base"></div>
+        <div class="phone"><div class="phone-body">
+          <span class="phone-badge" data-i18n="demo_badge"></span>
+          <div class="phone-h" data-i18n="demo_h"></div>
+          <div class="phone-btn" data-i18n="demo_cta"></div>
+          <div class="phone-card"></div><div class="phone-card short"></div>
+        </div></div>
       </div>
       <aside class="price" aria-labelledby="pricetitle">
       <span class="tag" data-i18n="price_tag"></span>
