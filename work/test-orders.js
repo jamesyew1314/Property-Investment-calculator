@@ -683,7 +683,7 @@ async function httpTests() {
     eq(r.status, 201, "HTTP 合法下单 → 201");
     ok(r.body.ok === true && core.ORDER_NO_RE.test(r.body.order.order_no), "HTTP 返回合法单号", r.body);
     eq(r.body.order.status, "new", "HTTP 新单状态 new");
-    eq([r.body.order.monthly_price, r.body.order.setup_price], [1500, 2500], "HTTP 返回价格 1500/2500");
+    eq([r.body.order.monthly_price, r.body.order.setup_price], [299, 2500], "HTTP 返回价格 299/2500");
     const orderNo = r.body.order.order_no;
     ok(fake._db.events.some(function (e) { return e.type === "created"; }), "HTTP 下单写入 created 事件");
     ok(fake._db.orders[0].domain === "andylau.com", "HTTP domain 归一化后入库");

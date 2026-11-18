@@ -4,8 +4,8 @@
 
 const PACKAGE_CODE = "dedicated";
 // 价格口径：setup = 首月总价（含建站 + 首月服务），不是“建站费 + 首月月费”。
-// monthly 从第 2 个月起收取；改价时同步改迁移默认值与前端文案。
-const PRICES = { monthly: 1500, setup: 2500 };
+// monthly 从第 2 个月起收取（默认主方案 RM299）；改价时同步改迁移默认值与前端文案。
+const PRICES = { monthly: 299, setup: 2500 };
 
 // 状态机白名单（顺序即后台下拉顺序）
 const STATUSES = ["new", "contacted", "paid", "building", "review", "live", "paused", "cancelled"];

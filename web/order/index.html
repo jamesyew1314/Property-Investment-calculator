@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Websites for businesses, sole traders and company owners: first month RM2,500, then RM1,500/month. Dedicated design, domain, hosting, content import and WhatsApp.">
+<meta name="description" content="Websites for businesses, sole traders and company owners: first month RM2,500, then from RM199/month. Dedicated design, domain, hosting, content import and WhatsApp.">
 <meta name="theme-color" content="#0F2740">
 <title>企业 / 个人建站 · RoofX Web Studio</title>
 <link rel="icon" type="image/png" href="/icon-256.png?v=ord1">
@@ -179,7 +179,7 @@
       <h1><span data-i18n="h1a"></span> <em data-i18n="h1b"></em></h1>
       <p class="lead" data-i18n="lead"></p>
       <div class="chips">
-        <span class="chip"><b>RM1,500</b> <span data-i18n="chip_month"></span></span>
+        <span class="chip"><b>RM299</b> <span data-i18n="chip_month"></span></span>
         <span class="chip"><b>RM2,500</b> <span data-i18n="chip_setup"></span></span>
         <span class="chip" data-i18n="chip_turnaround"></span>
       </div>
@@ -192,7 +192,19 @@
       <span class="tag" data-i18n="price_tag"></span>
       <div class="row">
         <span class="k" id="pricetitle" data-i18n="price_month_k"></span>
-        <span class="v">RM1,500 <small data-i18n="per_month"></small></span>
+        <span class="v"></span>
+      </div>
+      <div class="row">
+        <span class="k" data-i18n="plan_care"></span>
+        <span class="v">RM199 <small data-i18n="per_month"></small></span>
+      </div>
+      <div class="row">
+        <span class="k" data-i18n="plan_content"></span>
+        <span class="v">RM299 <small data-i18n="per_month"></small></span>
+      </div>
+      <div class="row">
+        <span class="k" data-i18n="plan_growth"></span>
+        <span class="v">RM499 <small data-i18n="per_month"></small></span>
       </div>
       <div class="row">
         <span class="k" data-i18n="price_setup_k"></span>
@@ -361,9 +373,9 @@
   var INDEX = { zh: 0, en: 1, bm: 2 };
   var I18N = {
     page_title: ["企业 / 个人建站 · RoofX Web Studio", "Websites for businesses and individuals · RoofX Web Studio", "Laman web untuk perniagaan dan individu · RoofX Web Studio"],
-    meta_desc: ["面向全行业个体、公司老板的专属建站服务：首月 RM2,500（含建站 + 首月服务），之后 RM1,500/月。专属设计、域名、托管、内容导入与 WhatsApp 直达。",
-      "Dedicated websites for businesses, sole traders and company owners: first month RM2,500 (setup + first month), then RM1,500/month. Design, domain, hosting, content import and WhatsApp.",
-      "Laman web khusus untuk perniagaan, individu dan pemilik syarikat: bulan pertama RM2,500 (penyediaan + bulan pertama), kemudian RM1,500/bulan. Reka bentuk, domain, hosting, import kandungan dan WhatsApp."],
+    meta_desc: ["面向全行业个体、公司老板的专属建站服务：首月 RM2,500（含建站 + 首月服务），第 2 个月起 RM199/299/499 三选一。专属设计、域名、托管、内容导入与 WhatsApp 直达。",
+      "Dedicated websites for businesses, sole traders and company owners: first month RM2,500 (setup + first month), then choose RM199/299/499 per month. Design, domain, hosting, content import and WhatsApp.",
+      "Laman web khusus untuk perniagaan, individu dan pemilik syarikat: bulan pertama RM2,500 (penyediaan + bulan pertama), kemudian pilih RM199/299/499 sebulan. Reka bentuk, domain, hosting, import kandungan dan WhatsApp."],
     eyebrow: ["全行业建站服务", "Website service for every industry", "Perkhidmatan laman web untuk semua industri"],
     h1a: ["一个真正", "A website", "Laman web"],
     h1b: ["属于你的品牌网站", "that is truly yours", "yang benar-benar milik anda"],
@@ -378,18 +390,21 @@
     hero_note: ["固定服务时段：每天 9:00am–12:00pm、1:00pm–4:00pm（马来西亚时间，12:00pm–1:00pm 午休）。时段内任何问题都会即时回复；非时段留言，下一时段开始后优先处理。",
       "Fixed service windows: 9:00am–12:00pm and 1:00pm–4:00pm Malaysia time, every day (closed 12:00pm–1:00pm). Any question during these windows gets an immediate reply; messages outside them are prioritised when the next window starts.",
       "Waktu perkhidmatan tetap: 9:00am–12:00pm dan 1:00pm–4:00pm waktu Malaysia, setiap hari (rehat 12:00pm–1:00pm). Sebarang pertanyaan dalam tempoh ini dibalas segera; mesej di luar tempoh akan diutamakan apabila tempoh seterusnya bermula."],
-    price_tag: ["Dedicated 套餐", "Dedicated package", "Pakej Dedicated"],
-    price_month_k: ["月费", "Monthly fee", "Bayaran bulanan"],
+    price_tag: ["建站 + 托管套餐", "Build + care package", "Pakej bina + penjagaan"],
+    price_month_k: ["第 2 个月起（上线前确认）", "From month 2 (confirmed before launch)", "Mulai bulan 2 (disahkan sebelum pelancaran)"],
+    plan_care: ["托管维护", "Hosting care", "Penjagaan hosting"],
+    plan_content: ["托管 + 内容", "Care + content", "Penjagaan + kandungan"],
+    plan_growth: ["内容成长", "Content growth", "Pertumbuhan kandungan"],
     price_setup_k: ["首月总价（含建站 + 首月服务）", "First month total (setup + first month)", "Jumlah bulan pertama (penyediaan + bulan pertama)"],
-    price_total: ["首月只收 RM2,500（含建站 + 首月服务），第 2 个月起 RM1,500/月。",
-      "First month is RM2,500 total (setup + first month of service). From month 2, RM1,500/month.",
-      "Bulan pertama RM2,500 (penyediaan + bulan pertama perkhidmatan). Mulai bulan kedua, RM1,500/bulan."],
+    price_total: ["首月 RM2,500（含建站 + 首月服务）。第 2 个月起三选一，上线前确认；年付按 10 个月计；超出内容修改 RM150/小时；Token 费用另计。",
+      "First month RM2,500 (setup + first month). From month 2, choose one plan, confirmed before launch; annual billing is 10 months; extra content work RM150/hour; token charges separate.",
+      "Bulan pertama RM2,500 (penyediaan + bulan pertama). Mulai bulan 2, pilih satu pelan, disahkan sebelum pelancaran; bil tahunan 10 bulan; kerja kandungan tambahan RM150/jam; caj token berasingan."],
     price_li1: ["专属设计，不是模板套壳", "Dedicated design, not a template", "Reka bentuk khusus, bukan templat"],
     price_li2: ["域名、SSL、托管全包", "Domain, SSL and hosting included", "Domain, SSL dan hosting disertakan"],
     price_li3: ["按月付费，提前 30 天通知可取消", "Billed monthly; cancel with 30 days' notice", "Dibilkan bulanan; batal dengan notis 30 hari"],
     per_month: ["/ 月", "/ month", "/ bulan"],
     one_time: ["含建站 + 首月服务", "incl. setup + first month", "termasuk penyediaan + bulan pertama"],
-    inc_title: ["RM1,500/月，包含什么", "What RM1,500/month includes", "Apa yang termasuk dalam RM1,500/bulan"],
+    inc_title: ["第 2 个月起，包含什么", "What the monthly plans include", "Apa yang termasuk dalam pelan bulanan"],
     inc_sub: ["不是只给你一个空壳网站，而是能直接接客的线上门面。",
       "Not an empty shell — an online storefront that can take enquiries from day one.",
       "Bukan laman kosong — kedai dalam talian yang boleh menerima pertanyaan sejak hari pertama."],
@@ -448,7 +463,7 @@
     success_body: ["记下这个订单号，方便之后查询进度。我们会在 9am–12pm、1pm–4pm 服务时段内通过 WhatsApp 即时回复你。",
       "Keep this order number to check progress. We will reply on WhatsApp during the 9am–12pm and 1pm–4pm service windows.",
       "Simpan nombor pesanan ini untuk menyemak status. Kami akan membalas di WhatsApp dalam waktu perkhidmatan 9am–12pm dan 1pm–4pm."],
-    success_prices: ["首月 RM2,500（含建站 + 首月服务）· 之后 RM1,500/月", "First month RM2,500 (setup + first month) · then RM1,500/month", "Bulan pertama RM2,500 (penyediaan + bulan pertama) · kemudian RM1,500/bulan"],
+    success_prices: ["首月 RM2,500（含建站 + 首月服务）· 第 2 个月起 RM199 / 299 / 499", "First month RM2,500 (setup + first month) · from month 2: RM199 / 299 / 499", "Bulan pertama RM2,500 (penyediaan + bulan pertama) · mulai bulan 2: RM199 / 299 / 499"],
     success_status: ["当前状态", "Current status", "Status semasa"],
     success_next: ["接下来：确认需求 → 支付首月费用 → 按确认排期上线。", "Next: confirm scope → pay first month → go live on the agreed schedule.", "Seterusnya: sahkan skop → bayar bulan pertama → dilancarkan mengikut jadual yang dipersetujui."],
     st_new: ["新订单", "New", "Baharu"],
