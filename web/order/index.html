@@ -217,6 +217,29 @@
     .cta.wa{margin-bottom:10px}
     .wa-float{right:12px;bottom:12px;padding:10px 14px;font-size:12px}
   }
+
+  .hero-right{display:flex;flex-direction:column;gap:18px}
+  .demo{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 18px 40px rgba(14,36,56,.10)}
+  .demo-cap{font-size:10.5px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:0 0 6px}
+  .demo-bar{display:flex;align-items:center;gap:6px;padding:0 2px 10px}
+  .demo-bar i{width:9px;height:9px;border-radius:50%;background:#D8D2C7}
+  .demo-bar i:first-child{background:#C96A5B}
+  .demo-bar i:nth-child(2){background:#D9A85B}
+  .demo-bar i:nth-child(3){background:#6BA36B}
+  .demo-url{flex:1;margin-left:6px;background:var(--paper);border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--muted);padding:4px 10px;text-align:center}
+  .demo-body{background:linear-gradient(135deg,#0F2740,#173A57 60%,#9C5C2C 160%);border-radius:12px;padding:18px 16px;color:#fff;position:relative;overflow:hidden}
+  .demo-badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#F2D49B;border:1px solid rgba(242,212,155,.5);border-radius:999px;padding:3px 9px}
+  .demo-h{font-family:Georgia,serif;font-size:20px;line-height:1.2;margin:10px 0 8px;max-width:20ch}
+  .demo-p{height:7px;border-radius:4px;background:rgba(255,255,255,.28);margin:7px 0;width:86%}
+  .demo-p.short{width:58%}
+  .demo-cta{display:flex;gap:8px;margin-top:12px}
+  .demo-cta span{font-size:11px;border-radius:999px;padding:7px 12px}
+  .demo-cta span:first-child{background:#C6A15B;color:#0E2438;font-weight:700}
+  .demo-cta .demo-wa{background:#1F7A4D}
+  .demo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .demo-grid i{height:34px;border-radius:8px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.14)}
+  .demo-grid i:nth-child(2){background:rgba(198,161,91,.25)}
+  @media(max-width:900px){.demo{display:none}}
 </style>
 </head>
 <body>
@@ -259,7 +282,19 @@
       <p class="note-small" data-i18n="hero_note"></p>
     </div>
 
-    <aside class="price" aria-labelledby="pricetitle">
+    <div class="hero-right">
+      <div class="demo" aria-hidden="true">
+        <div class="demo-cap" data-i18n="demo_tag"></div>
+        <div class="demo-bar"><i></i><i></i><i></i><span class="demo-url" data-i18n="demo_url"></span></div>
+        <div class="demo-body">
+          <span class="demo-badge" data-i18n="demo_badge"></span>
+          <div class="demo-h" data-i18n="demo_h"></div>
+          <div class="demo-p"></div><div class="demo-p short"></div>
+          <div class="demo-cta"><span data-i18n="demo_cta"></span><span class="demo-wa" data-i18n="demo_wa"></span></div>
+          <div class="demo-grid"><i></i><i></i><i></i></div>
+        </div>
+      </div>
+      <aside class="price" aria-labelledby="pricetitle">
       <span class="tag" data-i18n="price_tag"></span>
       <div class="row">
         <span class="k" id="pricetitle" data-i18n="price_month_k"></span>
@@ -288,6 +323,7 @@
         <li data-i18n="price_li3"></li>
       </ul>
     </aside>
+    </div>
   </div>
 
   <section class="block" id="plans">
@@ -660,6 +696,12 @@
     err_brief: ["建站需求格式不正确，请检查链接与长度。", "Brief details look invalid. Please check the links and lengths.", "Butiran projek tidak sah. Sila semak pautan dan panjangnya."],
     footer_note: ["RoofX Web Studio · 马来西亚全行业建站", "RoofX Web Studio · Websites for every industry in Malaysia", "RoofX Web Studio · Laman web untuk semua industri di Malaysia"],
     footer_terms: ["服务条款", "Terms", "Terma"],
+    demo_tag: ["示例站效果", "Sample preview", "Pratonton contoh"],
+    demo_url: ["yourbrand.com", "yourbrand.com", "yourbrand.com"],
+    demo_badge: ["你的专属网站", "Your dedicated website", "Laman web khusus anda"],
+    demo_h: ["把访客变成客户", "Turn visitors into customers", "Tukar pelawat menjadi pelanggan"],
+    demo_cta: ["联系我们", "Contact us", "Hubungi kami"],
+    demo_wa: ["WhatsApp", "WhatsApp", "WhatsApp"],
     promo_left: ["马来西亚全行业建站 · 首月 RM2,500 含建站 + 首月服务",
       "Malaysia websites for every industry · first month RM2,500 includes setup + first month",
       "Laman web Malaysia untuk semua industri · bulan pertama RM2,500 termasuk penyediaan + bulan pertama"],
