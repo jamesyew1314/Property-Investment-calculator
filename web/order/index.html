@@ -333,6 +333,15 @@
   .phone-card{height:22px;border-radius:5px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.15);margin-bottom:5px}
   .phone-card.short{height:16px;width:70%}
   @media(max-width:900px){.device-stage{display:none}}
+
+  .offer-stamp{display:inline-flex;align-items:baseline;gap:10px;background:#FFD400;color:#071A3A;
+    border-radius:14px;padding:10px 16px;margin:0 0 16px;box-shadow:0 12px 26px rgba(0,0,0,.25);flex-wrap:wrap}
+  .offer-stamp .os-label{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5A4300}
+  .offer-stamp strong{font-size:30px;line-height:1;font-weight:900;letter-spacing:-.5px}
+  .offer-stamp .os-sub{font-size:12px;font-weight:700;color:#3A2D00}
+  .scroll-cue{display:inline-block;margin:2px 0 0 12px;color:#FFD400;font-size:12.5px;font-weight:700;text-decoration:none}
+  .scroll-cue:hover{text-decoration:underline}
+  @media(max-width:640px){.offer-stamp strong{font-size:26px}.scroll-cue{display:block;margin:4px 0 0}}
 </style>
 </head>
 <body>
@@ -363,15 +372,16 @@
       <p class="lead" data-i18n="lead"></p>
       <div class="trustrow">
         <span data-i18n="trust_1"></span><span data-i18n="trust_2"></span>
-        <span data-i18n="trust_3"></span><span data-i18n="trust_4"></span>
+        <span data-i18n="trust_3"></span>
       </div>
-      <div class="chips">
-        <span class="chip"><b>RM299</b> <span data-i18n="chip_month"></span></span>
-        <span class="chip"><b>RM2,500</b> <span data-i18n="chip_setup"></span></span>
-        <span class="chip" data-i18n="chip_turnaround"></span>
+      <div class="offer-stamp">
+        <span class="os-label" data-i18n="offer_label"></span>
+        <strong>RM2,500</strong>
+        <span class="os-sub" data-i18n="offer_sub"></span>
       </div>
       <a class="cta wa" href="https://wa.me/60165280918?text=Hi%20RoofX%2C%20I%20want%20a%20website" target="_blank" rel="noopener" data-i18n="cta_wa"></a>
-      <a class="cta ghost" href="#included" data-i18n="cta_secondary"></a>
+      <a class="cta ghost" href="#plans" data-i18n="cta_secondary"></a>
+      <a class="scroll-cue" href="#plans" data-i18n="scroll_cue"></a>
       <p class="note-small" data-i18n="hero_note"></p>
     </div>
 
@@ -654,9 +664,9 @@
     eyebrow: ["马来西亚 · 企业网站设计", "Malaysia · corporate website design", "Malaysia · reka bentuk laman web korporat"],
     h1a: ["专业企业网站", "Professional business websites", "Laman web perniagaan profesional"],
     h1b: ["让客户主动找上门", "that bring customers to you", "yang membawa pelanggan kepada anda"],
-    lead: ["多页面企业网站、手机自适应、基础 SEO、WhatsApp 直达、内容导入。首月 RM2,500 含建站 + 首月服务，之后低至 RM199/月。",
-      "Multi-page business website, mobile responsive, basic SEO, WhatsApp click-to-chat and content import. First month RM2,500 includes setup + first month; from RM199/month after.",
-      "Laman web perniagaan berbilang halaman, mudah alih, SEO asas, WhatsApp terus dan import kandungan. Bulan pertama RM2,500 termasuk penyediaan + bulan pertama; mulai RM199/bulan selepas itu."],
+    lead: ["多页面企业网站、手机自适应、基础 SEO、WhatsApp 直达、内容导入。上线后月费低至 RM199。",
+      "Multi-page business website, mobile responsive, basic SEO, WhatsApp click-to-chat and content import. Monthly plans from RM199 after launch.",
+      "Laman web perniagaan berbilang halaman, mudah alih, SEO asas, WhatsApp terus dan import kandungan. Pelan bulanan dari RM199 selepas dilancarkan."],
     chip_month: ["/ 月", "/ month", "/ bulan"],
     chip_setup: ["首月总价（含建站）", "first month total (incl. setup)", "jumlah bulan pertama (termasuk penyediaan)"],
     chip_turnaround: ["固定服务 9am–12pm / 1pm–4pm", "Fixed service 9am–12pm / 1pm–4pm", "Perkhidmatan tetap 9am–12pm / 1pm–4pm"],
@@ -814,6 +824,9 @@
     trust_3: ["WhatsApp 直达", "WhatsApp direct", "WhatsApp terus"],
     trust_4: ["固定服务时段", "Fixed service hours", "Waktu perkhidmatan tetap"],
     cta_wa: ["WhatsApp 咨询", "WhatsApp us", "WhatsApp kami"],
+    offer_label: ["首月总价", "First month", "Bulan pertama"],
+    offer_sub: ["含建站 + 首月服务", "includes setup + first month", "termasuk penyediaan + bulan pertama"],
+    scroll_cue: ["往下看方案与价格 ↓", "See plans & pricing ↓", "Lihat pelan & harga ↓"],
     wa_float: ["WhatsApp 咨询", "WhatsApp us", "WhatsApp kami"],
     faq_title: ["常见问题", "Common questions", "Soalan lazim"],
     faq_sub: ["先看答案，再决定要不要聊。", "Read the answers first, then decide whether to talk.", "Baca jawapan dahulu, kemudian tentukan sama ada mahu berbincang."],
