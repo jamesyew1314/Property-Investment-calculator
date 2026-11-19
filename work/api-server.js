@@ -15,6 +15,7 @@ const createOrderApi = require("./order-api");
 const createClientApi = require("./client-api");
 const { createTokenUsageApi } = require("./token-usage");
 const { createPaymentsApi } = require("./payments");
+const { createAbApi } = require("./ab-test");
 const renderAgentPage = require("./agent-page");
 const renderPublicListing = require("./public-page");
 const runDigest = require("./digest");
@@ -1563,6 +1564,9 @@ app.use("/api/client", createClientApi({
 
 // ---------- 自动 token 计量（开发侧 meter 内部上报） ----------
 app.use("/api/internal", createTokenUsageApi({ pool: pool }));
+
+// ---------- 主页标题 A/B 测试 ----------
+app.use("/api/ab", createAbApi({ pool: pool, requireAdmin: requireAdmin, rateLimit: rateLimit }));
 
 // ---------- 在线支付（Billplz Phase A） ----------
 app.use("/api/internal/payments", createPaymentsApi({

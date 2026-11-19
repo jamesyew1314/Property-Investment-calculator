@@ -204,6 +204,19 @@
     <h1 data-i18n="title"></h1>
     <p class="sub" data-i18n="sub"></p>
 
+    <div id="abbox" style="background:#fff;border:1px solid #E4DED2;border-radius:14px;padding:14px 16px;margin:0 0 16px">
+      <h3 style="margin:0 0 4px;font-size:14px;color:#0F2740" data-i18n="ab_title"></h3>
+      <p style="margin:0 0 8px;font-size:12px;color:#6B7785" data-i18n="ab_note"></p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:170px;background:#F7F4EE;border-radius:10px;padding:10px 12px">
+          <b>A · <span data-i18n="ab_variant_a"></span></b><span id="ab-a" style="float:right;font-weight:600">—</span>
+        </div>
+        <div style="flex:1;min-width:170px;background:#F7F4EE;border-radius:10px;padding:10px 12px">
+          <b>B · <span data-i18n="ab_variant_b"></span></b><span id="ab-b" style="float:right;font-weight:600">—</span>
+        </div>
+      </div>
+    </div>
+
     <div class="toolbar">
       <div class="field">
         <label for="fstatus" data-i18n="filter_status"></label>
@@ -423,6 +436,10 @@
     bill_open: ["打开付款链接", "Open payment link", "Buka pautan bayaran"],
     gen_bill: ["生成付款链接", "Create payment link", "Jana pautan bayaran"],
     gateway_not_configured: ["支付网关未配置（缺 BILLPLZ_API_KEY / BILLPLZ_COLLECTION_ID）", "Payment gateway not configured (missing BILLPLZ_API_KEY / BILLPLZ_COLLECTION_ID)", "Gerbang pembayaran belum dikonfigurasi (tiada BILLPLZ_API_KEY / BILLPLZ_COLLECTION_ID)"],
+    ab_title: ["主页标题 A/B 测试", "Homepage headline A/B test", "Ujian A/B tajuk laman utama"],
+    ab_note: ["浏览 / 转化（WhatsApp + 表单）· 转化率", "Views / conversions (WhatsApp + form) · conversion rate", "Paparan / penukaran (WhatsApp + borang) · kadar penukaran"],
+    ab_variant_a: ["专业企业网站 · 让客户主动找上门", "Professional websites · bring customers to you", "Laman web profesional · bawa pelanggan kepada anda"],
+    ab_variant_b: ["你的网站 · 是你的业务员", "Your website · is your salesperson", "Laman web anda · ialah jurujual anda"],
     plan_care: ["托管维护", "Hosting care", "Penjagaan hosting"],
     plan_content: ["托管 + 内容", "Care + content", "Penjagaan + kandungan"],
     plan_growth: ["内容成长", "Content growth", "Pertumbuhan kandungan"],
@@ -665,6 +682,20 @@
   function showApp() {
     $("gate").hidden = true;
     $("app").hidden = false;
+    loadAb();
+  }
+
+  function fmtAb(v) {
+    v = v || {};
+    return (v.views || 0) + " / " + (v.conversions || 0) + " (" + (v.ctr || 0) + "%)";
+  }
+  function loadAb() {
+    if (!$("abbox")) return;
+    fetchJson("/api/ab/summary").then(function (j) {
+      if (!j || !j.ok || !j.variants) return;
+      $("ab-a").textContent = fmtAb(j.variants.A);
+      $("ab-b").textContent = fmtAb(j.variants.B);
+    }).catch(function () {});
   }
 
   function fetchJson(url, opts) {

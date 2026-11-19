@@ -847,6 +847,41 @@
   var lang = q.get("lang") || localStorage.getItem("kt_lang") || localStorage.getItem("kwongthye_lang") || "zh";
   if (!INDEX.hasOwnProperty(lang)) lang = "zh";
 
+  // ---------- 首屏标题 A/B（50/50，localStorage 稳定分流） ----------
+  var AB_KEY = "roofx_hero_ab";
+  var heroVariant = "A";
+  try {
+    var abv = localStorage.getItem(AB_KEY);
+    if (abv === "A" || abv === "B") heroVariant = abv;
+    else {
+      heroVariant = Math.random() < 0.5 ? "A" : "B";
+      localStorage.setItem(AB_KEY, heroVariant);
+    }
+  } catch (e) {}
+  var AB_HERO = {
+    A: { h1a: ["专业企业网站", "Professional business websites", "Laman web perniagaan profesional"],
+         h1b: ["让客户主动找上门", "that bring customers to you", "yang membawa pelanggan kepada anda"] },
+    B: { h1a: ["你的网站", "Your website", "Laman web anda"],
+         h1b: ["是你的业务员", "is your salesperson", "ialah jurujual anda"] }
+  };
+  function trackAb(event) {
+    try {
+      fetch("/api/ab/event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event: event, variant: heroVariant, path: location.pathname }),
+        keepalive: true
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  function applyHeroVariant() {
+    var c = AB_HERO[heroVariant];
+    var a = document.querySelector('[data-i18n="h1a"]');
+    var b = document.querySelector('[data-i18n="h1b"]');
+    if (a && c) a.textContent = c.h1a[INDEX[lang]] || c.h1a[0];
+    if (b && c) b.textContent = c.h1b[INDEX[lang]] || c.h1b[0];
+  }
+
   function t(key) {
     var v = I18N[key];
     return v ? (v[INDEX[lang]] || v[0]) : key;
@@ -872,6 +907,7 @@
     if (lastOrder) {
       document.getElementById("orderstatus").textContent = t("st_" + lastOrder.status) || lastOrder.status;
     }
+    applyHeroVariant();
   }
 
   function setLang(next) {
@@ -890,6 +926,13 @@
     var b = e.target.closest("button[data-lang]");
     if (b) setLang(b.getAttribute("data-lang"));
   });
+
+  var waCta = document.querySelector(".cta.wa");
+  if (waCta) waCta.addEventListener("click", function () { trackAb("whatsapp_click"); });
+  var ghostCta = document.querySelector(".cta.ghost");
+  if (ghostCta) ghostCta.addEventListener("click", function () { trackAb("plans_click"); });
+  var cue = document.querySelector(".scroll-cue");
+  if (cue) cue.addEventListener("click", function () { trackAb("plans_click"); });
 
   var lastOrder = null;
   var form = document.getElementById("orderform");
@@ -1004,6 +1047,7 @@
         document.getElementById("formcard").hidden = true;
         document.getElementById("success").classList.add("show");
         document.getElementById("success").scrollIntoView({ behavior: "smooth", block: "center" });
+        trackAb("form_submit");
         return;
       }
       if (r.status === 429) { showErr(t("err_rate")); return; }
@@ -1024,6 +1068,7 @@
 
   document.getElementById("year").textContent = String(new Date().getFullYear());
   apply();
+  trackAb("view");
 })();
 </script>
 </body>
